@@ -456,10 +456,55 @@ export interface paths {
                                 joinToken: string | null;
                                 /** @description 聚會時段 */
                                 sessions: {
-                                    id: number;
+                                    /**
+                                     * @description 聚會日期
+                                     * @example 2026-10-01
+                                     */
                                     sessionDate: string;
+                                    /**
+                                     * @description 開始時間（HH:MM），可為 null
+                                     * @example 14:00
+                                     */
                                     startTime: string | null;
+                                    /**
+                                     * @description 結束時間（HH:MM），可為 null
+                                     * @example 16:00
+                                     */
                                     endTime: string | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description 穩定規律群組 ID；非規律時段為 null
+                                     */
+                                    recurrenceGroupId?: string | null;
+                                    /**
+                                     * CohortRecurrenceRule
+                                     * @description 群組原始規則；非規律時段為 null
+                                     */
+                                    recurrenceRule?: {
+                                        /**
+                                         * @description 規律範圍起始日期
+                                         * @example 2026-11-10
+                                         */
+                                        startDate: string;
+                                        /**
+                                         * @description 持續週數（1–52）
+                                         * @example 4
+                                         */
+                                        weeks: number;
+                                        /**
+                                         * @description ISO 星期：週一1至週日7
+                                         * @example [
+                                         *       2,
+                                         *       4
+                                         *     ]
+                                         */
+                                        weekdays: number[];
+                                    } | null;
+                                    /**
+                                     * @description 聚會時段 ID
+                                     * @example 1
+                                     */
+                                    id: number;
                                 }[];
                                 /** @description 外部報名連結 */
                                 externalSignupUrl: string | null;
@@ -473,6 +518,11 @@ export interface paths {
                                 };
                                 /** @description 組織設定的邀請文案 */
                                 inviteMessage: string | null;
+                                /**
+                                 * @description 場次共用 IANA 時區
+                                 * @example Asia/Taipei
+                                 */
+                                timezone: string;
                             };
                             /**
                              * Format: date-time
@@ -550,10 +600,7 @@ export interface paths {
         /** 挑戰主題列表 */
         get: {
             parameters: {
-                query?: {
-                    /** @description 只列某組織底下的挑戰主題 */
-                    organizationId?: number;
-                };
+                query?: never;
                 header?: never;
                 path?: never;
                 cookie?: never;
@@ -657,8 +704,6 @@ export interface paths {
             requestBody?: {
                 content: {
                     "application/json": {
-                        /** @description 所屬組織 ID（通常為島島官方組織） */
-                        organizationId: number;
                         /** @example 晨間書寫 */
                         name: string;
                         description?: string | null;
@@ -1864,10 +1909,7 @@ export interface paths {
         /** 組織模板列表 */
         get: {
             parameters: {
-                query: {
-                    /** @description 組織 ID（模板隸屬組織） */
-                    organizationId: number;
-                };
+                query?: never;
                 header?: never;
                 path?: never;
                 cookie?: never;
@@ -1997,7 +2039,6 @@ export interface paths {
                         /** @default [] */
                         practiceTimePeriods?: ("morning" | "afternoon" | "evening" | "night" | "commute")[];
                         resources?: components["schemas"]["PracticeResourceInput"][];
-                        organizationId: number;
                     };
                 };
             };
@@ -6730,13 +6771,13 @@ export interface paths {
                                  * @enum {string}
                                  */
                                 runStatus: "upcoming" | "ongoing" | "ended";
-                                /** @description 目前是否可加入 */
+                                /** @description 目前是否可加入（只有未開始的挑戰可加入） */
                                 canJoin: boolean;
                                 /**
-                                 * @description 不可加入原因；可加入時為 null
+                                 * @description 不可加入原因；started＝已開始（進行中）不接受新加入；可加入時為 null
                                  * @enum {string|null}
                                  */
-                                unavailableReason: "ended" | "expired" | "full" | "paused" | null;
+                                unavailableReason: "ended" | "started" | "expired" | "full" | "paused" | null;
                                 /** @description 當前使用者是否已加入；未登入一律 false */
                                 isJoined: boolean;
                                 /** @description 是否有指派靈感卡卡組（顯示抽卡 icon） */
@@ -6883,13 +6924,13 @@ export interface paths {
                                  * @enum {string}
                                  */
                                 runStatus: "upcoming" | "ongoing" | "ended";
-                                /** @description 目前是否可加入 */
+                                /** @description 目前是否可加入（只有未開始的挑戰可加入） */
                                 canJoin: boolean;
                                 /**
-                                 * @description 不可加入原因；可加入時為 null
+                                 * @description 不可加入原因；started＝已開始（進行中）不接受新加入；可加入時為 null
                                  * @enum {string|null}
                                  */
-                                unavailableReason: "ended" | "expired" | "full" | "paused" | null;
+                                unavailableReason: "ended" | "started" | "expired" | "full" | "paused" | null;
                                 /** @description 當前使用者是否已加入；未登入一律 false */
                                 isJoined: boolean;
                                 /** @description 是否有指派靈感卡卡組（顯示抽卡 icon） */
@@ -7841,8 +7882,8 @@ export interface paths {
                 query?: {
                     /** @description 取此 ID 之前的訊息（歷史分頁） */
                     before?: number;
-                    /** @description 取此 ID 之後的新訊息（增量輪詢） */
-                    after?: number;
+                    /** @description 取此 ID 之後的新訊息（增量輪詢）；聊天室還沒有訊息時傳 0 */
+                    after?: number | null;
                     /** @description ISO 時間戳，搭配 after 使用，回傳 changed/deletedIds */
                     since?: string;
                     /** @description 每頁筆數（預設 50，上限 100） */
@@ -9694,10 +9735,55 @@ export interface paths {
                                 location: string | null;
                                 /** @description 聚會時段 */
                                 sessions: {
-                                    id: number;
+                                    /**
+                                     * @description 聚會日期
+                                     * @example 2026-10-01
+                                     */
                                     sessionDate: string;
+                                    /**
+                                     * @description 開始時間（HH:MM），可為 null
+                                     * @example 14:00
+                                     */
                                     startTime: string | null;
+                                    /**
+                                     * @description 結束時間（HH:MM），可為 null
+                                     * @example 16:00
+                                     */
                                     endTime: string | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description 穩定規律群組 ID；非規律時段為 null
+                                     */
+                                    recurrenceGroupId?: string | null;
+                                    /**
+                                     * CohortRecurrenceRule
+                                     * @description 群組原始規則；非規律時段為 null
+                                     */
+                                    recurrenceRule?: {
+                                        /**
+                                         * @description 規律範圍起始日期
+                                         * @example 2026-11-10
+                                         */
+                                        startDate: string;
+                                        /**
+                                         * @description 持續週數（1–52）
+                                         * @example 4
+                                         */
+                                        weeks: number;
+                                        /**
+                                         * @description ISO 星期：週一1至週日7
+                                         * @example [
+                                         *       2,
+                                         *       4
+                                         *     ]
+                                         */
+                                        weekdays: number[];
+                                    } | null;
+                                    /**
+                                     * @description 聚會時段 ID
+                                     * @example 1
+                                     */
+                                    id: number;
                                 }[];
                                 /** @enum {string} */
                                 feeType: "free" | "paid";
@@ -9720,6 +9806,8 @@ export interface paths {
                                 canJoin: boolean;
                                 /** @enum {string|null} */
                                 unavailableReason: "not_published" | "expired" | "full" | "paused" | null;
+                                /** @description 所有成立的不可加入原因（依優先序，第一個等於 unavailableReason）；可加入時為空陣列 */
+                                unavailableReasons: ("not_published" | "expired" | "full" | "paused")[];
                                 /**
                                  * CohortPrivacy
                                  * @description 隱私設定
@@ -9738,6 +9826,11 @@ export interface paths {
                                     bio: string | null;
                                     externalLink: string | null;
                                 };
+                                /**
+                                 * @description 場次共用 IANA 時區
+                                 * @example Asia/Taipei
+                                 */
+                                timezone: string;
                             };
                             /**
                              * Format: date-time
@@ -9953,10 +10046,55 @@ export interface paths {
                                 location: string | null;
                                 /** @description 聚會時段 */
                                 sessions: {
-                                    id: number;
+                                    /**
+                                     * @description 聚會日期
+                                     * @example 2026-10-01
+                                     */
                                     sessionDate: string;
+                                    /**
+                                     * @description 開始時間（HH:MM），可為 null
+                                     * @example 14:00
+                                     */
                                     startTime: string | null;
+                                    /**
+                                     * @description 結束時間（HH:MM），可為 null
+                                     * @example 16:00
+                                     */
                                     endTime: string | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description 穩定規律群組 ID；非規律時段為 null
+                                     */
+                                    recurrenceGroupId?: string | null;
+                                    /**
+                                     * CohortRecurrenceRule
+                                     * @description 群組原始規則；非規律時段為 null
+                                     */
+                                    recurrenceRule?: {
+                                        /**
+                                         * @description 規律範圍起始日期
+                                         * @example 2026-11-10
+                                         */
+                                        startDate: string;
+                                        /**
+                                         * @description 持續週數（1–52）
+                                         * @example 4
+                                         */
+                                        weeks: number;
+                                        /**
+                                         * @description ISO 星期：週一1至週日7
+                                         * @example [
+                                         *       2,
+                                         *       4
+                                         *     ]
+                                         */
+                                        weekdays: number[];
+                                    } | null;
+                                    /**
+                                     * @description 聚會時段 ID
+                                     * @example 1
+                                     */
+                                    id: number;
                                 }[];
                                 /** @enum {string} */
                                 feeType: "free" | "paid";
@@ -9996,6 +10134,11 @@ export interface paths {
                                     lastCheckinAt: string | null;
                                     themeColor: string | null;
                                 }[];
+                                /**
+                                 * @description 場次共用 IANA 時區
+                                 * @example Asia/Taipei
+                                 */
+                                timezone: string;
                             };
                             /**
                              * Format: date-time
@@ -13997,13 +14140,13 @@ export interface paths {
                                  * @enum {string}
                                  */
                                 runStatus: "upcoming" | "ongoing" | "ended";
-                                /** @description 目前是否可加入 */
+                                /** @description 目前是否可加入（只有未開始的挑戰可加入） */
                                 canJoin: boolean;
                                 /**
-                                 * @description 不可加入原因；可加入時為 null
+                                 * @description 不可加入原因；started＝已開始（進行中）不接受新加入；可加入時為 null
                                  * @enum {string|null}
                                  */
-                                unavailableReason: "ended" | "expired" | "full" | "paused" | null;
+                                unavailableReason: "ended" | "started" | "expired" | "full" | "paused" | null;
                                 /** @description 當前使用者是否已加入；未登入一律 false */
                                 isJoined: boolean;
                                 /** @description 是否有指派靈感卡卡組（顯示抽卡 icon） */
@@ -15859,7 +16002,65 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        delete?: never;
+        /** 拒絕刪除驗收 fixture 組織（不提供組織刪除功能） */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    organizationId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 組織 ID 驗證失敗 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description 參數驗證失敗
+                             * @example false
+                             * @enum {boolean}
+                             */
+                            success: false;
+                            error: {
+                                /**
+                                 * @description 驗證錯誤類型
+                                 * @example bad_request
+                                 * @enum {string}
+                                 */
+                                type: "bad_request";
+                                /**
+                                 * @description 錯誤說明
+                                 * @example 驗證失敗
+                                 */
+                                message: string;
+                                /** @description 欄位驗證錯誤清單 */
+                                details: {
+                                    /**
+                                     * @description 錯誤欄位
+                                     * @example organizationId
+                                     */
+                                    path: string;
+                                    /**
+                                     * @description 欄位驗證錯誤說明
+                                     * @example Invalid input: expected number, received NaN
+                                     */
+                                    message: string;
+                                }[];
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                404: components["responses"]["NotFoundError"];
+            };
+        };
         options?: never;
         head?: never;
         /** Admin 編輯或停權組織 */
@@ -16836,6 +17037,11 @@ export interface paths {
                                 capacity: number | null;
                                 inviteMessage: string | null;
                                 showInviteMessageOnSignup: boolean;
+                                /**
+                                 * @description 場次共用 IANA 時區
+                                 * @example Asia/Taipei
+                                 */
+                                timezone: string;
                                 /** @description 互動方式 */
                                 interactionModes: ("sync" | "async" | "physical")[];
                                 /** @description 會議連結 */
@@ -16859,6 +17065,35 @@ export interface paths {
                                      * @example 16:00
                                      */
                                     endTime: string | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description 穩定規律群組 ID；非規律時段為 null
+                                     */
+                                    recurrenceGroupId?: string | null;
+                                    /**
+                                     * CohortRecurrenceRule
+                                     * @description 群組原始規則；非規律時段為 null
+                                     */
+                                    recurrenceRule?: {
+                                        /**
+                                         * @description 規律範圍起始日期
+                                         * @example 2026-11-10
+                                         */
+                                        startDate: string;
+                                        /**
+                                         * @description 持續週數（1–52）
+                                         * @example 4
+                                         */
+                                        weeks: number;
+                                        /**
+                                         * @description ISO 星期：週一1至週日7
+                                         * @example [
+                                         *       2,
+                                         *       4
+                                         *     ]
+                                         */
+                                        weekdays: number[];
+                                    } | null;
                                     /**
                                      * @description 聚會時段 ID
                                      * @example 1
@@ -17034,6 +17269,35 @@ export interface paths {
                              * @example 16:00
                              */
                             endTime: string | null;
+                            /**
+                             * Format: uuid
+                             * @description 穩定規律群組 ID；非規律時段為 null
+                             */
+                            recurrenceGroupId?: string | null;
+                            /**
+                             * CohortRecurrenceRule
+                             * @description 群組原始規則；非規律時段為 null
+                             */
+                            recurrenceRule?: {
+                                /**
+                                 * @description 規律範圍起始日期
+                                 * @example 2026-11-10
+                                 */
+                                startDate: string;
+                                /**
+                                 * @description 持續週數（1–52）
+                                 * @example 4
+                                 */
+                                weeks: number;
+                                /**
+                                 * @description ISO 星期：週一1至週日7
+                                 * @example [
+                                 *       2,
+                                 *       4
+                                 *     ]
+                                 */
+                                weekdays: number[];
+                            } | null;
                         }[];
                         /**
                          * @description 收費類型：free（免費）、paid（付費）
@@ -17083,6 +17347,11 @@ export interface paths {
                          * @enum {string}
                          */
                         status?: "draft" | "published" | "archived";
+                        /**
+                         * @description 場次共用 IANA 時區
+                         * @example Asia/Taipei
+                         */
+                        timezone?: string;
                     };
                 };
             };
@@ -17144,6 +17413,35 @@ export interface paths {
                                      */
                                     endTime: string | null;
                                     /**
+                                     * Format: uuid
+                                     * @description 穩定規律群組 ID；非規律時段為 null
+                                     */
+                                    recurrenceGroupId?: string | null;
+                                    /**
+                                     * CohortRecurrenceRule
+                                     * @description 群組原始規則；非規律時段為 null
+                                     */
+                                    recurrenceRule?: {
+                                        /**
+                                         * @description 規律範圍起始日期
+                                         * @example 2026-11-10
+                                         */
+                                        startDate: string;
+                                        /**
+                                         * @description 持續週數（1–52）
+                                         * @example 4
+                                         */
+                                        weeks: number;
+                                        /**
+                                         * @description ISO 星期：週一1至週日7
+                                         * @example [
+                                         *       2,
+                                         *       4
+                                         *     ]
+                                         */
+                                        weekdays: number[];
+                                    } | null;
+                                    /**
                                      * @description 聚會時段 ID
                                      * @example 1
                                      */
@@ -17192,6 +17490,11 @@ export interface paths {
                                 createdAt: string;
                                 /** Format: date-time */
                                 updatedAt: string | null;
+                                /**
+                                 * @description 場次共用 IANA 時區
+                                 * @example Asia/Taipei
+                                 */
+                                timezone: string;
                             };
                             /**
                              * Format: date-time
@@ -17336,6 +17639,35 @@ export interface paths {
                                      */
                                     endTime: string | null;
                                     /**
+                                     * Format: uuid
+                                     * @description 穩定規律群組 ID；非規律時段為 null
+                                     */
+                                    recurrenceGroupId?: string | null;
+                                    /**
+                                     * CohortRecurrenceRule
+                                     * @description 群組原始規則；非規律時段為 null
+                                     */
+                                    recurrenceRule?: {
+                                        /**
+                                         * @description 規律範圍起始日期
+                                         * @example 2026-11-10
+                                         */
+                                        startDate: string;
+                                        /**
+                                         * @description 持續週數（1–52）
+                                         * @example 4
+                                         */
+                                        weeks: number;
+                                        /**
+                                         * @description ISO 星期：週一1至週日7
+                                         * @example [
+                                         *       2,
+                                         *       4
+                                         *     ]
+                                         */
+                                        weekdays: number[];
+                                    } | null;
+                                    /**
                                      * @description 聚會時段 ID
                                      * @example 1
                                      */
@@ -17384,6 +17716,11 @@ export interface paths {
                                 createdAt: string;
                                 /** Format: date-time */
                                 updatedAt: string | null;
+                                /**
+                                 * @description 場次共用 IANA 時區
+                                 * @example Asia/Taipei
+                                 */
+                                timezone: string;
                             };
                             /**
                              * Format: date-time
@@ -17516,6 +17853,35 @@ export interface paths {
                              * @example 16:00
                              */
                             endTime: string | null;
+                            /**
+                             * Format: uuid
+                             * @description 穩定規律群組 ID；非規律時段為 null
+                             */
+                            recurrenceGroupId?: string | null;
+                            /**
+                             * CohortRecurrenceRule
+                             * @description 群組原始規則；非規律時段為 null
+                             */
+                            recurrenceRule?: {
+                                /**
+                                 * @description 規律範圍起始日期
+                                 * @example 2026-11-10
+                                 */
+                                startDate: string;
+                                /**
+                                 * @description 持續週數（1–52）
+                                 * @example 4
+                                 */
+                                weeks: number;
+                                /**
+                                 * @description ISO 星期：週一1至週日7
+                                 * @example [
+                                 *       2,
+                                 *       4
+                                 *     ]
+                                 */
+                                weekdays: number[];
+                            } | null;
                         }[];
                         /**
                          * @description 收費類型：free（免費）、paid（付費）
@@ -17543,6 +17909,11 @@ export interface paths {
                         visibility?: "private" | "public";
                         /** @enum {string} */
                         status?: "draft" | "published" | "archived";
+                        /**
+                         * @description 場次共用 IANA 時區
+                         * @example Asia/Taipei
+                         */
+                        timezone?: string;
                     };
                 };
             };
@@ -17604,6 +17975,35 @@ export interface paths {
                                      */
                                     endTime: string | null;
                                     /**
+                                     * Format: uuid
+                                     * @description 穩定規律群組 ID；非規律時段為 null
+                                     */
+                                    recurrenceGroupId?: string | null;
+                                    /**
+                                     * CohortRecurrenceRule
+                                     * @description 群組原始規則；非規律時段為 null
+                                     */
+                                    recurrenceRule?: {
+                                        /**
+                                         * @description 規律範圍起始日期
+                                         * @example 2026-11-10
+                                         */
+                                        startDate: string;
+                                        /**
+                                         * @description 持續週數（1–52）
+                                         * @example 4
+                                         */
+                                        weeks: number;
+                                        /**
+                                         * @description ISO 星期：週一1至週日7
+                                         * @example [
+                                         *       2,
+                                         *       4
+                                         *     ]
+                                         */
+                                        weekdays: number[];
+                                    } | null;
+                                    /**
                                      * @description 聚會時段 ID
                                      * @example 1
                                      */
@@ -17654,6 +18054,11 @@ export interface paths {
                                 updatedAt: string | null;
                                 /** @description 切換隱私時影響的實踐數量 */
                                 affectedPracticeCount?: number;
+                                /**
+                                 * @description 場次共用 IANA 時區
+                                 * @example Asia/Taipei
+                                 */
+                                timezone: string;
                             };
                             /**
                              * Format: date-time
@@ -18714,6 +19119,35 @@ export interface paths {
                                      */
                                     endTime: string | null;
                                     /**
+                                     * Format: uuid
+                                     * @description 穩定規律群組 ID；非規律時段為 null
+                                     */
+                                    recurrenceGroupId?: string | null;
+                                    /**
+                                     * CohortRecurrenceRule
+                                     * @description 群組原始規則；非規律時段為 null
+                                     */
+                                    recurrenceRule?: {
+                                        /**
+                                         * @description 規律範圍起始日期
+                                         * @example 2026-11-10
+                                         */
+                                        startDate: string;
+                                        /**
+                                         * @description 持續週數（1–52）
+                                         * @example 4
+                                         */
+                                        weeks: number;
+                                        /**
+                                         * @description ISO 星期：週一1至週日7
+                                         * @example [
+                                         *       2,
+                                         *       4
+                                         *     ]
+                                         */
+                                        weekdays: number[];
+                                    } | null;
+                                    /**
                                      * @description 聚會時段 ID
                                      * @example 1
                                      */
@@ -18762,6 +19196,11 @@ export interface paths {
                                 createdAt: string;
                                 /** Format: date-time */
                                 updatedAt: string | null;
+                                /**
+                                 * @description 場次共用 IANA 時區
+                                 * @example Asia/Taipei
+                                 */
+                                timezone: string;
                             };
                             /**
                              * Format: date-time
@@ -18881,6 +19320,11 @@ export interface paths {
                                 capacity: number | null;
                                 inviteMessage: string | null;
                                 showInviteMessageOnSignup: boolean;
+                                /**
+                                 * @description 場次共用 IANA 時區
+                                 * @example Asia/Taipei
+                                 */
+                                timezone: string;
                                 /** @description 互動方式 */
                                 interactionModes: ("sync" | "async" | "physical")[];
                                 /** @description 會議連結 */
@@ -18904,6 +19348,35 @@ export interface paths {
                                      * @example 16:00
                                      */
                                     endTime: string | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description 穩定規律群組 ID；非規律時段為 null
+                                     */
+                                    recurrenceGroupId?: string | null;
+                                    /**
+                                     * CohortRecurrenceRule
+                                     * @description 群組原始規則；非規律時段為 null
+                                     */
+                                    recurrenceRule?: {
+                                        /**
+                                         * @description 規律範圍起始日期
+                                         * @example 2026-11-10
+                                         */
+                                        startDate: string;
+                                        /**
+                                         * @description 持續週數（1–52）
+                                         * @example 4
+                                         */
+                                        weeks: number;
+                                        /**
+                                         * @description ISO 星期：週一1至週日7
+                                         * @example [
+                                         *       2,
+                                         *       4
+                                         *     ]
+                                         */
+                                        weekdays: number[];
+                                    } | null;
                                     /**
                                      * @description 聚會時段 ID
                                      * @example 1
@@ -42417,6 +42890,11 @@ export interface components {
              * @example 3
              */
             dayNumber?: number | null;
+            /**
+             * @description 教練加入的資源（燈塔本期草稿由模板帶入），學員不可移除或修改；退出本期後解除
+             * @example false
+             */
+            isLocked?: boolean;
         };
         /**
          * @description 實踐活動詳細資訊
@@ -42496,6 +42974,11 @@ export interface components {
              */
             isChallenge?: boolean;
             /**
+             * @description 是否為燈塔場次實踐（隱私由場次統一設定，學員不可修改；只在詳情回傳）
+             * @example false
+             */
+            isCohortPrivacyLocked?: boolean;
+            /**
              * @description 實踐行動描述
              * @example 閱讀技術書籍或文章
              */
@@ -42553,6 +43036,11 @@ export interface components {
              * @enum {string}
              */
             status: "draft" | "not_started" | "active" | "completed" | "archived";
+            /**
+             * @description 隱私狀態（private／public／delayed）
+             * @example public
+             */
+            privacyStatus?: string;
             /**
              * @description 是否有相關資源
              * @example true
@@ -48704,6 +49192,26 @@ export interface components {
              */
             created_at: string;
             actor: components["schemas"]["NotificationActor"];
+            /**
+             * @description 通知關聯內容的名稱
+             * @example 學習地圖
+             */
+            entityTitle?: string;
+            /**
+             * @description 場次名稱；歷史資料可能缺少
+             * @example 夏季期
+             */
+            cohortName?: string;
+            /**
+             * @description 事件說明
+             * @example 你收到「夏季期」的加入邀請。
+             */
+            message?: string;
+            /**
+             * @description 有可用目的頁時提供的連結
+             * @example https://app.daodao.so/cohorts/join/invitation-token
+             */
+            url?: string;
         };
         /** @description 發送者資訊 */
         NotificationActor: {
