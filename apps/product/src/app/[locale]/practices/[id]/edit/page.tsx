@@ -175,6 +175,14 @@ export default function EditPracticePage() {
     }
   }, [formValues, form, practiceData]);
 
+  useEffect(() => {
+    if (!formValues || window.location.hash !== "#practice-resources") return;
+    const frame = requestAnimationFrame(() => {
+      document.getElementById("practice-resources")?.scrollIntoView({ block: "start" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [formValues]);
+
   const handleSubmit = async (values: ManualPracticeFormValues) => {
     if (isSubmitting) {
       return;
