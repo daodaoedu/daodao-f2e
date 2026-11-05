@@ -102,3 +102,56 @@ describe("Lighthouse middleware backend routing", () => {
     expect(response.headers.get("location")).toContain(destination);
   });
 });
+
+describe("organization invitation URL privacy", () => {
+  it.each([
+    "/organization-invitation",
+    "/en/organization-invitation",
+    "/zh-TW/organization-invitation",
+  ])("redirects %s before rendering and keeps the secret HttpOnly", async (path) => {
+    const response = await middleware(
+      new NextRequest(`https://product.example.test${path}?token=${"a".repeat(64)}&other=drop`)
+    );
+    expect(response.status).toBe(303);
+    expect(response.headers.get("location")).toBe(`https://product.example.test${path}`);
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(response.headers.get("referrer-policy")).toBe("no-referrer");
+    const cookie = response.cookies.get("organization_invitation");
+    expect(cookie).toMatchObject({
+      value: "a".repeat(64),
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 604800,
+    });
+  });
+  it.each([
+    "token=",
+    "token=bad%3Bvalue",
+    "token=first&token=second",
+  ])("rejects ambiguous/malformed invitation %s and clears stale cookie", async (query) => {
+    const response = await middleware(
+      new NextRequest(`https://product.example.test/organization-invitation?${query}`, {
+        headers: { cookie: "organization_invitation=previous" },
+      })
+    );
+    expect(response.status).toBe(303);
+    expect(response.cookies.get("organization_invitation")).toMatchObject({ value: "", maxAge: 0 });
+  });
+  it("keeps local HTTP cookie usable while production HTTPS is secure", async () => {
+    const response = await middleware(
+      new NextRequest(`http://localhost:3463/organization-invitation?token=${"b".repeat(64)}`)
+    );
+    expect(response.cookies.get("organization_invitation")?.secure).toBe(false);
+  });
+  it("does not overwrite the invitation during a reload or locale switch", async () => {
+    const response = await middleware(
+      new NextRequest("https://product.example.test/en/organization-invitation", {
+        headers: { cookie: "organization_invitation=previous" },
+      })
+    );
+    expect(response.cookies.get("organization_invitation")).toBeUndefined();
+    expect(response.headers.get("location")).toBeNull();
+  });
+});

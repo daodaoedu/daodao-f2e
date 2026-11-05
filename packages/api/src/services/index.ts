@@ -55,6 +55,8 @@ export * from "./og-image";
 export * from "./og-image-hooks";
 // Onboarding Flow Service
 export * from "./onboarding-flow";
+// Organization owner invitations
+export * from "./organization-invitation";
 // Persona Service
 export * from "./persona";
 export * from "./persona-hooks";
