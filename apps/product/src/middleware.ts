@@ -2,6 +2,11 @@ import { getEnv } from "@daodao/config";
 import createMiddleware from "@daodao/i18n/middleware";
 import { routing } from "@daodao/i18n/routing";
 import { type NextRequest, NextResponse } from "next/server";
+import {
+  isOrganizationInvitationToken,
+  ORGANIZATION_INVITATION_COOKIE,
+  ORGANIZATION_INVITATION_PATH,
+} from "./lib/organization-invitation-token";
 
 /**
  * i18n middleware plus the Lighthouse organization-membership gate.
@@ -56,6 +61,28 @@ function localizedPath(pathname: string, path: string): string {
 
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  // Remove the secret before rendering HTML, loading analytics, or constructing OAuth state.
+  if (ORGANIZATION_INVITATION_PATH.test(pathname) && request.nextUrl.searchParams.has("token")) {
+    const tokens = request.nextUrl.searchParams.getAll("token");
+    const token = tokens.length === 1 ? (tokens[0] ?? null) : null;
+    const cleanUrl = request.nextUrl.clone();
+    cleanUrl.search = "";
+    const response = NextResponse.redirect(cleanUrl, 303);
+    response.headers.set("Cache-Control", "no-store");
+    response.headers.set("Referrer-Policy", "no-referrer");
+    response.cookies.set(
+      ORGANIZATION_INVITATION_COOKIE,
+      isOrganizationInvitationToken(token) ? token : "",
+      {
+        httpOnly: true,
+        secure: getEnv("NODE_ENV") === "production" || request.nextUrl.protocol === "https:",
+        sameSite: "lax",
+        path: "/",
+        maxAge: isOrganizationInvitationToken(token) ? 7 * 24 * 60 * 60 : 0,
+      }
+    );
+    return response;
+  }
   if (LIGHTHOUSE_PATH_RE.test(pathname) && !LIGHTHOUSE_ACCESS_REQUIRED_RE.test(pathname)) {
     const access = await hasLighthouseAccess(request);
     if (access !== "allowed") {

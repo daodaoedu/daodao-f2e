@@ -1,6 +1,7 @@
 "use client";
 
 import featureHappyJson from "@daodao/assets/images/quiz/feature-happy.json";
+import { getOrganizationInvitationReturnPath } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
@@ -8,6 +9,7 @@ import { ConfettiAnimation } from "@daodao/ui/components/confetti-animation";
 import Lottie from "lottie-react";
 import { MailIcon } from "lucide-react";
 import { motion } from "motion/react";
+import { useRouter as useRawRouter, useSearchParams } from "next/navigation";
 
 interface SuccessSectionProps {
   /** 用戶名稱，用於個人化歡迎訊息 */
@@ -21,9 +23,14 @@ interface SuccessSectionProps {
 export const SuccessSection = ({ userName }: SuccessSectionProps) => {
   const t = useTranslations("onboarding");
   const router = useRouter();
+  const rawRouter = useRawRouter();
+  const invitationReturnPath = getOrganizationInvitationReturnPath(
+    useSearchParams().get("redirect")
+  );
 
   const handleGoToHome = () => {
-    router.push("/");
+    if (invitationReturnPath) rawRouter.push(invitationReturnPath);
+    else router.push("/");
   };
 
   return (
@@ -78,7 +85,9 @@ export const SuccessSection = ({ userName }: SuccessSectionProps) => {
           transition={{ duration: 0.5, delay: 0.6 }}
         >
           <Button variant="ctaPrimary" className="w-full" onClick={handleGoToHome}>
-            {t("steps.success.primaryButton")}
+            {invitationReturnPath
+              ? t("steps.success.invitationButton")
+              : t("steps.success.primaryButton")}
           </Button>
         </motion.div>
       </div>

@@ -654,5 +654,42 @@
   "cohort_signup_external_hint": "這個場次使用外部報名連結，島島報名表不會啟用。完成報名後，可分享場次邀請連結或以 Email 邀請參與者加入。",
   "cohort_signup_add_question": "新增問題",
   "cohort_signup_custom_form_coming_soon": "客製化報名表 & 金流服務 coming soon",
-  "cohort_signup_preview_read_only": "此為目前場次設定的唯讀預覽，不會儲存設定或加入活動。"
+  "cohort_signup_preview_read_only": "此為目前場次設定的唯讀預覽，不會儲存設定或加入活動。",
+  "organization_invitation": {
+    "eyebrow": "燈塔組織邀請",
+    "title": "接受組織邀請",
+    "description": "接受邀請後，你將成為這個組織的 owner，可以進入燈塔管理組織。",
+    "email_hint": "請使用收到邀請的 Email 登入。若使用不同信箱，需由島島確認後才能加入。",
+    "login": "登入或註冊以繼續",
+    "accept": "接受邀請",
+    "accepting": "正在處理⋯",
+    "loading": "載入中⋯",
+    "error": "暫時無法接受邀請，請稍後再試。",
+    "open_lighthouse": "進入燈塔",
+    "home": "回首頁",
+    "accepted": {
+      "title": "已加入組織",
+      "description": "你已成為組織 owner，現在可以進入燈塔。"
+    },
+    "needs_confirmation": {
+      "title": "需由島島確認",
+      "description": "你的登入信箱與受邀信箱不相符。已送出確認申請，請聯絡島島協助；確認前不會加入組織。"
+    },
+    "expired": {
+      "title": "邀請已過期",
+      "description": "此邀請已超過有效期限，請聯絡島島管理員重寄邀請。"
+    },
+    "revoked": {
+      "title": "邀請已失效",
+      "description": "此邀請已被撤銷或已重寄。請使用最新的邀請信，或聯絡島島管理員。"
+    },
+    "used": {
+      "title": "邀請已被使用",
+      "description": "此連結已完成加入，無法再次使用。若你已加入，請從首頁進入燈塔。"
+    },
+    "invalid": {
+      "title": "無效的邀請連結",
+      "description": "找不到這個邀請，請使用邀請信中的完整連結，或聯絡島島管理員。"
+    }
+  }
 }
