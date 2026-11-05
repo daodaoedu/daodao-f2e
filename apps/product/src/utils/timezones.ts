@@ -31,7 +31,9 @@ function getTimeZoneOptions(): string[] {
     supportedValuesOf?: (key: "timeZone") => string[];
   };
   const supported = intlWithTimeZones.supportedValuesOf?.("timeZone") ?? COMMON_TIMEZONES;
-  return Array.from(new Set(["UTC", DEFAULT_COHORT_TIMEZONE, ...supported])).sort();
+  return Array.from(new Set(["UTC", DEFAULT_COHORT_TIMEZONE, ...supported])).sort((a, b) =>
+    a.localeCompare(b)
+  );
 }
 
 export const TIME_ZONE_OPTIONS = getTimeZoneOptions();

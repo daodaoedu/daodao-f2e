@@ -427,7 +427,9 @@ function CohortSetupPanel({
 
   const toggleRecurrenceWeekday = useCallback((weekday: number) => {
     setRecurrenceWeekdays((prev) =>
-      prev.includes(weekday) ? prev.filter((day) => day !== weekday) : [...prev, weekday].sort()
+      prev.includes(weekday)
+        ? prev.filter((day) => day !== weekday)
+        : [...prev, weekday].sort((a, b) => a - b)
     );
   }, []);
   const updateSessionGroup = useCallback(
@@ -1119,7 +1121,10 @@ function CohortSetupPanel({
                               aria-label={recurrenceCopy.editIndividual}
                               onClick={() => {
                                 const sessionIds = group.sessions.map((item) => item.id);
-                                const key = sessionIds.slice().sort().join("|");
+                                const key = sessionIds
+                                  .slice()
+                                  .sort((a, b) => a.localeCompare(b))
+                                  .join("|");
                                 setExpandedRepeatGroups((prev) =>
                                   prev.some((item) => item.key === key)
                                     ? prev
