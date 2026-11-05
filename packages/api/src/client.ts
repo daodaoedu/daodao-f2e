@@ -299,6 +299,35 @@ export const client = createClient<paths>({
   fetch: unauthorizedHandler.wrapFetch,
 });
 
+// swr-openapi throws only the error body. Keep transport status at this boundary,
+// including proxy text/empty errors, so Lighthouse can distinguish outages from revocation.
+client.use({
+  async onResponse({ request, response }) {
+    if (response.status < 400 || !new URL(request.url).pathname.startsWith("/api/v1/lighthouse/"))
+      return response;
+    const text = await response.clone().text();
+    let body: unknown = text;
+    try {
+      body = JSON.parse(text);
+    } catch {
+      // Gateways need not return the application's JSON envelope.
+    }
+    const data =
+      body !== null && typeof body === "object" && !Array.isArray(body)
+        ? body
+        : { error: { message: text } };
+    const headers = new Headers(response.headers);
+    headers.set("Content-Type", "application/json");
+    headers.delete("Content-Length");
+    headers.delete("Content-Encoding");
+    return new Response(JSON.stringify({ ...data, status: response.status }), {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
+  },
+});
+
 export function initMobileClient(config: {
   baseUrl: string;
   getToken: () => Promise<string | null>;

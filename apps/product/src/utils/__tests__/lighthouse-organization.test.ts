@@ -256,6 +256,8 @@ describe("temporary Lighthouse query failures", () => {
   it.each([
     new TypeError("Failed to fetch"),
     { status: 503 },
+    { status: 408 },
+    { status: 429 },
     { error: { code: "SERVICE_UNAVAILABLE" } },
     { error: { code: "INTERNAL_SERVER_ERROR" } },
     { error: { code: "TIMEOUT" } },

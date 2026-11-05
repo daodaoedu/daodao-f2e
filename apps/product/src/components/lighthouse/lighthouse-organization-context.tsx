@@ -12,6 +12,8 @@ import {
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { usePathname, useRouter } from "@daodao/i18n/navigation";
+import { DialogManagerProvider } from "@daodao/ui/components/animate-ui/components/radix/dialog-manager";
+import { PortalScopeProvider } from "@daodao/ui/components/portal-scope";
 import {
   Select,
   SelectContent,
@@ -511,11 +513,20 @@ export function useLighthouseOrganizationGuard(dirty: boolean, busy = false) {
 /** Keep the navigation available while withholding stale or unauthorized page content. */
 export function LighthouseOrganizationContent({ children }: { children: ReactNode }) {
   const { organization, statusContent, preserveDrafts } = useLighthouseOrganization();
+  const t = useTranslations("lighthouse");
   return (
     <>
       {statusContent}
       <div key={organization?.id} hidden={Boolean(statusContent)} inert={Boolean(statusContent)}>
-        {!statusContent || preserveDrafts ? children : null}
+        {!statusContent || preserveDrafts ? (
+          <PortalScopeProvider
+            suspended={Boolean(statusContent)}
+            feedback={statusContent}
+            label={t("load_failed")}
+          >
+            <DialogManagerProvider>{children}</DialogManagerProvider>
+          </PortalScopeProvider>
+        ) : null}
       </div>
     </>
   );

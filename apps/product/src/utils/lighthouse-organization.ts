@@ -54,7 +54,8 @@ export function shouldSaveLighthouseOrganization(
 export function isRecoverableLighthouseQueryError(error: unknown): boolean {
   if (error instanceof TypeError) return true;
   if (!error || typeof error !== "object") return false;
-  if ("status" in error && typeof error.status === "number") return error.status >= 500;
+  if ("status" in error && typeof error.status === "number")
+    return error.status >= 500 || error.status === 408 || error.status === 429;
   const detail = "error" in error ? error.error : error;
   if (!detail || typeof detail !== "object" || !("code" in detail)) return false;
   return [
