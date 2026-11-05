@@ -451,5 +451,7 @@
   "wizard_done_primary_template": "看看我的模版",
   "wizard_done_secondary_personal": "再建立一個實踐",
   "wizard_done_secondary_template": "再建立一個模版",
-  "wizard_create_failed": "建立失敗，請稍後再試"
+  "wizard_create_failed": "建立失敗，請稍後再試",
+  "template_access_denied": "只有島島管理員可以建立官方模板。你可以建立自己的個人實踐。",
+  "template_access_create_personal": "建立個人實踐"
 }
