@@ -73,6 +73,7 @@
   "summary_generating": "Generating summary...",
   "summary_load_failed": "Failed to load, please try again later",
   "summary_no_data": "Unable to load summary data",
+  "summary_delayed_toast": "Your practice will become public after completion",
   "summary_public_toast": "Your practice check-ins are now public",
   "summary_public_toast_description": "Shown in Inspiration Square for others to see your growth!",
   "summary_public_toast_dismiss": "Don't show again",

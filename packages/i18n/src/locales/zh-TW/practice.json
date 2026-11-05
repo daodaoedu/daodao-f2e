@@ -73,6 +73,7 @@
   "summary_generating": "正在生成總結...",
   "summary_load_failed": "載入失敗，請稍後再試",
   "summary_no_data": "無法載入總結資料",
+  "summary_delayed_toast": "實踐完成後會公開",
   "summary_public_toast": "你的實踐打卡內容已公開",
   "summary_public_toast_description": "已顯示在靈感廣場，讓更多人看見你的成長！",
   "summary_public_toast_dismiss": "不再顯示",
