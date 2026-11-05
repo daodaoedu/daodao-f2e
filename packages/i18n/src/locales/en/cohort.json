@@ -69,5 +69,6 @@
   "settings_privacy": "Privacy",
   "settings_privacy_desc": "Control whether your practice results can be exported by your coach.",
   "save": "Save",
-  "exit_cancel": "Cancel"
+  "exit_cancel": "Cancel",
+  "meeting_schedule": "Meeting schedule"
 }

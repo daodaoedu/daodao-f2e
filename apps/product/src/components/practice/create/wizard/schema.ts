@@ -7,7 +7,7 @@
 import type { useTranslations } from "@daodao/i18n";
 import { addDays, isAfter, isBefore, isValid, parse, startOfDay } from "date-fns";
 import { z } from "zod";
-import { ExecutionTiming } from "@/constants/practice-form";
+import { ExecutionTiming, MAX_PERSONAL_PRACTICE_RESOURCES } from "@/constants/practice-form";
 import { allocateSegmentDays } from "@/lib/practice-create";
 import { isResourceDayInRange } from "@/lib/resource-usage-date";
 
@@ -33,7 +33,7 @@ export const SEGMENTS_MAX = 3;
 export const SEGMENT_TIMING_MAX_LENGTH = 40;
 export const CUSTOM_TIMING_MAX_LENGTH = 20;
 export const TAGS_MAX = 10;
-export const RESOURCES_MAX = 10;
+export const RESOURCES_MAX = MAX_PERSONAL_PRACTICE_RESOURCES;
 export const RESOURCE_NAME_MAX_LENGTH = 100;
 
 export const DURATION_DAY_PRESETS = [7, 14, 21, 30] as const;

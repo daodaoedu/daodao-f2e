@@ -1,4 +1,5 @@
 {
+  "resource_relevant_date": "Relevant date: {date}",
   "tab_comments": "Comments",
   "tab_checkins": "Check-ins",
   "tab_resources": "Resources",
@@ -18,6 +19,7 @@
   "action_copying": "Copying…",
   "more_info": "More Info",
   "edit_practice": "Edit Practice",
+  "edit_resources": "Edit resources",
   "delete_practice_title": "Delete this practice?",
   "delete_practice_message": "Once deleted, it cannot be recovered and all check-in records will be lost.",
   "delete_dialog_title": "Delete this practice?",
@@ -458,6 +460,7 @@
   "wizard_done_secondary_personal": "Create another practice",
   "wizard_done_secondary_template": "Create another template",
   "wizard_create_failed": "Couldn't create, please try again",
+  "resource_no_link": "No link available",
   "template_access_denied": "Only DaoDao administrators can create official templates. You can create a personal practice instead.",
   "template_access_create_personal": "Create a personal practice"
 }

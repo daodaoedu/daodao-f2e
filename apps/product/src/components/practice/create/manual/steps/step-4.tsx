@@ -19,6 +19,7 @@ import { forwardRef, useImperativeHandle, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { ResourceCard } from "@/components/practice/shared";
 import { ResourceDateSelector } from "@/components/practice/shared/resource-date-selector";
+import { MAX_PERSONAL_PRACTICE_RESOURCES } from "@/constants/practice-form";
 import { useTagEditSheet } from "@/hooks/use-tag-edit-sheet";
 import type { ManualPracticeFormValues } from "../schema";
 
@@ -62,6 +63,15 @@ export const Step4 = forwardRef<Step4Handle, Step4Props>(({ form }, ref) => {
     }
 
     const resources = form.getValues("resources") || [];
+    if (
+      resources.filter((resource) => !resource.isLocked).length >= MAX_PERSONAL_PRACTICE_RESOURCES
+    ) {
+      form.setError("resources", {
+        type: "manual",
+        message: t("wizard_resource_max", { max: MAX_PERSONAL_PRACTICE_RESOURCES }),
+      });
+      return false;
+    }
 
     // 如果有輸入 URL，驗證 URL 格式和 HTTPS
     if (trimmedUrl) {
@@ -211,7 +221,7 @@ export const Step4 = forwardRef<Step4Handle, Step4Props>(({ form }, ref) => {
           const hasLockedResource = resources.some((r) => r.isLocked);
 
           return (
-            <FormItem>
+            <FormItem id="practice-resources" className="scroll-mt-24">
               <FormLabel className="block text-base font-normal text-text-dark mb-3">
                 {t("step4_resources_label")}
               </FormLabel>
@@ -287,21 +297,27 @@ export const Step4 = forwardRef<Step4Handle, Step4Props>(({ form }, ref) => {
                             locked={resource.isLocked}
                             onRemove={() => handleRemoveResource(resource.id)}
                           />
-                          <ResourceDateSelector
-                            dayNumber={resource.dayNumber}
-                            startDate={startDate}
-                            durationDays={durationDays}
-                            disabled={resource.isLocked}
-                            onChange={(dayNumber) => {
-                              form.setValue(
-                                "resources",
-                                resources.map((item) =>
-                                  item.id === resource.id ? { ...item, dayNumber } : item
-                                ),
-                                { shouldDirty: true, shouldValidate: true }
-                              );
-                            }}
-                          />
+                          {resource.isLocked && resource.relevantDate && (
+                            <p className="text-sm text-text-dark">{resource.relevantDate}</p>
+                          )}
+                          {(!resource.isLocked ||
+                            (resource.dayNumber != null && !resource.relevantDate)) && (
+                            <ResourceDateSelector
+                              dayNumber={resource.dayNumber}
+                              startDate={startDate}
+                              durationDays={durationDays}
+                              disabled={resource.isLocked}
+                              onChange={(dayNumber) => {
+                                form.setValue(
+                                  "resources",
+                                  resources.map((item) =>
+                                    item.id === resource.id ? { ...item, dayNumber } : item
+                                  ),
+                                  { shouldDirty: true, shouldValidate: true }
+                                );
+                              }}
+                            />
+                          )}
                         </div>
                       ))}
                     </div>

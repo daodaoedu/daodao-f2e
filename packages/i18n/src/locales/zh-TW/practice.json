@@ -1,4 +1,5 @@
 {
+  "resource_relevant_date": "相關日期：{date}",
   "tab_comments": "留言",
   "tab_checkins": "打卡紀錄",
   "tab_resources": "使用資源",
@@ -18,6 +19,7 @@
   "action_copying": "複製中…",
   "more_info": "更多資訊",
   "edit_practice": "編輯實踐",
+  "edit_resources": "編輯資源",
   "delete_practice_title": "確定刪除這個實踐？",
   "delete_practice_message": "一旦刪除就無法復原，所有打卡紀錄也會一併消失。",
   "delete_dialog_title": "確定刪除這個實踐？",
@@ -458,6 +460,7 @@
   "wizard_done_secondary_personal": "再建立一個實踐",
   "wizard_done_secondary_template": "再建立一個模版",
   "wizard_create_failed": "建立失敗，請稍後再試",
+  "resource_no_link": "目前無連結",
   "template_access_denied": "只有島島管理員可以建立官方模板。你可以建立自己的個人實踐。",
   "template_access_create_personal": "建立個人實踐"
 }
