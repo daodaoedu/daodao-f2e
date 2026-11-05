@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@daodao/auth";
+import { getSafeLoginRedirect } from "@daodao/auth/lib/safe-redirect";
 import { useTranslations } from "@daodao/i18n";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
@@ -16,7 +17,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     // 從 URL 參數中取得 redirect URL
-    const redirectUrl = searchParams.get("redirect") || undefined;
+    const redirectUrl = getSafeLoginRedirect(searchParams.get("redirect"));
     // 打開登入 Dialog，強制不可關閉
     openLoginDialog({ redirectUrl, source: "app", dismissible: false });
   }, [searchParams, openLoginDialog]);
@@ -30,7 +31,7 @@ export default function LoginPage() {
   // - 避開 next/navigation 的 router.push 不帶 locale prefix 在 next-intl 下的不一致行為
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      const redirectUrl = searchParams.get("redirect") || "/";
+      const redirectUrl = getSafeLoginRedirect(searchParams.get("redirect"));
       window.location.href = redirectUrl;
     }
   }, [isLoading, isAuthenticated, searchParams]);
