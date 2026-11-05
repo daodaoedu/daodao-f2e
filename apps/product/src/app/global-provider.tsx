@@ -1,7 +1,7 @@
 "use client";
 
 import { AnalyticsScripts } from "@daodao/analytics";
-import { AuthProvider } from "@daodao/auth";
+import { AuthProvider, getOrganizationInvitationOnboardingUrl } from "@daodao/auth";
 import { type Locale, type Messages, NextIntlClientProvider } from "@daodao/i18n";
 import { type DeviceInfo, DeviceProvider, detectDeviceClient } from "@daodao/shared";
 import "@daodao/ui/globals.css";
@@ -11,10 +11,11 @@ import { SheetManagerProvider } from "@daodao/ui/components/animate-ui/component
 import { Toaster } from "@daodao/ui/components/sonner";
 import { NavigationBlockerProvider } from "@daodao/ui/hooks/navigation-blocker";
 import { Anonymous_Pro } from "next/font/google";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { PwaInstallPrompt } from "@/components/pwa/install-prompt";
 import { RegisterServiceWorker } from "@/components/pwa/register-sw";
 import { TrackingRefCapture } from "@/components/tracking-ref-capture";
+import { ORGANIZATION_INVITATION_PATH } from "@/lib/organization-invitation-token";
 
 const anonymousPro = Anonymous_Pro({
   weight: ["400", "700"],
@@ -39,6 +40,7 @@ function GlobalProvider({
   initialDevice = detectDeviceClient(),
 }: GlobalProviderProps) {
   const router = useRouter();
+  const isInvitationPage = ORGANIZATION_INVITATION_PATH.test(usePathname());
 
   return (
     <html
@@ -51,7 +53,7 @@ function GlobalProvider({
       <body className={anonymousPro.variable}>
         <TrackingRefCapture />
         <RegisterServiceWorker />
-        <AnalyticsScripts />
+        {!isInvitationPage && <AnalyticsScripts />}
         <NextIntlClientProvider messages={messages} locale={locale} timeZone="Asia/Taipei">
           <DeviceProvider initialDevice={initialDevice}>
             <NavigationBlockerProvider>
@@ -70,6 +72,7 @@ function GlobalProvider({
                       "^/challenges(/.*)?$",
                       "^/activities(/.*)?$",
                       "^/roadmap(/.*)?$",
+                      "^/organization-invitation$",
                       "^/resource(/.*)?$",
                       "^/persona(/.*)?$",
                       "^/mine(/.*)?$",
@@ -85,7 +88,14 @@ function GlobalProvider({
                     }}
                     onboardingPath="/auth/onboarding"
                     onTemporaryUser={() => {
-                      router.push("/auth/onboarding");
+                      // The OAuth callback validates state and retains invitation destinations itself.
+                      if (/^\/(?:(?:en|zh-TW)\/)?auth\/callback$/.test(window.location.pathname))
+                        return;
+                      router.push(
+                        getOrganizationInvitationOnboardingUrl(
+                          window.location.pathname + window.location.search
+                        )
+                      );
                     }}
                     emailVerificationPath="/auth/verify-email"
                     onEmailUnverified={() => {

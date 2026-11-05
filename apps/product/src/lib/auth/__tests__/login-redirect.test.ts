@@ -4,6 +4,8 @@ const fixture = vi.hoisted(() => ({
   params: new URLSearchParams(),
   authenticated: true,
   validState: true,
+  replayEffect: false,
+  consumptions: 0,
   redirect: "",
   openLoginDialog: vi.fn(),
 }));
@@ -18,7 +20,11 @@ vi.mock("@daodao/i18n", () => ({ useTranslations: () => (key: string) => key }))
 vi.mock("next/navigation", () => ({ useSearchParams: () => fixture.params }));
 vi.mock("react", async (importOriginal) => ({
   ...(await importOriginal<typeof import("react")>()),
-  useEffect: (effect: () => void) => effect(),
+  useEffect: (effect: () => void) => {
+    effect();
+    if (fixture.replayEffect) effect();
+  },
+  useRef: <T>(initial: T) => ({ current: initial }),
 }));
 vi.mock("@daodao/shared", () => ({
   getStorage: () => ({ set: vi.fn() }),
@@ -26,7 +32,10 @@ vi.mock("@daodao/shared", () => ({
 }));
 vi.mock("../../../../../../packages/auth/src/lib/auth-client", () => ({
   decodeOAuthState: () => ({ redirectUrl: fixture.redirect }),
-  verifyAndConsumeOAuthState: () => fixture.validState,
+  verifyAndConsumeOAuthState: () => {
+    fixture.consumptions += 1;
+    return fixture.validState && fixture.consumptions === 1;
+  },
 }));
 
 import { useRedirectAfterLogin } from "../../../../../../packages/auth/src/hooks/use-redirect-after-login";
@@ -50,6 +59,8 @@ beforeEach(() => {
   fixture.params = new URLSearchParams();
   fixture.authenticated = true;
   fixture.validState = true;
+  fixture.replayEffect = false;
+  fixture.consumptions = 0;
   fixture.openLoginDialog.mockClear();
   vi.stubGlobal("window", { location: { href: "" } });
 });
@@ -107,4 +118,21 @@ describe("OAuth callback destination", () => {
     useRedirectAfterLogin();
     expect(window.location.href).toBe("/");
   });
+});
+
+it("keeps the English invitation across onboarding with validated state", () => {
+  fixture.params.set("state", "validated-state");
+  fixture.params.set("isNewUser", "true");
+  fixture.redirect = "/en/organization-invitation";
+  useRedirectAfterLogin();
+  expect(window.location.href).toBe("/en/auth/onboarding?redirect=%2Fen%2Forganization-invitation");
+});
+
+it("consumes OAuth state once when React replays the effect", () => {
+  fixture.replayEffect = true;
+  fixture.params.set("state", "validated-state");
+  fixture.redirect = "/en/organization-invitation";
+  useRedirectAfterLogin();
+  expect(fixture.consumptions).toBe(1);
+  expect(window.location.href).toBe("/en/organization-invitation");
 });

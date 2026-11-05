@@ -2,10 +2,11 @@
 
 import { getStorage, StorageEnum } from "@daodao/shared";
 import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { decodeOAuthState, verifyAndConsumeOAuthState } from "../lib/auth-client";
 import { DEFAULT_REDIRECT_URL, ONBOARDING_URL } from "../lib/auth-constants";
 import { getSafeLoginRedirect } from "../lib/safe-redirect";
+import { getOrganizationInvitationOnboardingUrl } from "../utils/organization-invitation-return";
 
 /**
  * 登入後跳轉的 Hook
@@ -36,8 +37,12 @@ const hardNavigate = (url: string) => {
 
 export const useRedirectAfterLogin = () => {
   const searchParams = useSearchParams();
+  const handled = useRef(false);
 
   useEffect(() => {
+    // StrictMode can replay this effect; consuming the nonce twice would lose the invitation.
+    if (handled.current) return;
+    handled.current = true;
     const stateParam = searchParams.get("state");
     const isNewUser = searchParams.get("isNewUser") === "true";
 
@@ -80,8 +85,8 @@ export const useRedirectAfterLogin = () => {
 
     // 驗證成功
     if (isNewUser) {
-      // 新用戶跳轉到 onboarding 流程
-      hardNavigate(ONBOARDING_URL);
+      // Keep an invitation through onboarding only after OAuth state verification.
+      hardNavigate(getOrganizationInvitationOnboardingUrl(state.redirectUrl));
     } else {
       // 舊用戶跳轉到原目標頁面
       // 過濾掉不適合作為登入後落地頁的路徑（設定頁、錯誤頁）

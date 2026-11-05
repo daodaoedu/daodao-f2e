@@ -1,8 +1,8 @@
 "use client";
 
-import { useAuth } from "@daodao/auth";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { getOrganizationInvitationReturnPath, useAuth } from "@daodao/auth";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { OnboardingForm } from "@/components/onboarding";
 
@@ -11,7 +11,18 @@ import { OnboardingForm } from "@/components/onboarding";
  * 新用戶完成註冊後的引導流程
  */
 export default function OnboardingPage() {
+  return (
+    <Suspense>
+      <OnboardingContent />
+    </Suspense>
+  );
+}
+
+function OnboardingContent() {
   const router = useRouter();
+  const invitationReturnPath = getOrganizationInvitationReturnPath(
+    useSearchParams().get("redirect")
+  );
   const { user, isAuthenticated, isLoading, isTemporary } = useAuth();
   // 追蹤是否已經初始化過，避免 refreshAuth 導致組件重新掛載
   const [hasInitialized, setHasInitialized] = useState(false);
@@ -22,13 +33,13 @@ export default function OnboardingPage() {
       if (isAuthenticated && isTemporary) {
         setHasInitialized(true);
       } else if (isAuthenticated && !isTemporary) {
-        // 已完成 onboarding，重定向到首頁
-        router.replace("/");
+        // Preserve a validated invitation if registration already completed.
+        router.replace(invitationReturnPath ?? "/");
       } else {
         router.replace("/");
       }
     }
-  }, [isLoading, isAuthenticated, isTemporary, hasInitialized, router]);
+  }, [isLoading, isAuthenticated, isTemporary, hasInitialized, router, invitationReturnPath]);
 
   // 初次載入時顯示載入狀態（之後不再顯示，避免 OnboardingForm 被卸載）
   if (!hasInitialized && (isLoading || !isAuthenticated)) {
