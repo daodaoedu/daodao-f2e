@@ -24148,7 +24148,7 @@ export interface paths {
                 content: {
                     "application/json": {
                         /**
-                         * @description 場次共用資源完整清單，依顯示順序排列，最多50筆
+                         * @description 場次共用資源完整清單；既有項目維持原位置，新增項目按送出順序置前；最多50筆
                          * @example [
                          *       {
                          *         "name": "活動講義",
