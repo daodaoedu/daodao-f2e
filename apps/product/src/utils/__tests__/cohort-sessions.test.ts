@@ -197,3 +197,10 @@ it("allows assigning the first date to a new one-off session", () => {
     updateSessionGroup(sessions, ["draft"], "sessionDate", "2026-12-30").map((s) => s.sessionDate)
   ).toEqual(["2026-12-30"]);
 });
+
+it("preserves relative occurrence dates when a folded group date is cleared then replaced", () => {
+  const sessions = [entry("2026-12-01", "first"), entry("2026-12-03", "second")];
+  const cleared = updateSessionGroup(sessions, ["first", "second"], "sessionDate", "");
+  const moved = updateSessionGroup(cleared, ["first", "second"], "sessionDate", "2026-12-02");
+  expect(moved.map((session) => session.sessionDate)).toEqual(["2026-12-02", "2026-12-04"]);
+});

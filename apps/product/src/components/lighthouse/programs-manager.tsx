@@ -901,7 +901,7 @@ function CohortSetupPanel({
                         variant="ghost"
                         type="button"
                         onClick={() => setRecurrenceWeekdays([1, 2, 3, 4, 5])}
-                        className="text-xs font-medium text-[#0D7773] hover:underline"
+                        className="h-auto rounded-none p-0 text-xs leading-4 font-medium text-[#0D7773] hover:underline"
                       >
                         {recurrenceCopy.weekdaysOnly}
                       </Button>
@@ -916,7 +916,7 @@ function CohortSetupPanel({
                             type="button"
                             aria-pressed={selected}
                             onClick={() => toggleRecurrenceWeekday(day)}
-                            className={`rounded-full border px-2.5 py-1 text-xs transition-colors ${
+                            className={`h-auto rounded-full border px-2.5 py-1 text-xs leading-4 transition-colors ${
                               selected
                                 ? "border-[#16B9B3] bg-[#E7FAF7] text-[#0D7773]"
                                 : "border-[#CDEBE8] bg-white text-[#5A7B79] hover:bg-[#F1F8F7]"

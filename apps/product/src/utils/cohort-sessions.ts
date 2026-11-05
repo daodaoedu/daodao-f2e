@@ -164,6 +164,8 @@ export function updateSessionGroup(
   const selected = new Set(ids);
   const first = sessions.find((s) => s.id === ids[0]);
   if (!first) return sessions;
+  // A folded group cannot lose the dates needed to preserve relative offsets.
+  if (field === "sessionDate" && !value && selected.size > 1) return sessions;
   const offset =
     field === "sessionDate" && value && first.sessionDate
       ? differenceInCalendarDays(parseISO(value), parseISO(first.sessionDate))
