@@ -3,12 +3,12 @@ import createMiddleware from "@daodao/i18n/middleware";
 import { routing } from "@daodao/i18n/routing";
 import { type NextRequest, NextResponse } from "next/server";
 import { checkPrivateSession, isPrivateSpacePath } from "./lib/auth/private-access";
-import { resolveLighthouseOrganization } from "./utils/lighthouse-organization";
 import {
   isOrganizationInvitationToken,
   ORGANIZATION_INVITATION_COOKIE,
   ORGANIZATION_INVITATION_PATH,
 } from "./lib/organization-invitation-token";
+import { resolveLighthouseOrganization } from "./utils/lighthouse-organization";
 
 /**
  * i18n middleware plus the Lighthouse organization-membership gate.
@@ -118,8 +118,20 @@ function normalizeRedirectLocation(request: NextRequest, response: NextResponse)
     const destination = new URL(location, request.nextUrl);
     // Next builds middleware URLs from the container's listen address. Host is the
     // requested public authority; forwarded-host must not choose a new destination.
-    if (destination.origin !== request.nextUrl.origin) return response;
     const publicOrigin = new URL(`${request.nextUrl.protocol}//${host}`);
+    // next-intl can combine the public Host hostname with Next's internal port.
+    // Accept only that exact request-protocol/listen-port variant, never another
+    // authority supplied by a redirect or by forwarded headers.
+    const isPublicHostWithListenPort =
+      destination.protocol === request.nextUrl.protocol &&
+      destination.hostname === publicOrigin.hostname &&
+      destination.port === request.nextUrl.port;
+    if (
+      destination.username ||
+      destination.password ||
+      (destination.origin !== request.nextUrl.origin && !isPublicHostWithListenPort)
+    )
+      return response;
     try {
       // TLS terminates before Next in dev; only the configured app authority may
       // restore HTTPS, never an untrusted forwarded header or a different host.
