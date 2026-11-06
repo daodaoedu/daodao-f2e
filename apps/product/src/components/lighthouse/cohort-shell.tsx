@@ -6,6 +6,7 @@ import { usePathname } from "@daodao/i18n/navigation";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { cn } from "@daodao/ui/lib/utils";
 import { ChevronLeft, Pencil } from "lucide-react";
+import { useLighthouseOrganization } from "./lighthouse-organization-context";
 
 interface CohortShellProps {
   programId: number;
@@ -17,6 +18,7 @@ interface CohortShellProps {
 const sections = ["dashboard", "roster", "focus", "feed", "outcome"] as const;
 
 export function CohortShell({ programId, cohortId, children }: CohortShellProps) {
+  const { href } = useLighthouseOrganization();
   const t = useTranslations("lighthouse");
   const pathname = usePathname();
   const base = `/lighthouse/programs/${programId}/cohorts/${cohortId}`;
@@ -32,12 +34,12 @@ export function CohortShell({ programId, cohortId, children }: CohortShellProps)
           aria-label={t("cohort_navigation")}
         >
           {sections.map((section) => {
-            const href = `${base}/${section}`;
-            const isActive = pathname.startsWith(href);
+            const sectionHref = `${base}/${section}`;
+            const isActive = pathname.startsWith(sectionHref);
             return (
               <CustomLink
                 key={section}
-                href={href}
+                href={href(`${base}/${section}`, cohort.data?.data.organizationId)}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-logo-cyan",
@@ -53,7 +55,7 @@ export function CohortShell({ programId, cohortId, children }: CohortShellProps)
 
       <header className="mx-auto w-full max-w-6xl px-5 pt-8 md:px-10">
         <CustomLink
-          href="/lighthouse/programs"
+          href={href("/lighthouse/programs", cohort.data?.data.organizationId)}
           className="inline-flex items-center gap-1 rounded-full border border-[#CDEBE8] bg-white px-3 py-1.5 text-xs font-medium text-[#345E5B] hover:bg-[#EDF8F6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-logo-cyan"
         >
           <ChevronLeft className="size-3.5" aria-hidden="true" />
@@ -65,7 +67,10 @@ export function CohortShell({ programId, cohortId, children }: CohortShellProps)
           </h1>
           {!isArchived && (
             <CustomLink
-              href={`/lighthouse/programs?edit=${cohortId}#cohort-${cohortId}`}
+              href={href(
+                `/lighthouse/programs?edit=${cohortId}#cohort-${cohortId}`,
+                cohort.data?.data.organizationId
+              )}
               aria-label={t("cohort_edit")}
               title={t("cohort_edit")}
               className="grid size-8 place-items-center rounded-full border border-[#CDEBE8] bg-white text-[#0D7773] hover:bg-[#EDF8F6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-logo-cyan"

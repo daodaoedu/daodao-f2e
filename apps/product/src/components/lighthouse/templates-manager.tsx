@@ -5,10 +5,8 @@ import {
   getCoachResourceBindings,
   type LighthouseTemplate,
   useLighthouseOrganizationCohorts,
-  useLighthouseOrganizations,
   useLighthouseTemplates,
 } from "@daodao/api";
-
 import { useTranslations } from "@daodao/i18n";
 import {
   Dialog,
@@ -24,6 +22,10 @@ import { cn } from "@daodao/ui/lib/utils";
 import { BookOpenText, Plus, Search, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { templateMatches } from "@/utils/template-library";
+import {
+  useLighthouseOrganization,
+  useLighthouseOrganizationGuard,
+} from "./lighthouse-organization-context";
 import { CohortResourceDialog } from "./cohort-resource-dialog";
 import { getFallbackResourceBindings } from "./fallback-resource-bindings";
 import { LIGHTHOUSE_SCOPE } from "./lighthouse-scope";
@@ -39,12 +41,12 @@ type CompleteState = { template: LighthouseTemplate; kind: TemplateSaveKind } | 
  */
 export function TemplatesManager() {
   const t = useTranslations("lighthouse");
-  const { organizations } = useLighthouseOrganizations();
-  const organization = organizations?.[0];
+  const { organization } = useLighthouseOrganization();
   const templatesQuery = useLighthouseTemplates(organization?.id);
   const cohortsQuery = useLighthouseOrganizationCohorts(organization?.id);
   const [query, setQuery] = useState("");
   const [editor, setEditor] = useState<EditorState>({ open: false, template: null });
+  useLighthouseOrganizationGuard(editor.open);
   const [complete, setComplete] = useState<CompleteState>(null);
   const [coachBindings, setCoachBindings] = useState<CoachResourceBinding[]>([]);
   const [coachLoading, setCoachLoading] = useState(true);

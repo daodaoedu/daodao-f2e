@@ -1,5 +1,3 @@
-import { ArchiveManager } from "@/components/lighthouse/archive-manager";
-
-export default function LighthouseArchivePage() {
-  return <ArchiveManager />;
+export default function LighthouseLegacyEntryPage() {
+  return null;
 }

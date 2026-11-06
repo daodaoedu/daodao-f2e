@@ -25,7 +25,12 @@ import {
   type InvitationPreviewSummary,
 } from "@/utils/cohort-invitation";
 import { CohortErrorState } from "./cohort-error-state";
+import { ConfirmDialog } from "./confirm-dialog";
 import { JoinCode, useCopyJoinLink, useJoinUrl } from "./join-code";
+import {
+  useLighthouseOrganization,
+  useLighthouseOrganizationGuard,
+} from "./lighthouse-organization-context";
 import { useLighthouseErrorMessage } from "./use-lighthouse-error-message";
 
 interface CohortRosterProps {
@@ -64,16 +69,21 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
   const t = useTranslations("lighthouse");
   const apiErrorMessage = useLighthouseErrorMessage();
   const { openWarningDialog } = useDialog();
+  const { organization } = useLighthouseOrganization();
+  const [confirmingInvitations, setConfirmingInvitations] = useState(false);
+  const [resendTarget, setResendTarget] = useState<{ id: number; email: string } | null>(null);
   const cohortQuery = useLighthouseCohort(programId, cohortId);
   const enrollmentQuery = useLighthouseCohortEnrollments(programId, cohortId);
   const cohort = cohortQuery.data?.data;
   const enrollments = enrollmentQuery.data?.data;
   const joinUrl = useJoinUrl(cohort?.joinToken);
   const copyJoinLink = useCopyJoinLink(joinUrl);
+  const [emailsInput, setEmailsInput] = useState("");
   const [csv, setCsv] = useState("");
   const [preview, setPreview] = useState<PreviewItem[]>([]);
   const [summary, setSummary] = useState<InvitationPreviewSummary | null>(null);
   const [busy, setBusy] = useState(false);
+  useLighthouseOrganizationGuard(Boolean(csv || emailsInput || preview.length), busy);
   const sendDisabledReason = summary ? getInvitationSendDisabledReason(summary) : null;
   const joinOpen = Boolean(cohort?.joinToken) && !cohort?.joinPaused;
 
@@ -113,7 +123,15 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
   async function sendInvitations() {
     // 已加入者由 server 略過不重寄（daodao#282），略過數以寄送當下的 server 結果為準
     const validEmails = preview.filter((item) => item.valid).map((item) => item.email);
-    if (!validEmails.length || sendDisabledReason) return;
+    if (
+      !validEmails.length ||
+      sendDisabledReason ||
+      !confirmingInvitations ||
+      !organization ||
+      !cohort
+    )
+      return;
+    setConfirmingInvitations(false);
     setBusy(true);
     const response = await inviteLighthouseCohortMembers(programId, cohortId, {
       emails: validEmails,
@@ -129,6 +147,7 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
     setPreview([]);
     setSummary(null);
     setCsv("");
+    setEmailsInput("");
     const { queuedCount, skippedCount } = response.data.data;
     toast.success(
       skippedCount > 0
@@ -143,7 +162,11 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
     setSummary(null);
   }
 
-  async function resend(enrollmentId: number) {
+  async function resend() {
+    if (!resendTarget || !organization || !cohort || busy) return;
+    const enrollmentId = resendTarget.id;
+    setResendTarget(null);
+    setBusy(true);
     try {
       const response = await resendLighthouseCohortInvitation(programId, cohortId, enrollmentId);
       if (response.error) {
@@ -155,6 +178,8 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
       toast.success(t("invitation_resent"));
     } catch {
       toast.error(t("invitation_send_failed"));
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -242,6 +267,14 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
             <Textarea
               id="invite-emails"
               name="emails"
+              value={emailsInput}
+              onChange={(event) => {
+                setEmailsInput(event.target.value);
+                setPreview([]);
+                setSummary(null);
+                setConfirmingInvitations(false);
+              }}
+              disabled={busy}
               rows={4}
               placeholder="one@example.com&#10;two@example.com"
             />
@@ -307,6 +340,32 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
         </section>
       </section>
 
+      <ConfirmDialog
+        open={confirmingInvitations}
+        title={t("send_invitations")}
+        description={t("invitation_destination_confirm", {
+          organization: organization?.name ?? "",
+          cohort: cohort?.displayName ?? "",
+          count: summary?.sendableCount ?? 0,
+        })}
+        confirmLabel={t("send_invitations")}
+        onConfirm={sendInvitations}
+        onOpenChange={setConfirmingInvitations}
+      />
+      <ConfirmDialog
+        open={resendTarget !== null}
+        title={t("resend")}
+        description={t("invitation_resend_destination_confirm", {
+          organization: organization?.name ?? "",
+          cohort: cohort?.displayName ?? "",
+          email: resendTarget?.email ?? "",
+        })}
+        confirmLabel={t("resend")}
+        onConfirm={resend}
+        onOpenChange={(open) => {
+          if (!open) setResendTarget(null);
+        }}
+      />
       {/* FR-RS-03 預覽結果 */}
       {preview.length > 0 && (
         <section
@@ -318,8 +377,8 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
               {t("preview_result")}
             </h2>
             <Button
-              onClick={sendInvitations}
-              disabled={busy || sendDisabledReason !== null}
+              onClick={() => setConfirmingInvitations(true)}
+              disabled={busy || sendDisabledReason !== null || !organization || !cohort}
               aria-describedby={sendDisabledReason ? "roster-send-disabled-reason" : undefined}
             >
               <Send className="size-4" aria-hidden="true" />
@@ -420,7 +479,17 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
                   {t(`enrollment_status_${enrollment.status}`)}
                 </span>
                 {enrollment.status === "invited" && (
-                  <Button size="sm" variant="outline" onClick={() => resend(enrollment.id)}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={busy || !organization || !cohort}
+                    onClick={() =>
+                      setResendTarget({
+                        id: enrollment.id,
+                        email: enrollment.email ?? enrollment.nickname ?? t("learner"),
+                      })
+                    }
+                  >
                     <RefreshCw className="size-4" aria-hidden="true" />
                     {t("resend")}
                   </Button>

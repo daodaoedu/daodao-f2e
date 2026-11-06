@@ -1,5 +1,6 @@
 import { XIcon } from "lucide-react";
 import { cn } from "../../../../lib/utils";
+import { PortalScopeContent, usePortalScope } from "../../../portal-scope";
 import {
   DialogClose as DialogClosePrimitive,
   type DialogCloseProps as DialogClosePrimitiveProps,
@@ -70,6 +71,7 @@ function DialogContent({
   portalContainer,
   ...props
 }: DialogContentProps) {
+  const scope = usePortalScope();
   return (
     <DialogPortalPrimitive container={portalContainer ?? undefined}>
       <DialogOverlay className={overlayClassName} />
@@ -79,14 +81,29 @@ function DialogContent({
           className
         )}
         {...props}
+        {...(scope?.suspended ? { "aria-label": scope.label, "aria-labelledby": undefined } : {})}
+        onEscapeKeyDown={(event) => {
+          if (scope?.suspended) event.preventDefault();
+          else props.onEscapeKeyDown?.(event);
+        }}
+        onPointerDownOutside={(event) => {
+          if (scope?.suspended) event.preventDefault();
+          else props.onPointerDownOutside?.(event);
+        }}
+        onInteractOutside={(event) => {
+          if (scope?.suspended) event.preventDefault();
+          else props.onInteractOutside?.(event);
+        }}
       >
-        {children}
-        {showCloseButton && (
-          <DialogClosePrimitive className="p-2 ring-offset-background focus:ring-ring bg-[#F5F6F6]/50 absolute top-4 right-5 rounded-full focus:ring-2 focus:ring-offset-2 focus:outline-hidden cursor-pointer disabled:pointer-events-none">
-            <XIcon className="size-6 text-light-gray" />
-            <span className="sr-only">Close</span>
-          </DialogClosePrimitive>
-        )}
+        <PortalScopeContent>
+          {children}
+          {showCloseButton && (
+            <DialogClosePrimitive className="p-2 ring-offset-background focus:ring-ring bg-[#F5F6F6]/50 absolute top-4 right-5 rounded-full focus:ring-2 focus:ring-offset-2 focus:outline-hidden cursor-pointer disabled:pointer-events-none">
+              <XIcon className="size-6 text-light-gray" />
+              <span className="sr-only">Close</span>
+            </DialogClosePrimitive>
+          )}
+        </PortalScopeContent>
       </DialogContentPrimitive>
     </DialogPortalPrimitive>
   );

@@ -5,7 +5,6 @@ import {
   type LighthouseFocusEncouragementType,
   type LighthouseMessageCategory,
   useLighthouseFocus,
-  useLighthouseOrganizations,
 } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import {
@@ -21,6 +20,7 @@ import { useState } from "react";
 import { CohortCheckinDrawer } from "./cohort-checkin-drawer";
 import { CohortErrorState } from "./cohort-error-state";
 import { CohortMessageComposeDialog, CohortMessageHistoryDialog } from "./cohort-message-dialogs";
+import { useLighthouseOrganization } from "./lighthouse-organization-context";
 
 interface CohortFocusProps {
   programId: number;
@@ -46,8 +46,8 @@ export function CohortFocus({ programId, cohortId }: CohortFocusProps) {
     null
   );
   const query = useLighthouseFocus(programId, cohortId);
-  const { organizations } = useLighthouseOrganizations();
-  const organizationId = organizations?.[0]?.id;
+  const { organization } = useLighthouseOrganization();
+  const organizationId = organization?.id;
   const data = query.data?.data;
 
   if (query.isLoading) return <p className="px-10 py-12 text-sm text-[#5A7B79]">{t("loading")}</p>;

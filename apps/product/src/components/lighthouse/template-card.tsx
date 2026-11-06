@@ -7,7 +7,6 @@ import {
   type LighthouseTemplate,
   setLighthouseTemplateBinding,
 } from "@daodao/api";
-
 import { useTranslations } from "@daodao/i18n";
 import {
   Dialog,
@@ -39,6 +38,7 @@ import { useState } from "react";
 import { formatSlashDate, isCohortStarted, templateBindingEndDate } from "@/utils/template-library";
 import { CohortResourceDialog } from "./cohort-resource-dialog";
 import { ConfirmDialog } from "./confirm-dialog";
+import { useLighthouseOrganizationGuard } from "./lighthouse-organization-context";
 import { LIGHTHOUSE_SCOPE } from "./lighthouse-scope";
 import { useLighthouseErrorMessage } from "./use-lighthouse-error-message";
 
@@ -74,6 +74,7 @@ export function TemplateCard({
   const t = useTranslations("lighthouse");
   const apiErrorMessage = useLighthouseErrorMessage();
   const [busy, setBusy] = useState(false);
+  useLighthouseOrganizationGuard(false, busy);
   const [bindOpen, setBindOpen] = useState(false);
   const [allOpen, setAllOpen] = useState(false);
   const [unbinding, setUnbinding] = useState<BoundRow | null>(null);

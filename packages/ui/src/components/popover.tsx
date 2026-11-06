@@ -4,6 +4,7 @@ import { Popover as PopoverPrimitive } from "radix-ui";
 import type * as React from "react";
 
 import { cn } from "../lib/utils";
+import { usePortalScope } from "./portal-scope";
 
 function Popover({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Root>) {
   return <PopoverPrimitive.Root data-slot="popover" {...props} />;
@@ -19,6 +20,8 @@ function PopoverContent({
   sideOffset = 4,
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Content>) {
+  const scope = usePortalScope();
+  if (scope?.suspended) return null;
   return (
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content

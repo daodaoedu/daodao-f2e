@@ -31,6 +31,8 @@ export interface AuthContextValue {
   user: StoredUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  /** The session could not be checked; this is not an authentication rejection. */
+  authCheckUnavailable?: boolean;
   /** 是否為臨時用戶（需要完成 onboarding） */
   isTemporary: boolean;
   /** Email 是否已驗證 */

@@ -3,12 +3,12 @@
 import {
   type LighthouseOrganizationCohortType,
   useLighthouseOrganizationCohorts,
-  useLighthouseOrganizations,
 } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { ArrowUpRight, Pencil, RadioTower } from "lucide-react";
+import { useLighthouseOrganization } from "./lighthouse-organization-context";
 
 const STATUS_STYLES: Record<LighthouseOrganizationCohortType["status"], string> = {
   published: "text-[#0D7773]",
@@ -17,9 +17,13 @@ const STATUS_STYLES: Record<LighthouseOrganizationCohortType["status"], string> 
 };
 
 function CohortCard({ cohort }: { cohort: LighthouseOrganizationCohortType }) {
+  const { href } = useLighthouseOrganization();
   const t = useTranslations("lighthouse");
   const manageHref = `/lighthouse/programs/${cohort.programId}/cohorts/${cohort.id}/dashboard`;
-  const editHref = `/lighthouse/programs?edit=${cohort.id}#cohort-${cohort.id}`;
+  const editHref = href(
+    `/lighthouse/programs?edit=${cohort.id}#cohort-${cohort.id}`,
+    cohort.organizationId
+  );
 
   return (
     <article
@@ -88,9 +92,10 @@ function CohortCard({ cohort }: { cohort: LighthouseOrganizationCohortType }) {
 }
 
 export function LighthouseOverview() {
+  const { href } = useLighthouseOrganization();
   const t = useTranslations("lighthouse");
-  const { organizations } = useLighthouseOrganizations();
-  const organizationId = organizations?.[0]?.id;
+  const { organization } = useLighthouseOrganization();
+  const organizationId = organization?.id;
   const { cohorts: allCohorts, isLoading } = useLighthouseOrganizationCohorts(organizationId);
   // 封存中的場次改由「封存」頁列出（FR-ARC-04 主要列表需排除封存項目）
   const cohorts = allCohorts?.filter((cohort) => cohort.status !== "archived");
@@ -103,7 +108,7 @@ export function LighthouseOverview() {
         </h1>
         <div className="mt-3 text-right">
           <CustomLink
-            href="/lighthouse/programs"
+            href={href("/lighthouse/programs")}
             className="text-sm font-semibold text-[#0D7773] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-logo-cyan"
           >
             {t("nav_programs")}

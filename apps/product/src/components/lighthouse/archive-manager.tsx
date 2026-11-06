@@ -7,7 +7,6 @@ import {
   type LighthouseArchiveType,
   restoreLighthouseArchiveItem,
   useLighthouseArchive,
-  useLighthouseOrganizations,
 } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
@@ -15,6 +14,10 @@ import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { useEffect, useState } from "react";
 import { ConfirmDialog } from "./confirm-dialog";
+import {
+  useLighthouseOrganization,
+  useLighthouseOrganizationGuard,
+} from "./lighthouse-organization-context";
 import { useLighthouseErrorMessage } from "./use-lighthouse-error-message";
 
 const RESTORE_NOTICE_MS = 3000;
@@ -23,14 +26,14 @@ const RESTORE_NOTICE_MS = 3000;
 export function ArchiveManager() {
   const t = useTranslations("lighthouse");
   const apiErrorMessage = useLighthouseErrorMessage();
-  const { organizations } = useLighthouseOrganizations();
-  const organization = organizations?.[0];
+  const { organization } = useLighthouseOrganization();
   const [type, setType] = useState<LighthouseArchiveType>("templates");
   const archiveQuery = useLighthouseArchive(organization?.id, type);
   const items = archiveQuery.data?.data.items ?? [];
   const [notice, setNotice] = useState<string | null>(null);
   const [pending, setPending] = useState<LighthouseArchiveItem | null>(null);
   const [busyId, setBusyId] = useState<number | null>(null);
+  useLighthouseOrganizationGuard(false, busyId !== null);
 
   useEffect(() => {
     if (!notice) return;

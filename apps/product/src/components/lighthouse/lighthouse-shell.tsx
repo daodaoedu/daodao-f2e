@@ -12,6 +12,11 @@ import {
   LayoutDashboard,
   RadioTower,
 } from "lucide-react";
+import {
+  LighthouseOrganizationContent,
+  LighthouseOrganizationProvider,
+  useLighthouseOrganization,
+} from "./lighthouse-organization-context";
 
 interface LighthouseShellProps {
   children: React.ReactNode;
@@ -31,6 +36,17 @@ const navigationItems = [
 ] as const;
 
 export function LighthouseShell({ children }: LighthouseShellProps) {
+  const pathname = usePathname();
+  if (pathname === "/lighthouse/access-required") return <>{children}</>;
+  return (
+    <LighthouseOrganizationProvider>
+      <LighthouseShellContent>{children}</LighthouseShellContent>
+    </LighthouseOrganizationProvider>
+  );
+}
+
+function LighthouseShellContent({ children }: LighthouseShellProps) {
+  const { href } = useLighthouseOrganization();
   const pathname = usePathname();
   const t = useTranslations("lighthouse");
 
@@ -55,12 +71,17 @@ export function LighthouseShell({ children }: LighthouseShellProps) {
         <nav className="mt-8" aria-label={t("navigation_label")}>
           <ul className="space-y-1.5">
             {navigationItems.map((item) => {
-              const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
+              const destination = href(item.href);
+              const isActive = item.exact
+                ? pathname === destination
+                : pathname.startsWith(destination) ||
+                  (item.href === "/lighthouse/programs" &&
+                    pathname.startsWith("/lighthouse/programs/"));
               const Icon = item.icon;
               return (
                 <li key={item.href}>
                   <CustomLink
-                    href={item.href}
+                    href={href(item.href)}
                     aria-current={isActive ? "page" : undefined}
                     className={cn(
                       "relative flex items-center gap-3 rounded-[12px] px-4 py-3 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-logo-cyan",
@@ -95,11 +116,16 @@ export function LighthouseShell({ children }: LighthouseShellProps) {
         <nav className="mt-3 overflow-x-auto" aria-label={t("navigation_label")}>
           <ul className="flex min-w-max gap-2 pb-1">
             {navigationItems.map((item) => {
-              const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
+              const destination = href(item.href);
+              const isActive = item.exact
+                ? pathname === destination
+                : pathname.startsWith(destination) ||
+                  (item.href === "/lighthouse/programs" &&
+                    pathname.startsWith("/lighthouse/programs/"));
               return (
                 <li key={item.href}>
                   <CustomLink
-                    href={item.href}
+                    href={href(item.href)}
                     aria-current={isActive ? "page" : undefined}
                     className={cn(
                       "block rounded-full px-3.5 py-2 text-sm font-medium focus-visible:outline-2 focus-visible:outline-logo-cyan",
@@ -115,7 +141,9 @@ export function LighthouseShell({ children }: LighthouseShellProps) {
         </nav>
       </header>
 
-      <main className="min-h-screen md:pl-64">{children}</main>
+      <main className="min-h-screen md:pl-64">
+        <LighthouseOrganizationContent>{children}</LighthouseOrganizationContent>
+      </main>
     </div>
   );
 }

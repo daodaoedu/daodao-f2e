@@ -31,6 +31,14 @@ export function getSafeLoginRedirect(value: string | null | undefined): string {
       if (next === decodedPath) break;
       decodedPath = next;
     }
+    const target = new URL(decodedPath, RETURN_ORIGIN);
+    if (
+      /^\/(?:en\/|zh-TW\/)?auth\/(?:login|callback|error|access-unavailable)(?:\/|$)/.test(
+        target.pathname
+      )
+    ) {
+      return DEFAULT_REDIRECT_URL;
+    }
     return value;
   } catch {
     return DEFAULT_REDIRECT_URL;

@@ -5,6 +5,7 @@ import { Select as SelectPrimitive } from "radix-ui";
 import type * as React from "react";
 
 import { cn } from "../lib/utils";
+import { usePortalScope } from "./portal-scope";
 
 function Select({ ...props }: React.ComponentProps<typeof SelectPrimitive.Root>) {
   return <SelectPrimitive.Root data-slot="select" {...props} />;
@@ -62,6 +63,8 @@ function SelectContent({
   align = "center",
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Content>) {
+  const scope = usePortalScope();
+  if (scope?.suspended) return null;
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content

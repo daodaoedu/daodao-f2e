@@ -1,5 +1,6 @@
 import { XIcon } from "lucide-react";
 import { cn } from "../../../../lib/utils";
+import { PortalScopeContent, usePortalScope } from "../../../portal-scope";
 import {
   SheetClose as SheetClosePrimitive,
   type SheetCloseProps as SheetClosePrimitiveProps,
@@ -54,6 +55,7 @@ function SheetClose(props: SheetCloseProps) {
 type SheetContentProps = SheetContentPrimitiveProps;
 
 function SheetContent({ className, children, side = "right", ...props }: SheetContentProps) {
+  const scope = usePortalScope();
   return (
     <SheetPortalPrimitive>
       <SheetOverlay />
@@ -68,8 +70,21 @@ function SheetContent({ className, children, side = "right", ...props }: SheetCo
         )}
         side={side}
         {...props}
+        {...(scope?.suspended ? { "aria-label": scope.label, "aria-labelledby": undefined } : {})}
+        onEscapeKeyDown={(event) => {
+          if (scope?.suspended) event.preventDefault();
+          else props.onEscapeKeyDown?.(event);
+        }}
+        onPointerDownOutside={(event) => {
+          if (scope?.suspended) event.preventDefault();
+          else props.onPointerDownOutside?.(event);
+        }}
+        onInteractOutside={(event) => {
+          if (scope?.suspended) event.preventDefault();
+          else props.onInteractOutside?.(event);
+        }}
       >
-        {children}
+        <PortalScopeContent>{children}</PortalScopeContent>
       </SheetContentPrimitive>
     </SheetPortalPrimitive>
   );

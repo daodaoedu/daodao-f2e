@@ -14,6 +14,10 @@ import { Textarea } from "@daodao/ui/components/textarea";
 import { cn } from "@daodao/ui/lib/utils";
 import { AlertCircle, Sparkles } from "lucide-react";
 import { useState } from "react";
+import {
+  useLighthouseOrganization,
+  useLighthouseOrganizationGuard,
+} from "./lighthouse-organization-context";
 import { useLighthouseErrorMessage } from "./use-lighthouse-error-message";
 
 interface CohortOutcomeSummaryProps {
@@ -37,6 +41,7 @@ export function CohortOutcomeSummary({
   outcome,
   refresh,
 }: CohortOutcomeSummaryProps) {
+  const { href } = useLighthouseOrganization();
   const t = useTranslations("lighthouse");
   const apiErrorMessage = useLighthouseErrorMessage();
   const [mode, setMode] = useState<LighthouseSummaryMode>("platform");
@@ -44,6 +49,10 @@ export function CohortOutcomeSummary({
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState<"generate" | "save" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  useLighthouseOrganizationGuard(
+    editing && draft !== outcome.summary.current?.content,
+    busy !== null
+  );
 
   const current = outcome.summary.current;
   const ownKey = outcome.ai.ownKey;
@@ -155,7 +164,7 @@ export function CohortOutcomeSummary({
               ? t("outcome_own_key_invalid")
               : t("outcome_own_key_missing")}{" "}
             <CustomLink
-              href="/lighthouse/organization"
+              href={href("/lighthouse/organization")}
               className="font-semibold underline underline-offset-2"
             >
               {t("nav_organization")}

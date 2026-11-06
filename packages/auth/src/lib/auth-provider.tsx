@@ -14,6 +14,7 @@ import { LoginDialog } from "../components/login-dialog";
 import type { AuthContextValue, StoredUser } from "../types";
 import { initiateOAuthLogin } from "./auth-client";
 import { DEFAULT_REDIRECT_URL } from "./auth-constants";
+import { classifySessionResponse } from "./session-response";
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
@@ -202,6 +203,7 @@ export const AuthProvider = ({
   const [user, setUser] = useState<StoredUser | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [authCheckUnavailable, setAuthCheckUnavailable] = useState(false);
   const [isTemporary, setIsTemporary] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(true); // 預設為 true，避免閃爍
   const [roles, setRoles] = useState<string[]>([]);
@@ -218,6 +220,7 @@ export const AuthProvider = ({
    * 統一處理使用者狀態清除邏輯
    */
   const clearAuthState = useCallback(() => {
+    setAuthCheckUnavailable(false);
     setUser(null);
     setIsAuthenticated(false);
     userInfoStorage.remove();
@@ -238,6 +241,7 @@ export const AuthProvider = ({
    */
   const setAuthState = useCallback(
     (storedUser: StoredUser) => {
+      setAuthCheckUnavailable(false);
       setUser(storedUser);
       setIsAuthenticated(true);
       userInfoStorage.set(storedUser);
@@ -254,7 +258,8 @@ export const AuthProvider = ({
       setIsLoading(true);
       const response = await getAuthMe();
 
-      if (response.data?.data?.user) {
+      const sessionStatus = classifySessionResponse(response.response.status, response.data);
+      if (sessionStatus === "authenticated" && response.data?.data?.user) {
         const userData = response.data.data.user;
         const temporary = response.data.data.isTemporary ?? false;
         const emailVerified = userData.email_verified ?? false;
@@ -278,21 +283,19 @@ export const AuthProvider = ({
           permissions: userPermissions,
         };
         setAuthState(storedUser);
-      } else {
-        // 未登入或 Token 無效
+      } else if (sessionStatus === "unauthorized") {
+        // Only an explicit 401 invalidates the session; an outage must not clear cookies.
         clearAuthState();
         setIsTemporary(false);
         setIsEmailVerified(true); // 重置為 true
         setRoles([]);
         setPermissions([]);
+      } else {
+        setAuthCheckUnavailable(true);
       }
     } catch (error) {
       console.error("Failed to check auth status:", error);
-      clearAuthState();
-      setIsTemporary(false);
-      setIsEmailVerified(true); // 重置為 true
-      setRoles([]);
-      setPermissions([]);
+      setAuthCheckUnavailable(true);
     } finally {
       setIsLoading(false);
     }
@@ -406,7 +409,7 @@ export const AuthProvider = ({
     }
 
     // 如果還在載入中，不進行檢查
-    if (isLoading) {
+    if (isLoading || authCheckUnavailable) {
       return;
     }
 
@@ -432,6 +435,7 @@ export const AuthProvider = ({
     pathname,
     isAuthenticated,
     isLoading,
+    authCheckUnavailable,
     publicPattern,
     protectedPattern,
     defaultProtected,
@@ -632,6 +636,7 @@ export const AuthProvider = ({
       user,
       isAuthenticated,
       isLoading,
+      authCheckUnavailable,
       isTemporary,
       isEmailVerified,
       login,
@@ -650,6 +655,7 @@ export const AuthProvider = ({
       user,
       isAuthenticated,
       isLoading,
+      authCheckUnavailable,
       isTemporary,
       isEmailVerified,
       login,
