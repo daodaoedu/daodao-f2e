@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+const redirects = vi.hoisted(() => ({ location: null as string | null }));
 const environment = vi.hoisted(() => new Map<string, string>());
 vi.mock("@daodao/config", () => ({
   getEnv: (key: string, fallback?: string) => environment.get(key) || fallback,
 }));
 vi.mock("@daodao/i18n/routing", () => ({ routing: {} }));
-vi.mock("@daodao/i18n/middleware", () => ({ default: () => () => NextResponse.next() }));
+vi.mock("@daodao/i18n/middleware", () => ({
+  default: () => () =>
+    redirects.location ? NextResponse.redirect(redirects.location) : NextResponse.next(),
+}));
 
 import middleware from "../middleware";
 
@@ -168,5 +172,81 @@ describe("old Lighthouse entry URLs", () => {
     );
     const response = await middleware(request("fixture-session", "/lighthouse"));
     expect(response.headers.get("location")).toBeNull();
+  });
+});
+
+describe("redirects through a mapped production listen port", () => {
+  beforeEach(() => {
+    environment.clear();
+    environment.set("API_INTERNAL_URL", "http://server:4000");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        async (url: string) =>
+          new Response(
+            JSON.stringify({
+              data: url.endsWith("/preferences")
+                ? { organizationId: 4 }
+                : [{ id: 4, status: "active" }],
+            })
+          )
+      )
+    );
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  it.each([
+    ["http://0.0.0.0:3001", "localhost:43141", "http://localhost:43141"],
+    ["https://0.0.0.0:3001", "app.example.test", "https://app.example.test"],
+    ["http://localhost:3001", "localhost:3001", "http://localhost:3001"],
+    ["http://[::1]:3001", "[::1]:43141", "http://[::1]:43141"],
+  ])("preserves the public authority %s -> %s", async (internalOrigin, host, publicOrigin) => {
+    const response = await middleware(
+      new NextRequest(`${internalOrigin}/en/lighthouse/programs?edit=8`, {
+        headers: { host, cookie: "auth_token=session", "x-forwarded-host": "attacker.example" },
+      })
+    );
+    expect(response.headers.get("location")).toBe(
+      `${publicOrigin}/en/lighthouse/o/4/programs?edit=8`
+    );
+  });
+
+  it.each([
+    [
+      "/en/spaces/personal?tab=active",
+      "/en/auth/login?redirect=%2Fen%2Fspaces%2Fpersonal%3Ftab%3Dactive",
+    ],
+    ["/en/lighthouse/programs", "/en/auth/login?redirect=%2Fen%2Flighthouse%2Fprograms"],
+  ])("keeps guest redirects on the public origin for %s", async (path, destination) => {
+    const response = await middleware(
+      new NextRequest(`http://0.0.0.0:3001${path}`, {
+        headers: { host: "localhost:43141" },
+      })
+    );
+    expect(response.headers.get("location")).toBe(`http://localhost:43141${destination}`);
+  });
+});
+
+describe("redirect authority safety", () => {
+  afterEach(() => {
+    redirects.location = null;
+  });
+  it("leaves an external redirect untouched", async () => {
+    redirects.location = "https://accounts.example.test/sign-in";
+    const response = await middleware(
+      new NextRequest("http://0.0.0.0:3001/challenges", { headers: { host: "localhost:43141" } })
+    );
+    expect(response.headers.get("location")).toBe("https://accounts.example.test/sign-in");
+  });
+  it.each([
+    "attacker.example/path",
+    "user@attacker.example",
+    "app.test,attacker.example",
+    "attacker.example#fragment",
+  ])("rejects malformed authority %s", async (host) => {
+    const response = await middleware(
+      new NextRequest("http://0.0.0.0:3001/en/spaces/personal", { headers: { host } })
+    );
+    expect(new URL(response.headers.get("location")!).origin).toBe("http://0.0.0.0:3001");
   });
 });

@@ -1,7 +1,10 @@
 import { NextRequest } from "next/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@daodao/config", () => ({ getEnv: () => "https://api.test" }));
+const environment = vi.hoisted(() => new Map<string, string>());
+vi.mock("@daodao/config", () => ({
+  getEnv: (key: string, fallback?: string) => environment.get(key) || fallback,
+}));
 vi.mock("@daodao/i18n/middleware", () => ({
   default: () => () => new Response(null, { status: 200 }),
 }));
@@ -15,7 +18,10 @@ const request = (path: string, token?: string) =>
     token ? { headers: { cookie: `auth_token=${token}` } } : undefined
   );
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  environment.clear();
+});
 
 describe("private routes require login and preserve their destination", () => {
   it.each([
@@ -74,5 +80,30 @@ describe("private routes require login and preserve their destination", () => {
     expect(location.searchParams.get("redirect")).toBe(
       "/en/lighthouse/organization?organizationId=2"
     );
+  });
+});
+
+describe("private session backend routing", () => {
+  it("uses the internal API for an authenticated private page", async () => {
+    environment.set("API_INTERNAL_URL", "http://server:4000/");
+    environment.set("NEXT_PUBLIC_API_URL", "http://localhost:43140");
+    const fetchMock = vi.fn(async (url: string) => {
+      if (url === "http://server:4000/api/v1/auth/me")
+        return new Response(JSON.stringify({ data: { user: { id: "user" }, isTemporary: false } }));
+      throw new TypeError("Public loopback is unreachable inside the product container");
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const response = await middleware(request("/en/spaces/personal", "valid"));
+    expect(response.status).toBe(200);
+    expect(fetchMock.mock.calls[0]?.[0]).toBe("http://server:4000/api/v1/auth/me");
+  });
+  it("falls back to the public API outside a private service network", async () => {
+    environment.set("NEXT_PUBLIC_API_URL", "https://api.test/");
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(new Response(JSON.stringify({ data: { user: { id: "user" } } })));
+    vi.stubGlobal("fetch", fetchMock);
+    expect((await middleware(request("/en/spaces/personal", "valid"))).status).toBe(200);
+    expect(fetchMock.mock.calls[0]?.[0]).toBe("https://api.test/api/v1/auth/me");
   });
 });

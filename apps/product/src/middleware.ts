@@ -12,11 +12,6 @@ import { resolveLighthouseOrganization } from "./utils/lighthouse-organization";
  */
 const i18nMiddleware = createMiddleware(routing);
 
-// dev 環境曾經出現 redirect Location 帶內部 listen port (:3001)，
-// 導致瀏覽器 navigate 到不可達 URL → ERR_CONNECTION_TIMED_OUT。
-// 觸發條件 curl 重現不出（只在瀏覽器特定 header / cookie 組合下發生），
-// 先在 middleware 層把 Location 中的 :3001 清掉，並 log 觸發 headers 以便日後追根因。
-const INTERNAL_PORT_RE = /:3001(?=\/|$|\?|#)/g;
 const LIGHTHOUSE_PATH_RE = /^\/(?:en\/)?lighthouse(?:\/|$)/;
 const LIGHTHOUSE_ACCESS_REQUIRED_RE = /^\/(?:en\/)?lighthouse\/access-required(?:\/|$)/;
 
@@ -70,34 +65,21 @@ function localizedPath(pathname: string, path: string): string {
 
 function normalizeRedirectLocation(request: NextRequest, response: NextResponse): NextResponse {
   const location = response.headers.get("location");
-  // Local dev runs on :3001 directly, so :3001 in Location is legitimate there.
-  // Only strip when the request host is not :3001 (i.e., behind a proxy in prod).
-  const isLocalDevPort = (request.headers.get("host") ?? "").endsWith(":3001");
-  if (location?.includes(":3001") && !isLocalDevPort) {
-    const cleaned = location.replace(INTERNAL_PORT_RE, "");
-    response.headers.set("location", cleaned);
+  const host = request.headers.get("host");
+  if (!location || !host || !/^[a-zA-Z0-9.[\]:-]+$/.test(host)) return response;
 
-    console.warn("[middleware] stripped :3001 from redirect Location", {
-      method: request.method,
-      path: request.nextUrl.pathname + request.nextUrl.search,
-      original: location,
-      rewritten: cleaned,
-      hasCookie: request.headers.has("cookie"),
-      hasRsc: request.headers.has("rsc") || request.headers.has("next-router-state-tree"),
-      headers: {
-        host: request.headers.get("host"),
-        "x-forwarded-host": request.headers.get("x-forwarded-host"),
-        "x-forwarded-port": request.headers.get("x-forwarded-port"),
-        "x-forwarded-proto": request.headers.get("x-forwarded-proto"),
-        referer: request.headers.get("referer"),
-        "user-agent": request.headers.get("user-agent"),
-        "sec-fetch-site": request.headers.get("sec-fetch-site"),
-        "sec-fetch-mode": request.headers.get("sec-fetch-mode"),
-        "sec-fetch-dest": request.headers.get("sec-fetch-dest"),
-      },
-    });
+  try {
+    const destination = new URL(location, request.nextUrl);
+    // Next builds middleware URLs from the container's listen address. Host is the
+    // requested public authority; forwarded-host must not choose a new destination.
+    if (destination.origin !== request.nextUrl.origin) return response;
+    const publicOrigin = new URL(`${request.nextUrl.protocol}//${host}`);
+    destination.hostname = publicOrigin.hostname;
+    destination.port = publicOrigin.port;
+    response.headers.set("location", destination.toString());
+  } catch {
+    // A malformed authority must not become a redirect destination.
   }
-
   return response;
 }
 
@@ -105,7 +87,9 @@ export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   if (isPrivateSpacePath(pathname)) {
     const apiBaseUrl =
-      getEnv("NEXT_PUBLIC_API_URL", "https://api.daodao.so") ?? "https://api.daodao.so";
+      getEnv("API_INTERNAL_URL") ||
+      getEnv("NEXT_PUBLIC_API_URL", "https://api.daodao.so") ||
+      "https://api.daodao.so";
     const access = await checkPrivateSession(request.cookies.get("auth_token")?.value, apiBaseUrl);
     if (access !== "allowed") {
       const destination = request.nextUrl.clone();
