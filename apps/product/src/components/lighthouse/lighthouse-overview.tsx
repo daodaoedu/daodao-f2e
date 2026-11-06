@@ -27,7 +27,7 @@ function CohortCard({ cohort }: { cohort: LighthouseOrganizationCohortType }) {
 
   return (
     <article
-      className="group relative rounded-3xl border border-[#CDEBE8] bg-white p-6 transition-transform hover:-translate-y-0.5 focus-within:-translate-y-0.5"
+      className="group relative min-w-0 rounded-3xl border border-[#CDEBE8] bg-white p-6 transition-transform hover:-translate-y-0.5 focus-within:-translate-y-0.5"
       aria-labelledby={`cohort-card-${cohort.id}-title`}
     >
       <CustomLink
@@ -55,7 +55,7 @@ function CohortCard({ cohort }: { cohort: LighthouseOrganizationCohortType }) {
                 asChild
                 variant="outline"
                 size="icon"
-                className="pointer-events-auto relative z-10 size-7 rounded-full border-[#CDEBE8] text-[#0D7773]"
+                className="pointer-events-auto relative z-10 size-7 shrink-0 rounded-full border-[#CDEBE8] text-[#0D7773]"
               >
                 <CustomLink href={editHref} aria-label={t("cohort_edit")} title={t("cohort_edit")}>
                   <Pencil className="size-3.5" aria-hidden="true" />
@@ -69,7 +69,7 @@ function CohortCard({ cohort }: { cohort: LighthouseOrganizationCohortType }) {
         </div>
         <CustomLink
           href={manageHref}
-          className="pointer-events-auto relative z-10 grid size-8 place-items-center rounded-full text-[#0D7773] hover:bg-[#EDF8F6]"
+          className="pointer-events-auto relative z-10 grid size-8 shrink-0 place-items-center rounded-full text-[#0D7773] hover:bg-[#EDF8F6]"
           aria-label={t("manage_cohort")}
           title={t("manage_cohort")}
         >
