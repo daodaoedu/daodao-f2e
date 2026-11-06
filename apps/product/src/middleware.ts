@@ -120,6 +120,21 @@ function normalizeRedirectLocation(request: NextRequest, response: NextResponse)
     // requested public authority; forwarded-host must not choose a new destination.
     if (destination.origin !== request.nextUrl.origin) return response;
     const publicOrigin = new URL(`${request.nextUrl.protocol}//${host}`);
+    try {
+      // TLS terminates before Next in dev; only the configured app authority may
+      // restore HTTPS, never an untrusted forwarded header or a different host.
+      const configuredOrigin = new URL(getEnv("NEXT_PUBLIC_APP_URL") || "");
+      if (
+        configuredOrigin.protocol === "https:" &&
+        configuredOrigin.host === publicOrigin.host &&
+        !configuredOrigin.username &&
+        !configuredOrigin.password
+      )
+        publicOrigin.protocol = "https:";
+    } catch {
+      // Missing or invalid app configuration retains the request's protocol.
+    }
+    destination.protocol = publicOrigin.protocol;
     destination.hostname = publicOrigin.hostname;
     destination.port = publicOrigin.port;
     response.headers.set("location", destination.toString());

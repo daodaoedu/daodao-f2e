@@ -305,6 +305,75 @@ describe("redirects through a mapped production listen port", () => {
 
   it.each([
     [
+      "http://0.0.0.0:3001",
+      "app.example.test",
+      "https://app.example.test",
+      "https://app.example.test",
+    ],
+    [
+      "http://0.0.0.0:3001",
+      "app.example.test",
+      "https://other.example.test",
+      "http://app.example.test",
+    ],
+    ["http://0.0.0.0:3001", "app.example.test", "not a URL", "http://app.example.test"],
+    [
+      "http://0.0.0.0:3001",
+      "app.example.test",
+      "ftp://app.example.test",
+      "http://app.example.test",
+    ],
+    [
+      "http://0.0.0.0:3001",
+      "localhost:43141",
+      "https://app.example.test",
+      "http://localhost:43141",
+    ],
+    [
+      "https://0.0.0.0:3001",
+      "app.example.test",
+      "http://app.example.test",
+      "https://app.example.test",
+    ],
+    [
+      "http://0.0.0.0:3001",
+      "app.example.test:8443",
+      "https://app.example.test:8443",
+      "https://app.example.test:8443",
+    ],
+    [
+      "http://0.0.0.0:3001",
+      "app.example.test:8443",
+      "https://app.example.test",
+      "http://app.example.test:8443",
+    ],
+  ])("uses the configured public HTTPS origin only for the same authority (%s, %s, %s)", async (internalOrigin, host, configuredOrigin, publicOrigin) => {
+    environment.set("NEXT_PUBLIC_APP_URL", configuredOrigin);
+    const response = await middleware(
+      new NextRequest(`${internalOrigin}/en/spaces/personal?tab=active`, {
+        headers: { host, "x-forwarded-proto": "https", "x-forwarded-host": "attacker.example" },
+      })
+    );
+    expect(response.headers.get("location")).toBe(
+      `${publicOrigin}/en/auth/login?redirect=%2Fen%2Fspaces%2Fpersonal%3Ftab%3Dactive`
+    );
+  });
+
+  it.each([
+    ["", "/en/lighthouse/programs", "/en/auth/login?redirect=%2Fen%2Flighthouse%2Fprograms"],
+    ["session", "/en/lighthouse/programs?edit=8", "/en/lighthouse/o/4/programs?edit=8"],
+  ])("keeps Lighthouse HTTPS redirects behind TLS termination (%s, %s)", async (token, path, destination) => {
+    environment.set("NEXT_PUBLIC_APP_URL", "https://app.example.test");
+    const response = await middleware(
+      new NextRequest(`http://0.0.0.0:3001${path}`, {
+        headers: { host: "app.example.test", ...(token ? { cookie: `auth_token=${token}` } : {}) },
+      })
+    );
+    expect(response.headers.get("location")).toBe(`https://app.example.test${destination}`);
+  });
+
+  it.each([
+    [
       "/en/spaces/personal?tab=active",
       "/en/auth/login?redirect=%2Fen%2Fspaces%2Fpersonal%3Ftab%3Dactive",
     ],
