@@ -529,6 +529,7 @@ export const myCohortsResponseSchema = apiSuccessSchema(
     z.object({
       cohortId: z.number().int().positive(),
       displayName: z.string(),
+      timezone: z.string(),
       startDate: z.string().datetime(),
       endDate: z.string().datetime(),
       status: z.string(),

@@ -270,7 +270,11 @@ export const useCohortJoinInfo = (joinToken: string) => {
 };
 
 export const useCohortMemberHome = (cohortId: number) => {
-  const query = useQuery("/api/v1/cohorts/{cohortId}", { params: { path: { cohortId } } });
+  const query = useQuery(
+    "/api/v1/cohorts/{cohortId}",
+    { params: { path: { cohortId } } },
+    { keepPreviousData: false, revalidateOnFocus: true }
+  );
   return useValidatedResponse(query, cohortMemberHomeResponseSchema);
 };
 
