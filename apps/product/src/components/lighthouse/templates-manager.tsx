@@ -1,6 +1,8 @@
 "use client";
 
 import {
+  type CoachResourceBinding,
+  getCoachResourceBindings,
   type LighthouseTemplate,
   useLighthouseOrganizationCohorts,
   useLighthouseTemplates,
@@ -18,12 +20,14 @@ import { Button } from "@daodao/ui/components/button";
 import { Input } from "@daodao/ui/components/input";
 import { cn } from "@daodao/ui/lib/utils";
 import { BookOpenText, Plus, Search, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { templateMatches } from "@/utils/template-library";
 import {
   useLighthouseOrganization,
   useLighthouseOrganizationGuard,
 } from "./lighthouse-organization-context";
+import { CohortResourceDialog } from "./cohort-resource-dialog";
+import { getFallbackResourceBindings } from "./fallback-resource-bindings";
 import { LIGHTHOUSE_SCOPE } from "./lighthouse-scope";
 import { TemplateCard } from "./template-card";
 import { TemplateEditorDialog, type TemplateSaveKind } from "./template-editor-dialog";
@@ -44,8 +48,38 @@ export function TemplatesManager() {
   const [editor, setEditor] = useState<EditorState>({ open: false, template: null });
   useLighthouseOrganizationGuard(editor.open);
   const [complete, setComplete] = useState<CompleteState>(null);
+  const [coachBindings, setCoachBindings] = useState<CoachResourceBinding[]>([]);
+  const [coachLoading, setCoachLoading] = useState(true);
+  const [coachFailed, setCoachFailed] = useState(false);
+  const [coachRetry, setCoachRetry] = useState(0);
+  const [coachResource, setCoachResource] = useState<CoachResourceBinding | null>(null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: retry explicitly reloads the failed request.
+  useEffect(() => {
+    let active = true;
+    setCoachLoading(true);
+    setCoachFailed(false);
+    void getCoachResourceBindings()
+      .then((response) => {
+        if (!active) return;
+        if (response.error || !response.data) {
+          setCoachFailed(true);
+          return;
+        }
+        setCoachBindings(response.data.data);
+      })
+      .catch(() => {
+        if (active) setCoachFailed(true);
+      })
+      .finally(() => {
+        if (active) setCoachLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [coachRetry]);
 
   const templates = templatesQuery.data?.data ?? [];
+  const fallbackBindings = getFallbackResourceBindings(coachBindings, organization?.id, templates);
   const draftLabel = t("template_draft_badge");
   const filtered = useMemo(
     () =>
@@ -60,6 +94,50 @@ export function TemplatesManager() {
     void templatesQuery.mutate();
     setEditor({ open: false, template: null });
     setComplete({ template, kind });
+  }
+
+  if (!organization) {
+    return (
+      <div className="mx-auto w-full max-w-6xl px-5 py-10 md:px-10">
+        <h1 className="text-2xl font-semibold">{t("templates_title")}</h1>
+        <p className="mt-3 text-[#5A7B79]">{t("coach_resources_scope")}</p>
+        {coachLoading && <output>{t("cohort_resources_loading")}</output>}
+        {coachFailed && (
+          <div role="alert">
+            <p>{t("cohort_resources_load_failed")}</p>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setCoachRetry((value) => value + 1)}
+            >
+              {t("cohort_resources_retry")}
+            </Button>
+          </div>
+        )}
+        {!coachLoading && !coachFailed && coachBindings.length === 0 && (
+          <p>{t("cohort_resources_empty")}</p>
+        )}
+        <div className="mt-6 space-y-3">
+          {coachBindings.map((binding) => (
+            <div
+              key={`${binding.templateId}-${binding.cohortId}`}
+              className="flex items-center justify-between gap-3 rounded-xl border border-[#DDEFED] bg-white p-4"
+            >
+              <div>
+                <p className="font-semibold">{binding.templateName}</p>
+                <p className="text-sm text-[#5A7B79]">{binding.cohortName}</p>
+              </div>
+              <Button type="button" variant="outline" onClick={() => setCoachResource(binding)}>
+                {t("cohort_resources_edit")}
+              </Button>
+            </div>
+          ))}
+        </div>
+        {coachResource && (
+          <CohortResourceDialog {...coachResource} onClose={() => setCoachResource(null)} />
+        )}
+      </div>
+    );
   }
 
   return (
@@ -155,6 +233,41 @@ export function TemplatesManager() {
             />
           ))}
         </div>
+      )}
+
+      {organization && coachFailed && (
+        <div role="alert" className="mt-8">
+          <p>{t("cohort_resources_load_failed")}</p>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setCoachRetry((value) => value + 1)}
+          >
+            {t("cohort_resources_retry")}
+          </Button>
+        </div>
+      )}
+      {organization && fallbackBindings.length > 0 && (
+        <section className="mt-8 space-y-3">
+          <h2 className="font-semibold">{t("coach_resources_scope")}</h2>
+          {fallbackBindings.map((binding) => (
+            <div
+              key={`${binding.templateId}-${binding.cohortId}`}
+              className="flex items-center justify-between gap-3 rounded-xl border border-[#DDEFED] bg-white p-4"
+            >
+              <div>
+                <p className="font-semibold">{binding.templateName}</p>
+                <p className="text-sm text-[#5A7B79]">{binding.cohortName}</p>
+              </div>
+              <Button type="button" variant="outline" onClick={() => setCoachResource(binding)}>
+                {t("cohort_resources_edit")}
+              </Button>
+            </div>
+          ))}
+        </section>
+      )}
+      {coachResource && (
+        <CohortResourceDialog {...coachResource} onClose={() => setCoachResource(null)} />
       )}
 
       {organization && (

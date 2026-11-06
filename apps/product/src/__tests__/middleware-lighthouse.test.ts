@@ -68,6 +68,98 @@ describe("Lighthouse middleware backend routing", () => {
     const response = await middleware(request());
     expect(response.headers.get("location")).toContain(destination);
   });
+  it.each([
+    200, 403,
+  ])("allows a non-member leader into templates after organization HTTP %s", async (status) => {
+    fetchMock
+      .mockResolvedValueOnce(new Response(JSON.stringify({ data: [] }), { status }))
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            data: [
+              {
+                organizationId: 1,
+                templateId: 2,
+                cohortId: 7,
+                cohortName: "場次",
+                templateName: "模板",
+              },
+            ],
+          }),
+          { status: 200 }
+        )
+      );
+    const response = await middleware(request("fixture-session", "/en/lighthouse/templates"));
+    expect(response.headers.get("location")).toBeNull();
+    expect(fetchMock.mock.calls[1]?.[0]).toContain("/my-cohort-resource-bindings");
+  });
+  it.each([
+    [200, { data: [] }, "/en/lighthouse/access-required"],
+    [401, {}, "/en/auth/login?"],
+    [403, {}, "/en/lighthouse/access-required"],
+    [500, {}, "/en/lighthouse/access-required?reason=unavailable"],
+    [200, { data: null }, "/en/lighthouse/access-required?reason=unavailable"],
+    [200, { data: [{}] }, "/en/lighthouse/access-required?reason=unavailable"],
+  ])("handles leader bindings HTTP %s without widening access", async (status, body, destination) => {
+    fetchMock
+      .mockResolvedValueOnce(new Response(JSON.stringify({ data: [] }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify(body), { status }));
+    const response = await middleware(request("fixture-session", "/en/lighthouse/templates"));
+    expect(response.headers.get("location")).toContain(destination);
+  });
+});
+
+describe("organization invitation URL privacy", () => {
+  it.each([
+    "/organization-invitation",
+    "/en/organization-invitation",
+    "/zh-TW/organization-invitation",
+  ])("redirects %s before rendering and keeps the secret HttpOnly", async (path) => {
+    const response = await middleware(
+      new NextRequest(`https://product.example.test${path}?token=${"a".repeat(64)}&other=drop`)
+    );
+    expect(response.status).toBe(303);
+    expect(response.headers.get("location")).toBe(`https://product.example.test${path}`);
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(response.headers.get("referrer-policy")).toBe("no-referrer");
+    const cookie = response.cookies.get("organization_invitation");
+    expect(cookie).toMatchObject({
+      value: "a".repeat(64),
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 604800,
+    });
+  });
+  it.each([
+    "token=",
+    "token=bad%3Bvalue",
+    "token=first&token=second",
+  ])("rejects ambiguous/malformed invitation %s and clears stale cookie", async (query) => {
+    const response = await middleware(
+      new NextRequest(`https://product.example.test/organization-invitation?${query}`, {
+        headers: { cookie: "organization_invitation=previous" },
+      })
+    );
+    expect(response.status).toBe(303);
+    expect(response.cookies.get("organization_invitation")).toMatchObject({ value: "", maxAge: 0 });
+  });
+  it("keeps local HTTP cookie usable while production HTTPS is secure", async () => {
+    const response = await middleware(
+      new NextRequest(`http://localhost:3463/organization-invitation?token=${"b".repeat(64)}`)
+    );
+    expect(response.cookies.get("organization_invitation")?.secure).toBe(false);
+  });
+  it("does not overwrite the invitation during a reload or locale switch", async () => {
+    const response = await middleware(
+      new NextRequest("https://product.example.test/en/organization-invitation", {
+        headers: { cookie: "organization_invitation=previous" },
+      })
+    );
+    expect(response.cookies.get("organization_invitation")).toBeUndefined();
+    expect(response.headers.get("location")).toBeNull();
+  });
 });
 
 describe("old Lighthouse entry URLs", () => {

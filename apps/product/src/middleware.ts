@@ -4,6 +4,11 @@ import { routing } from "@daodao/i18n/routing";
 import { type NextRequest, NextResponse } from "next/server";
 import { checkPrivateSession, isPrivateSpacePath } from "./lib/auth/private-access";
 import { resolveLighthouseOrganization } from "./utils/lighthouse-organization";
+import {
+  isOrganizationInvitationToken,
+  ORGANIZATION_INVITATION_COOKIE,
+  ORGANIZATION_INVITATION_PATH,
+} from "./lib/organization-invitation-token";
 
 /**
  * i18n middleware plus the Lighthouse organization-membership gate.
@@ -37,22 +42,63 @@ async function hasLighthouseAccess(request: NextRequest): Promise<LighthouseAcce
       cache: "no-store",
     });
     if (response.status === 401) return { status: "unauthorized" };
-    if (response.status === 403) return { status: "denied" };
-    if (!response.ok) return { status: "unavailable" };
+    if (response.status !== 403) {
+      if (!response.ok) return { status: "unavailable" };
 
-    const payload: unknown = await response.json();
-    if (!payload || typeof payload !== "object" || !("data" in payload))
-      return { status: "unavailable" };
-    if (!Array.isArray(payload.data)) return { status: "unavailable" };
-    const organizations = payload.data.filter(
-      (item): item is { id: number; status: string } =>
-        item !== null &&
-        typeof item === "object" &&
-        typeof item.id === "number" &&
-        typeof item.status === "string"
+      const payload: unknown = await response.json();
+      if (!payload || typeof payload !== "object" || !("data" in payload))
+        return { status: "unavailable" };
+      if (!Array.isArray(payload.data)) return { status: "unavailable" };
+      const organizations = payload.data.filter(
+        (item): item is { id: number; status: string } =>
+          item !== null &&
+          typeof item === "object" &&
+          typeof item.id === "number" &&
+          typeof item.status === "string"
+      );
+      if (organizations.length !== payload.data.length) return { status: "unavailable" };
+      if (organizations.length > 0) return { status: "allowed", organizations };
+    }
+    // Leaders without organization membership may only access their resources in templates.
+    if (!/^\/(?:en\/)?lighthouse\/templates(?:\/|$)/.test(request.nextUrl.pathname))
+      return { status: "denied" };
+    const bindingsResponse = await fetch(
+      `${apiBaseUrl}/api/v1/lighthouse/my-cohort-resource-bindings`,
+      {
+        headers: { Cookie: `auth_token=${authToken}` },
+        cache: "no-store",
+      }
     );
-    if (organizations.length !== payload.data.length) return { status: "unavailable" };
-    return organizations.length > 0 ? { status: "allowed", organizations } : { status: "denied" };
+    if (bindingsResponse.status === 401) return { status: "unauthorized" };
+    if (bindingsResponse.status === 403) return { status: "denied" };
+    if (!bindingsResponse.ok) return { status: "unavailable" };
+    const bindings: unknown = await bindingsResponse.json();
+    if (
+      !bindings ||
+      typeof bindings !== "object" ||
+      !("data" in bindings) ||
+      !Array.isArray(bindings.data)
+    )
+      return { status: "unavailable" };
+    if (
+      !bindings.data.every(
+        (binding: unknown) =>
+          binding !== null &&
+          typeof binding === "object" &&
+          "organizationId" in binding &&
+          Number.isInteger(binding.organizationId) &&
+          "templateId" in binding &&
+          Number.isInteger(binding.templateId) &&
+          "cohortId" in binding &&
+          Number.isInteger(binding.cohortId) &&
+          "cohortName" in binding &&
+          typeof binding.cohortName === "string" &&
+          "templateName" in binding &&
+          typeof binding.templateName === "string"
+      )
+    )
+      return { status: "unavailable" };
+    return { status: bindings.data.length > 0 ? "allowed" : "denied" };
   } catch (error) {
     console.error("[middleware] Lighthouse membership check failed", error);
     return { status: "unavailable" };
@@ -85,6 +131,28 @@ function normalizeRedirectLocation(request: NextRequest, response: NextResponse)
 
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  // Remove the secret before rendering HTML, loading analytics, or constructing OAuth state.
+  if (ORGANIZATION_INVITATION_PATH.test(pathname) && request.nextUrl.searchParams.has("token")) {
+    const tokens = request.nextUrl.searchParams.getAll("token");
+    const token = tokens.length === 1 ? (tokens[0] ?? null) : null;
+    const cleanUrl = request.nextUrl.clone();
+    cleanUrl.search = "";
+    const response = normalizeRedirectLocation(request, NextResponse.redirect(cleanUrl, 303));
+    response.headers.set("Cache-Control", "no-store");
+    response.headers.set("Referrer-Policy", "no-referrer");
+    response.cookies.set(
+      ORGANIZATION_INVITATION_COOKIE,
+      isOrganizationInvitationToken(token) ? token : "",
+      {
+        httpOnly: true,
+        secure: getEnv("NODE_ENV") === "production" || request.nextUrl.protocol === "https:",
+        sameSite: "lax",
+        path: "/",
+        maxAge: isOrganizationInvitationToken(token) ? 7 * 24 * 60 * 60 : 0,
+      }
+    );
+    return response;
+  }
   if (isPrivateSpacePath(pathname)) {
     const apiBaseUrl =
       getEnv("API_INTERNAL_URL") ||

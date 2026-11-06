@@ -42,6 +42,10 @@ export interface SurveyConfig {
 export interface SurveyWithQuestions extends Survey {
   questions: SurveyQuestion[];
   coverUrl?: string;
+  cohortFeedback?: {
+    state: "login_required" | "ineligible" | "ready" | "completed";
+    privacyNotice: string;
+  };
 }
 
 export interface SurveyQuestion {

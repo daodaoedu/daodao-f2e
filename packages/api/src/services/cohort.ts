@@ -79,6 +79,19 @@ const cohortSessionShape = {
   sessionDate: z.string(),
   startTime: z.string().nullable(),
   endTime: z.string().nullable(),
+  recurrenceGroupId: z
+    .string()
+    .uuid()
+    .nullish()
+    .transform((value) => value ?? null),
+  recurrenceRule: z
+    .object({
+      startDate: z.string(),
+      weeks: z.number().int().min(1).max(52),
+      weekdays: z.array(z.number().int().min(1).max(7)),
+    })
+    .nullish()
+    .transform((value) => value ?? null),
 } satisfies z.ZodRawShape;
 
 const lighthouseCohortShape = {
@@ -91,6 +104,7 @@ const lighthouseCohortShape = {
   tagline: z.string().nullable(),
   startDate: z.string(),
   endDate: z.string(),
+  timezone: z.string().default("Asia/Taipei"),
   joinToken: z.string().nullable(),
   joinPaused: z.boolean(),
   joinDeadline: z.string().nullable(),
@@ -115,7 +129,7 @@ const lighthouseCohortShape = {
   createdAt: z.string().datetime(),
   updatedAt: nullableDateTimeSchema,
 } satisfies z.ZodRawShape;
-export const lighthouseCohortSchema: z.ZodType<LighthouseCohortType> =
+export const lighthouseCohortSchema: z.ZodType<LighthouseCohortType, z.ZodTypeDef, unknown> =
   z.object(lighthouseCohortShape);
 
 export const lighthouseOrganizationListResponseSchema: z.ZodType<OrganizationListResponse> =
@@ -125,9 +139,11 @@ export const lighthouseProgramListResponseSchema: z.ZodType<ProgramListResponse>
   z.array(lighthouseProgramSchema)
 );
 
-export const lighthouseCohortListResponseSchema: z.ZodType<CohortListResponse> = apiSuccessSchema(
-  z.array(lighthouseCohortSchema)
-);
+export const lighthouseCohortListResponseSchema: z.ZodType<
+  CohortListResponse,
+  z.ZodTypeDef,
+  unknown
+> = apiSuccessSchema(z.array(lighthouseCohortSchema));
 
 export const lighthouseCohortResponseSchema = apiSuccessSchema(lighthouseCohortSchema);
 /** 總覽用：組織底下所有系列的全部場次，附系列名稱、已加入人數與焦點摘要（FR-OV-02） */
@@ -472,6 +488,7 @@ export const cohortJoinInfoResponseSchema = apiSuccessSchema(
   z.object({
     cohortId: z.number().int().positive(),
     displayName: z.string(),
+    timezone: z.string().default("Asia/Taipei"),
     startDate: z.string().datetime(),
     endDate: z.string().datetime(),
     tagline: z.string().nullable(),
@@ -526,6 +543,7 @@ export const cohortMemberHomeResponseSchema = apiSuccessSchema(
   z.object({
     cohortId: z.number().int().positive(),
     displayName: z.string(),
+    timezone: z.string().default("Asia/Taipei"),
     startDate: z.string().datetime(),
     endDate: z.string().datetime(),
     tagline: z.string().nullable(),
@@ -1136,3 +1154,34 @@ export const lighthousePreferencesResponseSchema = apiSuccessSchema(
 /** Save the current account's organization; the backend validates membership and status. */
 export const updateLighthousePreferences = async (organizationId: number) =>
   client.PATCH("/api/v1/lighthouse/preferences", { body: { organizationId } });
+const cohortResourcesPath =
+  "/api/v1/lighthouse/organizations/{organizationId}/templates/{templateId}/cohorts/{cohortId}/resources";
+type CohortResourcesResponse =
+  paths[typeof cohortResourcesPath]["get"]["responses"][200]["content"]["application/json"];
+export type CohortTemplateResource = CohortResourcesResponse["data"][number];
+export type CohortTemplateResourceInput = NonNullable<
+  paths[typeof cohortResourcesPath]["put"]["requestBody"]
+>["content"]["application/json"]["resources"][number];
+export type CoachResourceBinding =
+  paths["/api/v1/lighthouse/my-cohort-resource-bindings"]["get"]["responses"][200]["content"]["application/json"]["data"][number];
+
+export const getCoachResourceBindings = () =>
+  client.GET("/api/v1/lighthouse/my-cohort-resource-bindings");
+
+export const getCohortTemplateResources = (
+  organizationId: number,
+  templateId: number,
+  cohortId: number
+) =>
+  client.GET(cohortResourcesPath, { params: { path: { organizationId, templateId, cohortId } } });
+
+export const saveCohortTemplateResources = (
+  organizationId: number,
+  templateId: number,
+  cohortId: number,
+  resources: CohortTemplateResourceInput[]
+) =>
+  client.PUT(cohortResourcesPath, {
+    params: { path: { organizationId, templateId, cohortId } },
+    body: { resources },
+  });

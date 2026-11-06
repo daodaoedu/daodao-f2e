@@ -162,3 +162,80 @@ describe("template mode", () => {
     expect(segments.every((s) => !("startDate" in s))).toBe(true);
   });
 });
+
+describe("resource usage date requests", () => {
+  it("sends the selected relative day while whole-period resources remain unassigned", () => {
+    const request = toCreatePracticeRequest(
+      values({
+        resources: [
+          { id: "first", name: "第一天", url: "", segmentIndexes: [], dayNumber: 1 },
+          { id: "last", name: "最後一天", url: "", segmentIndexes: [], dayNumber: 14 },
+          { id: "all", name: "整段", url: "", segmentIndexes: [], dayNumber: null },
+        ],
+      }),
+      { nameFallback: NAME_FALLBACK }
+    );
+    expect(request.resources).toEqual([
+      { name: "第一天", url: "", dayNumber: 1 },
+      { name: "最後一天", url: "", dayNumber: 14 },
+      { name: "整段", url: "" },
+    ]);
+  });
+
+  it("places a dated resource only in its segment and converts to segment-relative days", () => {
+    const request = toBatchCreatePracticeRequest(
+      values({
+        durationDays: 40,
+        isSegmented: true,
+        segments: [emptySegmentOverride(), emptySegmentOverride(), emptySegmentOverride()],
+        resources: [
+          { id: "first-end", name: "第一段末", url: "", segmentIndexes: [], dayNumber: 14 },
+          { id: "second-start", name: "第二段首", url: "", segmentIndexes: [0], dayNumber: 15 },
+          { id: "last-end", name: "最後一天", url: "", segmentIndexes: [], dayNumber: 40 },
+          { id: "all", name: "整段", url: "", segmentIndexes: [] },
+          { id: "assigned", name: "第二段共用", url: "", segmentIndexes: [1] },
+        ],
+      }),
+      { nameFallback: NAME_FALLBACK }
+    );
+    expect(request.segments.map((segment) => segment.resources)).toEqual([
+      [
+        { name: "第一段末", url: "", dayNumber: 14 },
+        { name: "整段", url: "" },
+      ],
+      [
+        { name: "第二段首", url: "", dayNumber: 1 },
+        { name: "整段", url: "" },
+        { name: "第二段共用", url: "" },
+      ],
+      [
+        { name: "最後一天", url: "", dayNumber: 13 },
+        { name: "整段", url: "" },
+      ],
+    ]);
+  });
+});
+
+describe("resource dates with custom segment lengths", () => {
+  it("uses overridden segment lengths when assigning dates instead of the automatic split", () => {
+    const request = toBatchCreatePracticeRequest(
+      values({
+        durationDays: 40,
+        isSegmented: true,
+        segments: [
+          { ...emptySegmentOverride(), days: 10 },
+          { ...emptySegmentOverride(), days: 30 },
+        ],
+        resources: [
+          { id: "boundary", name: "第二段第一天", url: "", segmentIndexes: [], dayNumber: 11 },
+        ],
+      }),
+      { nameFallback: NAME_FALLBACK }
+    );
+    expect(request.segments[0]?.resources).toBeUndefined();
+    expect(request.segments[1]?.resources).toEqual([
+      { name: "第二段第一天", url: "", dayNumber: 1 },
+    ]);
+    expect(request.segments[1]?.startDate).toBe("2026-09-11");
+  });
+});

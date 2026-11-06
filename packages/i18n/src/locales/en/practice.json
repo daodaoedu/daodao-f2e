@@ -1,4 +1,5 @@
 {
+  "resource_relevant_date": "Relevant date: {date}",
   "tab_comments": "Comments",
   "tab_checkins": "Check-ins",
   "tab_resources": "Resources",
@@ -18,6 +19,7 @@
   "action_copying": "Copying…",
   "more_info": "More Info",
   "edit_practice": "Edit Practice",
+  "edit_resources": "Edit resources",
   "delete_practice_title": "Delete this practice?",
   "delete_practice_message": "Once deleted, it cannot be recovered and all check-in records will be lost.",
   "delete_dialog_title": "Delete this practice?",
@@ -35,6 +37,11 @@
   "copy_failed": "Copy failed, please try again later",
   "comments_loading": "Loading comments...",
   "no_resources": "No resources added yet",
+  "resource_usage_label": "Use during",
+  "resource_usage_all": "Entire period",
+  "resource_usage_date": "Specific date",
+  "resource_usage_choose_date": "Choose resource date",
+  "resource_usage_out_of_range": "This resource date is outside the practice period. Choose another date or the entire period.",
   "resource_day_badge": "Day {day}",
   "followers_with_others": "{firstName} and {count} others",
   "you_with_others": "You and {count} others",
@@ -73,6 +80,7 @@
   "summary_generating": "Generating summary...",
   "summary_load_failed": "Failed to load, please try again later",
   "summary_no_data": "Unable to load summary data",
+  "summary_delayed_toast": "Your practice will become public after completion",
   "summary_public_toast": "Your practice check-ins are now public",
   "summary_public_toast_description": "Shown in Inspiration Square for others to see your growth!",
   "summary_public_toast_dismiss": "Don't show again",
@@ -451,5 +459,8 @@
   "wizard_done_primary_template": "See my templates",
   "wizard_done_secondary_personal": "Create another practice",
   "wizard_done_secondary_template": "Create another template",
-  "wizard_create_failed": "Couldn't create, please try again"
+  "wizard_create_failed": "Couldn't create, please try again",
+  "resource_no_link": "No link available",
+  "template_access_denied": "Only DaoDao administrators can create official templates. You can create a personal practice instead.",
+  "template_access_create_personal": "Create a personal practice"
 }

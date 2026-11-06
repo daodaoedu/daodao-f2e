@@ -514,6 +514,12 @@ export function useLighthouseOrganizationGuard(dirty: boolean, busy = false) {
 export function LighthouseOrganizationContent({ children }: { children: ReactNode }) {
   const { organization, statusContent, preserveDrafts } = useLighthouseOrganization();
   const t = useTranslations("lighthouse");
+  const pathname = usePathname();
+  // The legacy template entry also serves cohort leaders without organization membership.
+  // TemplatesManager limits this entry to the separately authorized resource bindings.
+  if (pathname === "/lighthouse/templates" && !organization) {
+    return <DialogManagerProvider>{children}</DialogManagerProvider>;
+  }
   return (
     <>
       {statusContent}

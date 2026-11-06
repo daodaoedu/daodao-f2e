@@ -175,3 +175,59 @@ describe("wizardFormSchema — Step 2 驗證彙總", () => {
     expect(issuesOf(unnamed).some((i) => i.path === "resources.0.name")).toBe(true);
   });
 });
+
+describe("wizard resource usage dates", () => {
+  const resource = (dayNumber?: number | null) => ({
+    id: "resource-date",
+    name: "閱讀筆記",
+    url: "",
+    segmentIndexes: [],
+    dayNumber,
+  });
+
+  it("accepts whole-period and first/last-day resources", () => {
+    expect(issuesOf(base({ resources: [resource(null), resource(1), resource(14)] }))).toEqual([]);
+  });
+
+  it("requires reselection after duration shrinks and keeps the original day", () => {
+    const shortened = base({ durationDays: 7, resources: [resource(14)] });
+    expect(issuesOf(shortened)).toContainEqual({
+      path: "resources.0.dayNumber",
+      message: "resource_usage_out_of_range",
+    });
+    expect(shortened.resources[0]?.dayNumber).toBe(14);
+    expect(issuesOf(base({ durationDays: 7, resources: [resource(7)] }))).toEqual([]);
+  });
+
+  it("keeps relative days when the start date shifts", () => {
+    const shifted = base({
+      startDate: format(addDays(new Date(), 7), "yyyy-MM-dd"),
+      resources: [resource(2)],
+    });
+    const result = wizardFormSchema.parse(shifted);
+    expect(result.resources[0]?.dayNumber).toBe(2);
+  });
+
+  it("checks the overall period for segmented practices", () => {
+    expect(
+      issuesOf(
+        base({
+          durationDays: 40,
+          isSegmented: true,
+          segments: [emptySegmentOverride(), emptySegmentOverride()],
+          resources: [resource(40)],
+        })
+      )
+    ).toEqual([]);
+    expect(
+      issuesOf(base({ resources: [resource(0)] })).some(
+        (issue) => issue.path === "resources.0.dayNumber"
+      )
+    ).toBe(true);
+    expect(
+      issuesOf(base({ resources: [resource(1.5)] })).some(
+        (issue) => issue.path === "resources.0.dayNumber"
+      )
+    ).toBe(true);
+  });
+});

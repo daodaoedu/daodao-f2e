@@ -8,6 +8,7 @@ import { Input } from "@daodao/ui/components/input";
 import { cn } from "@daodao/ui/lib/utils";
 import { Link2Icon, PencilIcon, XIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { ResourceDateSelector } from "@/components/practice/shared/resource-date-selector";
 import { RESOURCE_NAME_MAX_LENGTH, type WizardResource } from "./schema";
 import {
   WIZARD_INPUT,
@@ -22,6 +23,9 @@ export interface ResourceItemProps {
   isEditing: boolean;
   /** 拆段時的段數；0 或 undefined = 不顯示指派列 */
   segmentCount?: number;
+  startDate?: string;
+  durationDays?: number;
+  onDateChange?: (dayNumber: number | null) => void;
   onStartEdit: () => void;
   onCancelEdit: () => void;
   /** 回傳錯誤訊息 = 驗證失敗，卡片內顯示；回傳 null = 儲存成功 */
@@ -71,6 +75,9 @@ export const ResourceItem = ({
   resource,
   isEditing,
   segmentCount = 0,
+  startDate,
+  durationDays = 0,
+  onDateChange,
   onStartEdit,
   onCancelEdit,
   onSave,
@@ -115,10 +122,10 @@ export const ResourceItem = ({
   };
 
   const isAll = resource.segmentIndexes.length === 0;
-  const showAssign = segmentCount > 0;
+  const showAssign = segmentCount > 0 && resource.dayNumber == null;
 
   return (
-    <div className={cn(WIZARD_RESOURCE_CARD, showAssign && "flex-col items-stretch gap-2")}>
+    <div className={cn(WIZARD_RESOURCE_CARD, "flex-col items-stretch gap-2")}>
       <div className="flex min-w-0 items-center gap-3">
         <BookSvg width={24} height={23} className="shrink-0 opacity-85" aria-hidden="true" />
         {isEditing ? (
@@ -201,6 +208,15 @@ export const ResourceItem = ({
           </>
         )}
       </div>
+
+      {startDate && onDateChange && (
+        <ResourceDateSelector
+          dayNumber={resource.dayNumber}
+          startDate={startDate}
+          durationDays={durationDays}
+          onChange={onDateChange}
+        />
+      )}
 
       {showAssign && (
         <div className="flex flex-wrap items-center gap-1.5 border-t border-very-light-gray pt-2">

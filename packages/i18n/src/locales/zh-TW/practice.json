@@ -1,4 +1,5 @@
 {
+  "resource_relevant_date": "相關日期：{date}",
   "tab_comments": "留言",
   "tab_checkins": "打卡紀錄",
   "tab_resources": "使用資源",
@@ -18,6 +19,7 @@
   "action_copying": "複製中…",
   "more_info": "更多資訊",
   "edit_practice": "編輯實踐",
+  "edit_resources": "編輯資源",
   "delete_practice_title": "確定刪除這個實踐？",
   "delete_practice_message": "一旦刪除就無法復原，所有打卡紀錄也會一併消失。",
   "delete_dialog_title": "確定刪除這個實踐？",
@@ -35,6 +37,11 @@
   "copy_failed": "複製失敗，請稍後再試",
   "comments_loading": "留言載入中...",
   "no_resources": "目前沒有使用資源",
+  "resource_usage_label": "使用期間",
+  "resource_usage_all": "整段期間",
+  "resource_usage_date": "指定日期",
+  "resource_usage_choose_date": "選擇資源使用日期",
+  "resource_usage_out_of_range": "資源日期已超出實踐期間，請重新選擇日期或改為整段期間。",
   "resource_day_badge": "第 {day} 天",
   "followers_with_others": "{firstName} 與其他 {count} 人",
   "you_with_others": "你 與其他 {count} 人",
@@ -73,6 +80,7 @@
   "summary_generating": "正在生成總結...",
   "summary_load_failed": "載入失敗，請稍後再試",
   "summary_no_data": "無法載入總結資料",
+  "summary_delayed_toast": "實踐完成後會公開",
   "summary_public_toast": "你的實踐打卡內容已公開",
   "summary_public_toast_description": "已顯示在靈感廣場，讓更多人看見你的成長！",
   "summary_public_toast_dismiss": "不再顯示",
@@ -451,5 +459,8 @@
   "wizard_done_primary_template": "看看我的模版",
   "wizard_done_secondary_personal": "再建立一個實踐",
   "wizard_done_secondary_template": "再建立一個模版",
-  "wizard_create_failed": "建立失敗，請稍後再試"
+  "wizard_create_failed": "建立失敗，請稍後再試",
+  "resource_no_link": "目前無連結",
+  "template_access_denied": "只有島島管理員可以建立官方模板。你可以建立自己的個人實踐。",
+  "template_access_create_personal": "建立個人實踐"
 }

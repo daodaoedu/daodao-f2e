@@ -138,3 +138,6 @@ export const parseFrequency = (frequency: Frequency): { minDays: number; maxDays
  * 實踐標籤最大數量限制
  */
 export const MAX_PRACTICE_TAGS = 10;
+
+/** Personal resources have a separate allowance from locked cohort resources. */
+export const MAX_PERSONAL_PRACTICE_RESOURCES = 10;

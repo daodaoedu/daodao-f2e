@@ -1,3 +1,4 @@
+import { getPublicSurvey, submitPublicSurvey } from "@daodao/api";
 import type { AIGenerateInput, CreateSurveyInput, SubmitResponseInput } from "../schema";
 import type {
   AIGenerateResponse,
@@ -45,6 +46,10 @@ type RawSurvey = {
   created_at: string;
   updated_at: string;
   questions: RawQuestion[];
+  cohort_feedback?: {
+    state: "login_required" | "ineligible" | "ready" | "completed";
+    privacy_notice: string;
+  };
 };
 
 type RawListItem = {
@@ -107,6 +112,9 @@ function mapSurvey(raw: RawSurvey): SurveyWithQuestions {
     createdAt: raw.created_at,
     updatedAt: raw.updated_at,
     tags: raw.tags,
+    cohortFeedback: raw.cohort_feedback
+      ? { state: raw.cohort_feedback.state, privacyNotice: raw.cohort_feedback.privacy_notice }
+      : undefined,
     questions: raw.questions.map((q) => ({
       ...mapQuestion(q, raw.questions),
       surveyId: String(raw.id),
@@ -188,8 +196,8 @@ export async function getSurveyById(id: string): Promise<SurveyWithQuestions> {
 }
 
 export async function getSurveyByShareId(shareId: string): Promise<SurveyWithQuestions> {
-  const res = await api<{ success: true; data: RawSurvey }>(`/surveys/public/${shareId}`);
-  return mapSurvey(res.data);
+  const data = await getPublicSurvey(shareId);
+  return mapSurvey(data);
 }
 
 export async function listSurveys(_params?: SurveyQueryParams): Promise<{
@@ -234,7 +242,7 @@ export async function updateSurveyStatus(id: string, status: string): Promise<Su
 // Responses
 // ---------------------------------------------------------------------------
 
-export async function submitResponse(input: SubmitResponseInput): Promise<{ response_id: number }> {
+export async function submitResponse(input: SubmitResponseInput) {
   const answers = input.answers.map((a) => {
     const v = a.value;
     if (typeof v === "boolean") return { question_id: Number(a.questionId), boolean_value: v };
@@ -243,14 +251,11 @@ export async function submitResponse(input: SubmitResponseInput): Promise<{ resp
       return { question_id: Number(a.questionId), selected_option_ids: v.map(Number) };
     return { question_id: Number(a.questionId), answer_text: v ?? undefined };
   });
-  const body: Record<string, unknown> = { answers };
-  if (input.startedAt) body.started_at = input.startedAt;
-  if (input.sessionKey) body.session_key = input.sessionKey;
-  const res = await api<{ success: true; data: { response_id: number } }>(
-    `/surveys/public/${input.externalId}/responses`,
-    { method: "POST", body: JSON.stringify(body) }
-  );
-  return res.data;
+  return submitPublicSurvey(input.externalId, {
+    answers,
+    ...(input.startedAt ? { started_at: input.startedAt } : {}),
+    ...(input.sessionKey ? { session_key: input.sessionKey } : {}),
+  });
 }
 
 export type ResponseListItem = {

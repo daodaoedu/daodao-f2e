@@ -4,16 +4,18 @@ import { BgRadialSvg, BookSvg, ClockSolidSvg, TagSolidSvg } from "@daodao/assets
 import { useTranslations } from "@daodao/i18n";
 import { Badge } from "@daodao/ui/components/badge";
 import { cn } from "@daodao/ui/lib/utils";
+import { format } from "date-fns";
 import { Link2Icon } from "lucide-react";
 import { Fragment, useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { formatDateRange } from "@/lib/practice-create";
+import { getResourceDate } from "@/lib/resource-usage-date";
 import {
   type EffectiveSegment,
   getBaseName,
   getEffectiveSegments,
+  getResourcesForSegment,
   isTimingPreset,
-  resourceAppliesToSegment,
 } from "./derive";
 import { TIMING_LABEL_KEYS } from "./rhythm-utils";
 import type { WizardFormValues, WizardResource } from "./schema";
@@ -106,10 +108,13 @@ const PreviewBadges = ({ timings, tags }: PreviewBadgesProps) => {
 const ResourceRows = ({
   resources,
   compact,
+  startDate,
 }: {
   resources: WizardResource[];
+  startDate?: string;
   compact?: boolean;
 }) => {
+  const t = useTranslations("practice");
   if (resources.length === 0) return null;
   return (
     <ul className={cn("flex flex-col", compact ? "gap-1.5" : "gap-2")}>
@@ -141,6 +146,12 @@ const ResourceRows = ({
             </>
           ) : (
             <span className={WIZARD_RESOURCE_PLAIN}>{resource.name}</span>
+          )}
+          {startDate && (
+            <span className="shrink-0 text-xs text-light-gray">
+              {getResourceDate(startDate, resource.dayNumber)?.replaceAll("-", "/") ??
+                t("resource_usage_all")}
+            </span>
           )}
         </li>
       ))}
@@ -196,7 +207,7 @@ export const StepPreview = ({ form }: StepPreviewProps) => {
             <h2 className="mt-4 mb-3.5 text-center text-sm font-medium text-text-dark">
               {t("wizard_preview_resources")}
             </h2>
-            <ResourceRows resources={values.resources} />
+            <ResourceRows resources={values.resources} startDate={values.startDate} />
           </section>
         )}
       </div>
@@ -207,9 +218,7 @@ export const StepPreview = ({ form }: StepPreviewProps) => {
     <div className="relative py-4">
       <div className="flex flex-col gap-3">
         {segments.map((segment) => {
-          const resources = values.resources.filter((r) =>
-            resourceAppliesToSegment(r, segment.index)
-          );
+          const resources = getResourcesForSegment(values, segment);
           return (
             <Fragment key={segment.index}>
               <div className="relative rounded-[12px] bg-white p-4">
@@ -240,7 +249,11 @@ export const StepPreview = ({ form }: StepPreviewProps) => {
                 {resources.length > 0 && (
                   <div className="mt-3 border-t border-bg-gray pt-3">
                     <h3 className="sr-only">{t("wizard_preview_resources")}</h3>
-                    <ResourceRows resources={resources} compact />
+                    <ResourceRows
+                      resources={resources}
+                      startDate={segment.start ? format(segment.start, "yyyy-MM-dd") : undefined}
+                      compact
+                    />
                   </div>
                 )}
               </div>
