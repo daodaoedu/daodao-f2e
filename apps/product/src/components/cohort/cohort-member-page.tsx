@@ -26,7 +26,7 @@ import { CohortErrorState } from "@/components/lighthouse/cohort-error-state";
 import { HOME_TAB_PATHS } from "@/constants/home-navigation";
 import { mapPracticeStatusToTaskStatus } from "@/constants/task-status";
 import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
-import { CohortSessionSchedule } from "./cohort-session-schedule";
+import { CohortMeetingCalendar } from "./cohort-meeting-calendar";
 
 /** 與「我的」頁一致的預設卡片主題色 */
 const DEFAULT_PRACTICE_THEME = "#FCDD84";
@@ -134,42 +134,50 @@ export function CohortMemberPage({ cohortId }: { cohortId: number }) {
                 {home?.displayName ?? t("cohort_home")}
               </h1>
             </div>
-            <Popover open={settingsMenuOpen} onOpenChange={setSettingsMenuOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-9 shrink-0 text-text-dark/60"
-                  aria-label={t("settings")}
-                >
-                  <Settings className="size-5" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent align="end" className="min-w-48">
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    setSettingsMenuOpen(false);
-                    setPrivacySettingsOpen(true);
-                  }}
-                  className="w-full justify-start gap-2 text-text-dark"
-                >
-                  <Settings className="size-4" />
-                  {t("settings_privacy")}
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={contactCourseAdmin}
-                  className="w-full justify-start gap-2 text-text-dark"
-                >
-                  <LogOut className="size-4" />
-                  {t("exit_program_activity")}
-                </Button>
-              </PopoverContent>
-            </Popover>
+            <div className="flex shrink-0 items-center gap-1">
+              {home && (
+                <CohortMeetingCalendar
+                  sessions={home.sessions}
+                  sourceTimezone={home.timezone}
+                  location={home.location}
+                  meetingUrl={home.meetingUrl}
+                />
+              )}
+              <Popover open={settingsMenuOpen} onOpenChange={setSettingsMenuOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-9 shrink-0 text-text-dark/60"
+                    aria-label={t("settings")}
+                  >
+                    <Settings className="size-5" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="min-w-48">
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setSettingsMenuOpen(false);
+                      setPrivacySettingsOpen(true);
+                    }}
+                    className="w-full justify-start gap-2 text-text-dark"
+                  >
+                    <Settings className="size-4" />
+                    {t("settings_privacy")}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={contactCourseAdmin}
+                    className="w-full justify-start gap-2 text-text-dark"
+                  >
+                    <LogOut className="size-4" />
+                    {t("exit_program_activity")}
+                  </Button>
+                </PopoverContent>
+              </Popover>
+            </div>
           </div>
-
-          {home && <CohortSessionSchedule sessions={home.sessions} timezone={home.timezone} />}
 
           <h2 className="mb-4 text-sm font-medium text-text-dark">{t("my_cohort_practices")}</h2>
           <div className="flex flex-col gap-3">

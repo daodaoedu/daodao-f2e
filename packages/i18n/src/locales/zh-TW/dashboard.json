@@ -44,7 +44,7 @@
   "greeting_morning": "早安，{name}",
   "greeting_afternoon": "午安，{name}",
   "greeting_evening": "晚安，{name}",
-  "your_today_collapsed": "今天還有 {count} 項練習",
+  "your_today_collapsed": "今天還有 {count} 個項目",
   "your_today_expand": "展開查看",
   "your_today_empty": "今天想從哪裡開始？",
   "your_today_first_checkin": "進行第一次打卡",

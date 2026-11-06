@@ -70,5 +70,16 @@
   "settings_privacy_desc": "決定你的實踐成果是否可以被教練匯出報告使用。",
   "save": "儲存",
   "exit_cancel": "取消",
-  "meeting_schedule": "聚會時段"
+  "meeting_schedule": "聚會時段",
+  "session_schedule_title": "聚會時間",
+  "session_schedule_next": "下一場聚會",
+  "session_schedule_user_timezone": "日期與時間依您的時區顯示（{timezone}）",
+  "session_schedule_time_not_set": "時間待公布",
+  "session_schedule_no_upcoming": "目前沒有即將舉行的場次",
+  "session_schedule_not_published": "場次時間尚未公布",
+  "session_schedule_join_online": "加入線上聚會",
+  "session_schedule_upcoming": "接下來",
+  "session_schedule_in_progress": "進行中",
+  "session_schedule_past": "已結束",
+  "session_schedule_cohort_timezone": "日期與時間依場次時區顯示（{timezone}）"
 }
