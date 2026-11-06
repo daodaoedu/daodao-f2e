@@ -411,3 +411,82 @@ describe("redirect authority safety", () => {
     expect(new URL(response.headers.get("location")!).origin).toBe("http://0.0.0.0:3001");
   });
 });
+
+describe("locale redirects behind the public host and internal listen port", () => {
+  beforeEach(() => {
+    environment.clear();
+    redirects.location = null;
+  });
+  afterEach(() => {
+    redirects.location = null;
+  });
+
+  it.each([
+    [
+      "http://0.0.0.0:3001",
+      "app-dev.daodao.so",
+      "https://app-dev.daodao.so",
+      "http://app-dev.daodao.so:3001",
+      "https://app-dev.daodao.so",
+    ],
+    [
+      "http://0.0.0.0:3001",
+      "localhost:43141",
+      "",
+      "http://localhost:3001",
+      "http://localhost:43141",
+    ],
+    [
+      "http://0.0.0.0:3001",
+      "app.example.test:8443",
+      "https://app.example.test:8443",
+      "http://app.example.test:3001",
+      "https://app.example.test:8443",
+    ],
+    [
+      "https://0.0.0.0:3001",
+      "app.example.test",
+      "https://app.example.test",
+      "https://app.example.test:3001",
+      "https://app.example.test",
+    ],
+  ])("normalizes the i18n listen-port authority (%s, %s)", async (internalOrigin, host, configuredOrigin, redirectOrigin, publicOrigin) => {
+    environment.set("NEXT_PUBLIC_APP_URL", configuredOrigin);
+    redirects.location = `${redirectOrigin}/lighthouse/o/18/templates?sort=new#library`;
+    const response = await middleware(
+      new NextRequest(`${internalOrigin}/zh-TW/lighthouse/o/18/templates?sort=new`, {
+        headers: {
+          host,
+          cookie: "auth_token=session",
+          "x-forwarded-host": "attacker.example",
+          "x-forwarded-proto": "https",
+        },
+      })
+    );
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(
+      `${publicOrigin}/lighthouse/o/18/templates?sort=new#library`
+    );
+  });
+
+  it.each([
+    "http://foreign.example:3001/lighthouse/o/18/templates",
+    "http://app-dev.daodao.so:3002/lighthouse/o/18/templates",
+    "https://app-dev.daodao.so:3001/lighthouse/o/18/templates",
+    "http://attacker.example:3001/lighthouse/o/18/templates",
+    "http://user@app-dev.daodao.so:3001/lighthouse/o/18/templates",
+  ])("leaves unrelated or credential-bearing locale redirect untouched: %s", async (location) => {
+    environment.set("NEXT_PUBLIC_APP_URL", "https://app-dev.daodao.so");
+    redirects.location = location;
+    const response = await middleware(
+      new NextRequest("http://0.0.0.0:3001/zh-TW/lighthouse/o/18/templates", {
+        headers: {
+          host: "app-dev.daodao.so",
+          cookie: "auth_token=session",
+          "x-forwarded-host": "attacker.example",
+        },
+      })
+    );
+    expect(response.headers.get("location")).toBe(location);
+  });
+});
