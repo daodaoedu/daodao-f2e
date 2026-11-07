@@ -275,3 +275,46 @@ describe("temporary Lighthouse query failures", () => {
     expect(isRecoverableLighthouseQueryError(error)).toBe(false);
   });
 });
+
+import {
+  lighthouseGuardEntryLeaveDelta,
+  lighthouseGuardEntryStep,
+} from "../lighthouse-organization";
+
+describe("lighthouseGuardEntryStep", () => {
+  it("adds one same-page entry once a form becomes dirty so Back stays interceptable", () => {
+    expect(lighthouseGuardEntryStep({ dirty: true, active: false, traversing: false })).toBe("add");
+    expect(lighthouseGuardEntryStep({ dirty: true, active: true, traversing: false })).toBeNull();
+  });
+  it("removes the entry once the form is clean so Back does not need an extra press", () => {
+    expect(lighthouseGuardEntryStep({ dirty: false, active: true, traversing: false })).toBe(
+      "remove"
+    );
+    expect(lighthouseGuardEntryStep({ dirty: false, active: false, traversing: false })).toBeNull();
+  });
+  it("waits for an in-flight removal before changing history again", () => {
+    expect(lighthouseGuardEntryStep({ dirty: true, active: false, traversing: true })).toBeNull();
+  });
+});
+
+describe("lighthouseGuardEntryLeaveDelta", () => {
+  it("leaves past the same-page entry when one Back press is confirmed", () => {
+    expect(lighthouseGuardEntryLeaveDelta(-1, true)).toBe(-2);
+  });
+  it("keeps the requested distance for a deeper jump or without the entry", () => {
+    expect(lighthouseGuardEntryLeaveDelta(-3, true)).toBe(-3);
+    expect(lighthouseGuardEntryLeaveDelta(-1, false)).toBe(-1);
+  });
+});
+
+import { lighthouseReplacedEntryIndex } from "../lighthouse-organization";
+
+describe("lighthouseReplacedEntryIndex", () => {
+  it("keeps the entry's own index while a traversal is being restored", () => {
+    expect(lighthouseReplacedEntryIndex({ scope: "doc", index: 0 }, "doc", 1)).toBe(0);
+  });
+  it("uses the current position for an entry this provider has not tagged", () => {
+    expect(lighthouseReplacedEntryIndex({ scope: "previous-doc", index: 7 }, "doc", 1)).toBe(1);
+    expect(lighthouseReplacedEntryIndex({}, "doc", 1)).toBe(1);
+  });
+});
