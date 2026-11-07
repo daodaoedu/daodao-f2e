@@ -1,6 +1,6 @@
 "use client";
 
-import { ManageOutlineSvg, UserOutlineSvg } from "@daodao/assets";
+import { UserOutlineSvg } from "@daodao/assets";
 import { useAuthContext } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
 import { useLogoutAndRedirect } from "@/hooks/use-logout-redirect";
+import { LighthouseIcon } from "./constant";
 import { LanguagePillToggle } from "./language-pill-toggle";
 
 interface MobileBottomSheetProps {
@@ -114,7 +115,7 @@ export function MobileBottomSheet({ identifier, isOpen, onClose }: MobileBottomS
           </CustomLink>
 
           <CustomLink href="/lighthouse" className={itemClass} onClick={onClose}>
-            <ManageOutlineSvg className="size-[18px] shrink-0 opacity-50" />
+            <LighthouseIcon className="size-[18px] shrink-0 opacity-50" />
             {t("nav_manage")}
           </CustomLink>
 

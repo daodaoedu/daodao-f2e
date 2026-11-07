@@ -97,7 +97,7 @@ function YourTodayContent() {
                 <CustomLink
                   key={`cohort-${cohort.cohortId}`}
                   href={`/cohorts/${cohort.cohortId}`}
-                  className="flex items-center gap-3 px-4 py-[14px] rounded-[18px] hover:bg-white/50 transition-colors group"
+                  className="flex min-w-0 max-w-full items-center gap-3 px-4 py-[14px] rounded-[18px] hover:bg-white/50 transition-colors group"
                 >
                   <span className="shrink-0 flex items-center justify-center size-6 rounded-full bg-[#0D7773]/10 text-[#0D7773]">
                     <Users className="size-3.5" aria-hidden="true" />
@@ -117,7 +117,7 @@ function YourTodayContent() {
                 <CustomLink
                   key={card.id}
                   href={`/practices/${card.id}`}
-                  className="flex items-center gap-3 px-4 py-[14px] rounded-[18px] hover:bg-white/50 transition-colors group"
+                  className="flex min-w-0 max-w-full items-center gap-3 px-4 py-[14px] rounded-[18px] hover:bg-white/50 transition-colors group"
                 >
                   <span
                     className={cn(

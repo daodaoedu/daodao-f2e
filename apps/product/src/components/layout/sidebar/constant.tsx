@@ -10,7 +10,7 @@ import {
 } from "@daodao/assets";
 import { createLucideIcon } from "lucide-react";
 
-const LighthouseIcon = createLucideIcon("Lighthouse", [
+export const LighthouseIcon = createLucideIcon("Lighthouse", [
   ["path", { d: "M12 3V2", key: "ar7q03" }],
   ["path", { d: "M16.066 16.865 7 22l2-11V6a3 3 0 016 0v5l2 11", key: "1945zj" }],
   ["path", { d: "m19.792 4.5.866-.5", key: "nm0czm" }],
