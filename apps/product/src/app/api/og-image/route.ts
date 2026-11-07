@@ -6,6 +6,7 @@
 import { unstable_cache } from "next/cache";
 import { NextResponse } from "next/server";
 import { getCachedOgImage, type IOgImageCacheData, setCachedOgImage } from "@/lib/og-image-cache";
+import { fetchPublicHtml, UnsafePublicUrlError, validatePublicUrl } from "@/lib/safe-public-fetch";
 
 /**
  * 從 HTML 內容中提取 Open Graph 資料
@@ -31,22 +32,15 @@ const extractOgData = (
     const match = html.match(pattern);
     if (match?.[1]) {
       const imageUrl = match[1].trim();
-      // 處理相對路徑
-      if (imageUrl.startsWith("https://")) {
-        ogImageUrl = imageUrl;
+      // Resolve relative metadata against the final public response URL.
+      try {
+        const resolved = new URL(imageUrl, baseUrl);
+        if (resolved.protocol !== "http:" && resolved.protocol !== "https:") continue;
+        ogImageUrl = resolved.href;
         break;
+      } catch {
+        // Ignore malformed metadata and continue looking for another match.
       }
-      if (imageUrl.startsWith("//")) {
-        ogImageUrl = `https:${imageUrl}`;
-        break;
-      }
-      if (imageUrl.startsWith("/")) {
-        const url = new URL(baseUrl);
-        ogImageUrl = `${url.protocol}//${url.host}${imageUrl}`;
-        break;
-      }
-      ogImageUrl = `${baseUrl}/${imageUrl}`;
-      break;
     }
   }
 
@@ -85,27 +79,11 @@ const extractOgData = (
   };
 };
 
-/**
- * 標準化 URL（用於快取鍵）
- * 移除 trailing slash、統一大小寫等
- */
+/** Preserve distinct paths and ports; fragments do not affect HTTP requests. */
 const normalizeUrl = (url: string): string => {
-  try {
-    const parsed = new URL(url);
-    // 移除 trailing slash（除了根路徑）
-    let pathname = parsed.pathname;
-    if (pathname.length > 1 && pathname.endsWith("/")) {
-      pathname = pathname.slice(0, -1);
-    }
-    // 統一 protocol 為小寫
-    const protocol = parsed.protocol.toLowerCase();
-    // 統一 hostname 為小寫
-    const hostname = parsed.hostname.toLowerCase();
-    // 重新構建 URL
-    return `${protocol}//${hostname}${pathname}${parsed.search}${parsed.hash}`;
-  } catch {
-    return url;
-  }
+  const parsed = new URL(url);
+  parsed.hash = "";
+  return parsed.href;
 };
 
 /**
@@ -115,25 +93,13 @@ const normalizeUrl = (url: string): string => {
 const fetchOgImageData = unstable_cache(
   async (url: string): Promise<IOgImageCacheData | null> => {
     // 檢查記憶體快取
-    const cached = getCachedOgImage(url);
+    const cached = getCachedOgImage(`public-v2:${url}`);
     if (cached) {
       return cached;
     }
 
-    // 取得網頁 HTML
-    const htmlResponse = await fetch(url, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-      },
-    });
-
-    if (!htmlResponse.ok) {
-      throw new Error(`Failed to fetch URL: ${htmlResponse.status} ${htmlResponse.statusText}`);
-    }
-
-    const html = await htmlResponse.text();
-    const ogData = extractOgData(html, url);
+    const { html, finalUrl } = await fetchPublicHtml(url);
+    const ogData = extractOgData(html, finalUrl);
 
     if (!ogData.ogImageUrl) {
       return null;
@@ -147,11 +113,11 @@ const fetchOgImageData = unstable_cache(
     };
 
     // 存入記憶體快取
-    setCachedOgImage(url, result);
+    setCachedOgImage(`public-v2:${url}`, result);
 
     return result;
   },
-  ["og-image-fetch"],
+  ["og-image-public-fetch-v2"],
   {
     revalidate: 24 * 60 * 60, // 24 小時
     tags: ["og-image"],
@@ -207,12 +173,14 @@ export async function GET(request: Request) {
       );
     }
 
+    await validatePublicUrl(targetUrl);
+
     // 標準化 URL 用於快取鍵
     const normalizedUrl = normalizeUrl(targetUrl);
 
     // 如果不需要強制刷新，先檢查快取
     if (!refresh) {
-      const cached = getCachedOgImage(normalizedUrl);
+      const cached = getCachedOgImage(`public-v2:${normalizedUrl}`);
       if (cached) {
         return NextResponse.json({
           success: true,
@@ -251,6 +219,9 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
+    if (error instanceof UnsafePublicUrlError) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+    }
     console.error("Error processing og:image:", error);
     return NextResponse.json(
       {
