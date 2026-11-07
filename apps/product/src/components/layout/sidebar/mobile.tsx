@@ -7,14 +7,15 @@ import { useTranslations } from "@daodao/i18n";
 import { usePathname, useRouter } from "@daodao/i18n/navigation";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
+import { Popover, PopoverContent, PopoverTrigger } from "@daodao/ui/components/popover";
 import { cn } from "@daodao/ui/lib/utils";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Plus, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { NotificationBell } from "@/components/notifications/notification-bell";
-import { ChatUnreadBadge } from "./chat-unread-badge";
 import { BreathingDot } from "./breathing-dot";
+import { ChatUnreadBadge } from "./chat-unread-badge";
 import { MobileBottomSheet } from "./mobile-bottom-sheet";
 import type { SidebarProps } from "./type";
 
@@ -27,7 +28,6 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
   const router = useRouter();
   const { user } = useAuthContext();
   const logoRef = useRef<HTMLDivElement>(null);
-  const createMenuRef = useRef<HTMLDivElement>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isCreateMenuOpen, setIsCreateMenuOpen] = useState(false);
 
@@ -69,24 +69,6 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
   const isMessagesActive = pathname.startsWith("/messages");
   const isNotificationsActive = pathname === "/notifications";
   const isAdmin = user?.roles?.includes("admin") ?? false;
-
-  useEffect(() => {
-    if (!isCreateMenuOpen) return;
-    const handleClickOutside = (event: PointerEvent) => {
-      if (createMenuRef.current && !createMenuRef.current.contains(event.target as Node)) {
-        setIsCreateMenuOpen(false);
-      }
-    };
-    const handleEsc = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsCreateMenuOpen(false);
-    };
-    document.addEventListener("pointerdown", handleClickOutside);
-    document.addEventListener("keydown", handleEsc);
-    return () => {
-      document.removeEventListener("pointerdown", handleClickOutside);
-      document.removeEventListener("keydown", handleEsc);
-    };
-  }, [isCreateMenuOpen]);
 
   const handleAvatarClick = useCallback(() => {
     setIsSheetOpen(true);
@@ -154,133 +136,137 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
 
           {/* Create menu */}
           <li className="flex flex-1 justify-center">
-            <div ref={createMenuRef} className="relative">
-              {isCreateMenuOpen && (
-                <div
-                  className="absolute bottom-[calc(100%+0.75rem)] left-1/2 w-[min(80vw,18rem)] -translate-x-1/2 rounded-[20px] bg-white p-2 shadow-[0_16px_40px_rgba(15,48,54,0.18)]"
-                  role="menu"
-                >
-                  <button
-                    type="button"
-                    className="flex w-full items-center gap-3 rounded-[14px] px-3 py-[11px] text-left transition-colors hover:bg-[#F0F9F8]"
-                    role="menuitem"
-                    onClick={() => {
-                      setIsCreateMenuOpen(false);
-                      router.push("/practices/create");
-                    }}
-                  >
-                    <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-logo-cyan/10">
-                      <svg
-                        aria-hidden="true"
-                        className="size-[18px] text-logo-cyan"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                        <circle cx="12" cy="7" r="4" />
-                      </svg>
-                    </span>
-                    <span>
-                      <span className="block text-sm font-semibold text-text-dark">
-                        {tDashboard("fab_create_practice")}
-                      </span>
-                      <span className="block text-xs text-text-dark/40">
-                        {tDashboard("fab_practice_subtitle")}
-                      </span>
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    className="flex w-full items-center gap-3 rounded-[14px] px-3 py-[11px] text-left transition-colors hover:bg-[#F0F9F8]"
-                    role="menuitem"
-                    onClick={() => {
-                      setIsCreateMenuOpen(false);
-                      router.push("/manage");
-                    }}
-                  >
-                    <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-[#FFA10B]/10">
-                      <svg
-                        aria-hidden="true"
-                        className="size-[18px] text-[#FFA10B]"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                        <circle cx="9" cy="7" r="4" />
-                        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                      </svg>
-                    </span>
-                    <span>
-                      <span className="block text-sm font-semibold text-text-dark">
-                        {tDashboard("fab_create_activity")}
-                      </span>
-                      <span className="block text-xs text-text-dark/40">
-                        {tDashboard("fab_activity_subtitle")}
-                      </span>
-                    </span>
-                  </button>
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      className="flex w-full items-center gap-3 rounded-[14px] px-3 py-[11px] text-left transition-colors hover:bg-[#F0F9F8]"
-                      role="menuitem"
-                      onClick={() => setIsCreateMenuOpen(false)}
-                    >
-                      <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-logo-cyan/5 text-logo-cyan/70">
-                        <svg
-                          aria-hidden="true"
-                          className="size-[18px]"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
-                          <line x1="4" y1="22" x2="4" y2="15" />
-                        </svg>
-                      </span>
-                      <span>
-                        <span className="block text-sm font-semibold text-text-dark">
-                          {tDashboard("fab_create_challenge")}
-                        </span>
-                        <span className="block text-xs text-text-dark/40">
-                          {tDashboard("fab_challenge_subtitle")}
-                        </span>
-                      </span>
-                    </button>
+            <Popover open={isCreateMenuOpen} onOpenChange={setIsCreateMenuOpen}>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className={cn(
+                    "flex size-11 items-center justify-center rounded-full text-white shadow-[0_2px_8px_rgba(22,185,179,0.35)] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-logo-cyan focus-visible:ring-offset-2",
+                    isCreateMenuOpen
+                      ? "bg-text-dark/80"
+                      : "bg-logo-cyan hover:scale-105 active:scale-95"
                   )}
-                </div>
-              )}
-              <button
-                type="button"
-                onClick={() => setIsCreateMenuOpen((open) => !open)}
-                className={cn(
-                  "flex size-11 items-center justify-center rounded-full text-white shadow-[0_2px_8px_rgba(22,185,179,0.35)] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-logo-cyan focus-visible:ring-offset-2",
-                  isCreateMenuOpen
-                    ? "bg-text-dark/80"
-                    : "bg-logo-cyan hover:scale-105 active:scale-95"
-                )}
-                aria-label={tDashboard("fab_add_task")}
-                aria-expanded={isCreateMenuOpen}
+                  aria-label={tDashboard("fab_add_task")}
+                  aria-haspopup="menu"
+                  aria-expanded={isCreateMenuOpen}
+                >
+                  {isCreateMenuOpen ? (
+                    <X className="size-6" />
+                  ) : (
+                    <Plus className="size-6" strokeWidth={2.5} />
+                  )}
+                </button>
+              </PopoverTrigger>
+
+              <PopoverContent
+                side="top"
+                align="center"
+                sideOffset={12}
+                role="menu"
+                className="w-[min(80vw,18rem)] rounded-[20px] border-none bg-white p-2 shadow-[0_16px_40px_rgba(15,48,54,0.18)]"
               >
-                {isCreateMenuOpen ? (
-                  <X className="size-6" />
-                ) : (
-                  <Plus className="size-6" strokeWidth={2.5} />
+                <button
+                  type="button"
+                  className="flex w-full items-center gap-3 rounded-[14px] px-3 py-[11px] text-left transition-colors hover:bg-[#F0F9F8]"
+                  role="menuitem"
+                  onClick={() => {
+                    setIsCreateMenuOpen(false);
+                    router.push("/practices/create");
+                  }}
+                >
+                  <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-logo-cyan/10">
+                    <svg
+                      aria-hidden="true"
+                      className="size-[18px] text-logo-cyan"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold text-text-dark">
+                      {tDashboard("fab_create_practice")}
+                    </span>
+                    <span className="block text-xs text-text-dark/40">
+                      {tDashboard("fab_practice_subtitle")}
+                    </span>
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  className="flex w-full items-center gap-3 rounded-[14px] px-3 py-[11px] text-left transition-colors hover:bg-[#F0F9F8]"
+                  role="menuitem"
+                  onClick={() => {
+                    setIsCreateMenuOpen(false);
+                    router.push("/manage");
+                  }}
+                >
+                  <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-[#FFA10B]/10">
+                    <svg
+                      aria-hidden="true"
+                      className="size-[18px] text-[#FFA10B]"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold text-text-dark">
+                      {tDashboard("fab_create_activity")}
+                    </span>
+                    <span className="block text-xs text-text-dark/40">
+                      {tDashboard("fab_activity_subtitle")}
+                    </span>
+                  </span>
+                </button>
+                {isAdmin && (
+                  <button
+                    type="button"
+                    className="flex w-full items-center gap-3 rounded-[14px] px-3 py-[11px] text-left transition-colors hover:bg-[#F0F9F8]"
+                    role="menuitem"
+                    onClick={() => setIsCreateMenuOpen(false)}
+                  >
+                    <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-logo-cyan/5 text-logo-cyan/70">
+                      <svg
+                        aria-hidden="true"
+                        className="size-[18px]"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+                        <line x1="4" y1="22" x2="4" y2="15" />
+                      </svg>
+                    </span>
+                    <span>
+                      <span className="block text-sm font-semibold text-text-dark">
+                        {tDashboard("fab_create_challenge")}
+                      </span>
+                      <span className="block text-xs text-text-dark/40">
+                        {tDashboard("fab_challenge_subtitle")}
+                      </span>
+                    </span>
+                  </button>
                 )}
-              </button>
-            </div>
+              </PopoverContent>
+            </Popover>
           </li>
 
           {/* Notifications */}

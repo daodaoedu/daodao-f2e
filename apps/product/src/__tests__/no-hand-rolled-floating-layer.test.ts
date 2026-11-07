@@ -59,6 +59,7 @@ const walk = (dir: string): string[] =>
   });
 
 const countHandRolled = (source: string): number => source.match(HAND_ROLLED)?.length ?? 0;
+const relativePath = (file: string): string => path.relative(SRC, file).split(path.sep).join("/");
 
 /** 檔案相對路徑 → 手刻浮層出現次數（只含有出現的檔案） */
 const scan = (): Map<string, number> => {
@@ -66,7 +67,7 @@ const scan = (): Map<string, number> => {
   for (const file of walk(SRC)) {
     if (path.relative(SRC, file) === SELF) continue;
     const hits = countHandRolled(readFileSync(file, "utf8"));
-    if (hits > 0) counts.set(path.relative(SRC, file), hits);
+    if (hits > 0) counts.set(relativePath(file), hits);
   }
   return counts;
 };
