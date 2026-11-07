@@ -144,6 +144,33 @@ export function lighthouseScopedHistoryRestore(
   return lighthouseHistoryRestore(current, "index" in target ? target.index : undefined);
 }
 
+/**
+ * A dirty form keeps one extra same-page history entry, so Back stays inside this document and
+ * reaches the in-app confirmation instead of depending on a browser beforeunload prompt.
+ */
+export function lighthouseGuardEntryStep(state: {
+  dirty: boolean;
+  active: boolean;
+  traversing: boolean;
+}): "add" | "remove" | null {
+  if (state.traversing || state.dirty === state.active) return null;
+  return state.dirty ? "add" : "remove";
+}
+
+/** One confirmed Back press lands on the page's own entry, so leaving must pass it as well. */
+export function lighthouseGuardEntryLeaveDelta(delta: number, active: boolean): number {
+  return active && delta === -1 ? -2 : delta;
+}
+
+/** Replacing never moves position, so a tagged entry keeps its index even mid-traversal. */
+export function lighthouseReplacedEntryIndex(
+  entry: { scope?: unknown; index?: unknown },
+  scope: string,
+  current: number
+): number {
+  return entry.scope === scope && typeof entry.index === "number" ? entry.index : current;
+}
+
 export type LighthouseTraversalEventType = Event & {
   navigationType?: string;
   destination?: { url: string; key: string };

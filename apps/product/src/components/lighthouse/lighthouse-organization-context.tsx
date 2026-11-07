@@ -33,13 +33,17 @@ import {
   useRef,
   useState,
 } from "react";
+import { flushSync } from "react-dom";
 import {
   createLighthousePreferenceWriter,
   interceptLighthouseTraversal,
   isRecoverableLighthouseQueryError,
   type LighthouseTraversalEventType,
+  lighthouseGuardEntryLeaveDelta,
+  lighthouseGuardEntryStep,
   lighthouseOrganizationHref,
   lighthouseOrganizationPathId,
+  lighthouseReplacedEntryIndex,
   lighthouseRouterHref,
   lighthouseScopedHistoryRestore,
   resolveLighthouseOrganization,
@@ -47,6 +51,8 @@ import {
 } from "@/utils/lighthouse-organization";
 import { CohortErrorState } from "./cohort-error-state";
 import { ConfirmDialog } from "./confirm-dialog";
+
+const HISTORY_TRAVERSAL_TIMEOUT_MS = 1000;
 
 type Guard = { dirty: boolean; busy: boolean };
 type OrganizationContextValue = {
@@ -158,12 +164,17 @@ function OrganizationState({ children }: { children: ReactNode }) {
   const pendingNavigationKey = useRef<string | null>(null);
   const restoringHistory = useRef(false);
   const allowingHistory = useRef(false);
+  const guardEntryActive = useRef(false);
+  const guardEntryTraversing = useRef(false);
+  const syncGuardEntry = useRef<(() => void) | null>(null);
+  const [dirty, setDirty] = useState(false);
 
   const registerGuard = useCallback((key: symbol, guard?: Guard) => {
     if (guard) guards.current.set(key, guard);
     else guards.current.delete(key);
     const values = [...guards.current.values()];
     setBlocked(values.some((item) => item.dirty || item.busy));
+    setDirty(values.some((item) => item.dirty));
     setWriting(values.some((item) => item.busy));
   }, []);
 
@@ -195,6 +206,8 @@ function OrganizationState({ children }: { children: ReactNode }) {
     allowingHistory.current = false;
     pendingHistoryDelta.current = null;
     pendingNavigationKey.current = null;
+    guardEntryActive.current = false;
+    guardEntryTraversing.current = false;
     setPendingHref(null);
     const originalPush = window.history.pushState;
     const originalReplace = window.history.replaceState;
@@ -223,6 +236,18 @@ function OrganizationState({ children }: { children: ReactNode }) {
       unused: string,
       url?: string | URL | null
     ) => {
+      if (guardEntryActive.current) {
+        // A real navigation takes over the extra entry, so Back never revisits the same page.
+        guardEntryActive.current = false;
+        originalReplace.call(
+          window.history,
+          { ...stateRecord(data), [indexKey]: historyIndex.current, [scopeKey]: historyScope },
+          unused,
+          url
+        );
+        rememberSource();
+        return;
+      }
       const nextIndex = historyIndex.current + 1;
       originalPush.call(
         window.history,
@@ -238,9 +263,18 @@ function OrganizationState({ children }: { children: ReactNode }) {
       unused: string,
       url?: string | URL | null
     ) => {
+      const entry = stateRecord(window.history.state);
       originalReplace.call(
         window.history,
-        { ...stateRecord(data), [indexKey]: historyIndex.current, [scopeKey]: historyScope },
+        {
+          ...stateRecord(data),
+          [indexKey]: lighthouseReplacedEntryIndex(
+            { scope: entry[scopeKey], index: entry[indexKey] },
+            historyScope,
+            historyIndex.current
+          ),
+          [scopeKey]: historyScope,
+        },
         unused,
         url
       );
@@ -248,6 +282,34 @@ function OrganizationState({ children }: { children: ReactNode }) {
     };
     window.history.pushState = taggedPush;
     window.history.replaceState = taggedReplace;
+    syncGuardEntry.current = () => {
+      const step = lighthouseGuardEntryStep({
+        dirty: [...guards.current.values()].some((item) => item.dirty),
+        active: guardEntryActive.current,
+        traversing: guardEntryTraversing.current,
+      });
+      if (step === "add") {
+        const nextIndex = historyIndex.current + 1;
+        originalPush.call(
+          window.history,
+          {
+            ...stateRecord(window.history.state),
+            [indexKey]: nextIndex,
+            [scopeKey]: historyScope,
+          },
+          ""
+        );
+        historyIndex.current = nextIndex;
+        guardEntryActive.current = true;
+        rememberSource();
+      } else if (step === "remove") {
+        guardEntryActive.current = false;
+        guardEntryTraversing.current = true;
+        restoringHistory.current = true;
+        historyIndex.current -= 1;
+        window.history.go(-1);
+      }
+    };
     const onBack = (event: PopStateEvent) => {
       const targetState = stateRecord(event.state);
       const targetIndex = targetState[indexKey];
@@ -255,6 +317,11 @@ function OrganizationState({ children }: { children: ReactNode }) {
       if (restoringHistory.current) {
         restoringHistory.current = false;
         event.stopImmediatePropagation();
+        if (guardEntryTraversing.current) {
+          guardEntryTraversing.current = false;
+          rememberSource();
+          syncGuardEntry.current?.();
+        }
         return;
       }
       if (
@@ -275,9 +342,13 @@ function OrganizationState({ children }: { children: ReactNode }) {
       event.stopImmediatePropagation();
       if (restore.kind === "traverse") {
         restoringHistory.current = true;
-        // Known entries preserve their original state and Forward history.
+        // Known entries keep their original state when the page is restored.
         window.history.go(-restore.delta);
-        pendingHistoryDelta.current = restore.delta;
+        pendingNavigationKey.current = null;
+        pendingHistoryDelta.current = lighthouseGuardEntryLeaveDelta(
+          restore.delta,
+          guardEntryActive.current
+        );
       } else {
         // An unmarked outside entry has no reliable direction or distance. Restore
         // the source in place, then use the captured target only after confirmation.
@@ -291,9 +362,16 @@ function OrganizationState({ children }: { children: ReactNode }) {
       }
     };
     const browserNavigation = (
-      window as unknown as { navigation?: EventTarget & { traverseTo: (key: string) => unknown } }
+      window as unknown as {
+        navigation?: EventTarget & {
+          traverseTo: (key: string) => unknown;
+          currentEntry?: { index: number } | null;
+        };
+      }
     ).navigation;
     const onNavigate = (event: Event) => {
+      // Our own restore and cleanup traversals must never reopen the confirmation.
+      if (restoringHistory.current) return;
       const values = [...guards.current.values()];
       const decision = interceptLighthouseTraversal(
         event as LighthouseTraversalEventType,
@@ -304,13 +382,28 @@ function OrganizationState({ children }: { children: ReactNode }) {
         allowingHistory.current
       );
       if (decision?.kind !== "confirm") return;
-      pendingHistoryDelta.current = null;
-      pendingNavigationKey.current = decision.key;
+      const destinationIndex = (event as unknown as { destination?: { index?: number } })
+        .destination?.index;
+      const currentIndex = browserNavigation?.currentEntry?.index;
+      const delta =
+        typeof destinationIndex === "number" && typeof currentIndex === "number"
+          ? destinationIndex - currentIndex
+          : null;
+      if (delta !== null && guardEntryActive.current && delta === -1) {
+        // The destination is this page's own entry, so the key alone would never leave it.
+        pendingHistoryDelta.current = lighthouseGuardEntryLeaveDelta(delta, true);
+        pendingNavigationKey.current = null;
+      } else {
+        pendingHistoryDelta.current = null;
+        pendingNavigationKey.current = decision.key;
+      }
       setPendingHref(decision.href);
     };
     browserNavigation?.addEventListener("navigate", onNavigate);
     window.addEventListener("popstate", onBack, true);
+    syncGuardEntry.current();
     return () => {
+      syncGuardEntry.current = null;
       browserNavigation?.removeEventListener("navigate", onNavigate);
       window.removeEventListener("popstate", onBack, true);
       if (window.history.pushState === taggedPush) window.history.pushState = originalPush;
@@ -318,6 +411,11 @@ function OrganizationState({ children }: { children: ReactNode }) {
         window.history.replaceState = originalReplace;
     };
   }, []);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: dirty is the trigger; the callback reads current guards.
+  useEffect(() => {
+    syncGuardEntry.current?.();
+  }, [dirty]);
 
   useEffect(() => {
     if (!organizationId) return;
@@ -480,12 +578,35 @@ function OrganizationState({ children }: { children: ReactNode }) {
           const navigation = (
             window as unknown as { navigation?: { traverseTo: (key: string) => unknown } }
           ).navigation;
+          // The user already chose to discard, so leaving must not raise a second prompt.
+          if ((navigationKey && navigation) || delta !== null) {
+            flushSync(() => setIsBlocked(false));
+          }
           if (navigationKey && navigation) {
+            guardEntryActive.current = false;
             allowingHistory.current = true;
             navigation.traverseTo(navigationKey);
           } else if (delta !== null) {
+            const hadGuardEntry = guardEntryActive.current;
+            let left = false;
+            const markLeft = () => {
+              left = true;
+            };
+            window.addEventListener("beforeunload", markLeft, { once: true });
+            window.addEventListener("popstate", markLeft, { once: true });
+            guardEntryActive.current = false;
             allowingHistory.current = true;
             window.history.go(delta);
+            // A traversal with no reachable entry is a silent no-op and fires neither event, so
+            // send the user to the organization home instead of stranding them on the discarded form.
+            window.setTimeout(() => {
+              window.removeEventListener("beforeunload", markLeft);
+              window.removeEventListener("popstate", markLeft);
+              if (left) return;
+              allowingHistory.current = false;
+              guardEntryActive.current = hadGuardEntry;
+              router.push(href("/lighthouse"));
+            }, HISTORY_TRAVERSAL_TIMEOUT_MS);
           } else router.push(lighthouseRouterHref(destination));
         }}
       />
