@@ -2,6 +2,7 @@ import { getEnv } from "@daodao/config";
 import createMiddleware from "@daodao/i18n/middleware";
 import { routing } from "@daodao/i18n/routing";
 import { type NextRequest, NextResponse } from "next/server";
+import { getRawAuthTokenCookie } from "./lib/auth/auth-cookie";
 import { checkPrivateSession, isPrivateSpacePath } from "./lib/auth/private-access";
 import {
   isOrganizationInvitationToken,
@@ -26,7 +27,7 @@ type LighthouseAccess = {
 };
 
 async function hasLighthouseAccess(request: NextRequest): Promise<LighthouseAccess> {
-  const authToken = request.cookies.get("auth_token")?.value;
+  const authToken = getRawAuthTokenCookie(request.headers.get("cookie"));
   if (!authToken) return { status: "unauthorized" };
 
   try {
@@ -185,7 +186,10 @@ export default async function middleware(request: NextRequest) {
       getEnv("API_INTERNAL_URL") ||
       getEnv("NEXT_PUBLIC_API_URL", "https://api.daodao.so") ||
       "https://api.daodao.so";
-    const access = await checkPrivateSession(request.cookies.get("auth_token")?.value, apiBaseUrl);
+    const access = await checkPrivateSession(
+      getRawAuthTokenCookie(request.headers.get("cookie")),
+      apiBaseUrl
+    );
     if (access !== "allowed") {
       const destination = request.nextUrl.clone();
       destination.pathname = localizedPath(
@@ -235,7 +239,9 @@ export default async function middleware(request: NextRequest) {
             getEnv("API_INTERNAL_URL") || getEnv("NEXT_PUBLIC_API_URL", "https://api.daodao.so")
           )?.replace(/\/$/, "");
           const preferenceResponse = await fetch(`${apiBaseUrl}/api/v1/lighthouse/preferences`, {
-            headers: { Cookie: `auth_token=${request.cookies.get("auth_token")?.value}` },
+            headers: {
+              Cookie: `auth_token=${getRawAuthTokenCookie(request.headers.get("cookie"))}`,
+            },
             cache: "no-store",
           });
           if (preferenceResponse.ok) {
