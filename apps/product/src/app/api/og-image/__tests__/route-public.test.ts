@@ -11,9 +11,12 @@ vi.mock("next/cache", () => ({ unstable_cache: (fn: unknown) => fn }));
 import { clearAllCachedOgImage, setCachedOgImage } from "@/lib/og-image-cache";
 import { GET } from "../route";
 
+let image = "/image.png";
+
 const requestFor = (url: string) =>
   new Request(`http://localhost/api/og-image?url=${encodeURIComponent(url)}`);
 beforeEach(() => {
+  image = "/image.png";
   vi.clearAllMocks();
   clearAllCachedOgImage();
   mocks.lookup.mockResolvedValue([{ address: "8.8.8.8", family: 4 }]);
@@ -24,7 +27,7 @@ beforeEach(() => {
           callback(
             Object.assign(
               Readable.from([
-                `<meta property="og:image" content="/image.png"><meta property="og:title" content="${url.pathname}"><meta property="og:description" content="public description">`,
+                `<meta property="og:image" content="${image}"><meta property="og:title" content="${url.pathname}"><meta property="og:description" content="public description">`,
               ]),
               { statusCode: 200, headers: {} }
             )
@@ -68,4 +71,24 @@ it("denies cached results when a formerly public hostname now resolves private",
   mocks.lookup.mockResolvedValue([{ address: "127.0.0.1", family: 4 }]);
   expect((await GET(requestFor(target))).status).toBe(400);
   expect(mocks.request).not.toHaveBeenCalled();
+});
+
+it.each([
+  "javascript:alert(1)",
+  "data:image/png;base64,c2VudGluZWw=",
+  "file:///private/image.png",
+])("ignores non-HTTP metadata image %s", async (value) => {
+  image = value;
+  const response = await GET(requestFor("https://resource.example/a/"));
+  expect(response.status).toBe(404);
+  expect(await response.text()).not.toContain(value);
+});
+it.each([
+  { value: "image.png", expected: "https://resource.example/a/image.png" },
+  { value: "../image.png", expected: "https://resource.example/image.png" },
+  { value: "http://images.example/image.png", expected: "http://images.example/image.png" },
+])("resolves ordinary HTTP metadata $value", async ({ value, expected }) => {
+  image = value;
+  const response = await GET(requestFor("https://resource.example/a/"));
+  expect(await response.json()).toMatchObject({ data: { ogImageUrl: expected } });
 });

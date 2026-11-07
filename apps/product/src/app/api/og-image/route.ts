@@ -34,7 +34,9 @@ const extractOgData = (
       const imageUrl = match[1].trim();
       // Resolve relative metadata against the final public response URL.
       try {
-        ogImageUrl = new URL(imageUrl, baseUrl).href;
+        const resolved = new URL(imageUrl, baseUrl);
+        if (resolved.protocol !== "http:" && resolved.protocol !== "https:") continue;
+        ogImageUrl = resolved.href;
         break;
       } catch {
         // Ignore malformed metadata and continue looking for another match.
