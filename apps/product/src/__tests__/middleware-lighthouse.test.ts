@@ -44,6 +44,25 @@ describe("Lighthouse middleware backend routing", () => {
     expect(response.headers.get("location")).toBeNull();
   });
 
+  it.each([
+    ["allowed; auth_token=denied", null],
+    ["denied; auth_token=allowed", "/en/lighthouse/access-required"],
+  ])("uses the same session as the API with duplicate cookies: %s", async (tokens, destination) => {
+    fetchMock.mockImplementation(async (_url: string, options: RequestInit) => {
+      const cookie = new Headers(options.headers).get("Cookie");
+      const allowed = cookie?.split(";")[0]?.trim() === "auth_token=allowed";
+      return new Response(JSON.stringify({ data: allowed ? [{ id: 1, status: "active" }] : [] }), {
+        status: allowed ? 200 : 403,
+      });
+    });
+    const response = await middleware(
+      request(tokens, "/en/lighthouse/programs/46/cohorts/127/outcome")
+    );
+    expect(response.headers.get("location")).toBe(
+      destination === null ? null : `https://product.example.test${destination}`
+    );
+  });
+
   it("keeps the public URL fallback when internal routing is unset", async () => {
     await middleware(request());
     expect(fetchMock.mock.calls[0]?.[0]).toBe(
