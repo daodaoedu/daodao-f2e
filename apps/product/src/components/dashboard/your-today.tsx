@@ -1,12 +1,14 @@
 "use client";
 
-import { useMyPractices } from "@daodao/api";
+import { useMyCohorts, useMyPractices } from "@daodao/api";
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { cn } from "@daodao/ui/lib/utils";
-import { ChevronDown, ChevronRight, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronUp, Users } from "lucide-react";
 import { useMemo, useState } from "react";
+import { CohortQueryScope } from "@/components/cohort/cohort-query-scope";
+import { isCohortQuickAccessVisible } from "@/utils/cohort-meeting-calendar";
 import { resolvePracticeDurationDays } from "@/utils/practice-period";
 
 function getGreetingKey(): "greeting_morning" | "greeting_afternoon" | "greeting_evening" {
@@ -26,10 +28,26 @@ interface PracticeCard {
 }
 
 export function YourToday() {
+  return (
+    <CohortQueryScope>
+      <YourTodayContent />
+    </CohortQueryScope>
+  );
+}
+
+function YourTodayContent() {
   const t = useTranslations("dashboard");
   const { user } = useAuth();
   const [isExpanded, setIsExpanded] = useState(true);
   const { data: practicesData } = useMyPractices({ limit: 20 });
+  const {
+    data: cohortsData,
+    error: cohortsError,
+    validationError: cohortsValidationError,
+  } = useMyCohorts();
+  const quickAccessCohorts = (
+    cohortsError || cohortsValidationError ? [] : (cohortsData?.data ?? [])
+  ).filter((cohort) => isCohortQuickAccessVisible(cohort));
 
   const cards = useMemo<PracticeCard[]>(() => {
     const practices = practicesData?.data ?? [];
@@ -51,6 +69,7 @@ export function YourToday() {
 
   const displayName = user?.name ?? "";
   const greetingKey = getGreetingKey();
+  const quickAccessCount = cards.length + quickAccessCohorts.length;
 
   if (!user) return null;
 
@@ -72,8 +91,28 @@ export function YourToday() {
             </button>
           </div>
 
-          {cards.length > 0 ? (
+          {quickAccessCount > 0 ? (
             <div className="flex flex-wrap gap-[10px]">
+              {quickAccessCohorts.map((cohort) => (
+                <CustomLink
+                  key={`cohort-${cohort.cohortId}`}
+                  href={`/cohorts/${cohort.cohortId}`}
+                  className="flex items-center gap-3 px-4 py-[14px] rounded-[18px] hover:bg-white/50 transition-colors group"
+                >
+                  <span className="shrink-0 flex items-center justify-center size-6 rounded-full bg-[#0D7773]/10 text-[#0D7773]">
+                    <Users className="size-3.5" aria-hidden="true" />
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="truncate text-sm font-medium text-text-dark">
+                      {cohort.displayName}
+                    </p>
+                    <p className="text-[11px] text-text-dark/40">
+                      {t("my_cohorts_org", { org: cohort.organizationName })}
+                    </p>
+                  </div>
+                  <ChevronRight className="size-[18px] text-text-dark/20 group-hover:text-text-dark/40 transition-colors" />
+                </CustomLink>
+              ))}
               {cards.map((card) => (
                 <CustomLink
                   key={card.id}
@@ -142,9 +181,9 @@ export function YourToday() {
           <h2 className="text-base font-semibold text-text-dark">
             {t(greetingKey, { name: displayName })}
           </h2>
-          {cards.length > 0 && (
+          {quickAccessCount > 0 && (
             <span className="text-sm text-text-dark/40">
-              {t("your_today_collapsed", { count: cards.length })}
+              {t("your_today_collapsed", { count: quickAccessCount })}
             </span>
           )}
           <button

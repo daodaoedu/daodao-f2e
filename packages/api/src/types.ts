@@ -14229,6 +14229,11 @@ export interface paths {
                                 startDate: string;
                                 /** Format: date-time */
                                 endDate: string;
+                                /**
+                                 * @description 場次共用 IANA 時區
+                                 * @example Asia/Taipei
+                                 */
+                                timezone: string;
                                 status: string;
                                 /** Format: date-time */
                                 joinedAt: string | null;

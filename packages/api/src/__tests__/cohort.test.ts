@@ -15,6 +15,7 @@ import {
   lighthousePreferencesResponseSchema,
   lighthouseProgramListResponseSchema,
   lighthouseTemplatesResponseSchema,
+  myCohortsResponseSchema,
 } from "../services/cohort";
 
 // Schema tests must run before config generation in a clean CI checkout.
@@ -581,5 +582,30 @@ describe("Lighthouse account preference contract", () => {
         }).success
       ).toBe(false);
     }
+  });
+});
+
+describe("member cohort quick access contract", () => {
+  const cohort = {
+    cohortId: 27,
+    displayName: "測試場次",
+    startDate: timestamp,
+    endDate: timestamp,
+    status: "published",
+    joinedAt: timestamp,
+    programName: "系列",
+    organizationName: "島島",
+    timezone: "Pacific/Honolulu",
+  };
+  it("retains the cohort zone used for homepage start-date eligibility", () => {
+    const result = myCohortsResponseSchema.parse({ success: true, data: [cohort], timestamp });
+    expect(result.data[0]).toHaveProperty("timezone", "Pacific/Honolulu");
+  });
+  it("rejects a response without the timezone required by quick access", () => {
+    const missingTimezone = { ...cohort, timezone: undefined };
+    expect(
+      myCohortsResponseSchema.safeParse({ success: true, data: [missingTimezone], timestamp })
+        .success
+    ).toBe(false);
   });
 });

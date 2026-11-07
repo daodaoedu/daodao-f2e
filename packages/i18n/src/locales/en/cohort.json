@@ -70,5 +70,17 @@
   "settings_privacy_desc": "Control whether your practice results can be exported by your coach.",
   "save": "Save",
   "exit_cancel": "Cancel",
-  "meeting_schedule": "Meeting schedule"
+  "meeting_schedule": "Meeting schedule",
+  "session_schedule_close": "Close meeting times",
+  "session_schedule_title": "Session schedule",
+  "session_schedule_next": "Next session",
+  "session_schedule_user_timezone": "Dates and times shown in your time zone ({timezone})",
+  "session_schedule_time_not_set": "Time to be announced",
+  "session_schedule_no_upcoming": "There are no upcoming sessions",
+  "session_schedule_not_published": "Session dates haven't been announced yet",
+  "session_schedule_join_online": "Join online session",
+  "session_schedule_upcoming": "Upcoming sessions",
+  "session_schedule_in_progress": "In progress",
+  "session_schedule_past": "Past sessions",
+  "session_schedule_cohort_timezone": "Dates and times shown in the cohort time zone ({timezone})"
 }
