@@ -71,6 +71,7 @@
   "save": "儲存",
   "exit_cancel": "取消",
   "meeting_schedule": "聚會時段",
+  "session_schedule_end_date": "結束日期：{date}",
   "session_schedule_close": "關閉聚會時間",
   "session_schedule_title": "聚會時間",
   "session_schedule_next": "下一場聚會",
