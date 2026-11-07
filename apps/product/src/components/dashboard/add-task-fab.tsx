@@ -10,11 +10,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 export const AddTaskFAB = () => {
   const t = useTranslations("dashboard");
   const router = useRouter();
-  const { user } = useAuth();
+  const { isAdmin } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-
-  const isAdmin = user?.roles?.includes("admin") ?? false;
 
   const handleToggle = useCallback(() => setIsOpen((prev) => !prev), []);
 

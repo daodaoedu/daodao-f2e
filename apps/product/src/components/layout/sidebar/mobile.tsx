@@ -1,18 +1,21 @@
 "use client";
 
-import { HomeOutlineSvg, HomeSolidSvg, MessagesOutlineSvg } from "@daodao/assets";
+import { MessagesOutlineSvg, SpacesOutlineSvg } from "@daodao/assets";
 import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
 import { useAuthContext } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
-import { usePathname } from "@daodao/i18n/navigation";
+import { usePathname, useRouter } from "@daodao/i18n/navigation";
+import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
+import { Popover, PopoverContent, PopoverTrigger } from "@daodao/ui/components/popover";
 import { cn } from "@daodao/ui/lib/utils";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { NotificationBell } from "@/components/notifications/notification-bell";
+import { BreathingDot } from "./breathing-dot";
 import { ChatUnreadBadge } from "./chat-unread-badge";
 import { MobileBottomSheet } from "./mobile-bottom-sheet";
 import type { SidebarProps } from "./type";
@@ -22,9 +25,12 @@ gsap.registerPlugin(ScrollTrigger);
 export const MobileSidebar = ({ identifier }: SidebarProps) => {
   const pathname = usePathname();
   const t = useTranslations("app_product");
-  const { user } = useAuthContext();
+  const tDashboard = useTranslations("dashboard");
+  const router = useRouter();
+  const { user, isAdmin } = useAuthContext();
   const logoRef = useRef<HTMLDivElement>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isCreateMenuOpen, setIsCreateMenuOpen] = useState(false);
 
   const displayName = user?.name || user?.email?.split("@")[0] || "";
   const initial = displayName.charAt(0).toUpperCase();
@@ -57,19 +63,21 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
     };
   }, [isHomePage]);
 
-  const isHomeActive = pathname === "/";
+  const isSpacesActive =
+    pathname.startsWith("/spaces") ||
+    pathname.startsWith("/activities") ||
+    pathname.startsWith("/challenges");
   const isMessagesActive = pathname.startsWith("/messages");
   const isNotificationsActive = pathname === "/notifications";
 
   const handleAvatarClick = useCallback(() => {
+    setIsCreateMenuOpen(false);
     setIsSheetOpen(true);
   }, []);
 
   const handleSheetClose = useCallback(() => {
     setIsSheetOpen(false);
   }, []);
-
-  const HomeIcon = isHomeActive ? HomeSolidSvg : HomeOutlineSvg;
 
   const navItemClass =
     "flex size-11 items-center justify-center rounded-xl transition-colors hover:bg-logo-cyan/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-logo-cyan";
@@ -87,20 +95,23 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
         aria-label={t("mobile_navigation")}
       >
         <ul className="flex items-center justify-evenly px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
-          {/* Home */}
+          {/* Spaces */}
           <li className="flex flex-1 justify-center">
             <CustomLink
-              href="/"
+              href="/spaces"
               className={navItemClass}
-              aria-label={t("nav_home")}
-              aria-current={isHomeActive ? "page" : undefined}
+              aria-label={t("nav_spaces")}
+              aria-current={isSpacesActive ? "page" : undefined}
             >
-              <HomeIcon
-                className={cn(
-                  iconClass,
-                  isHomeActive ? "text-logo-cyan opacity-100" : "text-light-gray opacity-45"
-                )}
-              />
+              <span className="relative inline-flex">
+                <SpacesOutlineSvg
+                  className={cn(
+                    iconClass,
+                    isSpacesActive ? "text-logo-cyan opacity-100" : "text-light-gray opacity-45"
+                  )}
+                />
+                <BreathingDot />
+              </span>
             </CustomLink>
           </li>
 
@@ -124,15 +135,142 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
             </CustomLink>
           </li>
 
-          {/* Create Practice (center plus button) */}
+          {/* Create menu */}
           <li className="flex flex-1 justify-center">
-            <CustomLink
-              href="/practices/create"
-              className="flex size-11 items-center justify-center rounded-full bg-logo-cyan text-white shadow-[0_2px_8px_rgba(22,185,179,0.35)] transition-transform hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-logo-cyan focus-visible:ring-offset-2"
-              aria-label={t("nav_create_practice")}
-            >
-              <Plus className="size-6" strokeWidth={2.5} />
-            </CustomLink>
+            <Popover open={isCreateMenuOpen} onOpenChange={setIsCreateMenuOpen}>
+              <PopoverContent
+                side="top"
+                sideOffset={12}
+                collisionPadding={16}
+                aria-label={tDashboard("fab_add_task")}
+                className="w-[min(80vw,18rem)] max-h-[var(--radix-popover-content-available-height)] overflow-y-auto rounded-[20px] border-0 bg-white p-2 shadow-[0_16px_40px_rgba(15,48,54,0.18)]"
+              >
+                <Button
+                  variant="ghost"
+                  animation="none"
+                  type="button"
+                  className="flex h-auto w-full items-center justify-start gap-3 whitespace-normal rounded-[14px] px-3 py-[11px] text-left transition-colors hover:bg-[#F0F9F8] hover:text-text-dark"
+                  onClick={() => {
+                    setIsCreateMenuOpen(false);
+                    router.push("/practices/create");
+                  }}
+                >
+                  <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-logo-cyan/10">
+                    <svg
+                      aria-hidden="true"
+                      className="size-[18px] text-logo-cyan"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold text-text-dark">
+                      {tDashboard("fab_create_practice")}
+                    </span>
+                    <span className="block text-xs text-text-dark/70">
+                      {tDashboard("fab_practice_subtitle")}
+                    </span>
+                  </span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  animation="none"
+                  type="button"
+                  className="flex h-auto w-full items-center justify-start gap-3 whitespace-normal rounded-[14px] px-3 py-[11px] text-left transition-colors hover:bg-[#F0F9F8] hover:text-text-dark"
+                  onClick={() => {
+                    setIsCreateMenuOpen(false);
+                    router.push("/manage");
+                  }}
+                >
+                  <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-[#FFA10B]/10">
+                    <svg
+                      aria-hidden="true"
+                      className="size-[18px] text-[#FFA10B]"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold text-text-dark">
+                      {tDashboard("fab_create_activity")}
+                    </span>
+                    <span className="block text-xs text-text-dark/70">
+                      {tDashboard("fab_activity_subtitle")}
+                    </span>
+                  </span>
+                </Button>
+                {isAdmin && (
+                  <Button
+                    variant="ghost"
+                    animation="none"
+                    type="button"
+                    className="flex h-auto w-full items-center justify-start gap-3 whitespace-normal rounded-[14px] px-3 py-[11px] text-left transition-colors hover:bg-[#F0F9F8] hover:text-text-dark"
+                    onClick={() => setIsCreateMenuOpen(false)}
+                  >
+                    <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-logo-cyan/5 text-logo-cyan/70">
+                      <svg
+                        aria-hidden="true"
+                        className="size-[18px]"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+                        <line x1="4" y1="22" x2="4" y2="15" />
+                      </svg>
+                    </span>
+                    <span>
+                      <span className="block text-sm font-semibold text-text-dark">
+                        {tDashboard("fab_create_challenge")}
+                      </span>
+                      <span className="block text-xs text-text-dark/70">
+                        {tDashboard("fab_challenge_subtitle")}
+                      </span>
+                    </span>
+                  </Button>
+                )}
+              </PopoverContent>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  animation="none"
+                  type="button"
+                  className={cn(
+                    "flex size-11 items-center justify-center rounded-full p-0 text-white hover:text-white shadow-[0_2px_8px_rgba(22,185,179,0.35)] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-logo-cyan focus-visible:ring-offset-2",
+                    isCreateMenuOpen
+                      ? "bg-text-dark/80"
+                      : "bg-logo-cyan hover:scale-105 active:scale-95"
+                  )}
+                  aria-label={tDashboard("fab_add_task")}
+                  aria-expanded={isCreateMenuOpen}
+                >
+                  {isCreateMenuOpen ? (
+                    <X className="size-6" />
+                  ) : (
+                    <Plus className="size-6" strokeWidth={2.5} />
+                  )}
+                </Button>
+              </PopoverTrigger>
+            </Popover>
           </li>
 
           {/* Notifications */}
@@ -149,9 +287,12 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
 
           {/* Avatar (opens bottom sheet) */}
           <li className="flex flex-1 justify-center">
-            <button
+            <Button
+              variant="ghost"
+              animation="none"
               type="button"
               onClick={handleAvatarClick}
+              size="icon"
               className={cn(navItemClass, isSheetOpen && "bg-logo-cyan/10")}
               aria-label={t("account_menu")}
               aria-expanded={isSheetOpen}
@@ -169,7 +310,7 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
                   {initial}
                 </span>
               )}
-            </button>
+            </Button>
           </li>
         </ul>
       </nav>
