@@ -29,25 +29,53 @@ interface CohortMeetingCalendarProps {
   meetingUrl?: string | null;
 }
 
-function formatSessionDate(
-  session: MeetingSessionType,
-  sourceTimezone: string,
-  displayTimezone: string
-) {
-  return formatSessionForTimezone(session, sourceTimezone, displayTimezone).date;
-}
-
-function formatSessionTime(
-  session: MeetingSessionType,
-  notSetLabel: string,
-  sourceTimezone: string,
-  displayTimezone: string
-) {
+function SessionDateTime({
+  session,
+  sourceTimezone,
+  displayTimezone,
+  highlight = false,
+}: {
+  session: MeetingSessionType;
+  sourceTimezone: string;
+  displayTimezone: string;
+  highlight?: boolean;
+}) {
+  const t = useTranslations("cohort");
   const display = formatSessionForTimezone(session, sourceTimezone, displayTimezone);
-  const endDate = display.endDate && display.endDate !== display.date ? `${display.endDate} ` : "";
-  if (display.startTime && display.endTime)
-    return `${display.startTime}–${endDate}${display.endTime}`;
-  return display.startTime || display.endTime || notSetLabel;
+  const time =
+    display.startTime && display.endTime
+      ? `${display.startTime}–${display.endTime}`
+      : display.startTime || display.endTime || t("session_schedule_time_not_set");
+
+  return (
+    <div className="min-w-0 w-full">
+      <div className="flex items-baseline justify-between gap-2 whitespace-nowrap">
+        <span
+          className={
+            highlight
+              ? "text-base font-semibold leading-6 text-text-dark dark:text-foreground"
+              : "text-sm font-medium text-text-dark dark:text-foreground"
+          }
+        >
+          {display.date}
+        </span>
+        <span className="inline-flex shrink-0 items-center gap-1.5 text-sm text-text-dark/80 dark:text-foreground/80">
+          {highlight && (
+            <Clock3
+              className="hidden min-[360px]:block size-4 shrink-0 text-[#0D7773] dark:text-[#8AD9D3]"
+              aria-hidden="true"
+            />
+          )}
+          {time}
+        </span>
+      </div>
+      {display.endDate && display.endDate !== display.date && (
+        <p className="mt-1 text-xs text-text-dark/80 dark:text-foreground/80">
+          {t("session_schedule_end_date", { date: display.endDate })}
+        </p>
+      )}
+    </div>
+  );
 }
 
 export function CohortMeetingCalendar({
@@ -129,23 +157,12 @@ export function CohortMeetingCalendar({
             <p className="mb-0.5 text-xs font-medium text-[#0D7773] dark:text-[#8AD9D3]">
               {t("session_schedule_next")}
             </p>
-            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <p className="text-base font-semibold leading-6 text-text-dark dark:text-foreground">
-                {formatSessionDate(nextSession, eventTimezone, displayTimezone)}
-              </p>
-              <p className="flex items-center gap-1.5 text-sm text-text-dark/80 dark:text-foreground/80">
-                <Clock3
-                  className="size-4 shrink-0 text-[#0D7773] dark:text-[#8AD9D3]"
-                  aria-hidden="true"
-                />
-                {formatSessionTime(
-                  nextSession,
-                  t("session_schedule_time_not_set"),
-                  eventTimezone,
-                  displayTimezone
-                )}
-              </p>
-            </div>
+            <SessionDateTime
+              session={nextSession}
+              sourceTimezone={eventTimezone}
+              displayTimezone={displayTimezone}
+              highlight
+            />
           </div>
         ) : (
           <p className="rounded-xl bg-[#F5FBFA] dark:bg-[#163C3A] px-4 py-3.5 text-sm text-text-dark/80 dark:text-foreground/80">
@@ -198,21 +215,12 @@ export function CohortMeetingCalendar({
             </h3>
             <ol className="divide-y divide-[#E7F0EF] rounded-xl border border-[#E7F0EF] px-3.5">
               {inProgressSessions.map((session) => (
-                <li
-                  key={session.id}
-                  className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 py-3"
-                >
-                  <span className="text-sm font-medium text-text-dark dark:text-foreground">
-                    {formatSessionDate(session, eventTimezone, displayTimezone)}
-                  </span>
-                  <span className="shrink-0 text-sm text-text-dark/80 dark:text-foreground/80">
-                    {formatSessionTime(
-                      session,
-                      t("session_schedule_time_not_set"),
-                      eventTimezone,
-                      displayTimezone
-                    )}
-                  </span>
+                <li key={session.id} className="py-3">
+                  <SessionDateTime
+                    session={session}
+                    sourceTimezone={eventTimezone}
+                    displayTimezone={displayTimezone}
+                  />
                 </li>
               ))}
             </ol>
@@ -226,21 +234,12 @@ export function CohortMeetingCalendar({
             </h3>
             <ol className="divide-y divide-[#E7F0EF] rounded-xl border border-[#E7F0EF] px-3.5">
               {otherSessions.map((session) => (
-                <li
-                  key={session.id}
-                  className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 py-3"
-                >
-                  <span className="text-sm font-medium text-text-dark dark:text-foreground">
-                    {formatSessionDate(session, eventTimezone, displayTimezone)}
-                  </span>
-                  <span className="shrink-0 text-sm text-text-dark/80 dark:text-foreground/80">
-                    {formatSessionTime(
-                      session,
-                      t("session_schedule_time_not_set"),
-                      eventTimezone,
-                      displayTimezone
-                    )}
-                  </span>
+                <li key={session.id} className="py-3">
+                  <SessionDateTime
+                    session={session}
+                    sourceTimezone={eventTimezone}
+                    displayTimezone={displayTimezone}
+                  />
                 </li>
               ))}
             </ol>
@@ -254,21 +253,12 @@ export function CohortMeetingCalendar({
             </h3>
             <ol className="divide-y divide-[#E7F0EF] rounded-xl border border-[#E7F0EF] px-3.5">
               {pastSessions.map((session) => (
-                <li
-                  key={session.id}
-                  className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 py-3"
-                >
-                  <span className="text-sm font-medium text-text-dark dark:text-foreground">
-                    {formatSessionDate(session, eventTimezone, displayTimezone)}
-                  </span>
-                  <span className="shrink-0 text-sm text-text-dark/80 dark:text-foreground/80">
-                    {formatSessionTime(
-                      session,
-                      t("session_schedule_time_not_set"),
-                      eventTimezone,
-                      displayTimezone
-                    )}
-                  </span>
+                <li key={session.id} className="py-3">
+                  <SessionDateTime
+                    session={session}
+                    sourceTimezone={eventTimezone}
+                    displayTimezone={displayTimezone}
+                  />
                 </li>
               ))}
             </ol>
