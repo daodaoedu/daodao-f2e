@@ -9,6 +9,7 @@ const MAX_BODY_BYTES = 2 * 1024 * 1024;
 const FETCH_TIMEOUT_MS = 10_000;
 class PublicConnectionError extends Error {}
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
+// These literals define classification ranges; they are never network destinations.
 const blockedV4 = new BlockList();
 for (const [address, prefix] of [
   ["0.0.0.0", 8],
@@ -217,25 +218,30 @@ function requestPage(
   });
 }
 
+/** Retry only this hop's already-vetted addresses, without another DNS lookup. */
+async function requestVettedAddresses(
+  target: Awaited<ReturnType<typeof resolvePublicUrl>>,
+  deadline: number
+): Promise<IPage> {
+  for (const address of target.addresses) {
+    if (Date.now() >= deadline) throw new Error("Public URL request timed out");
+    try {
+      return await requestPage({ url: target.url, ...address }, deadline);
+    } catch (error) {
+      if (!(error instanceof PublicConnectionError) || address === target.addresses.at(-1))
+        throw error;
+    }
+  }
+  throw new Error("No public URL address available");
+}
+
 /** Only this transport may fetch user-supplied URLs; validate and pin every hop. */
 export async function fetchPublicHtml(input: string): Promise<{ html: string; finalUrl: string }> {
   const deadline = Date.now() + FETCH_TIMEOUT_MS;
   let next = input;
   for (let redirects = 0; redirects <= MAX_REDIRECTS; redirects += 1) {
     const target = await resolvePublicUrl(next, deadline);
-    if (Date.now() >= deadline) throw new Error("Public URL request timed out");
-    let page: IPage | undefined;
-    for (const address of target.addresses) {
-      if (Date.now() >= deadline) throw new Error("Public URL request timed out");
-      try {
-        page = await requestPage({ url: target.url, ...address }, deadline);
-        break;
-      } catch (error) {
-        if (!(error instanceof PublicConnectionError) || address === target.addresses.at(-1))
-          throw error;
-      }
-    }
-    if (!page) throw new Error("No public URL address available");
+    const page = await requestVettedAddresses(target, deadline);
     if (REDIRECT_STATUSES.has(page.status)) {
       if (!page.location || redirects === MAX_REDIRECTS)
         throw new Error("Public URL redirect limit exceeded");
