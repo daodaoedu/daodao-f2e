@@ -132,12 +132,12 @@ export function MyBugReports() {
   const highlightId = reportIdFromSearch(searchParams.get("report"));
   const { data, isLoading, error, mutate } = useMyBugReports();
   const items = data?.data?.items ?? [];
-  const scrolled = useRef(false);
+  const scrolledId = useRef<number | null>(null);
 
   const highlightVisible = highlightId !== null && items.some((item) => item.id === highlightId);
   useEffect(() => {
-    if (!highlightVisible || scrolled.current) return;
-    scrolled.current = true;
+    if (!highlightVisible || scrolledId.current === highlightId) return;
+    scrolledId.current = highlightId;
     document.getElementById(`bug-report-${highlightId}`)?.scrollIntoView({ block: "start" });
   }, [highlightVisible, highlightId]);
 
