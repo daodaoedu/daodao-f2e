@@ -3,11 +3,13 @@ import { FlatList, RefreshControl, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text, YStack } from "tamagui";
 import { ShowcaseSearchBar, TabSwitcher, type TabType } from "@/components/home";
+import { ExploreTopicsSection } from "@/components/home/explore-topics-section";
 import { PracticeShowcaseCard } from "@/components/showcase/PracticeShowcaseCard";
 import { PracticeTasksSection } from "@/components/showcase/PracticeTasksSection";
 import { ShowcaseFeed } from "@/components/showcase/ShowcaseFeed";
 import { FilterStatus, type FilterStatus as FilterStatusType } from "@/constants/task-status";
 import { colors } from "@/generated/design-tokens";
+import { useChallenges, useExploreTopics } from "@/hooks/useChallenges";
 import { usePractices } from "@/hooks/usePractices";
 import {
   type IShowcaseFeedParams,
@@ -42,6 +44,8 @@ export default function ShowcaseScreen() {
     isLoading: isMyLoading,
     mutate: mutatePractices,
   } = usePractices();
+  const { challenges } = useChallenges();
+  const { topics } = useExploreTopics();
 
   const filteredInProgressTasks = useMemo(() => {
     if (filterStatus === FilterStatus.completed) return [];
@@ -109,15 +113,19 @@ export default function ShowcaseScreen() {
                 <Text color={colors.text.dark}>載入中...</Text>
               </YStack>
             ) : (
-              <PracticeTasksSection
-                filterStatus={filterStatus}
-                onFilterChange={setFilterStatus}
-                filteredInProgressTasks={filteredInProgressTasks}
-                showInProgress={showInProgress}
-                showCompleted={showCompleted}
-                completedTasks={completedTasks}
-                isEmpty={inProgressTasks.length === 0 && completedTasks.length === 0}
-              />
+              <>
+                <PracticeTasksSection
+                  filterStatus={filterStatus}
+                  onFilterChange={setFilterStatus}
+                  filteredInProgressTasks={filteredInProgressTasks}
+                  showInProgress={showInProgress}
+                  showCompleted={showCompleted}
+                  completedTasks={completedTasks}
+                  isEmpty={inProgressTasks.length === 0 && completedTasks.length === 0}
+                  challenges={challenges}
+                />
+                <ExploreTopicsSection topics={topics} />
+              </>
             )}
           </>
         }

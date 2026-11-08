@@ -7,11 +7,11 @@
  * - onMenuPress callback
  */
 
-import * as Haptics from "expo-haptics";
 import { useCallback } from "react";
 import { Text, XStack } from "tamagui";
 import { ShowcaseCard } from "@/components/home";
 import type { IShowcasePractice } from "@/hooks/useShowcaseFeed";
+import { impactLight } from "@/utils/haptics";
 
 interface PracticeShowcaseCardProps {
   practice: IShowcasePractice;
@@ -40,7 +40,7 @@ const brewingOverlay = (
 
 export function PracticeShowcaseCard({ practice, onMenuPress }: PracticeShowcaseCardProps) {
   const handleReactionTap = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    impactLight();
   }, []);
 
   return (
