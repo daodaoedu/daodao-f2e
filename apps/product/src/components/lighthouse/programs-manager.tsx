@@ -18,6 +18,7 @@ import {
 import { useLocale, useTranslations } from "@daodao/i18n";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -45,6 +46,7 @@ import {
   ChevronDown,
   Copy,
   Eye,
+  Mail,
   Minus,
   MoreVertical,
   Pencil,
@@ -209,9 +211,8 @@ interface CohortSetupPanelProps {
       selectedTemplateIds?: number[];
       /** 使用者改過的模板開始日（YYYY-MM-DD；null＝沿用場次開始日） */
       templateStartDates?: ReadonlyMap<number, string | null>;
-      publishNow?: boolean;
     }
-  ) => Promise<void>;
+  ) => Promise<boolean | undefined>;
   onClose: () => void;
   busy: boolean;
 }
@@ -271,6 +272,11 @@ function CohortSetupPanel({
     startDate: string;
     endDate: string;
   } | null>(null);
+  const initialSnapshotsRef = useRef<Partial<Record<SetupTab, string>>>({});
+  const [dirtyTabs, setDirtyTabs] = useState<Set<SetupTab>>(() => new Set());
+  const hasChanges = dirtyTabs.size > 0;
+  const [pendingTab, setPendingTab] = useState<SetupTab | null>(null);
+  const [confirmClose, setConfirmClose] = useState(false);
   // 已開始的場次 server 會拒絕變更綁定（FR-TPL-05），直接鎖住勾選
   const templatesLocked = mode === "edit" && !!cohort && isCohortStarted(cohort.startDate);
   // 只記使用者動過的模板，其餘跟著最新的既有綁定走：templates 可能比面板晚載入，
@@ -348,7 +354,6 @@ function CohortSetupPanel({
   const [hostCommentPrivate, setHostCommentPrivate] = useState(
     cohort?.hostCommentDefaultPrivate ?? false
   );
-  const [publishNow, setPublishNow] = useState(false);
   const [taglineValue, setTaglineValue] = useState(cohort?.tagline ?? "");
   const [capacityUnlimited, setCapacityUnlimited] = useState(!cohort?.capacity);
   const [interactionDropdownOpen, setInteractionDropdownOpen] = useState(false);
@@ -365,6 +370,108 @@ function CohortSetupPanel({
     cohortStartDate;
   const expandedSessionIds = new Set(expandedRepeatGroups.flatMap((group) => group.sessionIds));
   const displayedSessions = groupSessionsForDisplay(sessions, expandedSessionIds);
+
+  function getSnapshot(
+    form: HTMLFormElement,
+    tab: SetupTab,
+    snapshotSessions = sessions
+  ): string {
+    const panel = form.querySelector<HTMLElement>(`[data-setup-tab="${tab}"]`);
+    const fields = Array.from(
+      panel?.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
+        "input, select, textarea"
+      ) ?? []
+    )
+      .filter(
+        (field) =>
+          !field.closest(
+            "[data-template-search], [data-timezone-search], [data-session-recurrence], [data-interaction-mode-picker], [data-session-editor]"
+          )
+      )
+      .map((field) => [
+        field.tagName,
+        field.name,
+        field.id,
+        field instanceof HTMLInputElement && (field.type === "checkbox" || field.type === "radio")
+          ? field.checked
+          : field.value,
+        field.disabled,
+      ]);
+    const tabState = {
+      basic: {
+        sessions: snapshotSessions.map(({ sessionDate, startTime, endTime }) => [
+          sessionDate,
+          startTime,
+          endTime,
+        ]),
+        timezone,
+        interactionModes: [...interactionModes].sort(),
+        feeType,
+        signupMethod,
+        capacityUnlimited,
+      },
+      templates: {
+        selectedTemplateIds: [...selectedTemplateIds].sort((a, b) => a - b),
+        templateStartDates: (templates ?? []).map((tpl) => [tpl.id, templateStartDate(tpl)]),
+      },
+      home: {},
+      privacy: { isPrivate, checkinPrivate, hostCommentPrivate, visibility },
+      signup: { showInviteOnSignup },
+    }[tab];
+    return JSON.stringify({ fields, tabState });
+  }
+
+  function refreshDirtyTabs(form: HTMLFormElement) {
+    const snapshots = initialSnapshotsRef.current;
+    const next = new Set<SetupTab>();
+    for (const tab of SETUP_TABS) {
+      if (snapshots[tab] !== undefined && getSnapshot(form, tab) !== snapshots[tab]) {
+        next.add(tab);
+      }
+    }
+    setDirtyTabs((current) => {
+      if (current.size === next.size && [...current].every((tab) => next.has(tab))) {
+        return current;
+      }
+      return next;
+    });
+  }
+
+  useEffect(() => {
+    if (mode !== "edit") return;
+    const form = panelRef.current;
+    if (!form) return;
+    if (Object.keys(initialSnapshotsRef.current).length === 0) {
+      initialSnapshotsRef.current = Object.fromEntries(
+        SETUP_TABS.filter((tab) => tab !== "templates" || templates !== undefined).map((tab) => [
+          tab,
+          getSnapshot(form, tab),
+        ])
+      );
+    } else if (templates !== undefined && initialSnapshotsRef.current.templates === undefined) {
+      initialSnapshotsRef.current.templates = getSnapshot(form, "templates");
+    }
+    refreshDirtyTabs(form);
+  });
+
+  function handleClose() {
+    if (hasChanges) setConfirmClose(true);
+    else onClose();
+  }
+
+  function confirmPendingAction() {
+    if (pendingTab) setActiveTab(pendingTab);
+    if (confirmClose) onClose();
+    setPendingTab(null);
+    setConfirmClose(false);
+  }
+
+  function closeUnsavedDialog(open: boolean) {
+    if (!open) {
+      setPendingTab(null);
+      setConfirmClose(false);
+    }
+  }
 
   useEffect(() => {
     panelRef.current?.scrollIntoView({
@@ -476,6 +583,7 @@ function CohortSetupPanel({
   // 送出失敗（400/409）時使用者填的內容會全部消失，只能從頭再填一次（#188）
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const form = event.currentTarget;
     const submission = prepareSessionSubmission(sessions, interactionModes);
     setInvalidSessionIds(new Set(submission.invalidSessionIds));
     if (submission.invalidSessionIds.length) {
@@ -485,7 +593,15 @@ function CohortSetupPanel({
       );
       return;
     }
-    await onSubmit(new FormData(event.currentTarget), {
+    const submittedSnapshots = Object.fromEntries(
+      SETUP_TABS.filter((tab) => initialSnapshotsRef.current[tab] !== undefined).map((tab) => [
+        tab,
+        getSnapshot(form, tab, tab === "basic" ? submission.sessions : undefined),
+      ])
+    );
+    const submittedTemplateOverrides = new Map(templateOverrides);
+    const submittedStartDateOverrides = new Map(startDateOverrides);
+    const saved = await onSubmit(new FormData(form), {
       interactionModes,
       timezone,
       sessions: submission.sessions,
@@ -497,8 +613,26 @@ function CohortSetupPanel({
       visibility,
       selectedTemplateIds: Array.from(selectedTemplateIds),
       templateStartDates: templatesLocked ? new Map() : startDateOverrides,
-      publishNow,
     });
+    if (saved && mode === "edit") {
+      setSessions(submission.sessions);
+      setTemplateOverrides((current) => {
+        const next = new Map(current);
+        for (const [id, value] of submittedTemplateOverrides) {
+          if (next.has(id) && next.get(id) === value) next.delete(id);
+        }
+        return next;
+      });
+      setStartDateOverrides((current) => {
+        const next = new Map(current);
+        for (const [id, value] of submittedStartDateOverrides) {
+          if (next.has(id) && next.get(id) === value) next.delete(id);
+        }
+        return next;
+      });
+      initialSnapshotsRef.current = submittedSnapshots;
+      refreshDirtyTabs(form);
+    }
   }
 
   const tabDisabled = mode === "create";
@@ -508,6 +642,11 @@ function CohortSetupPanel({
     <form
       ref={panelRef}
       onSubmit={handleSubmit}
+      onInput={(event) => {
+        if (mode === "edit" && Object.keys(initialSnapshotsRef.current).length > 0) {
+          refreshDirtyTabs(event.currentTarget);
+        }
+      }}
       className="scroll-mt-24 rounded-[20px] border border-[#B9DCD8] bg-[#F7FCFB] p-6"
     >
       <div className="mb-4 flex items-center justify-between gap-4">
@@ -519,7 +658,7 @@ function CohortSetupPanel({
           variant="ghost"
           size="icon"
           className="size-[30px] rounded-full border border-[#CDEBE8] bg-white text-[#5A7B79] hover:bg-[#EDF8F6]"
-          onClick={onClose}
+          onClick={handleClose}
           aria-label={t("close")}
         >
           <X className="size-[15px]" />
@@ -538,7 +677,11 @@ function CohortSetupPanel({
               aria-selected={activeTab === tab}
               aria-disabled={disabled}
               title={disabled ? t("cohort_tab_disabled_tooltip") : undefined}
-              onClick={() => !disabled && setActiveTab(tab)}
+              onClick={() => {
+                if (disabled || tab === activeTab) return;
+                if (dirtyTabs.has(activeTab)) setPendingTab(tab);
+                else setActiveTab(tab);
+              }}
               className={`h-8 shrink-0 whitespace-nowrap rounded-full border px-3.5 text-[13px] font-semibold transition-colors ${
                 activeTab === tab
                   ? "border-[#16B9B3] bg-[#16B9B3] text-white"
@@ -554,7 +697,7 @@ function CohortSetupPanel({
       </div>
 
       {/* Tab: basic */}
-      <div className={activeTab !== "basic" ? "hidden" : ""} role="tabpanel">
+      <div className={activeTab !== "basic" ? "hidden" : ""} role="tabpanel" data-setup-tab="basic">
         <div className="grid gap-4 md:grid-cols-2">
           <label htmlFor={`${prefix}-name`} className="grid gap-1.5 text-sm font-medium">
             {t("cohort_display_name")}
@@ -658,7 +801,7 @@ function CohortSetupPanel({
           </div>
 
           {/* 互動方式 */}
-          <div className="relative md:col-span-2">
+          <div className="relative md:col-span-2" data-interaction-mode-picker>
             <p className="mb-1.5 text-sm font-medium">{t("cohort_interaction_modes")}</p>
             <button
               type="button"
@@ -834,6 +977,7 @@ function CohortSetupPanel({
                     variant="outline"
                     size="sm"
                     className="mt-3 w-fit gap-2 border-[#CDEBE8]"
+                    disabled={busy}
                   >
                     <Plus className="size-4" />
                     {t("cohort_session_add")}
@@ -870,7 +1014,11 @@ function CohortSetupPanel({
                 </p>
               )}
               {sessionAddMode === "regular" && (
-                <div className="mt-3 grid gap-3 rounded-xl border border-[#DDEFED] bg-white p-3">
+                <fieldset
+                  disabled={busy}
+                  data-session-recurrence
+                  className="mt-3 grid min-w-0 gap-3 rounded-xl border border-[#DDEFED] bg-white p-3"
+                >
                   <p className="text-sm font-medium text-[#0D3036]">{recurrenceCopy.title}</p>
                   <div className="grid gap-3 sm:grid-cols-2">
                     {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
@@ -967,11 +1115,13 @@ function CohortSetupPanel({
                     <Plus className="size-4" />
                     {recurrenceCopy.add}
                   </Button>
-                </div>
+                </fieldset>
               )}
               {sessions.length > 0 && (
-                <div
-                  className={`mt-3 grid gap-2 ${
+                <fieldset
+                  disabled={busy}
+                  data-session-editor
+                  className={`mt-3 grid min-w-0 gap-2 border-0 p-0 ${
                     sessionAddMode === "irregular"
                       ? "rounded-xl border border-[#DDEFED] bg-white p-3"
                       : ""
@@ -1143,7 +1293,7 @@ function CohortSetupPanel({
                       </div>
                     );
                   })}
-                </div>
+                </fieldset>
               )}
             </fieldset>
           )}
@@ -1213,7 +1363,11 @@ function CohortSetupPanel({
       </div>
 
       {/* Tab: templates */}
-      <div className={activeTab !== "templates" ? "hidden" : ""} role="tabpanel">
+      <div
+        className={activeTab !== "templates" ? "hidden" : ""}
+        role="tabpanel"
+        data-setup-tab="templates"
+      >
         <p className="text-[13px] font-semibold text-[#0D3036]">{t("cohort_select_templates")}</p>
         <p className="mt-1 text-xs text-[#78928F]">
           {t("cohort_select_templates_hint", { count: selectedTemplateIds.size })}
@@ -1361,14 +1515,18 @@ function CohortSetupPanel({
       </div>
 
       {/* Tab: home (placeholder) */}
-      <div className={activeTab !== "home" ? "hidden" : ""} role="tabpanel">
+      <div className={activeTab !== "home" ? "hidden" : ""} role="tabpanel" data-setup-tab="home">
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <p className="text-sm text-[#5A7B79]">{t("cohort_home_page_coming_soon")}</p>
         </div>
       </div>
 
       {/* Tab: privacy */}
-      <div className={activeTab !== "privacy" ? "hidden" : ""} role="tabpanel">
+      <div
+        className={activeTab !== "privacy" ? "hidden" : ""}
+        role="tabpanel"
+        data-setup-tab="privacy"
+      >
         <p className="mb-1 text-sm font-medium">{t("cohort_privacy_title")}</p>
         <p className="mb-3 text-xs text-[#78928F]">{t("cohort_privacy_description")}</p>
         <div
@@ -1432,7 +1590,11 @@ function CohortSetupPanel({
       </div>
 
       {/* Tab: signup */}
-      <div className={activeTab !== "signup" ? "hidden" : ""} role="tabpanel">
+      <div
+        className={activeTab !== "signup" ? "hidden" : ""}
+        role="tabpanel"
+        data-setup-tab="signup"
+      >
         <Button
           type="button"
           variant="outline"
@@ -1537,16 +1699,10 @@ function CohortSetupPanel({
 
       {/* Bottom action bar */}
       <div className="mt-5 flex items-center justify-end gap-2">
-        {mode === "create" && (
-          <span className="mr-1 flex items-center gap-2 text-sm">
-            <Switch checked={publishNow} onCheckedChange={setPublishNow} />
-            {t("publish_now")}
-          </span>
-        )}
         <Button
           type="button"
           variant="outline"
-          onClick={onClose}
+          onClick={handleClose}
           disabled={busy}
           className="h-auto rounded-full border-[#CDEBE8] bg-white px-[18px] py-[9px] text-sm font-normal text-[#5A7B79] hover:bg-[#F0FBF9] hover:text-[#5A7B79]"
         >
@@ -1554,12 +1710,25 @@ function CohortSetupPanel({
         </Button>
         <Button
           type="submit"
-          disabled={busy}
+          disabled={busy || (mode === "edit" && !hasChanges)}
           className="h-auto rounded-full bg-[#16B9B3] px-5 py-[9px] text-sm font-semibold text-white hover:brightness-[1.04]"
         >
           {mode === "create" ? t("cohort_create") : t("save")}
         </Button>
       </div>
+      {mode === "edit" && (
+        <ConfirmDialog
+          open={pendingTab !== null || confirmClose}
+          title={t("cohort_editor_unsaved_title")}
+          description={
+            confirmClose ? t("cohort_editor_leave_description") : t("cohort_editor_tab_description")
+          }
+          confirmLabel={confirmClose ? t("cohort_editor_discard") : t("cohort_editor_continue")}
+          destructive={confirmClose}
+          onConfirm={confirmPendingAction}
+          onOpenChange={closeUnsavedDialog}
+        />
+      )}
     </form>
   );
 }
@@ -1571,6 +1740,8 @@ interface CohortCardProps {
   templates?: CohortTemplateSummary[];
   refresh: () => Promise<unknown>;
   refreshTemplates: () => Promise<unknown>;
+  openEditor?: boolean;
+  showSetupReminder?: boolean;
 }
 
 function CohortCard({
@@ -1580,22 +1751,33 @@ function CohortCard({
   templates,
   refresh,
   refreshTemplates,
+  openEditor = false,
+  showSetupReminder = false,
 }: CohortCardProps) {
   const t = useTranslations("lighthouse");
+  const inactiveInviteMessage = t("cohort_draft_invite_inactive");
+  const publishWord = inactiveInviteMessage.includes("發佈") ? "發佈" : "Publish";
+  const [inactiveInvitePrefix, inactiveInviteSuffix] = inactiveInviteMessage.split(publishWord);
   const apiErrorMessage = useLighthouseErrorMessage();
   const { errorMessage: serverErrorMessage } = useServerErrorMessage();
   const searchParams = useSearchParams();
   const [editing, setEditing] = useState(searchParams.get("edit") === String(cohort.id));
   const [busy, setBusy] = useState(false);
   useLighthouseOrganizationGuard(editing, busy);
+  const [setupReminderOpen, setSetupReminderOpen] = useState(false);
+  const [confirmPublish, setConfirmPublish] = useState(false);
+
+  useEffect(() => {
+    if (!openEditor) return;
+    setEditing(true);
+    if (showSetupReminder) setSetupReminderOpen(true);
+  }, [openEditor, showSetupReminder]);
 
   async function handlePublish() {
-    if (!window.confirm(t("cohort_publish_confirm"))) {
-      return;
-    }
     setBusy(true);
     const response = await updateLighthouseCohort(programId, cohort.id, { status: "published" });
     setBusy(false);
+    setConfirmPublish(false);
     if (response.error) {
       toast.error(apiErrorMessage(response, t("cohort_publish_failed")));
       return;
@@ -1637,22 +1819,22 @@ function CohortCard({
       const endDate = String(formData.get("endDate") ?? "");
       if (!startDate || !endDate || new Date(endDate) < new Date(startDate)) {
         toast.error(t("cohort_date_error"));
-        return;
+        return false;
       }
       if (extras.interactionModes.length === 0) {
         toast.error(t("cohort_interaction_modes_error"));
-        return;
+        return false;
       }
       const capacityValue = String(formData.get("capacity") ?? "");
       const feeAmountValue = String(formData.get("feeAmount") ?? "");
       if (extras.feeType === "paid" && !feeAmountValue) {
         toast.error(t("cohort_fee_amount_error"));
-        return;
+        return false;
       }
       const externalUrl = String(formData.get("externalSignupUrl") ?? "").trim();
       if (extras.signupMethod === "external" && !externalUrl) {
         toast.error(t("cohort_external_signup_url_error"));
-        return;
+        return false;
       }
       const bindingChanges = diffTemplateBindings(
         templates ?? [],
@@ -1738,10 +1920,10 @@ function CohortCard({
         toast.error(bindingsChanged ? t("cohort_saved_templates_only", { reason }) : reason);
         return;
       }
-      setBusy(false);
       await Promise.all([refresh(), refreshTemplates()]);
-      setEditing(false);
+      setBusy(false);
       toast.success(t("cohort_saved"));
+      return true;
     },
     [
       programId,
@@ -1777,7 +1959,7 @@ function CohortCard({
     <div className="grid gap-3">
       <div
         id={`cohort-${cohort.id}`}
-        className="flex scroll-mt-24 flex-col gap-4 rounded-2xl border border-[#DDEFED] px-5 py-4 lg:flex-row lg:items-start"
+        className="relative flex scroll-mt-24 flex-col gap-4 rounded-2xl border border-[#DDEFED] px-5 py-4 lg:flex-row lg:items-start"
       >
         <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#E7FAF7] text-[#0D7773]">
           <CalendarDays className="size-5" />
@@ -1806,27 +1988,64 @@ function CohortCard({
           </p>
           {cohort.joinToken && (
             <div className="mt-2">
-              <JoinCode joinToken={cohort.joinToken} />
-              {cohort.status === "published" && (
-                <CustomLink
-                  href={`/lighthouse/programs/${programId}/cohorts/${cohort.id}/roster`}
-                  className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[#CDEBE8] px-3 py-1.5 text-xs font-medium text-[#0D5B59] hover:bg-[#EDF8F6]"
-                >
-                  <Send className="size-3.5" aria-hidden="true" />
-                  {t("cohort_invite_by_email")}
-                </CustomLink>
-              )}
+              <JoinCode
+                joinToken={cohort.joinToken}
+                inactive={cohort.status === "draft"}
+                inactiveMessage={
+                  cohort.status === "draft" ? (
+                    <>
+                      {inactiveInvitePrefix}
+                      <span className="inline-flex items-center gap-1 align-middle">
+                        <Send className="size-3.5" aria-hidden="true" />
+                        {publishWord}
+                      </span>
+                      {inactiveInviteSuffix}
+                    </>
+                  ) : undefined
+                }
+                inactiveMessageTitle={
+                  cohort.status === "draft" ? t("cohort_draft_invite_inactive") : undefined
+                }
+                actions={
+                  cohort.status === "published" ? (
+                    <Button
+                      asChild
+                      size="sm"
+                      variant="outline"
+                      className="h-8 rounded-full px-3 py-0 text-xs font-medium"
+                    >
+                      <CustomLink
+                        href={`/lighthouse/programs/${programId}/cohorts/${cohort.id}/roster`}
+                      >
+                        <Mail className="size-4" aria-hidden="true" />
+                        {t("cohort_invite_by_email")}
+                      </CustomLink>
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-8 rounded-full px-3 py-0 text-xs font-medium"
+                      disabled
+                      title={t("cohort_draft_email_invite_disabled")}
+                    >
+                      <Mail className="size-4" aria-hidden="true" />
+                      {t("cohort_invite_by_email")}
+                    </Button>
+                  )
+                }
+              />
             </div>
           )}
         </div>
-        <div className="flex shrink-0 items-center gap-1">
+        <div className="absolute right-3 top-3 z-10 flex shrink-0 items-center gap-1 lg:static">
           {cohort.status === "draft" && (
             <Button
               type="button"
               variant="ghost"
               size="icon"
               className="size-8"
-              onClick={handlePublish}
+              onClick={() => setConfirmPublish(true)}
               disabled={busy}
               aria-label={t("cohort_publish")}
               title={t("cohort_publish")}
@@ -1889,6 +2108,15 @@ function CohortCard({
           </DropdownMenu>
         </div>
         <ConfirmDialog
+          open={confirmPublish}
+          title={t("cohort_publish")}
+          description={t("cohort_publish_confirm")}
+          confirmLabel={t("cohort_publish")}
+          busy={busy}
+          onConfirm={handlePublish}
+          onOpenChange={setConfirmPublish}
+        />
+        <ConfirmDialog
           open={confirmArchive}
           title={t("cohort_archive_title")}
           description={t("cohort_archive_confirm")}
@@ -1900,6 +2128,28 @@ function CohortCard({
         />
       </div>
       {setupPanel}
+      <Dialog open={setupReminderOpen} onOpenChange={setSetupReminderOpen}>
+        <DialogContent
+          showCloseButton={false}
+          overlayClassName="bg-[#0F3036]/30"
+          className="w-[min(440px,92vw)] rounded-[28px] border-0 bg-white p-6 sm:max-w-none"
+        >
+          <DialogClose
+            className="absolute right-6 top-6 inline-flex size-6 items-center justify-center bg-transparent p-0 text-[#5A7B79] opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16B9B3] focus-visible:ring-offset-2"
+            aria-label={t("close")}
+          >
+            <X className="size-4" aria-hidden="true" />
+          </DialogClose>
+          <DialogHeader className="items-start text-left">
+            <DialogTitle className="text-left text-xl font-semibold text-[#0D3036]">
+              {t("cohort_created_setup_title")}
+            </DialogTitle>
+            <DialogDescription className="text-left text-sm text-[#5A7B79]">
+              {t("cohort_created_setup_description")}
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -1920,15 +2170,44 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
   const { errorMessage: serverErrorMessage } = useServerErrorMessage();
   const { cohorts, isLoading, mutate } = useLighthouseCohorts(program.id);
   // 封存中的場次改由「封存」頁列出（FR-ARC-04）
-  const visibleCohorts = cohorts?.filter((cohort) => cohort.status !== "archived");
+  const [newlyCreatedCohortId, setNewlyCreatedCohortId] = useState<number | null>(null);
+  const visibleCohorts = cohorts
+    ?.filter((cohort) => cohort.status !== "archived")
+    .sort((a, b) => {
+      const newestFirst = Date.parse(b.createdAt) - Date.parse(a.createdAt);
+      return newestFirst || b.id - a.id;
+    });
   const templatesQuery = useLighthouseTemplates(program.organizationId);
   const templates = templatesQuery.data?.data;
   const [editing, setEditing] = useState(false);
   const [creatingCohort, setCreatingCohort] = useState(false);
   const [busy, setBusy] = useState(false);
   useLighthouseOrganizationGuard(editing || creatingCohort, busy);
+  const programFormRef = useRef<HTMLFormElement>(null);
+  const programSnapshotRef = useRef<string | null>(null);
+  const [programHasChanges, setProgramHasChanges] = useState(false);
+  const [confirmProgramClose, setConfirmProgramClose] = useState(false);
+
+  const getProgramSnapshot = useCallback(
+    (form: HTMLFormElement) => JSON.stringify(Array.from(new FormData(form).entries())),
+    []
+  );
+
+  useEffect(() => {
+    if (!editing || !programFormRef.current) return;
+    programSnapshotRef.current = getProgramSnapshot(programFormRef.current);
+    setProgramHasChanges(false);
+  }, [editing, getProgramSnapshot]);
+
+  function closeProgramEditor() {
+    if (programHasChanges) setConfirmProgramClose(true);
+    else setEditing(false);
+  }
 
   async function handleProgramUpdate(formData: FormData) {
+    const submittedSnapshot = programFormRef.current
+      ? getProgramSnapshot(programFormRef.current)
+      : JSON.stringify(Array.from(formData.entries()));
     setBusy(true);
     const response = await updateLighthouseProgram(program.id, {
       name: String(formData.get("name") ?? "").trim(),
@@ -1940,7 +2219,11 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
       return;
     }
     await refreshPrograms();
-    setEditing(false);
+    programSnapshotRef.current = submittedSnapshot;
+    setProgramHasChanges(
+      programFormRef.current !== null &&
+        getProgramSnapshot(programFormRef.current) !== submittedSnapshot
+    );
     toast.success(t("program_saved"));
   }
 
@@ -1999,7 +2282,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
       const slug = String(formData.get("slug") ?? "").trim();
       if (!COHORT_SLUG_PATTERN.test(slug)) {
         toast.error(t("cohort_slug_error"));
-        return;
+        return false;
       }
       setBusy(true);
       const response = await createLighthouseCohort(program.id, {
@@ -2012,7 +2295,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
         joinDeadline: String(formData.get("joinDeadline") ?? "") || null,
         capacity: capacityValue ? Number(capacityValue) : null,
         inviteMessage: String(formData.get("inviteMessage") ?? "").trim() || null,
-        status: extras.publishNow ? "published" : "draft",
+        status: "draft",
         visibility: extras.visibility,
         interactionModes: extras.interactionModes as ("sync" | "async" | "physical")[],
         meetingUrl: String(formData.get("meetingUrl") ?? "").trim() || undefined,
@@ -2047,22 +2330,37 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
             response.response.status
           )
         );
-        return;
+        return false;
       }
-      // 新增場次不綁模板（#273 決策）：模板分頁在建立時是 disabled，建好後從編輯或模板庫綁定
+      // 建立基本資料後留在本頁，直接開啟新場次編輯以完成其他分頁設定。
       setBusy(false);
       await mutate();
+      setNewlyCreatedCohortId(response.data.data.id);
       setCreatingCohort(false);
-      toast.success(t("cohort_created"));
+      return true;
     },
     [program.id, mutate, t, serverErrorMessage]
   );
 
   return (
     <article className="overflow-hidden rounded-3xl border border-[#CDEBE8] bg-white">
-      <div className="flex flex-col gap-5 border-b border-[#DDEFED] px-6 py-6 lg:flex-row lg:items-start lg:justify-between">
+      <div className="relative flex flex-col gap-5 border-b border-[#DDEFED] px-6 py-6 lg:flex-row lg:items-start lg:justify-between">
         {editing ? (
-          <form action={handleProgramUpdate} className="grid w-full max-w-xl gap-3">
+          <form
+            ref={programFormRef}
+            onSubmit={(event) => {
+              event.preventDefault();
+              void handleProgramUpdate(new FormData(event.currentTarget));
+            }}
+            onInput={(event) => {
+              if (programSnapshotRef.current !== null) {
+                setProgramHasChanges(
+                  getProgramSnapshot(event.currentTarget) !== programSnapshotRef.current
+                );
+              }
+            }}
+            className="grid w-full max-w-xl gap-3"
+          >
             <Input
               name="name"
               required
@@ -2075,16 +2373,16 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
               aria-label={t("program_description")}
             />
             <div className="flex gap-2">
-              <Button type="submit" disabled={busy}>
+              <Button type="submit" disabled={busy || !programHasChanges}>
                 {t("save")}
               </Button>
-              <Button variant="ghost" onClick={() => setEditing(false)}>
+              <Button type="button" variant="ghost" onClick={closeProgramEditor}>
                 {t("cancel")}
               </Button>
             </div>
           </form>
         ) : (
-          <div>
+          <div className="pr-20 lg:pr-0">
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#0D7773]">
               {t("program_label")}
             </p>
@@ -2095,9 +2393,17 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
           </div>
         )}
         {!editing && (
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
-              {t("edit")}
+          <div className="absolute right-6 top-6 z-10 flex items-center gap-2 lg:static">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-8"
+              onClick={() => setEditing(true)}
+              aria-label={t("edit")}
+              title={t("edit")}
+            >
+              <Pencil className="size-4" aria-hidden="true" />
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -2149,14 +2455,28 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
         onConfirm={handleArchive}
         onOpenChange={setConfirmArchive}
       />
+      <ConfirmDialog
+        open={confirmProgramClose}
+        title={t("cohort_editor_unsaved_title")}
+        description={t("cohort_editor_leave_description")}
+        confirmLabel={t("cohort_editor_discard")}
+        destructive
+        onConfirm={() => {
+          setConfirmProgramClose(false);
+          setEditing(false);
+        }}
+        onOpenChange={setConfirmProgramClose}
+      />
 
       <div className="px-6 py-6">
         <div className="flex items-center justify-between gap-4">
           <h3 className="font-semibold">{t("cohorts_title")}</h3>
-          <Button size="sm" onClick={() => setCreatingCohort((value) => !value)}>
-            {creatingCohort ? <X className="size-4" /> : <Plus className="size-4" />}
-            {creatingCohort ? t("close") : t("cohort_create")}
-          </Button>
+          {!creatingCohort && (
+            <Button size="sm" onClick={() => setCreatingCohort(true)}>
+              <Plus className="size-4" />
+              {t("cohort_create")}
+            </Button>
+          )}
         </div>
 
         {creatingCohort && (
@@ -2189,6 +2509,8 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
               templates={templates}
               refresh={mutate}
               refreshTemplates={templatesQuery.mutate}
+              openEditor={cohort.id === newlyCreatedCohortId}
+              showSetupReminder={cohort.id === newlyCreatedCohortId}
             />
           ))}
         </div>
@@ -2204,6 +2526,12 @@ export function ProgramsManager() {
   const [creating, setCreating] = useState(false);
   const [busy, setBusy] = useState(false);
   useLighthouseOrganizationGuard(creating, busy);
+  const [newlyCreatedProgramId, setNewlyCreatedProgramId] = useState<number | null>(null);
+  const visiblePrograms = programs
+    ?.slice()
+    .sort(
+      (a, b) => Number(b.id === newlyCreatedProgramId) - Number(a.id === newlyCreatedProgramId)
+    );
 
   async function handleCreate(formData: FormData) {
     if (!organization) return;
@@ -2219,6 +2547,7 @@ export function ProgramsManager() {
       return;
     }
     await mutate();
+    setNewlyCreatedProgramId(response.data.data.id);
     setCreating(false);
     toast.success(t("program_created"));
   }
@@ -2269,7 +2598,7 @@ export function ProgramsManager() {
             <p className="mt-2 text-sm text-[#5A7B79]">{t("programs_empty_copy")}</p>
           </div>
         )}
-        {programs?.map((program) => (
+        {visiblePrograms?.map((program) => (
           <ProgramPanel key={program.id} program={program} refreshPrograms={() => mutate()} />
         ))}
       </div>
