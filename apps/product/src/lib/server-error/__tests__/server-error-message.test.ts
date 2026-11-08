@@ -88,6 +88,38 @@ describe("parseServerError", () => {
 });
 
 describe("resolveServerErrorMessage", () => {
+  it("explains empty outcome data in English instead of a generic conflict (#473)", () => {
+    const error = body("APP_ERROR", "目前還沒有打卡或留言可以整理，請等參與者開始行動後再產生摘要");
+    const { error: e, status } = splitApiResult({
+      error,
+      response: new Response(null, { status: 409 }),
+    });
+    expect(
+      resolveServerErrorMessage(e, {
+        ...en,
+        status,
+        detailMessage: error.error.message,
+        fallback: "Failed to generate summary",
+      })
+    ).toBe(
+      "There are no check-ins or comments to summarize yet. Generate a summary after participants start contributing."
+    );
+    expect(resolveServerErrorMessage(e, { ...zh, status })).toBe(error.error.message);
+  });
+
+  it("does not translate unrelated or malformed conflicts as empty outcome data", () => {
+    const message = "目前還沒有打卡或留言可以整理，請等參與者開始行動後再產生摘要";
+    expect(
+      resolveServerErrorMessage(body("APP_ERROR", "其他業務衝突"), { ...en, status: 409 })
+    ).toBe(enMessages.common.server_error.conflict);
+    expect(
+      resolveServerErrorMessage(body("INTERNAL_SERVER_ERROR", message), { ...en, status: 409 })
+    ).toBe(enMessages.common.server_error.conflict);
+    expect(resolveServerErrorMessage(body("APP_ERROR", message), { ...en, status: 403 })).toBe(
+      enMessages.common.server_error.forbidden
+    );
+  });
+
   it("known precise code → localized key in both locales", () => {
     const error = apiError(401, "TOKEN_EXPIRED", "認證令牌已過期");
     expect(resolveServerErrorMessage(error, en)).toBe(

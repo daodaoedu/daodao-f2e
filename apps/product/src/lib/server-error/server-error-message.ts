@@ -20,6 +20,7 @@ export type ServerErrorMessageKey =
   | "forbidden"
   | "not_found"
   | "conflict"
+  | "summary_no_activity"
   | "gone"
   | "rate_limited"
   | "validation"
@@ -180,6 +181,16 @@ export function resolveServerErrorMessage(
 
   const override = code ? codeMessages?.[code] : undefined;
   if (override) return override;
+
+  // The outcome endpoint currently uses APP_ERROR for this known business condition.
+  // Translate only this exact 409 response; unknown server text still stays hidden in English.
+  if (
+    code === "APP_ERROR" &&
+    status === 409 &&
+    parsed.message === "目前還沒有打卡或留言可以整理，請等參與者開始行動後再產生摘要"
+  ) {
+    return t("summary_no_activity");
+  }
 
   const detail = asString(detailMessage);
   if (isDefaultLocale && detail) return detail;

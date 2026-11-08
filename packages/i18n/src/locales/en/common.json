@@ -407,6 +407,7 @@
     "forbidden": "You don't have permission to do this.",
     "not_found": "We couldn't find what you were looking for. It may have been removed.",
     "conflict": "This conflicts with existing data. Please refresh and try again.",
+    "summary_no_activity": "There are no check-ins or comments to summarize yet. Generate a summary after participants start contributing.",
     "gone": "This content is no longer available.",
     "rate_limited": "Too many requests. Please try again later.",
     "validation": "Some of the information is invalid. Please check and try again.",
