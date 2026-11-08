@@ -54,6 +54,11 @@ export function getNotificationText(
       return t("text_roadmap_shipped", {
         title: item.entityTitle?.trim() || t("related_roadmap_item"),
       });
+    // 團隊回覆了錯誤回報（daodao#451）：App 沒有「我的回報」頁，只顯示文字、不導頁
+    case "FeedbackReplied":
+      return t("text_feedback_replied", {
+        title: item.entityTitle?.trim() || t("related_bug_report"),
+      });
     case NotificationType.cohortInvitation:
     case NotificationType.cohortMemberRemoved: {
       const isInvitation = type === NotificationType.cohortInvitation;

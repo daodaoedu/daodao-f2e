@@ -30,6 +30,7 @@ const BACKEND_TYPE_MAP: Record<string, INotificationData["type"]> = {
   PartnerCheckinActivity: NotificationType.updatePracticeCheckin,
   PracticeUpdateActivity: NotificationType.updatePractice,
   PartnerUpdateActivity: NotificationType.updatePractice,
+  FeedbackReplied: NotificationType.feedbackReplied,
 };
 
 function normalizeNotificationType(backendType: string): INotificationData["type"] {

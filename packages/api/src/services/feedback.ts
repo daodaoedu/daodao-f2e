@@ -70,3 +70,31 @@ export const submitBugReport = async (
   } | null;
   return { id: typeof body?.data?.id === "number" ? body.data.id : null };
 };
+
+// ── 我的回報：GET /api/v1/feedback/mine（daodao#451）────────────────────────
+// 對應 server src/validators/feedback.validator.ts 的 MyBugReport；server PR 合併、gen:types 同步前，
+// src/types.ts 還沒有這個路徑，hooks 先用本地型別。
+
+export type BugReportStatus = "pending" | "replied" | "closed";
+
+export interface MyBugReportReply {
+  id: number;
+  content: string;
+  createdAt: string;
+}
+
+export interface MyBugReport {
+  id: number;
+  content: string;
+  area: string | null;
+  link: string | null;
+  screenshots: string[];
+  status: BugReportStatus;
+  createdAt: string;
+  /** 團隊回覆，由舊到新 */
+  replies: MyBugReportReply[];
+}
+
+export interface MyBugReportList {
+  items: MyBugReport[];
+}

@@ -87,3 +87,20 @@ describe("cohort notification content", () => {
     expect(render("follow-user")).toContain("關注了你");
   });
 });
+
+describe("FeedbackReplied notification（daodao#451）", () => {
+  it("以島島團隊身分顯示，即使 actor 帶了 id／customId 也不連到個人頁", () => {
+    const html = render("feedback-replied", {
+      actor: { id: "admin-uuid", customId: "admin-ming", name: "島島團隊" },
+      entityTitle: "按鈕沒反應",
+    });
+    expect(html).toContain("島島團隊回覆了你的錯誤回報「按鈕沒反應」");
+    expect(html).not.toContain("<a");
+  });
+
+  it("一般通知仍連到觸發者個人頁", () => {
+    expect(
+      render("follow-user", { actor: { id: "u1", customId: "coach", name: "教練" } })
+    ).toContain("<a");
+  });
+});

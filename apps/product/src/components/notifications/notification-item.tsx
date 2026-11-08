@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRightOutlineSvg, MoreSvg } from "@daodao/assets";
+import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
 import { useTranslations } from "@daodao/i18n";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Button } from "@daodao/ui/components/button";
@@ -293,6 +294,15 @@ function NotificationText({ notification }: { notification: INotificationData })
       </p>
     );
   }
+  if (type === NotificationType.feedbackReplied) {
+    return (
+      <p className="text-sm leading-5 line-clamp-2">
+        {t("feedback_replied", {
+          title: notification.entityTitle?.trim() || t("related_bug_report"),
+        })}
+      </p>
+    );
+  }
   if (notification.message?.trim()) {
     return <p className="text-sm leading-5 line-clamp-2">{notification.message.trim()}</p>;
   }
@@ -377,7 +387,9 @@ export function NotificationItem({
   onClick,
 }: NotificationItemProps) {
   const { actor, time, isRead } = notification;
-  const actorProfileLink = getUserProfilePath(actor);
+  // 團隊回覆錯誤回報：以島島團隊身分顯示，不連到任何個人頁（daodao#451）
+  const isTeamNotification = notification.type === NotificationType.feedbackReplied;
+  const actorProfileLink = isTeamNotification ? null : getUserProfilePath(actor);
 
   const isClickable =
     notification.type !== NotificationType.connect &&
@@ -413,7 +425,14 @@ export function NotificationItem({
       {!isRead && <div className="absolute left-3 top-3.5 size-1.5 rounded-full bg-[#FF6E0B]" />}
 
       {/* 頭像 */}
-      {actorProfileLink ? (
+      {isTeamNotification ? (
+        <Avatar className="size-[60px] shrink-0">
+          <AvatarImage src={favicon256Png.src} alt={actor.name} />
+          <AvatarFallback className="text-base font-medium text-text-dark">
+            {actor.name.slice(0, 1)}
+          </AvatarFallback>
+        </Avatar>
+      ) : actorProfileLink ? (
         <CustomLink
           href={actorProfileLink}
           className="shrink-0"
