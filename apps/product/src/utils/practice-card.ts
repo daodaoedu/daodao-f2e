@@ -1,6 +1,21 @@
 import { differenceInCalendarDays, format, isValid, parseISO } from "date-fns";
 import { parseLocalDate } from "./practice-period";
 
+// Legacy practices may omit either boundary; only supplied dates restrict visibility.
+export function isPracticeVisibleByDate(
+  startDate: string | null | undefined,
+  endDate: string | null | undefined,
+  now = new Date()
+): boolean {
+  const start = startDate ? parseLocalDate(startDate) : null;
+  const end = endDate ? parseLocalDate(endDate) : null;
+  if ((startDate && !start) || (endDate && !end)) return false;
+  return (
+    (!start || differenceInCalendarDays(now, start) >= 0) &&
+    (!end || differenceInCalendarDays(now, end) <= 0)
+  );
+}
+
 export function calculateRemainingDays(endDate: string | null | undefined): number | null {
   if (!endDate) return null;
   const end = parseISO(endDate);
