@@ -1,5 +1,23 @@
 import { differenceInCalendarDays, format, isValid, parseISO } from "date-fns";
-import { parseLocalDate } from "./practice-period";
+import { isPracticeEnded, parseLocalDate } from "./practice-period";
+
+/**
+ * Whether an active practice belongs on the dashboard within its scheduled date window.
+ * Start and end dates are inclusive. Missing dates leave that side of the window open
+ * for legacy practices; malformed provided dates are excluded from the dashboard.
+ */
+export function isPracticeVisibleByDate(
+  startDate: string | null | undefined,
+  endDate: string | null | undefined,
+  now = new Date()
+): boolean {
+  const start = startDate ? parseLocalDate(startDate) : null;
+  if (startDate && !start) return false;
+  if (start && differenceInCalendarDays(now, start) < 0) return false;
+
+  if (endDate && !parseLocalDate(endDate)) return false;
+  return !isPracticeEnded(endDate, now);
+}
 
 export function calculateRemainingDays(endDate: string | null | undefined): number | null {
   if (!endDate) return null;
