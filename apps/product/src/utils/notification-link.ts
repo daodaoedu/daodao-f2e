@@ -50,6 +50,11 @@ export function buildNotificationDeepLink(item: NotificationApiItem): string | n
       return extId ? `/practices/${extId}` : null;
     case "persona_answer":
       return item.url ?? null;
+    case "feedback":
+      // 團隊回覆了錯誤回報（daodao#451 AC-07）：進「我的回報」並捲到該則
+      return extId && /^\d+$/.test(extId)
+        ? `/settings/bug-report/mine?report=${extId}`
+        : "/settings/bug-report/mine";
     default:
       return null;
   }

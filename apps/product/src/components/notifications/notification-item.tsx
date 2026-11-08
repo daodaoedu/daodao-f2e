@@ -293,6 +293,15 @@ function NotificationText({ notification }: { notification: INotificationData })
       </p>
     );
   }
+  if (type === NotificationType.feedbackReplied) {
+    return (
+      <p className="text-sm leading-5 line-clamp-2">
+        {t("feedback_replied", {
+          title: notification.entityTitle?.trim() || t("related_bug_report"),
+        })}
+      </p>
+    );
+  }
   if (notification.message?.trim()) {
     return <p className="text-sm leading-5 line-clamp-2">{notification.message.trim()}</p>;
   }

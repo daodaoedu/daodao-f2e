@@ -32,5 +32,7 @@
   "cohort_removed_fallback": "You were removed from a cohort. The cohort details are no longer available.",
   "wish_linked": "Your wish was linked to the roadmap item “{title}”",
   "roadmap_shipped": "The roadmap item you supported, “{title}”, has shipped",
-  "related_roadmap_item": "Related item"
+  "related_roadmap_item": "Related item",
+  "feedback_replied": "The DaoDao team replied to your bug report “{title}”",
+  "related_bug_report": "your report"
 }

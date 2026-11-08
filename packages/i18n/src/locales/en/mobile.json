@@ -1000,6 +1000,8 @@
     "text_cohort_removed_fallback": "You were removed from a cohort. The cohort details are no longer available.",
     "text_wish_linked": "Your wish was linked to the roadmap item “{title}”",
     "text_roadmap_shipped": "The roadmap item you supported, “{title}”, has shipped",
+    "text_feedback_replied": "The DaoDao team replied to your bug report “{title}”",
+    "related_bug_report": "your report",
     "related_roadmap_item": "Related item"
   },
   "createManual": {

@@ -10,6 +10,8 @@ const messages: Record<string, string> = {
   text_follow_user: "{name} 開始關注你",
   text_default: "{name} 發出了一則通知",
   text_wish_linked: "你的願望已連結到路線圖項目「{title}」",
+  text_feedback_replied: "島島團隊回覆了你的錯誤回報「{title}」",
+  related_bug_report: "錯誤回報",
   text_roadmap_shipped: "你支持的路線圖項目「{title}」已上線",
   related_roadmap_item: "相關項目",
 };
@@ -131,5 +133,21 @@ describe("mobile roadmap notifications", () => {
   ])("rejects missing or unrelated roadmap destination %s", (url) => {
     expect(getNotificationHref(item({ type: "WishLinked", url }))).toBeNull();
     expect(getNotificationHref(item({ type: "RoadmapShipped", url }))).toBeNull();
+  });
+});
+
+describe("mobile feedback replied notification（daodao#451）", () => {
+  it("顯示團隊回覆了哪則錯誤回報，App 沒有我的回報頁所以不導頁", () => {
+    const notification = item({
+      type: "FeedbackReplied",
+      entityType: "feedback",
+      entityId: "8",
+      entityTitle: "按鈕沒反應",
+    });
+    expect(getNotificationText(notification, t)).toBe("島島團隊回覆了你的錯誤回報「按鈕沒反應」");
+    expect(getNotificationText(item({ type: "FeedbackReplied" }), t)).toBe(
+      "島島團隊回覆了你的錯誤回報「錯誤回報」"
+    );
+    expect(getNotificationHref(notification)).toBeNull();
   });
 });
