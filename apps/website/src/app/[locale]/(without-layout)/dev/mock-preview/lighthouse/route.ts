@@ -1,4 +1,11 @@
+import { routing } from "@daodao/i18n/routing";
 import { NextResponse } from "next/server";
+
+export const dynamic = "force-static";
+
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
 
 const html = /* html */ `<!doctype html><html lang="zh-TW"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>島島阿學 燈塔 v2</title>
