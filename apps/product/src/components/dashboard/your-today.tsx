@@ -9,6 +9,7 @@ import { ChevronDown, ChevronRight, ChevronUp, Users } from "lucide-react";
 import { useMemo, useState } from "react";
 import { CohortQueryScope } from "@/components/cohort/cohort-query-scope";
 import { isCohortQuickAccessVisible } from "@/utils/cohort-meeting-calendar";
+import { isPracticeVisibleByDate } from "@/utils/practice-card";
 import { resolvePracticeDurationDays } from "@/utils/practice-period";
 
 function getGreetingKey(): "greeting_morning" | "greeting_afternoon" | "greeting_evening" {
@@ -52,7 +53,7 @@ function YourTodayContent() {
   const cards = useMemo<PracticeCard[]>(() => {
     const practices = practicesData?.data ?? [];
     return practices
-      .filter((p) => p.status === "active")
+      .filter((p) => p.status === "active" && isPracticeVisibleByDate(p.startDate, p.endDate))
       .map((p) => {
         // 總天數含頭尾，與實踐頁同一規則（daodao#277）
         const totalDays = resolvePracticeDurationDays(p) ?? 1;
