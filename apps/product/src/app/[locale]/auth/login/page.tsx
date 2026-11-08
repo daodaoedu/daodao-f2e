@@ -5,6 +5,7 @@ import { getSafeLoginRedirect } from "@daodao/auth/lib/safe-redirect";
 import { useTranslations } from "@daodao/i18n";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import { shouldKeepInvitationLoginOpen } from "@/lib/auth/post-logout";
 
 /**
  * 登入頁面
@@ -14,6 +15,10 @@ export default function LoginPage() {
   const t = useTranslations("auth");
   const { openLoginDialog, isAuthenticated, isLoading } = useAuth();
   const searchParams = useSearchParams();
+  const invitationReauthentication = shouldKeepInvitationLoginOpen(
+    searchParams.get("redirect"),
+    searchParams.get("reauth")
+  );
 
   useEffect(() => {
     // 從 URL 參數中取得 redirect URL
@@ -30,11 +35,12 @@ export default function LoginPage() {
   //   避免目標頁面在 isAuthenticated 還沒翻成 true 前就觸發路由保護踢回登入頁形成循環
   // - 避開 next/navigation 的 router.push 不帶 locale prefix 在 next-intl 下的不一致行為
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
+    // A failed logout may leave a valid cookie: let the recipient choose Google again.
+    if (!isLoading && isAuthenticated && !invitationReauthentication) {
       const redirectUrl = getSafeLoginRedirect(searchParams.get("redirect"));
       window.location.href = redirectUrl;
     }
-  }, [isLoading, isAuthenticated, searchParams]);
+  }, [isLoading, isAuthenticated, invitationReauthentication, searchParams]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">

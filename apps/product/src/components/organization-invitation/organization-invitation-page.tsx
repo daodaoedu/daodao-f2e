@@ -10,6 +10,8 @@ import { Link } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { Building2, CheckCircle2, Clock3, Link2Off } from "lucide-react";
 import { useRef, useState } from "react";
+import { useLogoutAndRedirect } from "@/hooks/use-logout-redirect";
+import { parseServerError } from "@/lib/server-error/server-error-message";
 import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 
 const InvitationStatus = {
@@ -33,8 +35,11 @@ function InvitationContent({ token }: { token: string }) {
   const [result, setResult] = useState<OrganizationInvitationAcceptResultType | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [needsLogin, setNeedsLogin] = useState(false);
   const submitting = useRef(false);
   const returnPath = `${locale === "en" ? "/en" : ""}/organization-invitation`;
+
+  const logoutAndRedirect = useLogoutAndRedirect(returnPath);
 
   async function accept() {
     if (submitting.current || !isAuthenticated || isTemporary || !token) return;
@@ -44,11 +49,13 @@ function InvitationContent({ token }: { token: string }) {
     try {
       const response = await acceptOrganizationInvitation(token);
       if (response.error) {
+        if (response.response.status === 401) setNeedsLogin(true);
         setError(errorMessage(response.error, t("error"), { status: response.response.status }));
         return;
       }
       setResult(response.data.data);
     } catch (caught) {
+      if (parseServerError(caught).status === 401) setNeedsLogin(true);
       setError(errorMessage(caught, t("error")));
     } finally {
       submitting.current = false;
@@ -101,16 +108,22 @@ function InvitationContent({ token }: { token: string }) {
         )}
         <div className="mt-8">
           {isLoading && <output className="text-sm">{t("loading")}</output>}
-          {!isLoading && !isFinished && !isAuthenticated && (
+          {!isLoading && !isFinished && (!isAuthenticated || needsLogin) && (
             <Button
               className="w-full"
               size="huge"
-              onClick={() => openLoginDialog({ redirectUrl: returnPath, source: "app" })}
+              onClick={async () => {
+                if (needsLogin) {
+                  await logoutAndRedirect();
+                  return;
+                }
+                openLoginDialog({ redirectUrl: returnPath, source: "app" });
+              }}
             >
               {t("login")}
             </Button>
           )}
-          {!isLoading && !isFinished && isAuthenticated && !isTemporary && (
+          {!isLoading && !isFinished && isAuthenticated && !isTemporary && !needsLogin && (
             <Button
               className="w-full"
               size="huge"
