@@ -97,7 +97,7 @@ export function CohortOutcome({ programId, cohortId }: CohortOutcomeProps) {
         <div className="mt-4 flex flex-wrap gap-3">
           <Button
             type="button"
-            className="h-auto min-w-[220px] flex-col items-start gap-0.5 rounded-2xl bg-[#F0FBF9] px-5 py-3 text-left text-[#0D5B59] hover:bg-[#E0F3F0]"
+            className="h-auto min-w-[220px] max-w-full flex-col items-start whitespace-normal gap-0.5 rounded-2xl bg-[#F0FBF9] px-5 py-3 text-left text-[#0D5B59] hover:bg-[#E0F3F0]"
             onClick={openReport}
             data-testid="outcome-export-report"
           >
@@ -113,7 +113,7 @@ export function CohortOutcome({ programId, cohortId }: CohortOutcomeProps) {
             type="button"
             disabled
             aria-disabled="true"
-            className="h-auto min-w-[220px] flex-col items-start gap-0.5 rounded-2xl bg-[#F6F9F8] px-5 py-3 text-left text-[#8AA09E] opacity-70"
+            className="h-auto min-w-[220px] max-w-full flex-col items-start whitespace-normal gap-0.5 rounded-2xl bg-[#F6F9F8] px-5 py-3 text-left text-[#8AA09E] opacity-70"
           >
             <span className="font-semibold">{t("outcome_export_learners")}</span>
             <span className="text-xs font-normal">{t("coming_soon_badge")}</span>
@@ -123,7 +123,7 @@ export function CohortOutcome({ programId, cohortId }: CohortOutcomeProps) {
               type="button"
               disabled
               aria-disabled="true"
-              className="h-auto min-w-[220px] flex-col items-start gap-0.5 rounded-2xl bg-[#F6F9F8] px-5 py-3 text-left text-[#8AA09E] opacity-70"
+              className="h-auto min-w-[220px] max-w-full flex-col items-start whitespace-normal gap-0.5 rounded-2xl bg-[#F6F9F8] px-5 py-3 text-left text-[#8AA09E] opacity-70"
               data-testid="outcome-export-feedback"
             >
               <span className="font-semibold">{t("feedback_export")}</span>
