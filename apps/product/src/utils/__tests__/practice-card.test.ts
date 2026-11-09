@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { calculateDaysProgress, calculateRemainingDays, formatCardDate } from "../practice-card";
+import {
+  calculateDaysProgress,
+  calculateRemainingDays,
+  formatCardDate,
+  isPracticeVisibleByDate,
+} from "../practice-card";
 
 describe("calculateRemainingDays", () => {
   afterEach(() => {
@@ -124,5 +129,51 @@ describe("API calendar dates", () => {
       elapsed: 1,
       total: 7,
     });
+  });
+});
+
+describe("isPracticeVisibleByDate", () => {
+  it.each([
+    ["before start", "2026-11-09", "2026-11-12", false],
+    ["on start", "2026-11-08", "2026-11-12", true],
+    ["between dates", "2026-11-01", "2026-11-12", true],
+    ["on end", "2026-11-01", "2026-11-08", true],
+    ["after end", "2026-11-01", "2026-11-07", false],
+    ["single day", "2026-11-08", "2026-11-08", true],
+    ["reversed range", "2026-11-09", "2026-11-07", false],
+  ])("%s", (_label, start, end, expected) => {
+    expect(isPracticeVisibleByDate(start, end, new Date(2026, 10, 8, 23, 59))).toBe(expected);
+  });
+
+  it("includes the start date from local midnight", () => {
+    expect(isPracticeVisibleByDate("2026-11-08", "2026-11-10", new Date(2026, 10, 8))).toBe(true);
+  });
+
+  it("uses the calendar date prefix for API timestamps", () => {
+    expect(
+      isPracticeVisibleByDate(
+        "2026-11-08T00:00:00Z",
+        "2026-11-08T00:00:00Z",
+        new Date(2026, 10, 8, 23)
+      )
+    ).toBe(true);
+  });
+});
+
+describe("legacy practice dates", () => {
+  const now = new Date(2026, 10, 8, 12);
+  it.each([
+    [undefined, undefined, true],
+    [null, null, true],
+    ["", "", true],
+    [undefined, "2026-11-07", false],
+    [undefined, "2026-11-08", true],
+    ["2026-11-09", undefined, false],
+    ["2026-11-08", undefined, true],
+    ["bad-date", "2026-11-09", false],
+    ["2026-02-30", undefined, false],
+    [undefined, "bad-date", false],
+  ])("start=%s end=%s visible=%s", (start, end, expected) => {
+    expect(isPracticeVisibleByDate(start, end, now)).toBe(expected);
   });
 });

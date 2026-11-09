@@ -5,10 +5,12 @@ import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { cn } from "@daodao/ui/lib/utils";
+import { differenceInMilliseconds, format, startOfTomorrow } from "date-fns";
 import { ChevronDown, ChevronRight, ChevronUp, Users } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CohortQueryScope } from "@/components/cohort/cohort-query-scope";
 import { isCohortQuickAccessVisible } from "@/utils/cohort-meeting-calendar";
+import { isPracticeVisibleByDate } from "@/utils/practice-card";
 import { resolvePracticeDurationDays } from "@/utils/practice-period";
 
 function getGreetingKey(): "greeting_morning" | "greeting_afternoon" | "greeting_evening" {
@@ -39,6 +41,19 @@ function YourTodayContent() {
   const t = useTranslations("dashboard");
   const { user } = useAuth();
   const [isExpanded, setIsExpanded] = useState(true);
+  const [today, setToday] = useState(() => format(new Date(), "yyyy-MM-dd"));
+  useEffect(() => {
+    const refreshDay = () => setToday(format(new Date(), "yyyy-MM-dd"));
+    const timer = window.setTimeout(
+      refreshDay,
+      differenceInMilliseconds(startOfTomorrow(), new Date())
+    );
+    window.addEventListener("focus", refreshDay);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("focus", refreshDay);
+    };
+  }, [today]);
   const { data: practicesData } = useMyPractices({ limit: 20 });
   const {
     data: cohortsData,
@@ -52,7 +67,11 @@ function YourTodayContent() {
   const cards = useMemo<PracticeCard[]>(() => {
     const practices = practicesData?.data ?? [];
     return practices
-      .filter((p) => p.status === "active")
+      .filter(
+        (p) =>
+          p.status === "active" &&
+          isPracticeVisibleByDate(p.startDate, p.endDate, new Date(`${today}T00:00:00`))
+      )
       .map((p) => {
         // 總天數含頭尾，與實踐頁同一規則（daodao#277）
         const totalDays = resolvePracticeDurationDays(p) ?? 1;
@@ -65,7 +84,7 @@ function YourTodayContent() {
           lastCheckInDate: p.lastCheckinAt ?? null,
         };
       });
-  }, [practicesData]);
+  }, [practicesData, today]);
 
   const displayName = user?.name ?? "";
   const greetingKey = getGreetingKey();
