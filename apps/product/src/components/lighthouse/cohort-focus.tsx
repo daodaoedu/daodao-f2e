@@ -13,6 +13,7 @@ import {
   TooltipTrigger,
 } from "@daodao/ui/components/animate-ui/components/base/tooltip";
 import { Button } from "@daodao/ui/components/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@daodao/ui/components/popover";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, parseISO } from "date-fns";
 import { Info, MessageCircle, MessageSquareText } from "lucide-react";
@@ -131,7 +132,7 @@ export function CohortFocus({ programId, cohortId }: CohortFocusProps) {
 
       {/* FR-TF-01 子頁籤 */}
       <div
-        className="mt-6 flex min-w-0 gap-2 rounded-full bg-[#E7FAF7] p-1.5"
+        className="mt-6 flex gap-2 rounded-full bg-[#E7FAF7] p-1.5"
         role="tablist"
         aria-label={t("cohort_nav_focus")}
       >
@@ -151,7 +152,7 @@ export function CohortFocus({ programId, cohortId }: CohortFocusProps) {
               variant="ghost"
               onClick={() => setTab(key)}
               className={cn(
-                "h-auto min-h-10 min-w-0 flex-1 whitespace-normal rounded-full px-2 py-2 text-xs font-semibold text-[#456B68] hover:bg-transparent hover:text-[#0D3036] sm:text-sm",
+                "h-10 flex-1 rounded-full text-sm font-semibold text-[#456B68] hover:bg-transparent hover:text-[#0D3036]",
                 active && "bg-[#0D3036] text-white hover:bg-[#0D3036] hover:text-white"
               )}
             >
@@ -169,6 +170,12 @@ export function CohortFocus({ programId, cohortId }: CohortFocusProps) {
         hidden={tab !== "encourage"}
         className="mt-5 rounded-3xl border border-[#CDEBE8] bg-white p-4 md:p-6"
       >
+        <div className="mb-3 flex justify-end">
+          <FocusCriteriaInfo
+            label={t("focus_criteria_encourage_label")}
+            content={t("focus_criteria_encourage")}
+          />
+        </div>
         {!data?.needsEncouragement.length ? (
           <EmptyState />
         ) : (
@@ -176,7 +183,10 @@ export function CohortFocus({ programId, cohortId }: CohortFocusProps) {
             <table className="min-w-[800px] w-full border-separate border-spacing-y-2 text-sm">
               <thead>
                 <tr className="text-left text-xs text-[#78928F]">
-                  <th scope="col" className="px-3 py-1 font-medium">
+                  <th
+                    scope="col"
+                    className="sticky left-0 z-30 bg-white px-3 py-1 font-medium shadow-[4px_0_6px_-5px_rgba(13,48,54,0.45)]"
+                  >
                     {t("col_participant")}
                   </th>
                   <th scope="col" className="px-3 py-1 font-medium">
@@ -202,7 +212,9 @@ export function CohortFocus({ programId, cohortId }: CohortFocusProps) {
                     key={`${item.userId}-${item.practiceId}`}
                     className="bg-white shadow-[0_0_0_1px_#DDEFED]"
                   >
-                    <td className="rounded-l-2xl px-3 py-3 font-semibold">{name(item)}</td>
+                    <td className="sticky left-0 z-20 rounded-l-2xl bg-white px-3 py-3 font-semibold shadow-[4px_0_6px_-5px_rgba(13,48,54,0.45)]">
+                      {name(item)}
+                    </td>
                     <td className="px-3 py-3">{practiceCell(item)}</td>
                     <td className="px-3 py-3 font-mono text-xs text-[#456B68]">
                       {day(item.lastCheckinDate)}
@@ -229,6 +241,12 @@ export function CohortFocus({ programId, cohortId }: CohortFocusProps) {
         hidden={tab !== "celebrate"}
         className="mt-5 rounded-3xl border border-[#CDEBE8] bg-white p-4 md:p-6"
       >
+        <div className="mb-3 flex justify-end">
+          <FocusCriteriaInfo
+            label={t("focus_criteria_celebrate_label")}
+            content={t("focus_criteria_celebrate")}
+          />
+        </div>
         {!data?.celebrations.length ? (
           <EmptyState />
         ) : (
@@ -236,7 +254,10 @@ export function CohortFocus({ programId, cohortId }: CohortFocusProps) {
             <table className="min-w-[840px] w-full border-separate border-spacing-y-2 text-sm">
               <thead>
                 <tr className="text-left text-xs text-[#78928F]">
-                  <th scope="col" className="px-3 py-1 font-medium">
+                  <th
+                    scope="col"
+                    className="sticky left-0 z-30 bg-white px-3 py-1 font-medium shadow-[4px_0_6px_-5px_rgba(13,48,54,0.45)]"
+                  >
                     {t("col_participant")}
                   </th>
                   <th scope="col" className="px-3 py-1 font-medium">
@@ -262,7 +283,9 @@ export function CohortFocus({ programId, cohortId }: CohortFocusProps) {
                     key={`${item.userId}-${item.practiceId}-${item.moment}`}
                     className="bg-white shadow-[0_0_0_1px_#DDEFED]"
                   >
-                    <td className="rounded-l-2xl px-3 py-3 font-semibold">{name(item)}</td>
+                    <td className="sticky left-0 z-20 rounded-l-2xl bg-white px-3 py-3 font-semibold shadow-[4px_0_6px_-5px_rgba(13,48,54,0.45)]">
+                      {name(item)}
+                    </td>
                     <td className="px-3 py-3">{practiceCell(item)}</td>
                     <td className="px-3 py-3 font-mono text-xs text-[#456B68]">
                       {day(item.firstCheckinAt)}
@@ -299,6 +322,32 @@ export function CohortFocus({ programId, cohortId }: CohortFocusProps) {
         onSent={() => void query.mutate()}
       />
     </div>
+  );
+}
+
+function FocusCriteriaInfo({ label, content }: { label: string; content: string }) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="size-8 shrink-0 rounded-full text-[#0D7773] hover:bg-[#EAF7F5]"
+          aria-label={label}
+        >
+          <Info className="size-3.5" aria-hidden="true" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        side="bottom"
+        align="end"
+        sideOffset={6}
+        className="w-80 max-w-[calc(100vw-2rem)] rounded-lg border-[#CDEBE8] bg-[#0D3036] px-3 py-2 text-xs leading-relaxed whitespace-pre-line text-white shadow-md"
+      >
+        {content}
+      </PopoverContent>
+    </Popover>
   );
 }
 

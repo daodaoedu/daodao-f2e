@@ -64,13 +64,7 @@ export function CohortOutcomeReport({ programId, cohortId }: CohortOutcomeReport
           section, .rounded-3xl { break-inside: avoid; }
         }
       `}</style>
-      <div
-        className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#CDEBE8] bg-[#F7FCFB] px-4 py-3"
-        data-report-actions
-      >
-        <p className="text-sm text-[#456B68]">
-          {t("outcome_report_print_hint", { filename: `${filename}.pdf` })}
-        </p>
+      <div className="mb-6 flex justify-end" data-report-actions>
         <Button
           type="button"
           className="rounded-full"
@@ -91,8 +85,8 @@ export function CohortOutcomeReport({ programId, cohortId }: CohortOutcomeReport
           {outcome.cohort.displayName}
         </h2>
         <p className="mt-1 text-sm text-[#5A7B79]">
-          {outcome.cohort.programName} · {outcome.cohort.startDate.slice(0, 10)} —{" "}
-          {outcome.cohort.endDate.slice(0, 10)}
+          {outcome.cohort.programName} · {formatReportDate(outcome.cohort.startDate)} —{" "}
+          {formatReportDate(outcome.cohort.endDate)}
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <PhaseBadge phase={outcome.phase} finalizedAt={outcome.finalizedAt} />
@@ -143,4 +137,8 @@ export function CohortOutcomeReport({ programId, cohortId }: CohortOutcomeReport
       </section>
     </div>
   );
+}
+
+function formatReportDate(value: string): string {
+  return value.slice(0, 10).replaceAll("-", "/");
 }
