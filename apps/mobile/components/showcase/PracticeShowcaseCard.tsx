@@ -6,11 +6,11 @@
  * - Brewing overlay（延遲分享練習顯示醞釀中提示）
  */
 
-import * as Haptics from "expo-haptics";
 import { useCallback } from "react";
 import { Text, XStack } from "tamagui";
 import { ShowcaseCard } from "@/components/home";
 import type { IShowcasePractice } from "@/hooks/useShowcaseFeed";
+import { impactLight } from "@/utils/haptics";
 
 interface PracticeShowcaseCardProps {
   practice: IShowcasePractice;
@@ -39,7 +39,7 @@ const brewingOverlay = (
 
 export function PracticeShowcaseCard({ practice, onReactionUpdated }: PracticeShowcaseCardProps) {
   const handleReactionTap = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    impactLight();
   }, []);
 
   return (

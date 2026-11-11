@@ -3,11 +3,13 @@ import { FlatList, RefreshControl, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text, YStack } from "tamagui";
 import { ShowcaseSearchBar, TabSwitcher, type TabType } from "@/components/home";
+import { ExploreTopicsSection } from "@/components/home/explore-topics-section";
 import { PracticeShowcaseCard } from "@/components/showcase/PracticeShowcaseCard";
 import { PracticeTasksSection } from "@/components/showcase/PracticeTasksSection";
 import { ShowcaseFeed } from "@/components/showcase/ShowcaseFeed";
 import { FilterStatus, type FilterStatus as FilterStatusType } from "@/constants/task-status";
 import { colors } from "@/generated/design-tokens";
+import { useChallenges, useExploreTopics } from "@/hooks/useChallenges";
 import { usePractices } from "@/hooks/usePractices";
 import {
   type IShowcaseFeedParams,
@@ -39,6 +41,8 @@ export default function ShowcaseScreen() {
   // ── Mine tab state ──
   const [filterStatus, setFilterStatus] = useState<FilterStatusType>(FilterStatus.all);
   const { allTasks, isLoading: isMyLoading, mutate: mutatePractices } = usePractices();
+  const { challenges } = useChallenges();
+  const { topics } = useExploreTopics();
 
   // ── Inspire tab render ──
   const renderShowcaseItem = useCallback(
@@ -103,11 +107,15 @@ export default function ShowcaseScreen() {
                 <Text color={colors.text.dark}>{t("loading")}</Text>
               </YStack>
             ) : (
-              <PracticeTasksSection
-                tasks={allTasks}
-                filterStatus={filterStatus}
-                onFilterChange={setFilterStatus}
-              />
+              <>
+                <PracticeTasksSection
+                  tasks={allTasks}
+                  filterStatus={filterStatus}
+                  onFilterChange={setFilterStatus}
+                  challenges={challenges}
+                />
+                <ExploreTopicsSection topics={topics} />
+              </>
             )}
           </>
         }
