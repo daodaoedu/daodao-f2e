@@ -1,4 +1,4 @@
-import { getPublicSurvey, submitPublicSurvey } from "@daodao/api";
+import { apiErrorFromBody, getPublicSurvey, submitPublicSurvey } from "@daodao/api";
 import type { AIGenerateInput, CreateSurveyInput, SubmitResponseInput } from "../schema";
 import type {
   AIGenerateResponse,
@@ -425,8 +425,9 @@ async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
   });
 
   if (!res.ok) {
-    const body = await res.text().catch(() => "");
-    throw new Error(`Survey API ${res.status}: ${body}`);
+    // 拋出結構化 ApiError，畫面透過 useServerErrorMessage 顯示 server 訊息，不露出原始 body（#525）
+    const body: unknown = await res.json().catch(() => undefined);
+    throw apiErrorFromBody(res.status, body, "問卷服務暫時無法使用");
   }
 
   if (res.status === 204) return undefined as T;
