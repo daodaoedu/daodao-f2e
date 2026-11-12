@@ -405,7 +405,7 @@ function CohortSetupPanel({
           endTime,
         ]),
         timezone,
-        interactionModes: [...interactionModes].sort(),
+        interactionModes: [...interactionModes].sort((a, b) => a.localeCompare(b)),
         feeType,
         signupMethod,
         capacityUnlimited,
