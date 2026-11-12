@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { getEnv, getRequiredEnv } from "@daodao/config";
-import { type APIRequestContext, expect, test } from "@playwright/test";
+import { type APIRequestContext, type APIResponse, expect, test } from "@playwright/test";
 import { fixtureUser, serviceUrl } from "./contracts";
 import { manifest, urls } from "./fixtures";
 
@@ -166,6 +166,7 @@ test("first Google-boundary signup accepts an emailed invitation and opens Light
     await context.addCookies([{ name: "NEXT_LOCALE", value: "en", url: product.origin }]);
     let providerRequests = 0;
     let unexpectedProviderRequests = 0;
+    const callbackObservation: { response?: APIResponse } = {};
     // A provider redirect must never leave this synthetic local test. The
     // browser-level block also covers redirected requests that Playwright routing
     // does not revisit after the initial URL in a redirect chain.
@@ -217,10 +218,11 @@ test("first Google-boundary signup accepts an emailed invitation and opens Light
         const callback = new URL(redirect as string);
         callback.searchParams.set("code", "journey-first-signup");
         callback.searchParams.set("state", state as string);
-        await route.fulfill({
-          response: initiated,
-          headers: { ...initiated.headers(), location: callback.toString() },
-        });
+        // Keep the real callback, cookies and nonce validation, but inspect its
+        // original response before browser interception can follow the redirect.
+        const completed = await context.request.get(callback.toString(), { maxRedirects: 0 });
+        callbackObservation.response = completed;
+        await route.fulfill({ response: completed });
       }
     );
     await page.goto(invitation.toString());
@@ -229,15 +231,7 @@ test("first Google-boundary signup accepts an emailed invitation and opens Light
     await page
       .getByRole("button", { name: "Sign in or register to continue", exact: true })
       .click();
-    // Check the server-owned new-identity signal directly, before the frontend
-    // callback redirects onward to onboarding.
-    const [callback] = await Promise.all([
-      page.waitForResponse((response) => {
-        const url = new URL(response.url());
-        return url.origin === api.origin && url.pathname === "/api/v1/auth/google/callback";
-      }),
-      page.getByRole("button", { name: "Sign in with Google account", exact: true }).click(),
-    ]);
+    await page.getByRole("button", { name: "Sign in with Google account", exact: true }).click();
     await expect(page).toHaveURL(
       /\/en\/auth\/onboarding\?redirect=%2Fen%2Forganization-invitation$/
     );
@@ -246,8 +240,10 @@ test("first Google-boundary signup accepts an emailed invitation and opens Light
     ).toBeVisible();
     expect(providerRequests).toBe(1);
     expect(unexpectedProviderRequests, "external provider navigation must remain blocked").toBe(0);
+    const callback = callbackObservation.response;
+    if (!callback) throw new Error("The real OAuth callback was not completed");
     expect(callback.status(), "OAuth callback redirects to the product").toBe(302);
-    const callbackLocation = await callback.headerValue("location");
+    const callbackLocation = callback.headers().location;
     expect(callbackLocation, "OAuth callback must provide its product redirect").toBeTruthy();
     const callbackUrl = new URL(callbackLocation as string);
     expect(callbackUrl.origin).toBe(product.origin);
