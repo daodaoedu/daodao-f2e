@@ -1,0 +1,46 @@
+# Created by https://www.toptal.com/developers/gitignore/api/react
+# Edit at https://www.toptal.com/developers/gitignore?templates=react
+
+### react ###
+.DS_*
+*.log
+logs
+**/*.backup.*
+**/*.back.*
+
+node_modules
+bower_components
+
+*.sublime*
+
+psd
+thumb
+sketch
+
+# Build output
+dist/
+
+# Environment files
+.env
+.env.*
+!.env.*.sample
+.env.local
+
+# Local overrides
+*.local
+
+# Vite
+.vite/
+
+# Test coverage
+coverage/
+
+# TypeScript build info
+tsconfig.tsbuildinfo
+
+# End of https://www.toptal.com/developers/gitignore/api/react
+
+# OMC / Claude artifacts
+.omc/
+# .claude/ 是版控內的制度檔（skills、hooks、settings），只忽略本機個人設定
+.claude/settings.local.json
