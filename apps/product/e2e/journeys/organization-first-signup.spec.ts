@@ -166,7 +166,6 @@ test("first Google-boundary signup accepts an emailed invitation and opens Light
     await context.addCookies([{ name: "NEXT_LOCALE", value: "en", url: product.origin }]);
     let providerRequests = 0;
     let unexpectedProviderRequests = 0;
-    let callbackNewUser = false;
     // A provider redirect must never leave this synthetic local test. The
     // browser-level block also covers redirected requests that Playwright routing
     // does not revisit after the initial URL in a redirect chain.
@@ -187,12 +186,6 @@ test("first Google-boundary signup accepts an emailed invitation and opens Light
         await route.abort("blockedbyclient");
       }
     );
-    page.on("response", (response) => {
-      const url = new URL(response.url());
-      if (url.pathname === "/en/auth/callback" || url.pathname === "/auth/callback") {
-        callbackNewUser ||= url.searchParams.get("isNewUser") === "true";
-      }
-    });
     // Playwright routes are called for the first URL in a redirect chain. Fetch
     // the real app initiation without following its provider redirect, preserving
     // its state/Redis/session work; replace only the external provider hop.
@@ -236,7 +229,15 @@ test("first Google-boundary signup accepts an emailed invitation and opens Light
     await page
       .getByRole("button", { name: "Sign in or register to continue", exact: true })
       .click();
-    await page.getByRole("button", { name: "Sign in with Google account", exact: true }).click();
+    // Check the server-owned new-identity signal directly, before the frontend
+    // callback redirects onward to onboarding.
+    const [callback] = await Promise.all([
+      page.waitForResponse((response) => {
+        const url = new URL(response.url());
+        return url.origin === api.origin && url.pathname === "/api/v1/auth/google/callback";
+      }),
+      page.getByRole("button", { name: "Sign in with Google account", exact: true }).click(),
+    ]);
     await expect(page).toHaveURL(
       /\/en\/auth\/onboarding\?redirect=%2Fen%2Forganization-invitation$/
     );
@@ -245,7 +246,16 @@ test("first Google-boundary signup accepts an emailed invitation and opens Light
     ).toBeVisible();
     expect(providerRequests).toBe(1);
     expect(unexpectedProviderRequests, "external provider navigation must remain blocked").toBe(0);
-    expect(callbackNewUser, "callback must identify an actual new app identity").toBe(true);
+    expect(callback.status(), "OAuth callback redirects to the product").toBe(302);
+    const callbackLocation = await callback.headerValue("location");
+    expect(callbackLocation, "OAuth callback must provide its product redirect").toBeTruthy();
+    const callbackUrl = new URL(callbackLocation as string);
+    expect(callbackUrl.origin).toBe(product.origin);
+    expect(callbackUrl.pathname).toBe("/auth/callback");
+    expect(
+      callbackUrl.searchParams.get("isNewUser"),
+      "callback must identify an actual new app identity"
+    ).toBe("true");
     const temporary = await context.request.get(serviceUrl(urls.api, "/api/v1/auth/me"));
     expect(temporary.status()).toBe(200);
     expect((await temporary.json()).data.isTemporary).toBe(true);
