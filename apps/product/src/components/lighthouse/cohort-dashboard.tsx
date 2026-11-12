@@ -141,6 +141,7 @@ export function CohortDashboard({ programId, cohortId }: CohortDashboardProps) {
             </fieldset>
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <DatePicker
+                showCalendarIcon={false}
                 aria-label={t("dashboard_range_from")}
                 value={parseISO(range.from ?? data.range.from)}
                 maxDate={parseISO(range.to ?? data.range.to)}
@@ -151,6 +152,7 @@ export function CohortDashboard({ programId, cohortId }: CohortDashboardProps) {
                 className="h-9 w-[150px] text-xs"
               />
               <DatePicker
+                showCalendarIcon={false}
                 aria-label={t("dashboard_range_to")}
                 value={parseISO(range.to ?? data.range.to)}
                 minDate={parseISO(range.from ?? data.range.from)}
@@ -191,8 +193,10 @@ export function CohortDashboard({ programId, cohortId }: CohortDashboardProps) {
               <div>
                 <p className="font-semibold">{row.title}</p>
                 <p className="mt-0.5 text-xs text-[#78928F]">
-                  {row.startDate ? row.startDate.slice(0, 10).replaceAll("-", "/") : "—"} –{" "}
-                  {row.endDate ? row.endDate.slice(0, 10).replaceAll("-", "/") : "—"}
+                  {t("dashboard_practice_period", {
+                    from: row.startDate ? row.startDate.slice(0, 10).replaceAll("-", "/") : "—",
+                    to: row.endDate ? row.endDate.slice(0, 10).replaceAll("-", "/") : "—",
+                  })}
                 </p>
               </div>
               <Stat label={t("dashboard_started_count")} value={row.startedCount} />

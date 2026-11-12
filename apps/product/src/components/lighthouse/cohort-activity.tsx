@@ -249,10 +249,12 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
           className="flex shrink-0 items-center gap-1 rounded-full border border-[#CDEBE8] px-2.5 py-1 text-xs text-[#456B68]"
         >
           <DatePicker
+            showCalendarIcon={false}
             value={activeFrom ? parseISO(activeFrom) : undefined}
             minDate={min ? parseISO(min) : undefined}
             maxDate={max ? parseISO(max) : undefined}
             aria-label={t("activity_start_label")}
+            title={t("activity_start_hint")}
             onChange={(date) =>
               setRange((current) => ({
                 ...current,
@@ -263,10 +265,12 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
           />
           <span aria-hidden="true">–</span>
           <DatePicker
+            showCalendarIcon={false}
             value={activeTo ? parseISO(activeTo) : undefined}
             minDate={min ? parseISO(min) : undefined}
             maxDate={max ? parseISO(max) : undefined}
             aria-label={t("activity_end_label")}
+            title={t("activity_end_hint")}
             onChange={(date) =>
               setRange((current) => ({
                 ...current,

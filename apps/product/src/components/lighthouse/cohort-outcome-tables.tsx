@@ -108,6 +108,7 @@ export function CohortOutcomeTables({
       >
         <div>
           <h3 className="text-[15px] font-semibold">{t("outcome_participants_title")}</h3>
+          <p className="mt-1 text-[13px] text-[#78928F]">{t("outcome_participants_description")}</p>
         </div>
       </div>
       <div className={cn("overflow-x-auto", !plain && "rounded-b-3xl")}>
@@ -250,7 +251,7 @@ export function CohortOutcomeTables({
       </div>
       {plain && (
         <p className="px-2 pt-2 text-[9px] leading-relaxed text-[#5A7B79]">
-          {t("outcome_col_published_comments")}：{t("outcome_published_comments_hint")}
+          {t("outcome_published_comments_footnote", { hint: t("outcome_published_comments_hint") })}
         </p>
       )}
     </section>

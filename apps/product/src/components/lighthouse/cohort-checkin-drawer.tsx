@@ -69,6 +69,14 @@ export function CohortCheckinDrawer({
         </SheetHeader>
         <div className="px-5 py-4">
           {query.isLoading && <p className="text-sm text-[#78928F]">{t("loading")}</p>}
+          {!query.isLoading && !data && (query.error || query.validationError) && (
+            <p
+              role="alert"
+              className="rounded-2xl border border-dashed border-[#F2C9C9] px-4 py-6 text-center text-sm text-[#A33A3A]"
+            >
+              {t("checkin_records_load_failed")}
+            </p>
+          )}
           {data && (
             <p className="text-xs text-[#78928F]">
               {t("checkin_records_count", { count: data.total })}

@@ -401,7 +401,9 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
               className="mt-3 rounded-2xl bg-[#FFF6E8] px-4 py-3 text-sm leading-6 text-[#A95D00]"
             >
               {t(`invitation_send_disabled_${sendDisabledReason}`, {
-                date: (cohort?.joinDeadline ?? cohort?.endDate ?? "").slice(0, 10),
+                date: (cohort?.joinDeadline ?? cohort?.endDate ?? "")
+                  .slice(0, 10)
+                  .replaceAll("-", "/"),
               })}
             </p>
           )}
