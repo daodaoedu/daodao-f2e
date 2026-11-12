@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { getEnv, getRequiredEnv } from "@daodao/config";
-import { type APIRequestContext, expect, test } from "@playwright/test";
+import { type APIRequestContext, type APIResponse, expect, test } from "@playwright/test";
 import { fixtureUser, serviceUrl } from "./contracts";
 import { manifest, urls } from "./fixtures";
 
@@ -166,7 +166,7 @@ test("first Google-boundary signup accepts an emailed invitation and opens Light
     await context.addCookies([{ name: "NEXT_LOCALE", value: "en", url: product.origin }]);
     let providerRequests = 0;
     let unexpectedProviderRequests = 0;
-    let callbackNewUser = false;
+    const callbackObservation: { response?: APIResponse } = {};
     // A provider redirect must never leave this synthetic local test. The
     // browser-level block also covers redirected requests that Playwright routing
     // does not revisit after the initial URL in a redirect chain.
@@ -187,12 +187,6 @@ test("first Google-boundary signup accepts an emailed invitation and opens Light
         await route.abort("blockedbyclient");
       }
     );
-    page.on("response", (response) => {
-      const url = new URL(response.url());
-      if (url.pathname === "/en/auth/callback" || url.pathname === "/auth/callback") {
-        callbackNewUser ||= url.searchParams.get("isNewUser") === "true";
-      }
-    });
     // Playwright routes are called for the first URL in a redirect chain. Fetch
     // the real app initiation without following its provider redirect, preserving
     // its state/Redis/session work; replace only the external provider hop.
@@ -224,10 +218,11 @@ test("first Google-boundary signup accepts an emailed invitation and opens Light
         const callback = new URL(redirect as string);
         callback.searchParams.set("code", "journey-first-signup");
         callback.searchParams.set("state", state as string);
-        await route.fulfill({
-          response: initiated,
-          headers: { ...initiated.headers(), location: callback.toString() },
-        });
+        // Keep the real callback, cookies and nonce validation, but inspect its
+        // original response before browser interception can follow the redirect.
+        const completed = await context.request.get(callback.toString(), { maxRedirects: 0 });
+        callbackObservation.response = completed;
+        await route.fulfill({ response: completed });
       }
     );
     await page.goto(invitation.toString());
@@ -245,7 +240,18 @@ test("first Google-boundary signup accepts an emailed invitation and opens Light
     ).toBeVisible();
     expect(providerRequests).toBe(1);
     expect(unexpectedProviderRequests, "external provider navigation must remain blocked").toBe(0);
-    expect(callbackNewUser, "callback must identify an actual new app identity").toBe(true);
+    const callback = callbackObservation.response;
+    if (!callback) throw new Error("The real OAuth callback was not completed");
+    expect(callback.status(), "OAuth callback redirects to the product").toBe(302);
+    const callbackLocation = callback.headers().location;
+    expect(callbackLocation, "OAuth callback must provide its product redirect").toBeTruthy();
+    const callbackUrl = new URL(callbackLocation as string);
+    expect(callbackUrl.origin).toBe(product.origin);
+    expect(callbackUrl.pathname).toBe("/auth/callback");
+    expect(
+      callbackUrl.searchParams.get("isNewUser"),
+      "callback must identify an actual new app identity"
+    ).toBe("true");
     const temporary = await context.request.get(serviceUrl(urls.api, "/api/v1/auth/me"));
     expect(temporary.status()).toBe(200);
     expect((await temporary.json()).data.isTemporary).toBe(true);

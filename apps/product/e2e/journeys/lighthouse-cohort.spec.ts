@@ -39,11 +39,6 @@ test("staff creates Lighthouse cohort; learner consent gates joining and cohort 
     await form.getByText("選擇互動方式", { exact: true }).click();
     await staff.getByText("線上非同步", { exact: true }).click();
     await form.getByRole("button", { name: "線上非同步", exact: true }).click();
-    await form
-      .locator("span")
-      .filter({ hasText: "建立後立即發佈並產生邀請連結" })
-      .getByRole("switch")
-      .check();
     const created = staff.waitForResponse(
       (entry) => entry.request().method() === "POST" && new URL(entry.url()).pathname === endpoint
     );
@@ -52,7 +47,57 @@ test("staff creates Lighthouse cohort; learner consent gates joining and cohort 
     expect(response.ok()).toBeTruthy();
     const cohort = (await response.json()).data;
     id = cohort.id;
+    expect(cohort.status, "#521：建立場次一律為草稿，發佈改由場次卡操作").toBe("draft");
     expect(cohort.joinToken).toBeTruthy();
+    // TEMP 診斷（#521 CI）：CI 不上傳截圖，失敗時把面板狀態寫進錯誤訊息
+    await staff.waitForTimeout(3000);
+    const diag = JSON.stringify({
+      cards: await panel.locator("[id^=cohort-]").count(),
+      newCard: await staff.locator(`#cohort-${id}`).count(),
+      forms: await panel.locator("form").count(),
+      headings: await panel.locator("h4").allTextContents(),
+      text: (await panel.innerText()).replace(/\s+/g, " ").slice(0, 600),
+    });
+    const listRes = await request.fetch(serviceUrl(urls.api, endpoint), {
+      headers: { Authorization: `Bearer ${token}`, cookie: `auth_token=${token}` },
+    });
+    const listBody = await listRes.text();
+    let listInfo = "";
+    try {
+      const rows = (JSON.parse(listBody).data ?? []) as { id: number }[];
+      const mine = rows.find((row) => row.id === id);
+      listInfo = JSON.stringify({
+        status: listRes.status(),
+        count: rows.length,
+        ids: rows.map((r) => r.id),
+        mine,
+      });
+    } catch {
+      listInfo = `status=${listRes.status()} body=${listBody.slice(0, 300)}`;
+    }
+    expect(
+      await staff.locator(`#cohort-${id}`).count(),
+      `diag ${diag} list ${listInfo.slice(0, 3000)}`
+    ).toBe(1);
+    // #521 AC-03：建立後留在管理頁並開啟場次設定，以文字提示接續設定
+    await expect(
+      panel.getByText("基本資料已建立，請完成其他設定", { exact: true }),
+      "post-create setup reminder"
+    ).toBeVisible();
+    const card = staff.locator(`#cohort-${id}`);
+    await card.getByRole("button", { name: "發佈", exact: true }).click();
+    const published = staff.waitForResponse(
+      (entry) =>
+        entry.request().method() === "PATCH" &&
+        new URL(entry.url()).pathname === `${endpoint}/${id}`
+    );
+    await staff
+      .getByRole("dialog")
+      .or(staff.getByRole("alertdialog"))
+      .first()
+      .getByRole("button", { name: "發佈", exact: true })
+      .click();
+    expect((await published).ok(), "publish from cohort card").toBeTruthy();
     await page.goto(`/zh-TW/cohorts/join/${cohort.joinToken}`);
     await expect(page.getByRole("heading", { name, exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "同意並加入", exact: true })).toBeDisabled();
