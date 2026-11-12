@@ -1,11 +1,4 @@
-/**
- * 官網（daodao.so）的 robots.txt 與 sitemap.xml 內容。
- *
- * 只有正式站允許搜尋引擎收錄；dev.daodao.so、本機等其他環境一律 Disallow，
- * 避免測試站被 Google 收錄。環境以建置時的 NEXT_PUBLIC_WEBSITE_URL 判斷。
- * 官網路由是 next-intl `localePrefix: "as-needed"`：中文不帶前綴，英文帶 `/en`。
- */
-
+// robots 允許爬取，讓搜尋引擎能讀取頁面上的 noindex。
 export const PRODUCTION_WEBSITE_URL = "https://daodao.so";
 
 const DEFAULT_LOCALE = "zh-TW";
@@ -39,10 +32,10 @@ const localizedUrl = (base: string, locale: string, path: string) =>
 
 export function buildWebsiteRobots(websiteUrl: string | undefined): WebsiteRobots {
   if (!isProductionWebsite(websiteUrl)) {
-    return { rules: [{ userAgent: "*", disallow: "/" }] };
+    return { rules: [{ userAgent: "*", allow: "/" }] };
   }
   return {
-    rules: [{ userAgent: "*", allow: "/", disallow: ["/dev/", "/en/dev/"] }],
+    rules: [{ userAgent: "*", allow: "/" }],
     sitemap: `${PRODUCTION_WEBSITE_URL}/sitemap.xml`,
   };
 }
@@ -60,4 +53,8 @@ export function buildWebsiteSitemap(websiteUrl: string | undefined): WebsiteSite
       alternates: { languages },
     }));
   });
+}
+
+export function buildWebsiteIndexingPolicy(websiteUrl: string | undefined) {
+  return isProductionWebsite(websiteUrl) ? undefined : { index: false, follow: false };
 }
