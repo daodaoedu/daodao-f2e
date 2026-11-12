@@ -328,6 +328,7 @@
   "cohort_created_setup_title": "Basic information is set up",
   "cohort_created_setup_description": "Continue with templates, activity page, privacy, and signup settings, then select Save.",
   "cohort_draft_invite_inactive": "This cohort is still a draft. Publish it to activate the invitation link.",
+  "cohort_draft_invite_inactive_rich": "This cohort is still a draft. <publish>Publish</publish> it to activate the invitation link.",
   "cohort_draft_email_invite_disabled": "Publish the cohort before sending email invitations.",
   "cohort_editor_unsaved_title": "Unsaved changes",
   "cohort_editor_tab_description": "Your changes will stay in the editor after switching tabs.",

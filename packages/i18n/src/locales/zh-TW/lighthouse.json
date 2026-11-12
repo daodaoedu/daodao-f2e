@@ -328,6 +328,7 @@
   "cohort_created_setup_title": "基本資料已建立，請完成其他設定",
   "cohort_created_setup_description": "請接續設定「連結實踐模板」、「場次活動主頁」、「隱私」與「報名設定」，完成後按「儲存」。",
   "cohort_draft_invite_inactive": "此場次仍為草稿，發佈後即可使用邀請連結。",
+  "cohort_draft_invite_inactive_rich": "此場次仍為草稿，<publish>發佈</publish>後即可使用邀請連結。",
   "cohort_draft_email_invite_disabled": "發佈場次後才能寄送 email 邀請。",
   "cohort_editor_unsaved_title": "尚未儲存變更",
   "cohort_editor_tab_description": "切換分頁後，變更仍會保留在編輯表單中。",

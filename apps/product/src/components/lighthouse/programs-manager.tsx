@@ -18,7 +18,6 @@ import {
 import { useLocale, useTranslations } from "@daodao/i18n";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -57,7 +56,7 @@ import {
   X,
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { type FormEvent, type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import {
   type ServerErrorMessageFn,
   useServerErrorMessage,
@@ -215,6 +214,8 @@ interface CohortSetupPanelProps {
   ) => Promise<boolean | undefined>;
   onClose: () => void;
   busy: boolean;
+  /** 建立後接續設定的文字提示（AC-03：取代建立完成彈窗） */
+  notice?: ReactNode;
 }
 
 function CohortSetupPanel({
@@ -226,6 +227,7 @@ function CohortSetupPanel({
   onSubmit,
   onClose,
   busy,
+  notice,
 }: CohortSetupPanelProps) {
   const t = useTranslations("lighthouse");
   const locale = useLocale();
@@ -264,7 +266,6 @@ function CohortSetupPanel({
           collapseRepeat: "收合規律時段",
         };
   const [activeTab, setActiveTab] = useState<SetupTab>("basic");
-  useLighthouseOrganizationGuard(true, busy);
   const panelRef = useRef<HTMLFormElement>(null);
   const [signupPreview, setSignupPreview] = useState<{
     name: string;
@@ -275,6 +276,8 @@ function CohortSetupPanel({
   const initialSnapshotsRef = useRef<Partial<Record<SetupTab, string>>>({});
   const [dirtyTabs, setDirtyTabs] = useState<Set<SetupTab>>(() => new Set());
   const hasChanges = dirtyTabs.size > 0;
+  // 編輯模式只在有未儲存變更時攔截離開；建立模式沿用原本一律攔截
+  useLighthouseOrganizationGuard(mode === "create" || hasChanges, busy);
   const [pendingTab, setPendingTab] = useState<SetupTab | null>(null);
   const [confirmClose, setConfirmClose] = useState(false);
   // 已開始的場次 server 會拒絕變更綁定（FR-TPL-05），直接鎖住勾選
@@ -371,11 +374,7 @@ function CohortSetupPanel({
   const expandedSessionIds = new Set(expandedRepeatGroups.flatMap((group) => group.sessionIds));
   const displayedSessions = groupSessionsForDisplay(sessions, expandedSessionIds);
 
-  function getSnapshot(
-    form: HTMLFormElement,
-    tab: SetupTab,
-    snapshotSessions = sessions
-  ): string {
+  function getSnapshot(form: HTMLFormElement, tab: SetupTab, snapshotSessions = sessions): string {
     const panel = form.querySelector<HTMLElement>(`[data-setup-tab="${tab}"]`);
     const fields = Array.from(
       panel?.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
@@ -664,6 +663,7 @@ function CohortSetupPanel({
           <X className="size-[15px]" />
         </Button>
       </div>
+      {notice}
 
       {/* Pill tabs */}
       <div className="mb-[18px] flex flex-wrap gap-1.5" role="tablist">
@@ -1755,15 +1755,13 @@ function CohortCard({
   showSetupReminder = false,
 }: CohortCardProps) {
   const t = useTranslations("lighthouse");
-  const inactiveInviteMessage = t("cohort_draft_invite_inactive");
-  const publishWord = inactiveInviteMessage.includes("發佈") ? "發佈" : "Publish";
-  const [inactiveInvitePrefix, inactiveInviteSuffix] = inactiveInviteMessage.split(publishWord);
   const apiErrorMessage = useLighthouseErrorMessage();
   const { errorMessage: serverErrorMessage } = useServerErrorMessage();
   const searchParams = useSearchParams();
   const [editing, setEditing] = useState(searchParams.get("edit") === String(cohort.id));
   const [busy, setBusy] = useState(false);
-  useLighthouseOrganizationGuard(editing, busy);
+  // 未儲存變更由 CohortSetupPanel 依實際 dirty 狀態登記；此處只攔截寫入中
+  useLighthouseOrganizationGuard(false, busy);
   const [setupReminderOpen, setSetupReminderOpen] = useState(false);
   const [confirmPublish, setConfirmPublish] = useState(false);
 
@@ -1949,8 +1947,19 @@ function CohortCard({
       organizationId={organizationId}
       templates={templates}
       onSubmit={handleEditSubmit}
-      onClose={() => setEditing(false)}
+      onClose={() => {
+        setEditing(false);
+        setSetupReminderOpen(false);
+      }}
       busy={busy}
+      notice={
+        setupReminderOpen ? (
+          <output className="mb-4 block rounded-xl bg-[#FFF6E8] px-3 py-2 text-[#8A5700]">
+            <p className="text-sm font-semibold">{t("cohort_created_setup_title")}</p>
+            <p className="mt-0.5 text-xs">{t("cohort_created_setup_description")}</p>
+          </output>
+        ) : undefined
+      }
     />
   ) : null;
 
@@ -1992,16 +2001,16 @@ function CohortCard({
                 joinToken={cohort.joinToken}
                 inactive={cohort.status === "draft"}
                 inactiveMessage={
-                  cohort.status === "draft" ? (
-                    <>
-                      {inactiveInvitePrefix}
-                      <span className="inline-flex items-center gap-1 align-middle">
-                        <Send className="size-3.5" aria-hidden="true" />
-                        {publishWord}
-                      </span>
-                      {inactiveInviteSuffix}
-                    </>
-                  ) : undefined
+                  cohort.status === "draft"
+                    ? t.rich("cohort_draft_invite_inactive_rich", {
+                        publish: (chunks) => (
+                          <span className="inline-flex items-center gap-1 align-middle">
+                            <Send className="size-3.5" aria-hidden="true" />
+                            {chunks}
+                          </span>
+                        ),
+                      })
+                    : undefined
                 }
                 inactiveMessageTitle={
                   cohort.status === "draft" ? t("cohort_draft_invite_inactive") : undefined
@@ -2128,30 +2137,13 @@ function CohortCard({
         />
       </div>
       {setupPanel}
-      <Dialog open={setupReminderOpen} onOpenChange={setSetupReminderOpen}>
-        <DialogContent
-          showCloseButton={false}
-          overlayClassName="bg-[#0F3036]/30"
-          className="w-[min(440px,92vw)] rounded-[28px] border-0 bg-white p-6 sm:max-w-none"
-        >
-          <DialogClose
-            className="absolute right-6 top-6 inline-flex size-6 items-center justify-center bg-transparent p-0 text-[#5A7B79] opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16B9B3] focus-visible:ring-offset-2"
-            aria-label={t("close")}
-          >
-            <X className="size-4" aria-hidden="true" />
-          </DialogClose>
-          <DialogHeader className="items-start text-left">
-            <DialogTitle className="text-left text-xl font-semibold text-[#0D3036]">
-              {t("cohort_created_setup_title")}
-            </DialogTitle>
-            <DialogDescription className="text-left text-sm text-[#5A7B79]">
-              {t("cohort_created_setup_description")}
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
     </div>
   );
+}
+
+/** 依建立時間新到舊排序；同時間以 id 大者在前 */
+function newestFirst(a: { id: number; createdAt: string }, b: { id: number; createdAt: string }) {
+  return Date.parse(b.createdAt) - Date.parse(a.createdAt) || b.id - a.id;
 }
 
 interface ProgramPanelProps {
@@ -2173,10 +2165,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
   const [newlyCreatedCohortId, setNewlyCreatedCohortId] = useState<number | null>(null);
   const visibleCohorts = cohorts
     ?.filter((cohort) => cohort.status !== "archived")
-    .sort((a, b) => {
-      const newestFirst = Date.parse(b.createdAt) - Date.parse(a.createdAt);
-      return newestFirst || b.id - a.id;
-    });
+    .sort(newestFirst);
   const templatesQuery = useLighthouseTemplates(program.organizationId);
   const templates = templatesQuery.data?.data;
   const [editing, setEditing] = useState(false);
@@ -2526,12 +2515,8 @@ export function ProgramsManager() {
   const [creating, setCreating] = useState(false);
   const [busy, setBusy] = useState(false);
   useLighthouseOrganizationGuard(creating, busy);
-  const [newlyCreatedProgramId, setNewlyCreatedProgramId] = useState<number | null>(null);
-  const visiblePrograms = programs
-    ?.slice()
-    .sort(
-      (a, b) => Number(b.id === newlyCreatedProgramId) - Number(a.id === newlyCreatedProgramId)
-    );
+  // AC-04：新建立的系列排最上方（與場次一致依 createdAt 新到舊，重整後仍成立）
+  const visiblePrograms = programs?.slice().sort(newestFirst);
 
   async function handleCreate(formData: FormData) {
     if (!organization) return;
@@ -2547,7 +2532,6 @@ export function ProgramsManager() {
       return;
     }
     await mutate();
-    setNewlyCreatedProgramId(response.data.data.id);
     setCreating(false);
     toast.success(t("program_created"));
   }
