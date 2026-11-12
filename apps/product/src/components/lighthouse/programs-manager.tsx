@@ -86,6 +86,7 @@ import {
   useLighthouseOrganization,
   useLighthouseOrganizationGuard,
 } from "./lighthouse-organization-context";
+import { newestFirst } from "./newest-first";
 import { useLighthouseErrorMessage } from "./use-lighthouse-error-message";
 
 type ExpandedRepeatGroup = { key: string; sessionIds: string[]; label: string };
@@ -1946,7 +1947,12 @@ function CohortCard({
       programId={programId}
       organizationId={organizationId}
       templates={templates}
-      onSubmit={handleEditSubmit}
+      onSubmit={async (formData, extras) => {
+        const saved = await handleEditSubmit(formData, extras);
+        // 儲存成功後提示已完成任務，不再顯示
+        if (saved) setSetupReminderOpen(false);
+        return saved;
+      }}
       onClose={() => {
         setEditing(false);
         setSetupReminderOpen(false);
@@ -2141,11 +2147,6 @@ function CohortCard({
   );
 }
 
-/** 依建立時間新到舊排序；同時間以 id 大者在前 */
-function newestFirst(a: { id: number; createdAt: string }, b: { id: number; createdAt: string }) {
-  return Date.parse(b.createdAt) - Date.parse(a.createdAt) || b.id - a.id;
-}
-
 interface ProgramPanelProps {
   program: {
     id: number;
@@ -2171,10 +2172,11 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
   const [editing, setEditing] = useState(false);
   const [creatingCohort, setCreatingCohort] = useState(false);
   const [busy, setBusy] = useState(false);
-  useLighthouseOrganizationGuard(editing || creatingCohort, busy);
   const programFormRef = useRef<HTMLFormElement>(null);
   const programSnapshotRef = useRef<string | null>(null);
   const [programHasChanges, setProgramHasChanges] = useState(false);
+  // 系列編輯只在有未儲存變更時攔截離開（AC-02）；建立場次面板沿用一律攔截
+  useLighthouseOrganizationGuard((editing && programHasChanges) || creatingCohort, busy);
   const [confirmProgramClose, setConfirmProgramClose] = useState(false);
 
   const getProgramSnapshot = useCallback(
