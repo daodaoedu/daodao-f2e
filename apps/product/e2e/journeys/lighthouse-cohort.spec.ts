@@ -58,7 +58,27 @@ test("staff creates Lighthouse cohort; learner consent gates joining and cohort 
       headings: await panel.locator("h4").allTextContents(),
       text: (await panel.innerText()).replace(/\s+/g, " ").slice(0, 600),
     });
-    expect(await staff.locator(`#cohort-${id}`).count(), `diag ${diag}`).toBe(1);
+    const listRes = await request.fetch(serviceUrl(urls.api, endpoint), {
+      headers: { Authorization: `Bearer ${token}`, cookie: `auth_token=${token}` },
+    });
+    const listBody = await listRes.text();
+    let listInfo = "";
+    try {
+      const rows = (JSON.parse(listBody).data ?? []) as { id: number }[];
+      const mine = rows.find((row) => row.id === id);
+      listInfo = JSON.stringify({
+        status: listRes.status(),
+        count: rows.length,
+        ids: rows.map((r) => r.id),
+        mine,
+      });
+    } catch {
+      listInfo = `status=${listRes.status()} body=${listBody.slice(0, 300)}`;
+    }
+    expect(
+      await staff.locator(`#cohort-${id}`).count(),
+      `diag ${diag} list ${listInfo.slice(0, 3000)}`
+    ).toBe(1);
     // #521 AC-03：建立後留在管理頁並開啟場次設定，以文字提示接續設定
     await expect(
       panel.getByText("基本資料已建立，請完成其他設定", { exact: true }),
