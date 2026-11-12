@@ -2,6 +2,7 @@ import faviconPng from "@daodao/assets/images/brand/favicon.png";
 import { hasLocale } from "@daodao/i18n";
 import { routing } from "@daodao/i18n/routing";
 import { getMessages, getTranslations, setRequestLocale } from "@daodao/i18n/server";
+import { buildWebsiteIndexingPolicy } from "@daodao/shared/lib/website-seo";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import GlobalProvider from "../global-provider";
@@ -25,6 +26,7 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
       default: t("title"),
     },
     description: t("description"),
+    robots: buildWebsiteIndexingPolicy(process.env.NEXT_PUBLIC_WEBSITE_URL),
     icons: {
       icon: faviconPng.src,
     },

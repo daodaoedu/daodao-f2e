@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { buildWebsiteRobots, buildWebsiteSitemap } from "../website-seo";
+import {
+  buildWebsiteIndexingPolicy,
+  buildWebsiteRobots,
+  buildWebsiteSitemap,
+} from "../website-seo";
 
 describe("buildWebsiteRobots", () => {
   it("正式站允許收錄並指向 sitemap", () => {
@@ -13,19 +17,14 @@ describe("buildWebsiteRobots", () => {
     expect(robots.sitemap).toBe("https://daodao.so/sitemap.xml");
   });
 
-  it("正式站擋掉內部設計系統頁", () => {
-    const [rule] = buildWebsiteRobots("https://daodao.so").rules as { disallow?: string[] }[];
-    expect(rule?.disallow).toEqual(expect.arrayContaining(["/dev/", "/en/dev/"]));
-  });
-
   it.each([
     "https://dev.daodao.so",
     "http://localhost:3000",
     "",
     undefined,
-  ])("非正式站（%s）全站禁止收錄且不提供 sitemap", (url) => {
+  ])("非正式站（%s）允許爬取 noindex 且不提供 sitemap", (url) => {
     const robots = buildWebsiteRobots(url);
-    expect(robots.rules).toEqual([{ userAgent: "*", disallow: "/" }]);
+    expect(robots.rules).toEqual([{ userAgent: "*", allow: "/" }]);
     expect(robots.sitemap).toBeUndefined();
   });
 });
@@ -58,5 +57,27 @@ describe("buildWebsiteSitemap", () => {
 
   it("非正式站回傳空 sitemap", () => {
     expect(buildWebsiteSitemap("https://dev.daodao.so")).toEqual([]);
+  });
+});
+
+describe("indexing policy", () => {
+  it("讓搜尋引擎能爬取 dev 頁面以讀取 noindex", () => {
+    expect(buildWebsiteRobots("https://dev.daodao.so").rules).toEqual([
+      { userAgent: "*", allow: "/" },
+    ]);
+  });
+});
+
+describe("buildWebsiteIndexingPolicy", () => {
+  it("正式站不覆蓋頁面本身的索引設定", () => {
+    expect(buildWebsiteIndexingPolicy("https://daodao.so")).toBeUndefined();
+  });
+  it.each([
+    "https://dev.daodao.so",
+    "http://localhost:3000",
+    "",
+    undefined,
+  ])("非正式環境 %s 不收錄", (url) => {
+    expect(buildWebsiteIndexingPolicy(url)).toEqual({ index: false, follow: false });
   });
 });
