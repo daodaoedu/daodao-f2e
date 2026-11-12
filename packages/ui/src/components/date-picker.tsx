@@ -1,10 +1,8 @@
 "use client";
 
 import { format, isAfter, isBefore, isValid, startOfDay } from "date-fns";
-import { CalendarIcon } from "lucide-react";
 import * as React from "react";
 import { cn } from "../lib/utils";
-import { Button } from "./button";
 import { Calendar } from "./calendar";
 import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
@@ -35,6 +33,7 @@ function isDateInRange(
 }
 
 interface DatePickerProps {
+  "aria-label"?: string;
   value: Date | undefined;
   invalid?: boolean;
   placeholder?: string;
@@ -51,6 +50,7 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
   (
     {
       value,
+      "aria-label": ariaLabel,
       invalid,
       placeholder = "請選擇日期",
       className,
@@ -92,18 +92,15 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
     return (
       <Popover open={disabled ? false : open} onOpenChange={disabled ? undefined : setOpen}>
         <PopoverTrigger asChild>
-          <div className="relative flex gap-2">
+          <div className="relative">
             <Input
               ref={ref}
+              aria-label={ariaLabel}
               value={inputValue}
               placeholder={placeholder}
               disabled={disabled}
               readOnly
-              className={cn(
-                "pr-10 cursor-pointer",
-                className,
-                (invalid || isRangeError) && "border-red"
-              )}
+              className={cn("cursor-pointer", className, (invalid || isRangeError) && "border-red")}
               onBlur={onBlur}
               onKeyDown={(e) => {
                 if (disabled) return;
@@ -113,16 +110,6 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
                 }
               }}
             />
-            <Button
-              id="date-picker"
-              variant="ghost"
-              disabled={disabled}
-              type="button"
-              className="absolute top-1/2 right-2 size-6 -translate-y-1/2 pointer-events-none"
-            >
-              <CalendarIcon className="size-3.5" />
-              <span className="sr-only">Select date</span>
-            </Button>
           </div>
         </PopoverTrigger>
         <PopoverContent

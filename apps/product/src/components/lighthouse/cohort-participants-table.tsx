@@ -3,6 +3,7 @@
 import { type LighthouseParticipantsSort, useLighthouseParticipants } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
+import { DatePicker } from "@daodao/ui/components/date-picker";
 import { Input } from "@daodao/ui/components/input";
 import {
   Select,
@@ -12,7 +13,9 @@ import {
   SelectValue,
 } from "@daodao/ui/components/select";
 import { cn } from "@daodao/ui/lib/utils";
+import { format, parseISO } from "date-fns";
 import { useEffect, useState } from "react";
+import { CohortCheckinDrawer } from "./cohort-checkin-drawer";
 
 interface CohortParticipantsTableProps {
   programId: number;
@@ -32,11 +35,10 @@ type ColumnKey =
   | "startDate"
   | "checkinCount"
   | "commentCount"
-  | "viewCount"
   | "reactionCount";
 type Column = { key: ColumnKey; labelKey: string; sort?: LighthouseParticipantsSort };
 
-/** FR-DB-09：欄位與預設欄寬 120 / 210 / 210 / 110 / 90 / 70 / 70 / 70，最小 60px */
+/** FR-DB-09：欄位與預設欄寬 120 / 210 / 210 / 110 / 90 / 70 / 70，最小 60px */
 const COLUMNS: Column[] = [
   { key: "nickname", labelKey: "col_participant", sort: "nickname" },
   { key: "email", labelKey: "col_email" },
@@ -44,7 +46,6 @@ const COLUMNS: Column[] = [
   { key: "startDate", labelKey: "col_start_date", sort: "startDate" },
   { key: "checkinCount", labelKey: "col_checkins", sort: "checkinCount" },
   { key: "commentCount", labelKey: "col_comments", sort: "commentCount" },
-  { key: "viewCount", labelKey: "col_views", sort: "viewCount" },
   { key: "reactionCount", labelKey: "col_reactions", sort: "reactionCount" },
 ];
 const DEFAULT_WIDTHS: Record<ColumnKey, number> = {
@@ -54,11 +55,16 @@ const DEFAULT_WIDTHS: Record<ColumnKey, number> = {
   startDate: 110,
   checkinCount: 90,
   commentCount: 70,
-  viewCount: 70,
   reactionCount: 70,
 };
 const MIN_WIDTH = 60;
 const ALL = "__all__";
+type CheckinDrawerPerson = {
+  userId: number;
+  nickname: string | null;
+  practiceId: number;
+  practiceTitle: string;
+};
 
 export function CohortParticipantsTable({
   programId,
@@ -77,6 +83,7 @@ export function CohortParticipantsTable({
   const [sort, setSort] = useState<LighthouseParticipantsSort>("nickname");
   const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [widths, setWidths] = useState(DEFAULT_WIDTHS);
+  const [checkinPerson, setCheckinPerson] = useState<CheckinDrawerPerson | null>(null);
 
   // 頂部 chip 切換時同步 dropdown
   useEffect(() => {
@@ -163,21 +170,19 @@ export function CohortParticipantsTable({
             ))}
           </SelectContent>
         </Select>
-        <Input
-          type="date"
+        <DatePicker
           aria-label={t("dashboard_range_from")}
-          value={from || appliedRange?.from || defaultRange.from}
-          onChange={(event) => setFrom(event.target.value)}
+          value={parseISO(from || appliedRange?.from || defaultRange.from)}
+          onChange={(date) => setFrom(date ? format(date, "yyyy-MM-dd") : "")}
           className="h-9 w-[150px] text-xs"
         />
         <span aria-hidden="true" className="text-xs">
           –
         </span>
-        <Input
-          type="date"
+        <DatePicker
           aria-label={t("dashboard_range_to")}
-          value={to || appliedRange?.to || defaultRange.to}
-          onChange={(event) => setTo(event.target.value)}
+          value={parseISO(to || appliedRange?.to || defaultRange.to)}
+          onChange={(date) => setTo(date ? format(date, "yyyy-MM-dd") : "")}
           className="h-9 w-[150px] text-xs"
         />
         <Button
@@ -205,7 +210,11 @@ export function CohortParticipantsTable({
                   <th
                     key={column.key}
                     scope="col"
-                    className="relative px-3 py-1 font-medium"
+                    className={cn(
+                      "relative px-3 py-1 font-medium",
+                      column.key === "nickname" &&
+                        "sticky left-0 z-30 bg-white shadow-[4px_0_6px_-5px_rgba(13,48,54,0.45)]"
+                    )}
                     style={{ width: widths[column.key], minWidth: widths[column.key] }}
                     aria-sort={
                       isSorted ? (order === "asc" ? "ascending" : "descending") : undefined
@@ -250,7 +259,7 @@ export function CohortParticipantsTable({
                 key={`${row.userId}-${row.practiceId}`}
                 className="rounded-2xl bg-white text-[#0D3036] shadow-[0_0_0_1px_#DDEFED]"
               >
-                <td className="truncate rounded-l-2xl px-3 py-3 font-semibold">
+                <td className="sticky left-0 z-20 truncate rounded-l-2xl bg-white px-3 py-3 font-semibold shadow-[4px_0_6px_-5px_rgba(13,48,54,0.45)]">
                   {row.nickname ?? "—"}
                 </td>
                 <td className="truncate px-3 py-3 text-[#456B68]">{row.email ?? "—"}</td>
@@ -258,9 +267,31 @@ export function CohortParticipantsTable({
                 <td className="px-3 py-3 text-[#456B68]">
                   {row.startDate ? row.startDate.slice(0, 10).replaceAll("-", "/") : "—"}
                 </td>
-                <td className="px-3 py-3">{row.checkinCount}</td>
+                <td className="px-3 py-3">
+                  {row.checkinCount > 0 ? (
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="h-auto px-0 text-sm font-medium text-[#0D7773]"
+                      aria-label={t("open_checkin_records", {
+                        name: row.nickname || t("learner"),
+                      })}
+                      onClick={() =>
+                        setCheckinPerson({
+                          userId: row.userId,
+                          nickname: row.nickname,
+                          practiceId: row.practiceId,
+                          practiceTitle: row.practiceTitle,
+                        })
+                      }
+                    >
+                      {row.checkinCount}
+                    </Button>
+                  ) : (
+                    row.checkinCount
+                  )}
+                </td>
                 <td className="px-3 py-3">{row.commentCount}</td>
-                <td className="px-3 py-3">{row.viewCount}</td>
                 <td className="rounded-r-2xl px-3 py-3">{row.reactionCount}</td>
               </tr>
             ))}
@@ -273,6 +304,12 @@ export function CohortParticipantsTable({
           <p className="py-6 text-center text-sm text-[#78928F]">{t("participants_empty")}</p>
         )}
       </div>
+      <CohortCheckinDrawer
+        programId={programId}
+        cohortId={cohortId}
+        person={checkinPerson}
+        onClose={() => setCheckinPerson(null)}
+      />
     </section>
   );
 }

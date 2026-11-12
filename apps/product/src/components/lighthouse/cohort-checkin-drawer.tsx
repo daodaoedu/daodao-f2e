@@ -2,6 +2,7 @@
 
 import { useLighthouseParticipantCheckins } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
+import { Link } from "@daodao/i18n/navigation";
 import {
   Sheet,
   SheetContent,
@@ -38,6 +39,7 @@ export function CohortCheckinDrawer({
     person?.practiceId
   );
   const data = query.data?.data;
+  const latestCheckinId = data?.items[0]?.id;
 
   return (
     <Sheet open={person !== null} onOpenChange={(open) => !open && onClose()}>
@@ -49,9 +51,21 @@ export function CohortCheckinDrawer({
           <SheetTitle className="text-left text-xl font-semibold text-[#0D3036]">
             {person?.nickname || t("learner")}
           </SheetTitle>
-          <SheetDescription className="text-xs text-[#5A7B79]">
-            {data?.practice.title ?? person?.practiceTitle}
-          </SheetDescription>
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <SheetDescription className="text-xs text-[#5A7B79]">
+              {data?.practice.title ?? person?.practiceTitle}
+            </SheetDescription>
+            {data?.practice.externalId && latestCheckinId && (
+              <Link
+                href={`/practices/${data.practice.externalId}/check-ins/${latestCheckinId}`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-8 items-center text-xs font-semibold text-[#0D7773] underline underline-offset-4 hover:text-[#0D5B59]"
+              >
+                {t("checkin_open_for_comment")}
+              </Link>
+            )}
+          </div>
         </SheetHeader>
         <div className="px-5 py-4">
           {query.isLoading && <p className="text-sm text-[#78928F]">{t("loading")}</p>}

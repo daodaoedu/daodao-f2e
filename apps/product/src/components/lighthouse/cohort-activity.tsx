@@ -8,16 +8,14 @@ import {
   useLighthouseActivities,
 } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
-import {
-  Tooltip,
-  TooltipPanel,
-  TooltipTrigger,
-} from "@daodao/ui/components/animate-ui/components/base/tooltip";
 import { Button } from "@daodao/ui/components/button";
+import { DatePicker } from "@daodao/ui/components/date-picker";
 import { Input } from "@daodao/ui/components/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@daodao/ui/components/popover";
 import { cn } from "@daodao/ui/lib/utils";
+import { format, parseISO } from "date-fns";
 import { Info, Search } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { type PointerEvent as ReactPointerEvent, useEffect, useMemo, useState } from "react";
 import {
   ActivityTypeBadge,
   DEFAULT_ACTIVITY_TIMEZONE,
@@ -33,7 +31,7 @@ interface CohortActivityProps {
 }
 
 const PAGE_SIZE = 50;
-const ROW_GRID = "grid-cols-[86px_96px_116px_minmax(150px,1fr)_minmax(280px,1.6fr)]";
+const ROW_GRID = "grid-cols-[minmax(120px,0.8fr)_86px_96px_116px_minmax(280px,1.6fr)]";
 
 /**
  * 場次「動態」（FRD frd-activity-outcome-org.md §3.1）：
@@ -50,6 +48,7 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
   const [hasText, setHasText] = useState(false);
   const [offset, setOffset] = useState(0);
   const [detail, setDetail] = useState<LighthouseActivityItem | null>(null);
+  const [nameColumnWidth, setNameColumnWidth] = useState(120);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setDebouncedKeyword(keyword.trim()), 250);
@@ -139,6 +138,30 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
   const max = data?.range.max;
   const total = data?.total ?? 0;
   const pageEnd = Math.min(offset + PAGE_SIZE, total);
+  const activeFrom = range.from ?? data?.range.from;
+  const activeTo = range.to ?? data?.range.to;
+
+  function startNameResize(event: ReactPointerEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    const startX = event.clientX;
+    const startWidth = nameColumnWidth;
+    const move = (moveEvent: PointerEvent) =>
+      setNameColumnWidth(Math.max(60, startWidth + moveEvent.clientX - startX));
+    const stop = () => {
+      document.removeEventListener("pointermove", move);
+      document.removeEventListener("pointerup", stop);
+      document.removeEventListener("pointercancel", stop);
+    };
+    document.addEventListener("pointermove", move);
+    document.addEventListener("pointerup", stop);
+    document.addEventListener("pointercancel", stop);
+  }
+
+  function resizeNameByKeyboard(delta: number) {
+    setNameColumnWidth((current) => Math.max(60, current + delta));
+  }
+
+  const gridTemplateColumns = `${nameColumnWidth}px 86px 96px 116px minmax(280px, 1.6fr)`;
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-5 px-5 py-8 md:px-10">
@@ -176,27 +199,27 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
             >
               {card.label}
               {card.hint && (
-                <Tooltip>
-                  <TooltipTrigger
-                    render={
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="size-5 rounded-full hover:bg-transparent"
-                        aria-label={card.hint}
-                      >
-                        <Info className="size-3.5" aria-hidden="true" />
-                      </Button>
-                    }
-                  />
-                  <TooltipPanel
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-7 shrink-0 rounded-full text-[#0D7773] hover:bg-[#EAF7F5]"
+                      aria-label={card.hint}
+                    >
+                      <Info className="size-3.5" aria-hidden="true" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
                     side="top"
-                    className="max-w-[260px] rounded-lg bg-[#0D3036] px-3 py-2 text-xs text-white"
+                    align="start"
+                    sideOffset={6}
+                    className="w-72 max-w-[calc(100vw-2rem)] rounded-lg border-[#CDEBE8] bg-[#0D3036] px-3 py-2 text-xs leading-relaxed text-white shadow-md"
                   >
                     {card.hint}
-                  </TooltipPanel>
-                </Tooltip>
+                  </PopoverContent>
+                </Popover>
               )}
             </p>
           </div>
@@ -221,34 +244,38 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
             className="h-[38px] rounded-full pl-9"
           />
         </div>
-        <div className="flex shrink-0 items-center gap-1 rounded-full border border-[#CDEBE8] px-2.5 py-1 text-xs text-[#456B68]">
-          <span>{t("activity_period")}</span>
-          <input
-            type="date"
-            value={range.from ?? data?.range.from ?? ""}
-            min={min}
-            max={max}
-            title={t("activity_start_hint")}
+        <fieldset
+          aria-label={t("activity_period")}
+          className="flex shrink-0 items-center gap-1 rounded-full border border-[#CDEBE8] px-2.5 py-1 text-xs text-[#456B68]"
+        >
+          <DatePicker
+            value={activeFrom ? parseISO(activeFrom) : undefined}
+            minDate={min ? parseISO(min) : undefined}
+            maxDate={max ? parseISO(max) : undefined}
             aria-label={t("activity_start_label")}
-            onChange={(event) =>
-              setRange((current) => ({ ...current, from: event.target.value || undefined }))
+            onChange={(date) =>
+              setRange((current) => ({
+                ...current,
+                from: date ? format(date, "yyyy-MM-dd") : undefined,
+              }))
             }
-            className="h-7 rounded-md border border-transparent bg-transparent px-1 text-xs"
+            className="h-7 w-[124px] rounded-md border-transparent bg-transparent px-1 text-xs shadow-none"
           />
           <span aria-hidden="true">–</span>
-          <input
-            type="date"
-            value={range.to ?? data?.range.to ?? ""}
-            min={min}
-            max={max}
-            title={t("activity_end_hint")}
+          <DatePicker
+            value={activeTo ? parseISO(activeTo) : undefined}
+            minDate={min ? parseISO(min) : undefined}
+            maxDate={max ? parseISO(max) : undefined}
             aria-label={t("activity_end_label")}
-            onChange={(event) =>
-              setRange((current) => ({ ...current, to: event.target.value || undefined }))
+            onChange={(date) =>
+              setRange((current) => ({
+                ...current,
+                to: date ? format(date, "yyyy-MM-dd") : undefined,
+              }))
             }
-            className="h-7 rounded-md border border-transparent bg-transparent px-1 text-xs"
+            className="h-7 w-[124px] rounded-md border-transparent bg-transparent px-1 text-xs shadow-none"
           />
-        </div>
+        </fieldset>
         <select
           value={type}
           onChange={(event) => setType(event.target.value as LighthouseActivityType | "")}
@@ -302,16 +329,29 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
           </p>
         </div>
         <div className="mt-4 overflow-x-auto rounded-b-3xl">
-          <div className="min-w-[760px]">
+          <div className="min-w-[800px]">
             <div
               className={cn(
                 "grid gap-3 border-b border-[#EEF6F5] bg-[#F7FCFB] px-[18px] py-2.5 text-[11px] font-medium text-[#78928F]",
                 ROW_GRID
               )}
+              style={{ gridTemplateColumns }}
             >
+              <span className="sticky left-0 z-20 bg-[#F7FCFB] shadow-[4px_0_6px_-5px_rgba(13,48,54,0.45)]">
+                {t("col_member")}
+                <button
+                  type="button"
+                  aria-label={t("resize_column", { column: t("col_member") })}
+                  className="absolute top-0 right-0 h-full w-2 touch-none cursor-col-resize border-r border-[#DDEFED] hover:border-[#16B9B3] focus-visible:outline-2 focus-visible:outline-logo-cyan"
+                  onPointerDown={startNameResize}
+                  onKeyDown={(event) => {
+                    if (event.key === "ArrowLeft") resizeNameByKeyboard(-10);
+                    if (event.key === "ArrowRight") resizeNameByKeyboard(10);
+                  }}
+                />
+              </span>
               <span>{t("col_time")}</span>
               <span>{t("col_type")}</span>
-              <span>{t("col_member")}</span>
               <span>{t("col_practice")}</span>
               <span>{t("col_summary")}</span>
             </div>
@@ -336,18 +376,20 @@ export function CohortActivity({ programId, cohortId }: CohortActivityProps) {
                     key={`${item.type}-${item.id}`}
                     className={cn(
                       "grid items-center gap-3 border-b border-[#EEF6F5] px-[18px] py-3.5 text-[13px] last:border-b-0",
-                      ROW_GRID
+                      ROW_GRID,
+                      "bg-white"
                     )}
+                    style={{ gridTemplateColumns }}
                   >
+                    <strong className="sticky left-0 z-10 truncate bg-inherit font-bold text-[#0D3036] shadow-[4px_0_6px_-5px_rgba(13,48,54,0.45)]">
+                      {item.member.nickname ?? t("learner")}
+                    </strong>
                     <span className="font-mono text-[#78928F]">
                       {formatActivityTime(item.occurredAt, timezone)}
                     </span>
                     <span>
                       <ActivityTypeBadge item={item} />
                     </span>
-                    <strong className="truncate font-bold text-[#0D3036]">
-                      {item.member.nickname ?? t("learner")}
-                    </strong>
                     <span className="truncate text-[#0D5B59]">{item.practice.title}</span>
                     <button
                       type="button"
