@@ -56,7 +56,7 @@ export function BlogShell({
             >
               ◐
             </Button>
-            <a className="blog-join" href="https://tally.so/r/44WXdk">
+            <a className="blog-join" href="https://tally.so/r/44WXdk" data-blog-cta="beta-interest">
               {t.apply}
             </a>
           </div>

@@ -581,6 +581,15 @@ importers:
       '@daodao/config':
         specifier: workspace:*
         version: link:../config
+      '@daodao/shared':
+        specifier: workspace:*
+        version: link:../shared
+      date-fns:
+        specifier: 'catalog:'
+        version: 3.6.0
+      zod:
+        specifier: 'catalog:'
+        version: 3.25.76
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -594,6 +603,9 @@ importers:
       react:
         specifier: 'catalog:'
         version: 19.2.3
+      tsx:
+        specifier: ^4.19.2
+        version: 4.21.0
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
