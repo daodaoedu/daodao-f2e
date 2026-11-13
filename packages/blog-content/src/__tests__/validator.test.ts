@@ -2,8 +2,9 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
-import { validateRepository } from "../index.js";
+import { getArticleHeadings, validateRepository } from "../index";
 
 const roots: string[] = [];
 const authors = [
@@ -268,10 +269,48 @@ describe("shared bilingual content validation", () => {
     await replace(root, "  decorative: true", "");
     expect((await validateRepository(root, { mode: "draft" })).ok).toBe(false);
   });
+  it.each([
+    "/en/blog/no-such-article",
+    "#missing",
+    "/blog/sample#missing",
+    "/unknown-page",
+  ])("rejects unresolved internal links: %s", async (link) => {
+    const root = await fixture();
+    await replace(root, "Content.", `[Link](${link})`);
+    const result = await validateRepository(root, { mode: "draft" });
+    expect(result.ok).toBe(false);
+    expect(
+      result.errors.some(
+        (error) => error.file === "articles/en/sample.md" && /Unresolved/.test(error.message)
+      )
+    ).toBe(true);
+  });
+  it("resolves same and cross-language article fragments, main-site pages and duplicate Unicode headings", async () => {
+    const root = await fixture();
+    const headings = getArticleHeadings("## 你好 **世界**\n\n## 你好 **世界**\n");
+    expect(headings).toEqual([
+      { depth: 2, id: "你好-世界", text: "你好 世界" },
+      { depth: 2, id: "你好-世界-1", text: "你好 世界" },
+    ]);
+    await replace(
+      root,
+      "Content.",
+      "[Same](#heading) [Cross](/blog/sample#heading) [About](/about) [English](/en/about) [Absolute](https://daodao.so/en/blog/sample-en#heading)"
+    );
+    expect((await validateRepository(root, { mode: "draft" })).ok).toBe(true);
+  });
+  it("reports malformed registry files at the actionable filename", async () => {
+    const root = await fixture();
+    await writeFile(path.join(root, "authors.json"), "{");
+    const result = await validateRepository(root, { mode: "draft" });
+    expect(result.errors[0]?.file).toBe("authors.json");
+    expect(result.articles).toEqual([]);
+  });
   it("CLI uses the same validator and fails closed without private approval evidence", async () => {
     const root = await fixture();
-    const cli = path.resolve("src/cli.ts");
-    const executable = path.resolve("node_modules/.bin/tsx");
+    const packageRoot = fileURLToPath(new URL("../../", import.meta.url));
+    const cli = path.join(packageRoot, "src/cli.ts");
+    const executable = path.join(packageRoot, "node_modules/.bin/tsx");
     const draft = JSON.parse(
       execFileSync(executable, [cli, "--root", root, "--mode", "draft"], { encoding: "utf8" })
     );

@@ -6,6 +6,7 @@ import type { Nodes } from "mdast";
 import { fromMarkdown } from "mdast-util-from-markdown";
 import { parseDocument } from "yaml";
 import { z } from "zod";
+import { getArticleHeadings } from "./markdown";
 import {
   type ApprovalType,
   type ArticleType,
@@ -16,9 +17,10 @@ import {
   ctaTargets,
   topicsSchema,
   webUrlSchema,
-} from "./schema.js";
+} from "./schema";
 
-export * from "./schema.js";
+export * from "./markdown";
+export * from "./schema";
 
 export type ValidationIssueType = { file: string; message: string };
 export type ValidatedArticleType = {
@@ -97,6 +99,7 @@ function bodyReferences(body: string) {
   const definitions = new Map<string, string>();
   const images: string[] = [];
   const links: string[] = [];
+  const internalLinks: string[] = [];
   walk(root, (node) => {
     if (node.type === "definition") {
       if (definitions.has(node.identifier))
@@ -116,16 +119,16 @@ function bodyReferences(body: string) {
     if (node.type === "link" || node.type === "linkReference") {
       const url = node.type === "link" ? node.url : definitions.get(node.identifier);
       if (!url) throw new Error("Link reference has no definition");
-      if (
-        !url.startsWith("#") &&
-        !/^\/(?:en\/)?blog(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)?\/?(?:#[a-zA-Z0-9_-]+)?$/.test(url)
-      ) {
+      if (url.startsWith("#") || (url.startsWith("/") && !url.startsWith("//"))) {
+        internalLinks.push(url);
+      } else {
         webUrlSchema.parse(url);
-        links.push(url);
+        if (new URL(url).origin === "https://daodao.so") internalLinks.push(url);
+        else links.push(url);
       }
     }
   });
-  return { images, links };
+  return { images, links, internalLinks };
 }
 
 /** Read-only validation. A valid draft is never proof of human approval or deployment. */
@@ -146,19 +149,24 @@ export async function validateRepository(
   const result: ValidationResultType = { ok: false, mode, articles: [], digests: {}, errors: [] };
   const fail = (file: string, error: unknown) =>
     result.errors.push({ file, message: error instanceof Error ? error.message : String(error) });
+  let sourceFile = rootPath;
   try {
     const root = await realpath(rootPath);
+    sourceFile = "authors.json";
     const authorBytes = await readConfined(root, "authors.json");
     const authors = authorsSchema.parse(JSON.parse(authorBytes.toString("utf8")));
     const authorIds = new Set(authors.map((author) => author.id));
     if (authorIds.size !== authors.length)
       throw new Error("authors.json contains duplicate author ids");
+    sourceFile = "topics.json";
     const topicBytes = await readConfined(root, "topics.json");
     const topics = topicsSchema.parse(JSON.parse(topicBytes.toString("utf8")));
     const topicIds = new Set(topics.map((topic) => topic.id));
     if (topicIds.size !== topics.length)
       throw new Error("topics.json contains duplicate topic ids");
+    sourceFile = "publishedBaseline";
     const baseline = baselineSchema.parse(options.publishedBaseline ?? {});
+    sourceFile = "approvalEvidence";
     const approvals = approvalSchema.parse(options.approvals ?? []);
     const approvalIds = new Set(approvals.map((approval) => approval.id));
     if (approvalIds.size !== approvals.length) throw new Error("Duplicate approval ids");
@@ -168,6 +176,7 @@ export async function validateRepository(
     >();
     const routes = new Set<string>();
     const languages = new Set<string>();
+    sourceFile = "articles/";
     const files = await markdownFiles(root);
     if (!files.length)
       throw new Error("articles/ must contain at least one bilingual article pair");
@@ -236,6 +245,54 @@ export async function validateRepository(
         fail(file, error);
       }
     }
+    const articleRoutes = new Map(
+      result.articles.map((article) => [
+        `${article.metadata.lang === "en" ? "/en" : ""}/blog/${article.metadata.slug}`,
+        article,
+      ])
+    );
+    const sitePaths = [
+      "",
+      "/about",
+      "/quiz",
+      "/action-maker",
+      "/learning-marathons/2025S1",
+      "/terms/ipr",
+      "/terms/service",
+      "/terms/privacy-policy",
+    ];
+    const knownPages = new Set(sitePaths.flatMap((route) => [route || "/", `/en${route}`]));
+    for (const article of result.articles) {
+      const currentRoute = `${article.metadata.lang === "en" ? "/en" : ""}/blog/${article.metadata.slug}`;
+      for (const link of bodyReferences(article.body).internalLinks) {
+        try {
+          const url = new URL(link, `https://daodao.so${currentRoute}`);
+          if (url.origin !== "https://daodao.so") throw new Error(`Unsafe internal link: ${link}`);
+          const targetPath = decodeURIComponent(url.pathname).replace(/\/$/, "") || "/";
+          const target = articleRoutes.get(targetPath);
+          const isBlog = /^\/(?:en\/)?blog(?:\/|$)/.test(targetPath);
+          if (
+            !target &&
+            targetPath !== "/blog" &&
+            targetPath !== "/en/blog" &&
+            !knownPages.has(targetPath)
+          ) {
+            throw new Error(`Unresolved internal link: ${link}`);
+          }
+          if (url.hash && isBlog) {
+            const fragment = decodeURIComponent(url.hash.slice(1));
+            if (
+              !target ||
+              !getArticleHeadings(target.body).some((heading) => heading.id === fragment)
+            ) {
+              throw new Error(`Unresolved article fragment: ${link}`);
+            }
+          }
+        } catch (error) {
+          fail(article.file, error);
+        }
+      }
+    }
     for (const [id, entries] of pairs) {
       if (
         entries.length !== 2 ||
@@ -276,7 +333,7 @@ export async function validateRepository(
       }
     }
   } catch (error) {
-    fail(rootPath, error);
+    fail(sourceFile, error);
   }
   result.ok = result.errors.length === 0;
   if (!result.ok) {

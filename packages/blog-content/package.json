@@ -14,10 +14,11 @@
   },
   "dependencies": {
     "date-fns": "catalog:",
+    "github-slugger": "2.0.0",
+    "image-size": "2.1.0",
     "mdast-util-from-markdown": "2.0.2",
     "yaml": "2.8.2",
-    "zod": "catalog:",
-    "image-size": "2.1.0"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@daodao/config": "workspace:*",

@@ -1,7 +1,7 @@
 import { readFile, realpath } from "node:fs/promises";
 import path from "node:path";
 import { parseArgs } from "node:util";
-import { type ApprovalType, approvalSchema, baselineSchema, validateRepository } from "./index.js";
+import { type ApprovalType, approvalSchema, baselineSchema, validateRepository } from "./index";
 
 try {
   const { values } = parseArgs({
