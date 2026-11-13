@@ -214,6 +214,84 @@ class BlogDevPreviewTests(unittest.TestCase):
         linked = Path(self.read_env()["BLOG_CONTENT_DIR"]) / "images/linked.png"
         self.assertTrue(linked.is_symlink())
 
+    def test_preview_wiring_changes_trigger_a_normal_website_build(self):
+        workflow = yaml.safe_load(WORKFLOW.read_text())
+        script = next(
+            step["run"]
+            for step in workflow["jobs"]["detect-changes"]["steps"]
+            if step.get("name") == "Detect file changes"
+        )
+        for relative, expected in (
+            (
+                ".github/scripts/blog-dev-preview.py",
+                {"website": "true", "product": "false"},
+            ),
+            (
+                ".github/workflows/linode-cd.yml",
+                {"website": "true", "product": "false"},
+            ),
+            (".dockerignore", {"website": "true", "product": "false"}),
+            ("docs/preview.md", {"website": "false", "product": "false"}),
+        ):
+            with self.subTest(relative=relative):
+                repository = self.root / ("changes-" + relative.replace("/", "_"))
+                repository.mkdir()
+
+                def git(*args, working_directory=repository):
+                    return subprocess.run(
+                        [
+                            "git",
+                            "-c",
+                            "core.hooksPath=/dev/null",
+                            "-c",
+                            "user.name=Preview Test",
+                            "-c",
+                            "user.email=preview@example.invalid",
+                            "-c",
+                            "commit.gpgsign=false",
+                            "-C",
+                            str(working_directory),
+                            *args,
+                        ],
+                        capture_output=True,
+                        text=True,
+                        check=True,
+                    ).stdout.strip()
+
+                git("init", "-q")
+                changed = repository / relative
+                changed.parent.mkdir(parents=True, exist_ok=True)
+                changed.write_text("before")
+                git("add", relative)
+                git("commit", "-qm", "before")
+                git("update-ref", "refs/deploy/dev", git("rev-parse", "HEAD"))
+                changed.write_text("after")
+                git("add", relative)
+                git("commit", "-qm", "after")
+                output = repository / "github-output"
+                result = subprocess.run(
+                    ["bash", "-e", "-c", script],
+                    cwd=repository,
+                    env={
+                        **os.environ,
+                        "BRANCH_NAME": "dev",
+                        "EVENT_NAME": "workflow_run",
+                        "APP_INPUT": "",
+                        "GITHUB_OUTPUT": str(output),
+                    },
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                    timeout=10,
+                )
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(
+                    dict(
+                        line.split("=", 1) for line in output.read_text().splitlines()
+                    ),
+                    expected,
+                )
+
     def test_workflow_uses_guarded_official_checkout_before_build(self):
         workflow = yaml.safe_load(WORKFLOW.read_text())
         steps = workflow["jobs"]["build-website"]["steps"]

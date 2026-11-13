@@ -120,7 +120,7 @@ jobs:
           echo "$CHANGED_FILES"
 
           # 檢查是否需要 build website
-          if echo "$CHANGED_FILES" | grep -qE '^(apps/website/|packages/|turbo.json|package.json|pnpm-lock.yaml|pnpm-workspace.yaml|docker/)'; then
+          if echo "$CHANGED_FILES" | grep -qE '^(apps/website/|packages/|turbo.json|package.json|pnpm-lock.yaml|pnpm-workspace.yaml|docker/|\.dockerignore$|\.github/workflows/linode-cd\.yml$|\.github/scripts/blog-dev-preview\.py$)'; then
             echo "website=true" >> $GITHUB_OUTPUT
             echo "✅ Website needs rebuild"
           else
