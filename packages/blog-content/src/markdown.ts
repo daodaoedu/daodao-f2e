@@ -1,4 +1,4 @@
-import GithubSlugger from "github-slugger";
+import GithubSlugger, { slug } from "github-slugger";
 import type { Nodes } from "mdast";
 import { fromMarkdown } from "mdast-util-from-markdown";
 
@@ -18,7 +18,7 @@ export function getArticleHeadings(body: string): ArticleHeadingType[] {
   const visit = (node: Nodes) => {
     if (node.type === "heading" && (node.depth === 2 || node.depth === 3)) {
       const text = headingText(node);
-      headings.push({ depth: node.depth, id: slugger.slug(text), text });
+      headings.push({ depth: node.depth, id: slugger.slug(slug(text) ? text : "section"), text });
     }
     if ("children" in node) for (const child of node.children) visit(child);
   };

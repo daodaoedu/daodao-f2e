@@ -123,7 +123,7 @@ function bodyReferences(body: string) {
         internalLinks.push(url);
       } else {
         webUrlSchema.parse(url);
-        if (new URL(url).origin === "https://daodao.so") internalLinks.push(url);
+        if (new URL(url).hostname === "daodao.so") internalLinks.push(url);
         else links.push(url);
       }
     }

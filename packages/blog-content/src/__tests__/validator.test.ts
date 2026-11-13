@@ -306,6 +306,18 @@ describe("shared bilingual content validation", () => {
     expect(result.errors[0]?.file).toBe("authors.json");
     expect(result.articles).toEqual([]);
   });
+  it("rejects noncanonical same-host HTTP links rather than treating them as external sources", async () => {
+    const root = await fixture();
+    const link = "http://daodao.so/en/blog/no-such-article";
+    await replace(root, "sources: []", `sources: [${link}]`);
+    await replace(root, "Content.", `[Missing](${link})`);
+    expect((await validateRepository(root, { mode: "draft" })).ok).toBe(false);
+  });
+  it("gives punctuation and emoji headings nonempty anchors without collisions with real section headings", () => {
+    expect(
+      getArticleHeadings("## 😀\n\n## !!!\n\n## Section\n").map((heading) => heading.id)
+    ).toEqual(["section", "section-1", "section-2"]);
+  });
   it("CLI uses the same validator and fails closed without private approval evidence", async () => {
     const root = await fixture();
     const packageRoot = fileURLToPath(new URL("../../", import.meta.url));
