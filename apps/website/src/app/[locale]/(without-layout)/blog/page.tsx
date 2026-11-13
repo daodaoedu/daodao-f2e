@@ -1,9 +1,15 @@
+import { getEnv } from "@daodao/config";
 import { loadBlog } from "@/components/blog/content";
 import { blogLocale } from "@/components/blog/copy";
 import { BlogList } from "@/components/blog/pages";
-export async function generateMetadata() {
-  const data = await loadBlog();
-  return { title: "Journal", ...(data.preview ? { robots: { index: false, follow: false } } : {}) };
+import { buildBlogCollectionMetadata } from "@/components/blog/seo";
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  return buildBlogCollectionMetadata(
+    await loadBlog(),
+    blogLocale(locale),
+    getEnv("NEXT_PUBLIC_WEBSITE_URL")
+  );
 }
 export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
