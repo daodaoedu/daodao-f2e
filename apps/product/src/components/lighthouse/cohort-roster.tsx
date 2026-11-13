@@ -264,6 +264,9 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
           <h2 id="roster-invite-title" className="text-xl font-semibold">
             {t("invite_people")}
           </h2>
+          <p className="mt-3 text-sm leading-6 text-[#5A7B79]">
+            {t("roster_google_account_reminder")}
+          </p>
           <label htmlFor="invite-emails" className="mt-5 grid gap-2 text-sm font-medium">
             {t("email_list")}
             <Textarea

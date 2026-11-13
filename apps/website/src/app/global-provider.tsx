@@ -25,7 +25,7 @@ function GlobalProvider({ head, locale, children, messages }: GlobalProviderProp
     >
       {head}
       <body>
-        <AnalyticsScripts />
+        <AnalyticsScripts disableSessionReplay websitePrivacy />
         <NextIntlClientProvider messages={messages} locale={locale} timeZone="Asia/Taipei">
           <NavigationBlockerProvider>
             <DialogManagerProvider>
