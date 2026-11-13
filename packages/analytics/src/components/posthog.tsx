@@ -1,6 +1,7 @@
 "use client";
 
 import Script from "next/script";
+import { sanitizeBlogAnalyticsEvent } from "../lib/blog-events";
 import { getAnalyticsConfig } from "../lib/config";
 
 declare global {
@@ -38,6 +39,7 @@ export function PostHog() {
           person_profiles: 'identified_only',
           capture_pageview: true,
           capture_pageleave: true,
+          before_send: ${sanitizeBlogAnalyticsEvent.toString()},
         });
       `}
     </Script>

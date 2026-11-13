@@ -19,6 +19,18 @@ export {
   posthogReset,
   posthogSetPersonProperties,
 } from "./components/posthog";
+export {
+  activationEventSchema,
+  activationInputSchema,
+  evaluateLeaderActivation,
+} from "./lib/blog-activation";
 
+export {
+  type BlogInteractionType,
+  blogInteractionSchema,
+  classifyBlogSource,
+  createBlogTracker,
+  sanitizeBlogAnalyticsEvent,
+} from "./lib/blog-events";
 // Config
 export { type AnalyticsConfig, getAnalyticsConfig } from "./lib/config";

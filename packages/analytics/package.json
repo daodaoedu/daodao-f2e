@@ -19,17 +19,22 @@
     "check": "biome check .",
     "check:fix": "biome check --write .",
     "typecheck": "tsc --noEmit",
-    "clean": "pnpm dlx rimraf dist node_modules"
+    "clean": "pnpm dlx rimraf dist node_modules",
+    "test": "vitest run",
+    "activation:report": "tsx scripts/activation-report.ts"
   },
   "dependencies": {
-    "@daodao/config": "workspace:*"
+    "@daodao/config": "workspace:*",
+    "date-fns": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "tsx": "^4.19.2"
   },
   "peerDependencies": {
     "next": ">=14.0.0",
