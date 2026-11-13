@@ -41,8 +41,11 @@ Public `/blog-release.json` identifies source pair and baseline hash. `/blog-pub
 For a controlled local adapter, run:
 
 ```sh
-python3 scripts/blog-release.py serve --store /path/to/store --host 127.0.0.1 --port 8536
+python3 scripts/blog-release.py serve --store /path/to/store --host 127.0.0.1 --port 8536 \
+  --tls-cert /private/server-cert.pem --tls-key /private/server-key.pem
 ```
+
+The `serve` command requires caller-provided `--tls-cert /private/server-cert.pem --tls-key /private/server-key.pem` and serves HTTPS on literal `127.0.0.1` only, with TLS 1.2 or newer. There is no plaintext fallback; missing, invalid or mismatched credentials stop before binding. Keep the private key outside the release store/web root, and configure clients to trust the issuing CA instead of disabling certificate verification. The short-lived internal candidate smoke server remains loopback-only and does not expose the persistent serving endpoint.
 
 This Python static server is a test/readback adapter, **not evidence of a cloud development deployment**. A real development host must serve `store/current/site` while following the current symlink for each request. Mount the store parent read-only into the web server, not the resolved symlink target (a mount of the target will stay on the old release). Keep logs, source workspaces and private inputs outside the web root. Existing Linode containers are image-backed and have no verified release mount; no such mount or self-hosted runner was installed by this PR.
 

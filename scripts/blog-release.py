@@ -8,6 +8,7 @@ import json
 import os
 import re
 import shutil
+import ssl
 import stat
 import subprocess
 import sys
@@ -1445,6 +1446,8 @@ def main():
     serve = commands.add_parser("serve")
     serve.add_argument("--store", type=Path, required=True)
     serve.add_argument("--port", type=int, default=8536)
+    serve.add_argument("--tls-cert", type=Path, required=True)
+    serve.add_argument("--tls-key", type=Path, required=True)
     serve.add_argument("--host", choices=("127.0.0.1",), default="127.0.0.1")
     args = parser.parse_args()
     try:
@@ -1457,16 +1460,20 @@ def main():
         elif args.operation == "fetch-baseline":
             result = fetch_baseline(args)
         else:
+            tls = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+            tls.minimum_version = ssl.TLSVersion.TLSv1_2
+            tls.load_cert_chain(args.tls_cert, args.tls_key)
             server = ThreadingHTTPServer(
                 ("127.0.0.1", args.port),
                 website_handler(lambda: args.store / "current/site"),
             )
+            server.socket = tls.wrap_socket(server.socket, server_side=True)
             print(
                 json.dumps(
                     {
                         "stage": "serving",
                         "port": server.server_port,
-                        "adapter": "filesystem-http",
+                        "adapter": "filesystem-https",
                     }
                 ),
                 flush=True,

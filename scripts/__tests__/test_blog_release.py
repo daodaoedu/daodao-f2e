@@ -3,6 +3,8 @@ import hashlib
 import importlib.util
 import json
 import os
+import select
+import ssl
 import subprocess
 import sys
 import tempfile
@@ -13,6 +15,7 @@ from http.server import BaseHTTPRequestHandler
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
+from urllib.error import URLError
 from urllib.request import urlopen
 
 SCRIPT = Path(__file__).resolve().parents[1] / "blog-release.py"
@@ -222,6 +225,126 @@ class LocalReleaseTests(unittest.TestCase):
                 )
                 self.assertEqual(result.returncode, 2)
                 self.assertIn("invalid choice", result.stderr)
+
+    def test_controlled_static_server_requires_explicit_tls_credentials(self):
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(SCRIPT),
+                "serve",
+                "--store",
+                str(self.store),
+                "--port",
+                "0",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("--tls-cert", result.stderr)
+        self.assertIn("--tls-key", result.stderr)
+
+    def test_controlled_static_server_uses_verified_tls_and_refuses_plain_http(self):
+        cert, key = self.root / "test-cert.pem", self.root / "test-key.pem"
+        subprocess.run(
+            [
+                "openssl",
+                "req",
+                "-x509",
+                "-newkey",
+                "rsa:2048",
+                "-nodes",
+                "-keyout",
+                str(key),
+                "-out",
+                str(cert),
+                "-days",
+                "1",
+                "-subj",
+                "/CN=127.0.0.1",
+                "-addext",
+                "subjectAltName=IP:127.0.0.1",
+            ],
+            capture_output=True,
+            check=True,
+            timeout=15,
+        )
+        site = self.store / "current/site"
+        site.mkdir(parents=True)
+        (site / "blog.html").write_bytes(b"Encrypted article")
+        command = [
+            sys.executable,
+            str(SCRIPT),
+            "serve",
+            "--store",
+            str(self.store),
+            "--port",
+            "0",
+            "--tls-cert",
+            str(cert),
+            "--tls-key",
+            str(key),
+        ]
+        server = subprocess.Popen(
+            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+        )
+        try:
+            self.assertTrue(
+                select.select([server.stdout], [], [], 5)[0],
+                "TLS server readiness timed out",
+            )
+            ready = json.loads(server.stdout.readline())
+            origin = "https://127.0.0.1:" + str(ready["port"])
+            verified = ssl.create_default_context(cafile=str(cert))
+            with urlopen(origin + "/blog", context=verified, timeout=3) as response:
+                self.assertEqual(response.read(), b"Encrypted article")
+                self.assertEqual(response.headers["Content-Type"], "text/html")
+            with self.assertRaises(URLError) as untrusted:
+                urlopen(origin + "/blog", timeout=3)
+            self.assertIsInstance(
+                untrusted.exception.reason, ssl.SSLCertVerificationError
+            )
+            with self.assertRaises((URLError, OSError)):
+                urlopen(origin.replace("https:", "http:") + "/blog", timeout=3)
+        finally:
+            server.terminate()
+            server.communicate(timeout=5)
+        invalid = subprocess.run(
+            command[:-1] + [str(self.root / "missing-key.pem")],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=False,
+        )
+        self.assertNotEqual(invalid.returncode, 0)
+        self.assertNotIn('"stage": "serving"', invalid.stdout)
+        other_key = self.root / "other-key.pem"
+        subprocess.run(
+            [
+                "openssl",
+                "genpkey",
+                "-algorithm",
+                "RSA",
+                "-pkeyopt",
+                "rsa_keygen_bits:2048",
+                "-out",
+                str(other_key),
+            ],
+            capture_output=True,
+            check=True,
+            timeout=15,
+        )
+        mismatched = subprocess.run(
+            command[:-1] + [str(other_key)],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=False,
+        )
+        self.assertNotEqual(mismatched.returncode, 0)
+        self.assertNotIn('"stage": "serving"', mismatched.stdout)
 
     def test_requested_url_cannot_grant_its_own_network_capability(self):
         identifier = self.artifact("a")
