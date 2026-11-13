@@ -1,3 +1,4 @@
+import ast
 import os
 import subprocess
 import sys
@@ -213,6 +214,95 @@ class BlogDevPreviewTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         linked = Path(self.read_env()["BLOG_CONTENT_DIR"]) / "images/linked.png"
         self.assertTrue(linked.is_symlink())
+
+    def test_workflow_selection_is_compatible_with_older_frontend_commits(self):
+        workflow = yaml.safe_load(WORKFLOW.read_text())
+        step = next(
+            s
+            for s in workflow["jobs"]["build-website"]["steps"]
+            if s.get("id") == "blog-preview"
+        )
+
+        def enabled(expression, branch, pin):
+            if not expression:
+                return True
+            for key, value in {
+                "env.BRANCH_NAME": branch,
+                "vars.BLOG_DEV_PREVIEW_CONTENT_SHA": pin,
+            }.items():
+                expression = expression.replace(key, repr(value))
+            expression = expression.replace("&&", " and ").replace("||", " or ")
+
+            def value(node):
+                if isinstance(node, ast.Expression):
+                    return value(node.body)
+                if isinstance(node, ast.Constant):
+                    return node.value
+                if isinstance(node, ast.BoolOp):
+                    values = [bool(value(v)) for v in node.values]
+                    return all(values) if isinstance(node.op, ast.And) else any(values)
+                if isinstance(node, ast.Compare):
+                    left = value(node.left)
+                    for op, right_node in zip(node.ops, node.comparators):
+                        right = value(right_node)
+                        if not (
+                            (isinstance(op, ast.Eq) and left == right)
+                            or (isinstance(op, ast.NotEq) and left != right)
+                        ):
+                            return False
+                        left = right
+                    return True
+                raise AssertionError("Unsupported workflow condition")
+
+            return value(ast.parse(expression, mode="eval"))
+
+        for index, (branch, pin, helper, success, expected) in enumerate(
+            [
+                ("prod", self.sha, False, True, None),
+                ("prod", self.sha, True, True, None),
+                ("feat/older", self.sha, False, True, None),
+                ("dev", self.sha, False, True, "enabled=false\n"),
+                (
+                    "dev",
+                    self.sha,
+                    True,
+                    True,
+                    f"enabled=true\ncontent-sha={self.sha}\n",
+                ),
+                ("dev", "--bad-ref", True, False, None),
+                ("dev", "", False, True, None),
+            ]
+        ):
+            with self.subTest(branch=branch, helper=helper, pin=pin):
+                workspace = self.root / f"compat-{index}"
+                workspace.mkdir()
+                output = workspace / "github-output"
+                if helper:
+                    script = workspace / ".github/scripts/blog-dev-preview.py"
+                    script.parent.mkdir(parents=True)
+                    script.write_text(SCRIPT.read_text())
+                if enabled(step.get("if"), branch, pin):
+                    result = subprocess.run(
+                        ["bash", "-e", "-c", step["run"]],
+                        cwd=workspace,
+                        env={
+                            **self.env,
+                            "BRANCH_NAME": branch,
+                            "BLOG_DEV_PREVIEW_CONTENT_SHA": pin,
+                            "GITHUB_OUTPUT": str(output),
+                        },
+                        capture_output=True,
+                        text=True,
+                        check=False,
+                        timeout=10,
+                    )
+                    self.assertEqual(result.returncode == 0, success, result.stderr)
+                else:
+                    self.assertTrue(success)
+                if expected is None:
+                    self.assertFalse(output.exists())
+                else:
+                    self.assertEqual(output.read_text(), expected)
 
     def test_preview_wiring_changes_trigger_a_normal_website_build(self):
         workflow = yaml.safe_load(WORKFLOW.read_text())

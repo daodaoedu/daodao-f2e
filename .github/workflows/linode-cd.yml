@@ -206,9 +206,17 @@ jobs:
 
       - name: Select dev Blog draft preview
         id: blog-preview
+        if: env.BRANCH_NAME == 'dev' && vars.BLOG_DEV_PREVIEW_CONTENT_SHA != ''
         env:
           BLOG_DEV_PREVIEW_CONTENT_SHA: ${{ vars.BLOG_DEV_PREVIEW_CONTENT_SHA }}
-        run: python3 .github/scripts/blog-dev-preview.py select
+        run: |
+          helper=.github/scripts/blog-dev-preview.py
+          if [ -f "$helper" ] && [ ! -L "$helper" ]; then
+            python3 "$helper" select
+          else
+            echo '::notice::This frontend commit does not provide a regular dev Blog preview helper; keeping its normal website build.'
+            echo 'enabled=false' >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Checkout pinned dev Blog draft content
         if: steps.blog-preview.outputs.enabled == 'true'
