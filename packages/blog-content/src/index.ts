@@ -50,6 +50,23 @@ export type ValidationOptionsType = {
   >;
 };
 
+function comparePaths(left: string, right: string) {
+  if (left === right) return 0;
+  return left < right ? -1 : 1;
+}
+function errorMessage(error: unknown) {
+  return error instanceof Error
+    ? error.message
+    : typeof error === "string"
+      ? error
+      : "Validation failed";
+}
+type ArticleEntryType = {
+  article: ValidatedArticleType;
+  bytes: Buffer;
+  assets: Map<string, Buffer>;
+};
+type BaselineType = NonNullable<ValidationOptionsType["publishedBaseline"]>;
 async function markdownFiles(root: string, directory = "articles"): Promise<string[]> {
   const files: string[] = [];
   const handle = await opendir(path.join(root, directory));
@@ -68,7 +85,7 @@ async function markdownFiles(root: string, directory = "articles"): Promise<stri
   } finally {
     await handle.close();
   }
-  return files.sort();
+  return files.sort(comparePaths);
 }
 function walk(node: Nodes, callback: (node: Nodes) => void) {
   callback(node);
@@ -109,25 +126,214 @@ function bodyReferences(body: string) {
       throw new Error("Raw HTML is not supported; use Markdown links and images");
     if (node.type === "image" || node.type === "imageReference") {
       if (!node.alt?.trim()) throw new Error("Images require nonempty alt text");
-      const url = node.type === "image" ? node.url : definitions.get(node.identifier);
-      if (!url) throw new Error("Image reference has no definition");
-      images.push(url);
+      images.push(referenceUrl(node, definitions));
     }
     if (node.type === "link" || node.type === "linkReference") {
-      const url = node.type === "link" ? node.url : definitions.get(node.identifier);
-      if (!url) throw new Error("Link reference has no definition");
-      if (url.startsWith("#") || (url.startsWith("/") && !url.startsWith("//"))) {
-        internalLinks.push(url);
-      } else {
-        webUrlSchema.parse(url);
-        if (new URL(url).hostname === "daodao.so") internalLinks.push(url);
-        else links.push(url);
-      }
+      const url = referenceUrl(node, definitions);
+      if (isInternalReference(url)) internalLinks.push(url);
+      else links.push(url);
     }
   });
   return { images, links, internalLinks };
 }
 
+function referenceUrl(
+  node: Extract<Nodes, { type: "image" | "imageReference" | "link" | "linkReference" }>,
+  definitions: Map<string, string>
+) {
+  const url = "url" in node ? node.url : definitions.get(node.identifier);
+  if (!url) throw new Error("Reference has no definition");
+  return url;
+}
+function isInternalReference(url: string) {
+  if (url.startsWith("#") || (url.startsWith("/") && !url.startsWith("//"))) return true;
+  webUrlSchema.parse(url);
+  return new URL(url).hostname === "daodao.so";
+}
+async function loadImages(root: string, images: string[]) {
+  const assets = new Map<string, Buffer>();
+  const imageMetadata: ValidatedArticleType["images"] = [];
+  for (const image of images) {
+    if (
+      !/^images\/[a-zA-Z0-9/_-]+\.(png|jpe?g|webp|avif|gif)$/.test(image) ||
+      image.split("/").includes("..")
+    ) {
+      throw new Error(`Image must use a local images/ raster path: ${image}`);
+    }
+    const absolute = path.resolve(root, image);
+    const imageRoot = path.resolve(root, "images");
+    if (!isWithin(imageRoot, await realpath(absolute)))
+      throw new Error(`Image escapes images/: ${image}`);
+    const imageBytes = await readConfined(root, image);
+    const dimensions = imageSize(imageBytes);
+    const expectedType = path.extname(image).slice(1).replace("jpeg", "jpg");
+    if (dimensions.type !== expectedType)
+      throw new Error(`Image format does not match extension: ${image}`);
+    if (!dimensions.width || !dimensions.height)
+      throw new Error(`Invalid image dimensions: ${image}`);
+    if (!imageMetadata.some((item) => item.path === image))
+      imageMetadata.push({ path: image, width: dimensions.width, height: dimensions.height });
+    assets.set(image, imageBytes);
+  }
+  return { assets, imageMetadata };
+}
+function validatePublishedIdentity(metadata: ArticleType, baseline: BaselineType) {
+  const published = Object.hasOwn(baseline, metadata.id) ? baseline[metadata.id] : undefined;
+  if (published && published.published_at !== metadata.published_at)
+    throw new Error("published_at differs from the published baseline");
+  if (published && published.slugs[metadata.lang] !== metadata.slug)
+    throw new Error("slug differs from the published baseline");
+}
+function validateSources(metadata: ArticleType, links: string[]) {
+  const sourceLinks = new Set(links.filter((link) => link !== ctaTargets[metadata.cta.target_id]));
+  if (
+    metadata.sources.some((url) => !sourceLinks.has(url)) ||
+    [...sourceLinks].some((url) => !metadata.sources.includes(url))
+  )
+    throw new Error(
+      "Body external links and frontmatter sources must match (excluding primary CTA)"
+    );
+}
+async function loadArticle(
+  root: string,
+  file: string,
+  authorIds: Set<string>,
+  topicIds: Set<string>,
+  baseline: BaselineType,
+  routes: Set<string>,
+  languages: Set<string>
+): Promise<ArticleEntryType> {
+  const bytes = await readConfined(root, file);
+  const { metadata, body } = parseArticle(bytes.toString("utf8"));
+  if (file !== `articles/${metadata.lang === "zh-TW" ? "zh-tw" : "en"}/${metadata.id}.md`)
+    throw new Error("Expected articles/<zh-tw|en>/<id>.md matching frontmatter");
+  const route = `${metadata.lang}/${metadata.slug}`;
+  const identity = `${metadata.id}/${metadata.lang}`;
+  if (routes.has(route)) throw new Error(`Duplicate locale/slug: ${route}`);
+  if (languages.has(identity)) throw new Error(`Duplicate article id/language: ${identity}`);
+  routes.add(route);
+  languages.add(identity);
+  if (!authorIds.has(metadata.author_id))
+    throw new Error(`Unknown author_id: ${metadata.author_id}`);
+  if (!topicIds.has(metadata.topic)) throw new Error(`Unknown topic: ${metadata.topic}`);
+  validatePublishedIdentity(metadata, baseline);
+  const { images, links } = bodyReferences(body);
+  validateSources(metadata, links);
+  if (metadata.cover) images.push(metadata.cover.path);
+  const { assets, imageMetadata } = await loadImages(root, images);
+  const article = { file, metadata, body, images: imageMetadata };
+  return { article, bytes, assets };
+}
+function validateInternalLink(
+  link: string,
+  currentRoute: string,
+  articleRoutes: Map<string, ValidatedArticleType>,
+  knownPages: Set<string>
+) {
+  const url = new URL(link, `https://daodao.so${currentRoute}`);
+  if (url.origin !== "https://daodao.so") throw new Error(`Unsafe internal link: ${link}`);
+  const targetPath = decodeURIComponent(url.pathname).replace(/\/$/, "") || "/";
+  const target = articleRoutes.get(targetPath);
+  const isBlog = /^\/(?:en\/)?blog(?:\/|$)/.test(targetPath);
+  if (
+    !target &&
+    targetPath !== "/blog" &&
+    targetPath !== "/en/blog" &&
+    !knownPages.has(targetPath)
+  ) {
+    throw new Error(`Unresolved internal link: ${link}`);
+  }
+  if (url.hash && isBlog) {
+    const fragment = decodeURIComponent(url.hash.slice(1));
+    if (!target || !getArticleHeadings(target.body).some((heading) => heading.id === fragment)) {
+      throw new Error(`Unresolved article fragment: ${link}`);
+    }
+  }
+}
+function validateArticleLinks(
+  articles: ValidatedArticleType[],
+  fail: (file: string, error: unknown) => void
+) {
+  const articleRoutes = new Map(
+    articles.map((article) => [
+      `${article.metadata.lang === "en" ? "/en" : ""}/blog/${article.metadata.slug}`,
+      article,
+    ])
+  );
+  const sitePaths = [
+    "",
+    "/about",
+    "/quiz",
+    "/action-maker",
+    "/learning-marathons/2025S1",
+    "/terms/ipr",
+    "/terms/service",
+    "/terms/privacy-policy",
+  ];
+  const knownPages = new Set(sitePaths.flatMap((route) => [route || "/", `/en${route}`]));
+  for (const article of articles) {
+    const currentRoute = `${article.metadata.lang === "en" ? "/en" : ""}/blog/${article.metadata.slug}`;
+    for (const link of bodyReferences(article.body).internalLinks) {
+      try {
+        validateInternalLink(link, currentRoute, articleRoutes, knownPages);
+      } catch (error) {
+        fail(article.file, error);
+      }
+    }
+  }
+}
+function pairDigest(entries: ArticleEntryType[], authorBytes: Buffer, topicBytes: Buffer) {
+  const hash = createHash("sha256");
+  const inputs = new Map<string, Buffer>([
+    ["authors.json", authorBytes],
+    ["topics.json", topicBytes],
+  ]);
+  for (const entry of entries) {
+    inputs.set(entry.article.file, entry.bytes);
+    for (const [name, bytes] of entry.assets) inputs.set(name, bytes);
+  }
+  for (const name of [...inputs.keys()].sort(comparePaths)) {
+    const bytes = inputs.get(name);
+    if (bytes)
+      hash
+        .update(JSON.stringify([name, bytes.length]))
+        .update("\n")
+        .update(bytes)
+        .update("\n");
+  }
+  return hash.digest("hex");
+}
+function validatePairs(
+  pairs: Map<string, ArticleEntryType[]>,
+  authorBytes: Buffer,
+  topicBytes: Buffer,
+  mode: "draft" | "publish",
+  approvals: ApprovalType[],
+  result: ValidationResultType,
+  fail: (file: string, error: unknown) => void
+) {
+  for (const [id, entries] of pairs) {
+    if (
+      entries.length !== 2 ||
+      new Set(entries.map((entry) => entry.article.metadata.lang)).size !== 2
+    ) {
+      fail(id, "Expected exactly one zh-TW and one en article");
+      continue;
+    }
+    if (new Set(entries.map((entry) => entry.article.metadata.published_at)).size !== 1) {
+      fail(id, "Bilingual pair must share the original published_at");
+      continue;
+    }
+    const digest = pairDigest(entries, authorBytes, topicBytes);
+    result.digests[id] = digest;
+    if (
+      mode === "publish" &&
+      !approvals.some((approval) => approval.id === id && approval.digest === digest)
+    ) {
+      fail(id, "Missing or stale bilingual approval digest");
+    }
+  }
+}
 /** Read-only validation. A valid draft is never proof of human approval or deployment. */
 export async function validateRepository(
   rootPath: string,
@@ -145,7 +351,7 @@ export async function validateRepository(
   const mode = modeResult.data;
   const result: ValidationResultType = { ok: false, mode, articles: [], digests: {}, errors: [] };
   const fail = (file: string, error: unknown) =>
-    result.errors.push({ file, message: error instanceof Error ? error.message : String(error) });
+    result.errors.push({ file, message: errorMessage(error) });
   let sourceFile = rootPath;
   try {
     const root = await realpath(rootPath);
@@ -167,10 +373,7 @@ export async function validateRepository(
     const approvals = approvalSchema.parse(options.approvals ?? []);
     const approvalIds = new Set(approvals.map((approval) => approval.id));
     if (approvalIds.size !== approvals.length) throw new Error("Duplicate approval ids");
-    const pairs = new Map<
-      string,
-      { article: ValidatedArticleType; bytes: Buffer; assets: Map<string, Buffer> }[]
-    >();
+    const pairs = new Map<string, ArticleEntryType[]>();
     const routes = new Set<string>();
     const languages = new Set<string>();
     sourceFile = "articles/";
@@ -179,156 +382,27 @@ export async function validateRepository(
       throw new Error("articles/ must contain at least one bilingual article pair");
     for (const file of files) {
       try {
-        const bytes = await readConfined(root, file);
-        const { metadata, body } = parseArticle(bytes.toString("utf8"));
-        if (file !== `articles/${metadata.lang === "zh-TW" ? "zh-tw" : "en"}/${metadata.id}.md`)
-          throw new Error("Expected articles/<zh-tw|en>/<id>.md matching frontmatter");
-        const route = `${metadata.lang}/${metadata.slug}`;
-        const identity = `${metadata.id}/${metadata.lang}`;
-        if (routes.has(route)) throw new Error(`Duplicate locale/slug: ${route}`);
-        if (languages.has(identity)) throw new Error(`Duplicate article id/language: ${identity}`);
-        routes.add(route);
-        languages.add(identity);
-        if (!authorIds.has(metadata.author_id))
-          throw new Error(`Unknown author_id: ${metadata.author_id}`);
-        if (!topicIds.has(metadata.topic)) throw new Error(`Unknown topic: ${metadata.topic}`);
-        const published = Object.hasOwn(baseline, metadata.id) ? baseline[metadata.id] : undefined;
-        if (published && published.published_at !== metadata.published_at)
-          throw new Error("published_at differs from the published baseline");
-        if (published && published.slugs[metadata.lang] !== metadata.slug)
-          throw new Error("slug differs from the published baseline");
-        const assets = new Map<string, Buffer>();
-        const imageMetadata: ValidatedArticleType["images"] = [];
-        const { images, links } = bodyReferences(body);
-        const sourceLinks = new Set(
-          links.filter((link) => link !== ctaTargets[metadata.cta.target_id])
+        const entry = await loadArticle(
+          root,
+          file,
+          authorIds,
+          topicIds,
+          baseline,
+          routes,
+          languages
         );
-        if (
-          metadata.sources.some((url) => !sourceLinks.has(url)) ||
-          [...sourceLinks].some((url) => !metadata.sources.includes(url))
-        )
-          throw new Error(
-            "Body external links and frontmatter sources must match (excluding primary CTA)"
-          );
-        if (metadata.cover) images.push(metadata.cover.path);
-        for (const image of images) {
-          if (
-            !/^images\/[a-zA-Z0-9/_-]+\.(png|jpe?g|webp|avif|gif)$/.test(image) ||
-            image.split("/").includes("..")
-          ) {
-            throw new Error(`Image must use a local images/ raster path: ${image}`);
-          }
-          const absolute = path.resolve(root, image);
-          const imageRoot = path.resolve(root, "images");
-          if (!isWithin(imageRoot, await realpath(absolute)))
-            throw new Error(`Image escapes images/: ${image}`);
-          const imageBytes = await readConfined(root, image);
-          const dimensions = imageSize(imageBytes);
-          const expectedType = path.extname(image).slice(1).replace("jpeg", "jpg");
-          if (dimensions.type !== expectedType)
-            throw new Error(`Image format does not match extension: ${image}`);
-          if (!dimensions.width || !dimensions.height)
-            throw new Error(`Invalid image dimensions: ${image}`);
-          if (!imageMetadata.some((item) => item.path === image))
-            imageMetadata.push({ path: image, width: dimensions.width, height: dimensions.height });
-          assets.set(image, imageBytes);
-        }
-        const article = { file, metadata, body, images: imageMetadata };
+        const { article } = entry;
+        const metadata = article.metadata;
         result.articles.push(article);
         const pair = pairs.get(metadata.id) ?? [];
-        pair.push({ article, bytes, assets });
+        pair.push(entry);
         pairs.set(metadata.id, pair);
       } catch (error) {
         fail(file, error);
       }
     }
-    const articleRoutes = new Map(
-      result.articles.map((article) => [
-        `${article.metadata.lang === "en" ? "/en" : ""}/blog/${article.metadata.slug}`,
-        article,
-      ])
-    );
-    const sitePaths = [
-      "",
-      "/about",
-      "/quiz",
-      "/action-maker",
-      "/learning-marathons/2025S1",
-      "/terms/ipr",
-      "/terms/service",
-      "/terms/privacy-policy",
-    ];
-    const knownPages = new Set(sitePaths.flatMap((route) => [route || "/", `/en${route}`]));
-    for (const article of result.articles) {
-      const currentRoute = `${article.metadata.lang === "en" ? "/en" : ""}/blog/${article.metadata.slug}`;
-      for (const link of bodyReferences(article.body).internalLinks) {
-        try {
-          const url = new URL(link, `https://daodao.so${currentRoute}`);
-          if (url.origin !== "https://daodao.so") throw new Error(`Unsafe internal link: ${link}`);
-          const targetPath = decodeURIComponent(url.pathname).replace(/\/$/, "") || "/";
-          const target = articleRoutes.get(targetPath);
-          const isBlog = /^\/(?:en\/)?blog(?:\/|$)/.test(targetPath);
-          if (
-            !target &&
-            targetPath !== "/blog" &&
-            targetPath !== "/en/blog" &&
-            !knownPages.has(targetPath)
-          ) {
-            throw new Error(`Unresolved internal link: ${link}`);
-          }
-          if (url.hash && isBlog) {
-            const fragment = decodeURIComponent(url.hash.slice(1));
-            if (
-              !target ||
-              !getArticleHeadings(target.body).some((heading) => heading.id === fragment)
-            ) {
-              throw new Error(`Unresolved article fragment: ${link}`);
-            }
-          }
-        } catch (error) {
-          fail(article.file, error);
-        }
-      }
-    }
-    for (const [id, entries] of pairs) {
-      if (
-        entries.length !== 2 ||
-        new Set(entries.map((entry) => entry.article.metadata.lang)).size !== 2
-      ) {
-        fail(id, "Expected exactly one zh-TW and one en article");
-        continue;
-      }
-      if (new Set(entries.map((entry) => entry.article.metadata.published_at)).size !== 1) {
-        fail(id, "Bilingual pair must share the original published_at");
-        continue;
-      }
-      const hash = createHash("sha256");
-      const inputs = new Map<string, Buffer>([
-        ["authors.json", authorBytes],
-        ["topics.json", topicBytes],
-      ]);
-      for (const entry of entries) {
-        inputs.set(entry.article.file, entry.bytes);
-        for (const [name, bytes] of entry.assets) inputs.set(name, bytes);
-      }
-      for (const name of [...inputs.keys()].sort()) {
-        const bytes = inputs.get(name);
-        if (bytes)
-          hash
-            .update(JSON.stringify([name, bytes.length]))
-            .update("\n")
-            .update(bytes)
-            .update("\n");
-      }
-      const digest = hash.digest("hex");
-      result.digests[id] = digest;
-      if (
-        mode === "publish" &&
-        !approvals.some((approval) => approval.id === id && approval.digest === digest)
-      ) {
-        fail(id, "Missing or stale bilingual approval digest");
-      }
-    }
+    validateArticleLinks(result.articles, fail);
+    validatePairs(pairs, authorBytes, topicBytes, mode, approvals, result, fail);
   } catch (error) {
     fail(sourceFile, error);
   }
