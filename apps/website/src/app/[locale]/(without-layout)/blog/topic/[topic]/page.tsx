@@ -7,6 +7,9 @@ import { buildBlogCollectionMetadata } from "@/components/blog/seo";
 export const dynamicParams = false;
 export async function generateStaticParams() {
   const data = await loadBlog();
+  // Next 15 static export rejects zero paths; this invalid topic ID renders only notFound().
+  if (data.topics.length === 0)
+    return ["zh-TW", "en"].map((locale) => ({ locale, topic: "_empty" }));
   return data.topics.flatMap((topic) =>
     ["zh-TW", "en"].map((locale) => ({ locale, topic: topic.id }))
   );

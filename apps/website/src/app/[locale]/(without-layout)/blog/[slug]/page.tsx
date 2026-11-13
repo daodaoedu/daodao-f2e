@@ -8,6 +8,9 @@ import { buildBlogArticleJsonLd, buildBlogArticleMetadata } from "@/components/b
 export const dynamicParams = false;
 export async function generateStaticParams() {
   const data = await loadBlog();
+  // Next 15 static export rejects zero paths; this invalid content slug renders only notFound().
+  if (data.articles.length === 0)
+    return ["zh-TW", "en"].map((locale) => ({ locale, slug: "_empty" }));
   return data.articles.map((a) => ({ locale: a.metadata.lang, slug: a.metadata.slug }));
 }
 export async function generateMetadata({
