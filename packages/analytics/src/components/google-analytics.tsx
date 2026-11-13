@@ -15,7 +15,7 @@ declare global {
   }
 }
 
-export function GoogleAnalytics() {
+export function GoogleAnalytics({ websitePrivacy = false }: { websitePrivacy?: boolean }) {
   const config = getAnalyticsConfig();
 
   if (!config.googleAnalytics.enabled || !config.googleAnalytics.measurementId) {
@@ -38,7 +38,7 @@ export function GoogleAnalytics() {
           const blogPageContext = ${getBlogPageContext.toString()};
           gtag('config', '${measurementId}', {
             page_path: window.location.pathname,
-            ...blogPageContext(window.location.href, document.referrer),
+            ...blogPageContext(window.location.href, document.referrer, ${websitePrivacy}),
           });
         `}
       </Script>

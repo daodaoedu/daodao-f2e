@@ -26,7 +26,7 @@ SDK `before_send` 使用相同經測試的self-contained hook：Blog自動事件
 
 ## 30天定義與分母
 
-實際exporter拒絕未來asOf並記錄capturedAt；evaluator必須收到capturedAt及evidenceMode。asOf不能超過已擷取覆蓋時間；observed模式也拒絕未來擷取時間，只有明確fixture可使用已宣告覆蓋的合成時鐘，輸出會保留fixture標示。
+實際exporter拒絕未來asOf並記錄capturedAt；Prisma operator client以唯讀Repeatable Read交易統一四組查詢快照（[Prisma6交易文件](https://www.prisma.io/docs/orm/v6/prisma-client/queries/transactions)）。asOf指事件時間，capturedAt指本次擷取，並非重建「當年該時刻已提交」的資料庫狀態；開始較早、較晚提交的交易可在下一次擷取出現，provenance會明列此語意。外部提供的transaction由呼叫者負責隔離，不冒稱已驗同等快照。evaluator必須收到capturedAt及evidenceMode。asOf不能超過已擷取覆蓋時間；observed模式也拒絕未來擷取時間，只有明確fixture可使用已宣告覆蓋的合成時鐘，輸出會保留fixture標示。
 
 `evaluateLeaderActivation` 使用註冊時間起算30×24小時的半開區間 [registeredAt, registeredAt+30days)，檢查至明確asOf。資格仍以註冊日起算，不改成取得組織身分的日期。
 
@@ -38,6 +38,8 @@ SDK `before_send` 使用相同經測試的self-contained hook：Blog自動事件
 - observing：來源完整但30天未滿，不能當失敗或進成熟分母。
 - not_activated：窗已滿且必需來源完整，仍無完整正向證據。
 - unknown：缺必需來源或政策未確認且無可證明的正向結果，列為成熟未知，不混成已確認未啟用。
+
+firstActivatedAt取第一筆符合完整條件的實際參與時間，timeToActivationMs從註冊時計算；沒有正向證據時兩者為null。windowEnd固定UTC，避免操作者時區改變輸出。
 
 結果分開去重leaderId、organizationId、cohortId；重送eventId不重算，衝突eventId直接拒絕。learner與unclassified另外計數。matureCohort.denominator保留所有已滿窗的可觀測帶領者，known與unknown分開列；只要存在成熟未知，point rate就是null，不能只拿已知正向者算100%。分母為0時也回null，不把尚未滿窗者放進成熟分母。
 
@@ -65,7 +67,7 @@ pnpm exec ts-node scripts/export-blog-activation.ts --registered-since "$REGISTE
 pnpm --filter @daodao/analytics activation:report --input /private/blog-evidence.json --output /private/blog-report.json
 ```
 
-先將三個日期變數設定為已查證的ISO時間；OBSERVED_AS_OF不得超過目前實際擷取時間，不能預先產生未來30天結果。輸出檔以0600且不覆蓋既有檔案建立，不可放public/articles/images。opaque IDs仍是內部分析資料，不混進公開文章。CLI不會自行查Tally、發布文章或送事件到Hosted analytics。
+先將三個日期變數設定為已查證的ISO時間；OBSERVED_AS_OF不得超過目前實際擷取時間，不能預先產生未來30天結果。輸出前解析真實parent目錄並拒絕public/articles/images（含symlink別名）；輸出檔以0600且不覆蓋既有檔案建立，不可放public/articles/images。opaque IDs仍是內部分析資料，不混進公開文章。CLI不會自行查Tally、發布文章或送事件到Hosted analytics。
 
 ## 固定AEO樣本與每月人工紀錄
 
@@ -84,3 +86,11 @@ GSC/Bing每週按實際文章canonical路徑、語言及品牌/非品牌查詢�
 工程目前已用disposable PostgreSQL執行durable writer/export；再把真SQL輸出餵給實際evaluator CLI，正向受控fixture結果：1觀測帶領者、1學員、1未分類、1啟用、成熟分母0(rate=null)。這是本機fixture，不是正式產品成效。
 
 本機實際Next/React頁面的StrictMode單次閱讀、滑鼠/鍵盤CTA、來源、query/fragment排除及英文列表無虛構文章ID已回讀SDK測試transport。PR檢查、dev部署/Hosted ingest回讀、Tally授權、完整#539受控旅程須各自記錄。未完成這些，不以單元測試或本文件宣稱#538/#531 Done。
+
+## 檢核補充與邊界
+
+GA4網站頁面一律提供去query的page_location及origin-only page_referrer，包含從Blog帶query到about的全頁導航；PostHog的$direct哨兵保留原義。產品AnalyticsProvider預設行為維持原設定。兩者本機實際script/config驗證不代表Hosted收件。
+
+既有server對已額滿或過加入期限的public join重試仍回409；這是base既有可用性規則，本卡不改報名政策。可重試的既有加入保持joined_at且無重複audit；完整API「任意時點都回201」不在此卡承諾。
+
+邀請audit表示目標建立，不是寄達。`invitationTokenUsed`存在raw join audit，實際報表目前以同enrollment邀請歷史配對；退出後改走public link是否仍計受邀、第一來源/助攻如何跨Tally與登入延續，仍需產品定義及真實來源接線，不能把unknown當0或宣稱FR10全部完成。

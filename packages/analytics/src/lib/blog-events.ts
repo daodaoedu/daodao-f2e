@@ -127,7 +127,9 @@ export function sanitizeBlogAnalyticsEvent(
     const record: Record<string, unknown> = {};
     let changed = false;
     for (const [key, value] of Object.entries(input)) {
-      if (urlKeys.has(key) && typeof value === "string" && value) {
+      if (value === "$direct" && (key === "$referrer" || key === "$initial_referrer")) {
+        record[key] = value;
+      } else if (urlKeys.has(key) && typeof value === "string" && value) {
         try {
           const url = new URL(value);
           if (!["https:", "http:"].includes(url.protocol)) {
@@ -216,10 +218,14 @@ export function sanitizeBlogAnalyticsEvent(
 }
 
 /** GA4 receives a canonical Blog URL and origin-only referrer, not inbound query/fragment data. */
-export function getBlogPageContext(href: string, referrer: string): Record<string, string> {
+export function getBlogPageContext(
+  href: string,
+  referrer: string,
+  websitePrivacy = false
+): Record<string, string> {
   try {
     const url = new URL(href);
-    if (!/^\/(?:en\/|zh-TW\/)?blog(?:\/|$)/.test(url.pathname)) return {};
+    if (!websitePrivacy && !/^\/(?:en\/|zh-TW\/)?blog(?:\/|$)/.test(url.pathname)) return {};
     let referringOrigin = "";
     try {
       if (referrer) referringOrigin = new URL(referrer).origin;

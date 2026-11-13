@@ -218,7 +218,49 @@ describe("Blog browser events", () => {
   });
 });
 
+it("sanitizes a Blog-derived referrer on the website about route while product defaults remain unchanged", () => {
+  expect(
+    getBlogPageContext(
+      "https://daodao.so/about?token=secret",
+      "https://daodao.so/blog/x?email=private@example.invalid",
+      true
+    )
+  ).toEqual({
+    page_location: "https://daodao.so/about",
+    page_path: "/about",
+    page_referrer: "https://daodao.so",
+  });
+  expect(
+    getBlogPageContext(
+      "https://app.daodao.so/lighthouse",
+      "https://daodao.so/blog/x?email=private@example.invalid"
+    )
+  ).toEqual({});
+});
+
 describe("30-day leader activation", () => {
+  it("reports the first qualifying participation time and elapsed registration time", () => {
+    const input = fixture();
+    const participation = input.events.find((e) => e.kind === "participated");
+    if (!participation) throw new Error("Fixture must contain actual participation");
+    input.events.push({
+      ...participation,
+      eventId: "later-participation",
+      occurredAt: "2026-10-10T00:00:00Z",
+    });
+    const row = evaluateLeaderActivation(input).rows[0];
+    expect(row).toMatchObject({
+      firstActivatedAt: "2026-10-05T00:00:00.000Z",
+      timeToActivationMs:
+        Date.parse(participation.occurredAt) - Date.parse(input.registrations[0].registeredAt),
+    });
+    input.events = [];
+    expect(evaluateLeaderActivation(input).rows[0]).toMatchObject({
+      firstActivatedAt: null,
+      timeToActivationMs: null,
+    });
+  });
+
   it("requires published activity plus a genuinely invited nonleader's real participation", () => {
     const result = evaluateLeaderActivation(fixture());
     expect(result.counts).toEqual({
@@ -375,4 +417,26 @@ describe("30-day leader activation", () => {
     expect(() => evaluateLeaderActivation(input)).toThrow();
     expect(() => evaluateLeaderActivation({ ...fixture(), asOf: "2026-02-30" })).toThrow();
   });
+});
+
+it("preserves PostHog direct-origin sentinels on other website pages", () => {
+  const event = {
+    event: "$pageview",
+    properties: {
+      $current_url: "https://daodao.so/about",
+      $referrer: "$direct",
+      $set_once: { $initial_referrer: "$direct" },
+    },
+  };
+  expect(sanitizeBlogAnalyticsEvent(event)).toEqual(event);
+});
+it("reports a UTC window boundary independent of the operator timezone", () => {
+  const previous = process.env.TZ;
+  try {
+    process.env.TZ = "America/New_York";
+    expect(evaluateLeaderActivation(fixture()).rows[0]?.windowEnd).toBe("2026-10-31T00:00:00.000Z");
+  } finally {
+    if (previous === undefined) delete process.env.TZ;
+    else process.env.TZ = previous;
+  }
 });

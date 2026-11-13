@@ -1,4 +1,4 @@
-import { addMilliseconds, formatRFC3339, getTime, isValid, parseISO } from "date-fns";
+import { addMilliseconds, getTime, isValid, parseISO } from "date-fns";
 import { z } from "zod";
 
 const id = z
@@ -71,6 +71,8 @@ export type LeaderActivationType = {
   registeredAt: string;
   windowEnd: string;
   status: "activated" | "observing" | "not_activated" | "unknown";
+  firstActivatedAt: string | null;
+  timeToActivationMs: number | null;
   activatedOrganizations: string[];
   activatedCohorts: string[];
 };
@@ -114,6 +116,7 @@ export function evaluateLeaderActivation(input: unknown) {
         getTime(parseISO(event.occurredAt)) < deadline &&
         getTime(parseISO(event.occurredAt)) <= asOf
     );
+    let firstActivationTime: number | null = null;
     const organizations = new Set<string>();
     const cohorts = new Set<string>();
     for (const publication of eligible.filter((event) => event.kind === "published")) {
@@ -148,6 +151,10 @@ export function evaluateLeaderActivation(input: unknown) {
             )
         );
         if (!joined) continue;
+        firstActivationTime =
+          firstActivationTime === null
+            ? participatedAt
+            : Math.min(firstActivationTime, participatedAt);
         organizations.add(publication.organizationId);
         cohorts.add(publication.cohortId);
       }
@@ -160,10 +167,11 @@ export function evaluateLeaderActivation(input: unknown) {
       leaderId: registration.leaderId,
       source: registration.source,
       registeredAt: registration.registeredAt,
-      windowEnd: formatRFC3339(addMilliseconds(parseISO(registration.registeredAt), WINDOW_MS), {
-        fractionDigits: 3,
-      }),
+      windowEnd: new Date(deadline).toISOString(),
       status,
+      firstActivatedAt:
+        firstActivationTime === null ? null : new Date(firstActivationTime).toISOString(),
+      timeToActivationMs: firstActivationTime === null ? null : firstActivationTime - start,
       activatedOrganizations: [...organizations].sort(),
       activatedCohorts: [...cohorts].sort(),
     });

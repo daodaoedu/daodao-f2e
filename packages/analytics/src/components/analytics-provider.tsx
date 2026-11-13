@@ -14,7 +14,7 @@ export function AnalyticsScripts({
 }) {
   return (
     <>
-      <GoogleAnalytics />
+      <GoogleAnalytics websitePrivacy={websitePrivacy} />
       {!disableSessionReplay && <Clarity />}
       <PostHog disableSessionReplay={disableSessionReplay} websitePrivacy={websitePrivacy} />
     </>
