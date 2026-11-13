@@ -672,6 +672,40 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
+  packages/blog-content:
+    dependencies:
+      date-fns:
+        specifier: 'catalog:'
+        version: 3.6.0
+      image-size:
+        specifier: 2.1.0
+        version: 2.1.0
+      mdast-util-from-markdown:
+        specifier: 2.0.2
+        version: 2.0.2
+      yaml:
+        specifier: 2.8.2
+        version: 2.8.2
+      zod:
+        specifier: 'catalog:'
+        version: 3.25.76
+    devDependencies:
+      '@daodao/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/mdast':
+        specifier: ^4.0.4
+        version: 4.0.4
+      '@types/node':
+        specifier: 'catalog:'
+        version: 20.19.30
+      tsx:
+        specifier: ^4.19.2
+        version: 4.21.0
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
   packages/config:
     devDependencies:
       '@types/node':
@@ -6919,6 +6953,11 @@ packages:
   image-size@1.2.1:
     resolution: {integrity: sha512-rH+46sQJ2dlwfjfhCyNx5thzrv+dtmBIhPHk0zgRUukHzZ/kRueTJXoYYsclBaKcSMBWuGbOFXtioLpzTb5euw==}
     engines: {node: '>=16.x'}
+    hasBin: true
+
+  image-size@2.1.0:
+    resolution: {integrity: sha512-6Dbisa46RsgeAh3TMSFL2i8+uIFG+/LRmz6Q2oscSJJvXo1sOw3EgNO4M8jPl1P+gR1atJLDPrpclX4IHz63sA==}
+    engines: {node: '>=18'}
     hasBin: true
 
   import-fresh@3.3.1:
@@ -17357,6 +17396,8 @@ snapshots:
   image-size@1.2.1:
     dependencies:
       queue: 6.0.2
+
+  image-size@2.1.0: {}
 
   import-fresh@3.3.1:
     dependencies:
