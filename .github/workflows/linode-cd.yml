@@ -152,7 +152,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
-          ref: ${{ env.BRANCH_NAME }}
+          ref: ${{ env.COMMIT_SHA }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -203,6 +203,27 @@ jobs:
 
           cp .env apps/website/.env
           cp .env apps/product/.env
+
+      - name: Select dev Blog draft preview
+        id: blog-preview
+        env:
+          BLOG_DEV_PREVIEW_CONTENT_SHA: ${{ vars.BLOG_DEV_PREVIEW_CONTENT_SHA }}
+        run: python3 .github/scripts/blog-dev-preview.py select
+
+      - name: Checkout pinned dev Blog draft content
+        if: steps.blog-preview.outputs.enabled == 'true'
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          repository: daodaoedu/daodao-blog
+          ref: ${{ steps.blog-preview.outputs.content-sha }}
+          path: .blog-dev-preview-source
+          persist-credentials: false
+
+      - name: Stage dev Blog draft snapshot
+        if: steps.blog-preview.outputs.enabled == 'true'
+        env:
+          BLOG_DEV_PREVIEW_CONTENT_SHA: ${{ steps.blog-preview.outputs.content-sha }}
+        run: python3 .github/scripts/blog-dev-preview.py prepare
 
       - name: Install dependencies and build
         run: |
