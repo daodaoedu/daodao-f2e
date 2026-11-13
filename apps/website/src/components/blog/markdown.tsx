@@ -18,9 +18,9 @@ export function BlogMarkdown({ article }: { article: BlogArticleType }) {
           h2: ({ children }) => <h2 id={outline[heading++]?.id}>{children}</h2>,
           h3: ({ children }) => <h3 id={outline[heading++]?.id}>{children}</h3>,
           table: ({ children }) => (
-            // biome-ignore lint/a11y/noNoninteractiveTabindex: Keyboard users must be able to focus and scroll wide tables.
             <section
               className="blog-scroll"
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: Keyboard focus is required to scroll wide tables without a pointer.
               tabIndex={0}
               aria-label={article.metadata.lang === "en" ? "Table" : "表格"}
             >
