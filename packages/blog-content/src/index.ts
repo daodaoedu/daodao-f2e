@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { opendir, realpath } from "node:fs/promises";
+import { lstat, opendir, realpath } from "node:fs/promises";
 import path from "node:path";
 import { imageSize } from "image-size";
 import type { Nodes } from "mdast";
@@ -54,6 +54,8 @@ async function markdownFiles(root: string, directory = "articles"): Promise<stri
   const files: string[] = [];
   const handle = await opendir(path.join(root, directory));
   try {
+    if ((await lstat(handle.path)).isSymbolicLink())
+      throw new Error("Article directory symlinks are not allowed");
     if (!isWithin(root, await realpath(handle.path)))
       throw new Error("Article directory escapes the authorized root");
     for (let entry = await handle.read(); entry !== null; entry = await handle.read()) {

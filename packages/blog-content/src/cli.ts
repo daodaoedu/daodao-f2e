@@ -8,6 +8,7 @@ import {
   baselineSchema,
   isWithinDirectory,
   readPrivateJson,
+  type ValidationOptionsType,
   validateRepository,
 } from "./index";
 
@@ -57,9 +58,11 @@ try {
     if (!evidenceRoot) throw new Error("Missing trusted evidence root");
     approvals = approvalSchema.parse(await readPrivateJson(evidenceRoot, values.approvals));
   }
-  const publishedBaseline = values.baseline
-    ? baselineSchema.parse(await readPrivateJson(evidenceRoot ?? "", values.baseline))
-    : undefined;
+  let publishedBaseline: ValidationOptionsType["publishedBaseline"];
+  if (values.baseline) {
+    if (!evidenceRoot) throw new Error("Missing trusted evidence root");
+    publishedBaseline = baselineSchema.parse(await readPrivateJson(evidenceRoot, values.baseline));
+  }
   const result = await validateRepository(contentRoot, { mode, approvals, publishedBaseline });
   console.log(JSON.stringify(result, null, 2));
   if (!result.ok) process.exitCode = 1;

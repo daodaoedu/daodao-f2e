@@ -396,6 +396,13 @@ describe("shared bilingual content validation", () => {
     expect(result.ok).toBe(false);
     expect(JSON.stringify(result)).not.toContain("private-filename");
   });
+  it("rejects a root articles directory alias even when its target remains in the checkout", async () => {
+    const root = await fixture();
+    const fs = await import("node:fs/promises");
+    await fs.rename(path.join(root, "articles"), path.join(root, "aliased-articles"));
+    await symlink(path.join(root, "aliased-articles"), path.join(root, "articles"));
+    expect((await validateRepository(root, { mode: "draft" })).ok).toBe(false);
+  });
   it("CLI uses the same validator and fails closed without private approval evidence", async () => {
     const root = await fixture();
     const packageRoot = fileURLToPath(new URL("../../", import.meta.url));
