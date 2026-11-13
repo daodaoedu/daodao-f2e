@@ -1,0 +1,1312 @@
+#!/usr/bin/env python3
+"""Pinned website artifacts and atomic filesystem release adapter (not a cloud deploy)."""
+
+import argparse
+import fcntl
+import hashlib
+import json
+import mimetypes
+import os
+import re
+import shutil
+import stat
+import subprocess
+import sys
+import tarfile
+import tempfile
+import threading
+import time
+import uuid
+from contextlib import contextmanager, nullcontext
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path, PurePosixPath
+from urllib.error import HTTPError, URLError
+from urllib.parse import unquote, urlsplit
+from urllib.request import HTTPRedirectHandler, Request, build_opener
+
+SHA = re.compile(r"^[a-f0-9]{40}$")
+RELEASE = re.compile(r"^[a-f0-9]{64}$")
+
+
+class ReleaseError(Exception):
+    def __init__(self, stage, message):
+        self.stage = stage
+        super().__init__(message)
+
+
+class RejectRedirect(HTTPRedirectHandler):
+    def redirect_request(self, request, fp, code, message, headers, newurl):
+        return None
+
+
+# A redirected 404 must never become first-release permission, and smoke must not contact a redirect target.
+HTTP = build_opener(RejectRedirect())
+
+
+def canonical(value):
+    return json.dumps(
+        value, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode()
+
+
+def digest(value):
+    return hashlib.sha256(value).hexdigest()
+
+
+def sha(value):
+    if not SHA.fullmatch(value):
+        raise ReleaseError("input", "Expected a full lowercase 40-character Git SHA")
+    return value
+
+
+def safe_relative(value):
+    path = PurePosixPath(value)
+    if (
+        not value
+        or path.is_absolute()
+        or any(part in ("..", ".") for part in value.split("/"))
+        or "\\" in value
+    ):
+        raise ReleaseError("artifact", "Unsafe artifact path")
+    return path
+
+
+def atomic_json(path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + "." + uuid.uuid4().hex)
+    temporary.write_bytes(canonical(value))
+    os.replace(temporary, path)
+
+
+def release_store(path):
+    resolved = path.resolve()
+    if resolved == Path("/root/daodao-f2e") or resolved.is_relative_to(
+        Path("/root/daodao-f2e")
+    ):
+        raise ReleaseError(
+            "input",
+            "Release store must be outside the legacy checkout and its git-clean scope",
+        )
+    return resolved
+
+
+@contextmanager
+def locked(store):
+    store.mkdir(parents=True, exist_ok=True)
+    with (store / ".release.lock").open("a") as handle:
+        fcntl.flock(handle, fcntl.LOCK_EX)
+        yield
+
+
+def tooling_environment():
+    keys = {
+        "PATH",
+        "HOME",
+        "TMPDIR",
+        "TMP",
+        "TEMP",
+        "LANG",
+        "LC_ALL",
+        "TZ",
+        "SSL_CERT_FILE",
+        "SSL_CERT_DIR",
+    }
+    return {
+        **{key: value for key, value in os.environ.items() if key in keys},
+        "GIT_TERMINAL_PROMPT": "0",
+        "GIT_CONFIG_GLOBAL": os.devnull,
+        "GIT_CONFIG_NOSYSTEM": "1",
+    }
+
+
+def command(stage, arguments, cwd, env, log):
+    if env is None:
+        env = tooling_environment()
+    try:
+        result = subprocess.run(
+            arguments,
+            cwd=cwd,
+            env=env,
+            text=True,
+            capture_output=True,
+            check=False,
+            timeout=1800,
+        )
+    except subprocess.TimeoutExpired as error:
+        raise ReleaseError(
+            stage, "Command exceeded its execution deadline; prior release unchanged"
+        ) from error
+    with log.open("a") as output:
+        output.write(
+            f"\n[{stage}] exit={result.returncode}\n{result.stdout}\n{result.stderr}\n"
+        )
+    if result.returncode:
+        raise ReleaseError(
+            stage,
+            f"Command failed (exit {result.returncode}); inspect private log {log.name}",
+        )
+    return result.stdout
+
+
+def checkout(repo, revision, destination, log):
+    if "://" in repo:
+        parsed = urlsplit(repo)
+        if (
+            parsed.scheme != "https"
+            or parsed.username
+            or parsed.password
+            or parsed.query
+            or parsed.fragment
+        ):
+            raise ReleaseError(
+                "fetch", "Remote repos must use credential-free HTTPS URLs"
+            )
+    elif not Path(repo).is_dir():
+        raise ReleaseError("fetch", "Local source repository does not exist")
+    if "://" not in repo:
+        # Avoid copying the object database on disk-constrained local hosts. Verify every
+        # archive member against the commit tree so export attributes cannot change inputs.
+        object_type = command(
+            "fetch", ["git", "-C", repo, "cat-file", "-t", revision], None, None, log
+        ).strip()
+        if object_type != "commit":
+            raise ReleaseError("fetch", "Requested object is not a commit")
+        listing = subprocess.check_output(
+            ["git", "-C", repo, "ls-tree", "-rz", revision], env=tooling_environment()
+        )
+        expected = {}
+        for entry in listing.split(b"\0"):
+            if not entry:
+                continue
+            fields, name = entry.split(b"\t", 1)
+            mode, kind, object_id = fields.decode().split()
+            if kind != "blob" or mode not in ("100644", "100755"):
+                raise ReleaseError(
+                    "fetch", "Source tree contains unsupported symlinks/submodules"
+                )
+            expected[name.decode()] = (object_id, mode)
+        destination.mkdir()
+        seen = set()
+        with log.open("ab") as errors:
+            process = subprocess.Popen(
+                ["git", "-C", repo, "archive", "--format=tar", revision],
+                stdout=subprocess.PIPE,
+                stderr=errors,
+                env=tooling_environment(),
+            )
+            try:
+                with tarfile.open(fileobj=process.stdout, mode="r|") as archive:
+                    for member in archive:
+                        name = member.name.rstrip("/")
+                        safe_relative(name)
+                        target = destination / name
+                        if member.isdir():
+                            target.mkdir(parents=True, exist_ok=True)
+                            continue
+                        if not member.isfile() or name not in expected:
+                            raise ReleaseError(
+                                "fetch", "Archive member is not in the pinned tree"
+                            )
+                        target.parent.mkdir(parents=True, exist_ok=True)
+                        source = archive.extractfile(member)
+                        blob = hashlib.sha1(
+                            ("blob " + str(member.size) + "\0").encode()
+                        )
+                        with target.open("wb") as output:
+                            while chunk := source.read(1024 * 1024):
+                                output.write(chunk)
+                                blob.update(chunk)
+                        if blob.hexdigest() != expected[name][0]:
+                            raise ReleaseError(
+                                "fetch", "Archive content differs from pinned Git blob"
+                            )
+                        target.chmod(0o755 if expected[name][1] == "100755" else 0o644)
+                        seen.add(name)
+                if process.wait() or seen != set(expected):
+                    raise ReleaseError(
+                        "fetch",
+                        "Archive did not contain the exact complete source tree",
+                    )
+            finally:
+                if process.poll() is None:
+                    process.terminate()
+                    process.wait()
+                process.stdout.close()
+        return command(
+            "fetch",
+            ["git", "-C", repo, "show", "-s", "--format=%ct", revision],
+            None,
+            None,
+            log,
+        ).strip()
+    command(
+        "fetch",
+        [
+            "git",
+            "clone",
+            "--no-checkout",
+            "--no-hardlinks",
+            "--",
+            repo,
+            str(destination),
+        ],
+        None,
+        None,
+        log,
+    )
+    command("fetch", ["git", "checkout", "--detach", revision], destination, None, log)
+    actual = command(
+        "fetch", ["git", "rev-parse", "HEAD"], destination, None, log
+    ).strip()
+    if actual != revision:
+        raise ReleaseError("fetch", "Resolved checkout differs from requested SHA")
+    listing = subprocess.check_output(
+        ["git", "-C", str(destination), "ls-tree", "-rz", revision],
+        env=tooling_environment(),
+    )
+    root_fd = os.open(destination, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        for entry in listing.split(b"\0"):
+            if not entry:
+                continue
+            fields, name = entry.split(b"\t", 1)
+            mode, kind, object_id = fields.decode().split()
+            if kind != "blob" or mode not in ("100644", "100755"):
+                raise ReleaseError(
+                    "fetch", "Source tree contains unsupported symlinks/submodules"
+                )
+            with confined_file(root_fd, name.decode()) as source:
+                blob = hashlib.sha1(
+                    ("blob " + str(os.fstat(source.fileno()).st_size) + "\0").encode()
+                )
+                while chunk := source.read(1024 * 1024):
+                    blob.update(chunk)
+            if blob.hexdigest() != object_id:
+                raise ReleaseError(
+                    "fetch", "Checked-out bytes differ from pinned Git blob"
+                )
+    finally:
+        os.close(root_fd)
+
+    return command(
+        "fetch", ["git", "show", "-s", "--format=%ct", revision], destination, None, log
+    ).strip()
+
+
+def tree_hashes(root):
+    result = {}
+    for path in sorted(root.rglob("*")):
+        if path.is_symlink():
+            raise ReleaseError(
+                "artifact", "Symlinks are not allowed inside a website artifact"
+            )
+        if path.is_file():
+            relative = path.relative_to(root).as_posix()
+            safe_relative(relative)
+            result[relative] = digest(path.read_bytes())
+    return result
+
+
+def route_file(site, route):
+    relative = route.lstrip("/")
+    candidates = [relative, relative + ".html", relative + "/index.html"]
+    if route == "/" or not relative:
+        candidates = ["index.html", "zh-TW.html", "zh-TW/index.html"]
+    if route.startswith("/blog"):
+        candidates += ["zh-TW/" + value for value in list(candidates)]
+    for candidate in candidates:
+        if candidate and (site / candidate).is_file():
+            return candidate
+    raise ReleaseError("build", f"Missing static output for route {route}")
+
+
+def verify_release(directory):
+    if (
+        directory.is_symlink()
+        or not directory.is_dir()
+        or (directory / "site").is_symlink()
+    ):
+        raise ReleaseError("artifact", "Release must be a regular immutable directory")
+    try:
+        manifest = json.loads((directory / "release.json").read_text())
+        if manifest.get("schema") != 1 or not RELEASE.fullmatch(manifest["id"]):
+            raise ValueError("Invalid release manifest")
+        sha(manifest["frontend_sha"])
+        sha(manifest["content_sha"])
+        if digest(canonical(manifest["inputs"])) != manifest["id"] or any(
+            manifest["inputs"].get(key) != manifest[key]
+            for key in ("frontend_sha", "content_sha")
+        ):
+            raise ValueError("Release ID does not bind the recorded source inputs")
+        files = tree_hashes(directory / "site")
+        if not files or files != manifest["files"]:
+            raise ValueError("Website artifact bytes differ from the recorded hashes")
+        public = json.loads((directory / "site/blog-release.json").read_text())
+        if public != {
+            key: manifest[key]
+            for key in ("id", "frontend_sha", "content_sha", "baseline_sha256")
+        }:
+            raise ValueError("Public version marker differs from release manifest")
+        if (
+            digest((directory / "site/blog-published-baseline.json").read_bytes())
+            != manifest["baseline_sha256"]
+            or digest(canonical(manifest["baseline"])) != manifest["baseline_sha256"]
+        ):
+            raise ValueError("Published baseline differs from version marker")
+        required = {
+            "/blog",
+            "/en/blog",
+            "/blog-release.json",
+            "/blog-published-baseline.json",
+        }
+        if not isinstance(manifest["baseline"], dict) or not manifest["baseline"]:
+            raise ValueError("Release requires a nonempty published article baseline")
+        for article in manifest["baseline"].values():
+            required.update(
+                (
+                    "/blog/" + article["slugs"]["zh-TW"],
+                    "/en/blog/" + article["slugs"]["en"],
+                )
+            )
+        # Derive homepage readback from verified bytes even for an older registered manifest.
+        for route in ("/", "/en"):
+            manifest["smoke"][route] = route_file(directory / "site", route)
+        if not required.issubset(manifest["smoke"]):
+            raise ValueError("Required article/list/version smoke routes missing")
+        for route, relative in manifest["smoke"].items():
+            if not route.startswith("/") or relative not in files:
+                raise ValueError("Invalid smoke route/file mapping")
+            safe_relative(relative)
+        return manifest
+    except (KeyError, OSError, ValueError, TypeError) as error:
+        raise ReleaseError("artifact", str(error)) from error
+
+
+def catalog(store):
+    file = store / "trusted-artifacts.json"
+    values = json.loads(file.read_text()) if file.exists() else {}
+    if not isinstance(values, dict) or any(
+        not RELEASE.fullmatch(key) or not RELEASE.fullmatch(value)
+        for key, value in values.items()
+    ):
+        raise ReleaseError("artifact", "Invalid trusted artifact catalog")
+    return values
+
+
+def register_artifact(store, identifier, manifest_hash):
+    values = catalog(store)
+    values[identifier] = manifest_hash
+    atomic_json(store / "trusted-artifacts.json", values)
+
+
+def stored_release(store, identifier):
+    if not RELEASE.fullmatch(identifier):
+        raise ReleaseError("artifact", "Invalid stored release identity")
+    target = store / "releases" / identifier
+    if (store / "releases").is_symlink() or not target.resolve().is_relative_to(
+        store / "releases"
+    ):
+        raise ReleaseError("artifact", "Release path escapes the trusted store")
+    expected = catalog(store).get(identifier)
+    if not expected or digest((target / "release.json").read_bytes()) != expected:
+        raise ReleaseError(
+            "artifact", "Stored manifest differs from trusted producer evidence"
+        )
+    manifest = verify_release(target)
+    if manifest["id"] != identifier:
+        raise ReleaseError("artifact", "Stored release identity mismatch")
+    return manifest
+
+
+def caller_input(path, evidence_root):
+    absolute = Path(os.path.abspath(path))
+    try:
+        relative = absolute.relative_to(evidence_root).as_posix()
+    except ValueError as error:
+        raise ReleaseError(
+            "approval", "Input is outside the independently configured evidence root"
+        ) from error
+    descriptor = os.open(evidence_root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        with confined_file(descriptor, relative) as source:
+            data = source.read(16 * 1024 * 1024 + 1)
+        if len(data) > 16 * 1024 * 1024:
+            raise ReleaseError("approval", "Private input exceeds supported size")
+        return data
+    except (OSError, ReleaseError) as error:
+        raise ReleaseError(
+            "approval", "Unable to read private input within trusted evidence root"
+        ) from error
+    finally:
+        os.close(descriptor)
+
+
+def prepare(args):
+    frontend_sha, content_sha = sha(args.frontend_sha), sha(args.content_sha)
+    if frontend_sha != sha(args.approved_frontend_sha):
+        raise ReleaseError(
+            "approval", "Frontend SHA is not the caller-provided trusted approved pin"
+        )
+    store = release_store(args.store)
+    store.mkdir(parents=True, exist_ok=True)
+    configured_root = os.environ.get("BLOG_EVIDENCE_ROOT")
+    if not configured_root:
+        raise ReleaseError(
+            "approval",
+            "Trusted caller BLOG_EVIDENCE_ROOT is required; never derive it from input paths",
+        )
+    evidence_root = Path(configured_root).resolve(strict=True)
+    approvals = Path(os.path.abspath(args.approvals))
+    baseline = Path(os.path.abspath(args.baseline)) if args.baseline else None
+    if "://" not in args.content_repo and approvals.is_relative_to(
+        Path(args.content_repo).resolve()
+    ):
+        raise ReleaseError(
+            "approval",
+            "Approval evidence must be outside the source content repository",
+        )
+    if "://" not in args.content_repo:
+        public_root = Path(args.content_repo).resolve()
+        if evidence_root.is_relative_to(public_root) or public_root.is_relative_to(
+            evidence_root
+        ):
+            raise ReleaseError(
+                "approval", "Trusted evidence root must be disjoint from public content"
+            )
+    approval_bytes = caller_input(approvals, evidence_root)
+    baseline_bytes = caller_input(baseline, evidence_root) if baseline else None
+    build_env = (
+        json.loads(caller_input(args.build_env, evidence_root))
+        if args.build_env
+        else {}
+    )
+    if not isinstance(build_env, dict) or any(
+        not key.startswith("NEXT_PUBLIC_") or not isinstance(value, str)
+        for key, value in build_env.items()
+    ):
+        raise ReleaseError(
+            "input",
+            "Build environment accepts only explicit NEXT_PUBLIC_* string values",
+        )
+    for key in ("NEXT_PUBLIC_APP_URL", "NEXT_PUBLIC_WEBSITE_URL"):
+        try:
+            origin = urlsplit(build_env.get(key, ""))
+            _ = origin.port
+        except ValueError as error:
+            raise ReleaseError("input", "Invalid public navigation origin") from error
+        if (
+            origin.scheme != "https"
+            or not origin.netloc
+            or not origin.hostname
+            or any(character.isspace() for character in origin.netloc)
+            or origin.username
+            or origin.password
+            or origin.query
+            or origin.fragment
+            or origin.path not in ("", "/")
+        ):
+            raise ReleaseError(
+                "input",
+                f"Build environment requires an explicit credential-free HTTPS origin for {key}",
+            )
+    inputs = {
+        "frontend_sha": frontend_sha,
+        "content_sha": content_sha,
+        "approvals_hash": digest(approval_bytes),
+        "baseline_hash": digest(baseline_bytes) if baseline_bytes is not None else None,
+        "build_env_hash": digest(canonical(build_env)),
+        "runner_hash": digest(Path(__file__).read_bytes()),
+    }
+    release_id = digest(canonical(inputs))
+    destination = store / "releases" / release_id
+    with locked(store):
+        if destination.exists() and release_id in catalog(store):
+            manifest = stored_release(store, release_id)
+            if manifest["inputs"] != inputs:
+                raise ReleaseError("artifact", "Release identity collision")
+            return {
+                "ok": True,
+                "stage": "prepared",
+                "id": release_id,
+                "reused": True,
+                "manifest": manifest,
+                "manifest_sha256": digest((destination / "release.json").read_bytes()),
+            }
+    (store / "logs").mkdir(exist_ok=True)
+    log = store / "logs" / (release_id + "-" + uuid.uuid4().hex + ".log")
+    executable = shutil.which("pnpm")
+    if not executable:
+        raise ReleaseError("tools", "pnpm unavailable; no build attempted")
+    with tempfile.TemporaryDirectory(prefix="blog-release-") as workspace:
+        workspace = Path(workspace).resolve()
+        frontend = workspace / "frontend"
+        content = workspace / "content"
+        private = workspace / "private"
+        private.mkdir(mode=0o700)
+        approvals = private / "approvals.json"
+        approvals.write_bytes(approval_bytes)
+        if baseline_bytes is not None:
+            baseline = private / "baseline.json"
+            baseline.write_bytes(baseline_bytes)
+        timestamp = checkout(args.frontend_repo, frontend_sha, frontend, log)
+        checkout(args.content_repo, content_sha, content, log)
+        allowed_environment = {
+            "PATH",
+            "HOME",
+            "TMPDIR",
+            "TMP",
+            "TEMP",
+            "CI",
+            "LANG",
+            "LC_ALL",
+            "TZ",
+            "PNPM_HOME",
+            "XDG_CACHE_HOME",
+            "XDG_DATA_HOME",
+            "SSL_CERT_FILE",
+            "SSL_CERT_DIR",
+            "NODE_EXTRA_CA_CERTS",
+            "NPM_CONFIG_CACHE",
+        }
+        inherited = {
+            key: value
+            for key, value in os.environ.items()
+            if key in allowed_environment
+        }
+        env = {
+            **inherited,
+            **build_env,
+            "NEXT_OUTPUT": "export",
+            "BLOG_CONTENT_DIR": str(content),
+            "BLOG_CONTENT_MODE": "publish",
+            "BLOG_APPROVALS_FILE": str(approvals),
+            "BLOG_EVIDENCE_ROOT": str(private),
+            "BLOG_CONTENT_SHA": content_sha,
+            "BLOG_FRONTEND_SHA": frontend_sha,
+            "BLOG_BUILD_ID": release_id[:32],
+        }
+        # Do not inherit a stale baseline from another release invocation.
+        env.pop("BLOG_PUBLISHED_BASELINE_FILE", None)
+        if baseline:
+            env["BLOG_PUBLISHED_BASELINE_FILE"] = str(baseline)
+        env["SOURCE_DATE_EPOCH"] = timestamp
+        command(
+            "install",
+            [
+                executable,
+                "install",
+                "--frozen-lockfile",
+                "--filter",
+                "@daodao/website...",
+                "--filter",
+                "@daodao/blog-content",
+            ],
+            frontend,
+            env,
+            log,
+        )
+        command(
+            "configure",
+            [executable, "--filter", "@daodao/config", "generate:env"],
+            frontend,
+            env,
+            log,
+        )
+        validate = [
+            executable,
+            "--filter",
+            "@daodao/blog-content",
+            "validate",
+            "--root",
+            str(content),
+            "--approvals",
+            str(approvals),
+        ]
+        if baseline:
+            validate += ["--baseline", str(baseline)]
+        output = command("validate", validate, frontend, env, log)
+        try:
+            validated = json.loads(output[output.index("{") :])
+        except (ValueError, json.JSONDecodeError) as error:
+            raise ReleaseError(
+                "validate", "Validator did not return its JSON result"
+            ) from error
+        if (
+            not validated.get("ok")
+            or validated.get("mode") != "publish"
+            or not validated.get("articles")
+        ):
+            raise ReleaseError(
+                "validate",
+                "Publish-mode validator did not return nonempty approved content",
+            )
+        if baseline_bytes is not None and set(json.loads(baseline_bytes)) - {
+            article["metadata"]["id"] for article in validated["articles"]
+        }:
+            raise ReleaseError(
+                "approval",
+                "Published articles cannot disappear in an ordinary publication; explicit unpublish policy is not implemented",
+            )
+        command(
+            "build",
+            [executable, "--filter", "@daodao/website", "build"],
+            frontend,
+            env,
+            log,
+        )
+        output_site = frontend / "apps/website/out"
+        if not output_site.is_dir():
+            raise ReleaseError("build", "Static website output is missing")
+        smoke = {
+            route: route_file(output_site, route)
+            for route in ("/", "/en", "/blog", "/en/blog")
+        }
+        article_baseline = {}
+        for article in validated["articles"]:
+            metadata = article["metadata"]
+            language = metadata["lang"]
+            article_id = metadata["id"]
+            route = ("/en/blog/" if language == "en" else "/blog/") + metadata["slug"]
+            smoke[route] = route_file(output_site, route)
+            previous = article_baseline.setdefault(
+                article_id, {"published_at": metadata["published_at"], "slugs": {}}
+            )
+            previous["slugs"][language] = metadata["slug"]
+            for image in article.get("images", []):
+                relative = (
+                    "blog-images/"
+                    + validated["digests"][article_id]
+                    + "/"
+                    + image["path"]
+                )
+                if (
+                    not (output_site / relative).is_file()
+                    or (output_site / relative).read_bytes()
+                    != (content / image["path"]).read_bytes()
+                ):
+                    raise ReleaseError(
+                        "build",
+                        "Published image is missing or differs from approved content",
+                    )
+                smoke["/" + relative] = relative
+        baseline_bytes = canonical(article_baseline)
+        (output_site / "blog-published-baseline.json").write_bytes(baseline_bytes)
+        public = {
+            "id": release_id,
+            "frontend_sha": frontend_sha,
+            "content_sha": content_sha,
+            "baseline_sha256": digest(baseline_bytes),
+        }
+        smoke["/blog-published-baseline.json"] = "blog-published-baseline.json"
+        (output_site / "blog-release.json").write_bytes(canonical(public))
+        smoke["/blog-release.json"] = "blog-release.json"
+        manifest = {
+            "schema": 1,
+            **public,
+            "inputs": inputs,
+            "digests": validated["digests"],
+            "baseline": article_baseline,
+            "files": tree_hashes(output_site),
+            "smoke": smoke,
+        }
+        staging = store / ("stage-" + uuid.uuid4().hex)
+        staging.mkdir()
+        try:
+            shutil.copytree(output_site, staging / "site")
+            (staging / "release.json").write_bytes(canonical(manifest))
+            verify_release(staging)
+            with locked(store):
+                destination.parent.mkdir(exist_ok=True)
+                if destination.exists():
+                    manifest = verify_release(destination)
+                    if manifest["inputs"] != inputs or manifest["files"] != tree_hashes(
+                        staging / "site"
+                    ):
+                        raise ReleaseError(
+                            "artifact",
+                            "Concurrent artifact differs for the same pinned inputs",
+                        )
+                else:
+                    os.rename(staging, destination)
+                register_artifact(
+                    store,
+                    release_id,
+                    digest((destination / "release.json").read_bytes()),
+                )
+        finally:
+            if staging.exists():
+                shutil.rmtree(staging)
+    return {
+        "ok": True,
+        "stage": "prepared",
+        "id": release_id,
+        "reused": False,
+        "manifest": manifest,
+        "manifest_sha256": digest((destination / "release.json").read_bytes()),
+    }
+
+
+def website_handler(site_provider):
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            try:
+                route = unquote(urlsplit(self.path).path)
+                if (
+                    not route.startswith("/")
+                    or "\\" in route
+                    or any(value in (".", "..") for value in route.split("/"))
+                ):
+                    raise ValueError("Invalid route")
+                site = site_provider().resolve()
+                relative = route_file(site, route)
+                file = site / relative
+                if file.is_symlink() or not file.resolve().is_relative_to(site):
+                    raise ValueError("Unsafe resource")
+                data = file.read_bytes()
+                self.send_response(200)
+                self.send_header("Content-Length", str(len(data)))
+                content_type = (
+                    "text/javascript"
+                    if file.suffix in (".js", ".mjs")
+                    else (
+                        mimetypes.guess_type(file.name)[0] or "application/octet-stream"
+                    )
+                )
+                self.send_header("Content-Type", content_type)
+                self.send_header("X-Content-Type-Options", "nosniff")
+                self.end_headers()
+                self.wfile.write(data)
+            except (OSError, ValueError, ReleaseError):
+                self.send_error(404)
+
+        def log_message(self, *_args):
+            pass
+
+    return Handler
+
+
+def http_readback(base_url, manifest):
+    parsed = urlsplit(base_url)
+    if (
+        parsed.scheme not in ("http", "https")
+        or not parsed.netloc
+        or parsed.username
+        or parsed.password
+        or parsed.query
+        or parsed.fragment
+    ):
+        raise ReleaseError("smoke", "Expected credential-free HTTP(S) base URL")
+    for route, relative in manifest["smoke"].items():
+        target_url = (
+            base_url.rstrip("/")
+            + route
+            + "?blog_release_readback="
+            + manifest["id"]
+            + "-"
+            + uuid.uuid4().hex
+        )
+        request = Request(
+            target_url,
+            headers={"Accept-Encoding": "identity", "Cache-Control": "no-cache"},
+        )
+        try:
+            with HTTP.open(request, timeout=10) as response:
+                if response.status != 200 or response.geturl() != target_url:
+                    raise ValueError("Unexpected response or redirect")
+                received = hashlib.sha256()
+                deadline = time.monotonic() + 30
+                while chunk := response.read1(1024 * 1024):
+                    received.update(chunk)
+                    if time.monotonic() > deadline:
+                        raise ValueError("Readback deadline exceeded")
+                if received.hexdigest() != manifest["files"][relative]:
+                    raise ValueError(f"Wrong deployed bytes at {route}")
+        except (HTTPError, URLError, OSError, ValueError) as error:
+            raise ReleaseError("smoke", str(error)) from error
+
+
+def switch_pointer(store, release_id):
+    temporary = store / ("current-" + uuid.uuid4().hex)
+    temporary.symlink_to(Path("releases") / release_id)
+    os.replace(temporary, store / "current")
+
+
+def recover_pending(store, base_url):
+    file = store / "pending.json"
+    if not file.exists():
+        return
+    pending = json.loads(file.read_text())
+    identifier = pending["id"]
+    old = pending["old"]
+    if not RELEASE.fullmatch(identifier) or (old and not RELEASE.fullmatch(old["id"])):
+        raise ReleaseError("state", "Invalid interrupted activation journal")
+    state_file = store / "active.json"
+    state = json.loads(state_file.read_text()) if state_file.exists() else None
+    pointer = store / "current"
+    target = store / "releases" / identifier
+    if (
+        state
+        and state["id"] == identifier
+        and state["generation"] == pending["generation"]
+        and pointer.resolve() == target.resolve()
+    ):
+        try:
+            http_readback(base_url, stored_release(store, identifier))
+        except ReleaseError:
+            pass  # A committed-but-unacknowledged candidate that no longer reads back falls back below.
+        else:
+            file.unlink()
+            return
+    allowed = {target.resolve()}
+    if old:
+        allowed.add((store / "releases" / old["id"]).resolve())
+    if (pointer.exists() or pointer.is_symlink()) and pointer.resolve() not in allowed:
+        raise ReleaseError(
+            "state", "Interrupted activation pointer is not a journaled version"
+        )
+    if old:
+        previous = stored_release(store, old["id"])
+        switch_pointer(store, old["id"])
+        atomic_json(state_file, old)
+        http_readback(base_url, previous)
+    else:
+        pointer.unlink(missing_ok=True)
+        state_file.unlink(missing_ok=True)
+    file.unlink()
+
+
+def verify_freshness(repository, manifest):
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository):
+        raise ReleaseError("input", "Invalid freshness policy repository")
+    try:
+        approved = subprocess.check_output(
+            [
+                "gh",
+                "api",
+                "repos/"
+                + repository
+                + "/environments/development/variables/BLOG_APPROVED_FRONTEND_SHA",
+                "--jq",
+                ".value",
+            ],
+            text=True,
+            timeout=30,
+        ).strip()
+        content = subprocess.check_output(
+            [
+                "gh",
+                "api",
+                "repos/daodaoedu/daodao-blog/git/ref/heads/main",
+                "--jq",
+                ".object.sha",
+            ],
+            text=True,
+            timeout=30,
+        ).strip()
+    except (OSError, subprocess.SubprocessError) as error:
+        raise ReleaseError(
+            "superseded", "Freshness policy could not be verified"
+        ) from error
+    if approved != manifest["frontend_sha"] or content != manifest["content_sha"]:
+        raise ReleaseError(
+            "superseded", "Source head or protected approval pin has advanced"
+        )
+
+
+def activate(args):
+    if not RELEASE.fullmatch(args.release) or args.generation < 1:
+        raise ReleaseError("input", "Release ID and positive generation required")
+    store = release_store(args.store)
+    with locked(store):
+        recover_pending(store, args.base_url)
+        target = store / "releases" / args.release
+        manifest = stored_release(store, args.release)
+        state_file = store / "active.json"
+        old = json.loads(state_file.read_text()) if state_file.exists() else None
+        if old:
+            if not RELEASE.fullmatch(old.get("id", "")):
+                raise ReleaseError("state", "Invalid active release identity")
+            previous_manifest = stored_release(store, old["id"])
+            for article_id, prior in previous_manifest["baseline"].items():
+                if (
+                    article_id in manifest["baseline"]
+                    and manifest["baseline"][article_id] != prior
+                ):
+                    raise ReleaseError(
+                        "approval",
+                        "Published dates/slugs differ from active trusted baseline",
+                    )
+            if getattr(args, "operation", "activate") != "rollback" and set(
+                previous_manifest["baseline"]
+            ) - set(manifest["baseline"]):
+                raise ReleaseError(
+                    "approval",
+                    "Published articles cannot disappear in an ordinary publication",
+                )
+            for historical in old.get("history", []):
+                prior_manifest = stored_release(store, historical)
+                for article_id, prior in prior_manifest["baseline"].items():
+                    if (
+                        article_id in manifest["baseline"]
+                        and manifest["baseline"][article_id] != prior
+                    ):
+                        raise ReleaseError(
+                            "approval",
+                            "Previously published identity differs from verified release history",
+                        )
+        if getattr(args, "operation", "activate") == "rollback" and (
+            not old or args.release not in old.get("history", [])
+        ):
+            raise ReleaseError(
+                "approval",
+                "Rollback target was not a previously verified active release",
+            )
+        generation = old["generation"] if old else 0
+        pointer = store / "current"
+        if pointer.exists() or pointer.is_symlink():
+            if (
+                not old
+                or not RELEASE.fullmatch(old["id"])
+                or pointer.resolve() != (store / "releases" / old["id"]).resolve()
+            ):
+                raise ReleaseError(
+                    "state", "Current pointer does not match the trusted active state"
+                )
+        elif old:
+            raise ReleaseError(
+                "state", "Recorded active release has no current pointer"
+            )
+        water_file = store / "generation.json"
+        water = (
+            json.loads(water_file.read_text())
+            if water_file.exists()
+            else {"generation": generation, "id": old["id"] if old else None}
+        )
+        if args.generation < water["generation"] or (
+            args.generation == water["generation"] and water["id"] != args.release
+        ):
+            raise ReleaseError(
+                "superseded", "A newer generation already owns this deployment"
+            )
+        atomic_json(water_file, {"generation": args.generation, "id": args.release})
+        if old and old["id"] == args.release:
+            if (
+                getattr(args, "freshness_repository", None)
+                and getattr(args, "operation", "activate") != "rollback"
+            ):
+                verify_freshness(args.freshness_repository, manifest)
+            http_readback(args.base_url, manifest)
+            if args.generation > generation:
+                atomic_json(state_file, {**old, "generation": args.generation})
+            return {
+                "ok": True,
+                "stage": "active",
+                "id": args.release,
+                "reused": True,
+                "generation": max(generation, args.generation),
+                "adapter": "filesystem-http",
+            }
+        # Validate every candidate URL before changing the visible pointer.
+        candidate = ThreadingHTTPServer(
+            ("127.0.0.1", 0), website_handler(lambda: target / "site")
+        )
+        thread = threading.Thread(target=candidate.serve_forever, daemon=True)
+        thread.start()
+        try:
+            http_readback("http://127.0.0.1:" + str(candidate.server_port), manifest)
+        finally:
+            candidate.shutdown()
+            candidate.server_close()
+            thread.join()
+        if (
+            getattr(args, "freshness_repository", None)
+            and getattr(args, "operation", "activate") != "rollback"
+        ):
+            verify_freshness(args.freshness_repository, manifest)
+        journal = store / "pending.json"
+        atomic_json(
+            journal, {"id": args.release, "generation": args.generation, "old": old}
+        )
+        switch_pointer(store, args.release)
+        try:
+            http_readback(args.base_url, manifest)
+            history = list(
+                dict.fromkeys([*(old.get("history", []) if old else []), args.release])
+            )
+            atomic_json(
+                state_file,
+                {
+                    "id": args.release,
+                    "generation": args.generation,
+                    "previous": old["id"] if old else None,
+                    "history": history,
+                },
+            )
+            journal.unlink()
+        except Exception as candidate_error:
+            try:
+                if old:
+                    switch_pointer(store, old["id"])
+                    atomic_json(state_file, old)
+                    http_readback(args.base_url, stored_release(store, old["id"]))
+                else:
+                    (store / "current").unlink(missing_ok=True)
+                    state_file.unlink(missing_ok=True)
+            except (
+                ReleaseError,
+                OSError,
+                ValueError,
+                TypeError,
+                KeyError,
+            ) as recovery_error:
+                # Keep the journal for a later verified recovery; neither failure is hidden.
+                raise ReleaseError(
+                    "recovery",
+                    f"Candidate failed: {candidate_error}; restoring prior version could not be verified: {recovery_error}",
+                ) from candidate_error
+            journal.unlink(missing_ok=True)
+            raise
+        return {
+            "ok": True,
+            "stage": "active",
+            "id": args.release,
+            "generation": args.generation,
+            "previous": old["id"] if old else None,
+            "adapter": "filesystem-http",
+            "frontend_sha": manifest["frontend_sha"],
+            "content_sha": manifest["content_sha"],
+        }
+
+
+def confined_file(root_fd, relative):
+    parts = safe_relative(relative).parts
+    directory = os.dup(root_fd)
+    try:
+        for part in parts[:-1]:
+            child = os.open(
+                part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=directory
+            )
+            os.close(directory)
+            directory = child
+        descriptor = os.open(parts[-1], os.O_RDONLY | os.O_NOFOLLOW, dir_fd=directory)
+        info = os.fstat(descriptor)
+        if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
+            os.close(descriptor)
+            raise ReleaseError(
+                "artifact", "Artifact requires independent regular files"
+            )
+        return os.fdopen(descriptor, "rb")
+    except OSError as error:
+        raise ReleaseError(
+            "artifact", "Unable to read artifact through confined no-follow descriptors"
+        ) from error
+    finally:
+        os.close(directory)
+
+
+def transfer_artifact_files(root_fd, files, site=None):
+    for relative, expected in files.items():
+        safe_relative(relative)
+        target = site / relative if site is not None else None
+        if target is not None:
+            target.parent.mkdir(parents=True, exist_ok=True)
+        copied = hashlib.sha256()
+        with (
+            confined_file(root_fd, "site/" + relative) as incoming,
+            target.open("wb") if target is not None else nullcontext() as output,
+        ):
+            while chunk := incoming.read(1024 * 1024):
+                if output is not None:
+                    output.write(chunk)
+                copied.update(chunk)
+        if copied.hexdigest() != expected:
+            raise ReleaseError("artifact", "Artifact changed during confined import")
+
+
+def import_release(args):
+    source = args.artifact.resolve()
+    store = release_store(args.store)
+    if not RELEASE.fullmatch(args.manifest_sha256):
+        raise ReleaseError("artifact", "Trusted producer manifest hash required")
+    descriptor = os.open(source, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    staging = None
+    try:
+        with confined_file(descriptor, "release.json") as file:
+            manifest_bytes = file.read(16 * 1024 * 1024 + 1)
+        if (
+            len(manifest_bytes) > 16 * 1024 * 1024
+            or digest(manifest_bytes) != args.manifest_sha256
+        ):
+            raise ReleaseError(
+                "artifact", "Imported manifest differs from the trusted producer pin"
+            )
+        manifest = json.loads(manifest_bytes)
+        identifier = manifest["id"]
+        if (
+            not isinstance(identifier, str)
+            or not RELEASE.fullmatch(identifier)
+            or not isinstance(manifest["files"], dict)
+        ):
+            raise ReleaseError("artifact", "Invalid imported manifest identity/files")
+        with locked(store):
+            destination = store / "releases" / identifier
+            if destination.exists():
+                if (
+                    digest((destination / "release.json").read_bytes())
+                    != args.manifest_sha256
+                ):
+                    raise ReleaseError(
+                        "artifact", "Existing release differs for this identity"
+                    )
+                verify_release(destination)
+                transfer_artifact_files(descriptor, manifest["files"])
+                register_artifact(store, identifier, args.manifest_sha256)
+                return {
+                    "ok": True,
+                    "stage": "imported",
+                    "id": identifier,
+                    "reused": True,
+                }
+            staging = store / ("import-" + uuid.uuid4().hex)
+            (staging / "site").mkdir(parents=True)
+            (staging / "release.json").write_bytes(manifest_bytes)
+            transfer_artifact_files(descriptor, manifest["files"], staging / "site")
+            verify_release(staging)
+            destination.parent.mkdir(exist_ok=True)
+            os.rename(staging, destination)
+            register_artifact(store, identifier, args.manifest_sha256)
+        return {"ok": True, "stage": "imported", "id": identifier, "reused": False}
+    finally:
+        os.close(descriptor)
+        if staging is not None and staging.exists():
+            shutil.rmtree(staging)
+
+
+def fetch_baseline(args):
+    parsed = urlsplit(args.base_url)
+    if (
+        parsed.scheme not in ("http", "https")
+        or not parsed.netloc
+        or parsed.username
+        or parsed.password
+        or parsed.query
+        or parsed.fragment
+    ):
+        raise ReleaseError(
+            "baseline", "Expected a credential-free trusted HTTP(S) base URL"
+        )
+    try:
+        marker_url = args.base_url.rstrip("/") + "/blog-release.json"
+        try:
+            with HTTP.open(marker_url, timeout=10) as response:
+                if response.geturl() != marker_url:
+                    raise ValueError("Unexpected baseline marker redirect")
+                marker = json.loads(response.read(65537))
+        except HTTPError as error:
+            if error.code == 404:
+                raise ReleaseError(
+                    "baseline-missing", "No prior release marker exists"
+                ) from error
+            raise
+        baseline_url = args.base_url.rstrip("/") + "/blog-published-baseline.json"
+        with HTTP.open(baseline_url, timeout=10) as response:
+            if response.geturl() != baseline_url:
+                raise ValueError("Unexpected baseline redirect")
+            data = response.read(4 * 1024 * 1024 + 1)
+        if len(data) > 4 * 1024 * 1024:
+            raise ValueError("Baseline exceeds supported size")
+        if not RELEASE.fullmatch(marker["id"]):
+            raise ValueError("Invalid prior release identity")
+        if digest(data) != marker["baseline_sha256"]:
+            raise ValueError("Baseline and release marker are not the same version")
+        sha(marker["frontend_sha"])
+        sha(marker["content_sha"])
+        # The shared validator owns baseline shape validation; this step binds transport bytes only.
+        json.loads(data)
+        args.output.write_bytes(data)
+    except (OSError, ValueError, KeyError) as error:
+        raise ReleaseError("baseline", str(error)) from error
+    return {"ok": True, "stage": "baseline", "release": marker["id"]}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    commands = parser.add_subparsers(dest="operation", required=True)
+    build = commands.add_parser("prepare")
+    for name in (
+        "frontend-repo",
+        "frontend-sha",
+        "approved-frontend-sha",
+        "content-repo",
+        "content-sha",
+    ):
+        build.add_argument("--" + name, required=True)
+    build.add_argument("--approvals", type=Path, required=True)
+    build.add_argument("--baseline", type=Path)
+    build.add_argument("--build-env", type=Path)
+    build.add_argument("--store", type=Path, required=True)
+    for name in ("activate", "rollback"):
+        deploy = commands.add_parser(name)
+        deploy.add_argument("--store", type=Path, required=True)
+        deploy.add_argument("--release", required=True)
+        deploy.add_argument("--generation", type=int, required=True)
+        deploy.add_argument("--base-url", required=True)
+        deploy.add_argument(
+            "--freshness-repository",
+            help="Trusted policy repository; check source/pin inside activation lock immediately before pointer swap",
+        )
+    importer = commands.add_parser("import")
+    importer.add_argument("--store", type=Path, required=True)
+    importer.add_argument("--artifact", type=Path, required=True)
+    importer.add_argument("--manifest-sha256", required=True)
+    fetch = commands.add_parser("fetch-baseline")
+    fetch.add_argument("--base-url", required=True)
+    fetch.add_argument("--output", type=Path, required=True)
+    serve = commands.add_parser("serve")
+    serve.add_argument("--store", type=Path, required=True)
+    serve.add_argument("--port", type=int, default=8536)
+    serve.add_argument("--host", default="127.0.0.1")
+    args = parser.parse_args()
+    try:
+        if args.operation == "prepare":
+            result = prepare(args)
+        elif args.operation in ("activate", "rollback"):
+            result = activate(args)
+        elif args.operation == "import":
+            result = import_release(args)
+        elif args.operation == "fetch-baseline":
+            result = fetch_baseline(args)
+        else:
+            server = ThreadingHTTPServer(
+                (args.host, args.port),
+                website_handler(lambda: args.store / "current/site"),
+            )
+            print(
+                json.dumps(
+                    {
+                        "stage": "serving",
+                        "port": server.server_port,
+                        "adapter": "filesystem-http",
+                    }
+                ),
+                flush=True,
+            )
+            server.serve_forever()
+            return 0
+        print(json.dumps(result, ensure_ascii=False))
+        return 0
+    except (ReleaseError, OSError, ValueError, TypeError, KeyError) as error:
+        print(
+            json.dumps(
+                {
+                    "ok": False,
+                    "stage": getattr(error, "stage", args.operation),
+                    "error": str(error),
+                }
+            )
+        )
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
