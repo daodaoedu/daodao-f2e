@@ -35,7 +35,6 @@ type ColumnKey =
   | "startDate"
   | "checkinCount"
   | "commentCount"
-  | "viewCount"
   | "reactionCount";
 type Column = { key: ColumnKey; labelKey: string; sort?: LighthouseParticipantsSort };
 
@@ -47,7 +46,6 @@ const COLUMNS: Column[] = [
   { key: "startDate", labelKey: "col_start_date", sort: "startDate" },
   { key: "checkinCount", labelKey: "col_checkins", sort: "checkinCount" },
   { key: "commentCount", labelKey: "col_comments", sort: "commentCount" },
-  { key: "viewCount", labelKey: "col_views", sort: "viewCount" },
   { key: "reactionCount", labelKey: "col_reactions", sort: "reactionCount" },
 ];
 const DEFAULT_WIDTHS: Record<ColumnKey, number> = {
@@ -57,7 +55,6 @@ const DEFAULT_WIDTHS: Record<ColumnKey, number> = {
   startDate: 110,
   checkinCount: 90,
   commentCount: 70,
-  viewCount: 70,
   reactionCount: 70,
 };
 const MIN_WIDTH = 60;
@@ -297,7 +294,6 @@ export function CohortParticipantsTable({
                   )}
                 </td>
                 <td className="px-3 py-3">{row.commentCount}</td>
-                <td className="px-3 py-3">{row.viewCount}</td>
                 <td className="rounded-r-2xl px-3 py-3">{row.reactionCount}</td>
               </tr>
             ))}
