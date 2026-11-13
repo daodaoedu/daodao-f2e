@@ -148,6 +148,16 @@ describe("Blog browser events", () => {
     });
     expect(getBlogPageContext("https://app.daodao.so/lighthouse", "")).toEqual({});
   });
+  it("redacts Blog-derived URLs and profile origin fields after navigation to a non-Blog page", () => {
+    const secret="fixture@example.invalid";
+    const event={event:"$pageview",properties:{$current_url:"https://daodao.so/about",$referrer:`https://daodao.so/blog/learning-check-in?email=${secret}#token`,$initial_current_url:`https://daodao.so/blog/learning-check-in?token=${secret}`},$set_once:{$initial_referrer:`https://daodao.so/blog/learning-check-in?email=${secret}`}};
+    const hook=Function(`return (${sanitizeBlogAnalyticsEvent.toString()})`)() as typeof sanitizeBlogAnalyticsEvent;
+    const safe=hook(event);
+    expect(safe?.event).toBe("$pageview");
+    expect(safe?.properties?.$current_url).toBe("https://daodao.so/about");
+    expect(JSON.stringify(safe)).not.toContain(secret);
+    expect(JSON.stringify(safe)).not.toContain("?token=");
+  });
   it("uses the actual self-contained SDK hook to suppress automatic Blog events and remove query/profile data", () => {
     const hook = Function(
       `return (${sanitizeBlogAnalyticsEvent.toString()})`
