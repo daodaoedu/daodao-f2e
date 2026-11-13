@@ -1,7 +1,6 @@
 import "server-only";
-import { readFile } from "node:fs/promises";
 import path from "node:path";
-import type { ValidatedArticleType } from "@daodao/blog-content";
+import { readRepositoryFile, type ValidatedArticleType } from "@daodao/blog-content";
 import { cache } from "react";
 import { configuredBlogSource } from "./config";
 import { publishedImagePath, readBlogSource } from "./source";
@@ -15,7 +14,7 @@ export const loadBlog = cache(async () => {
         if (source.preview && source.root) {
           const ext = path.extname(image.path).slice(1).replace("jpg", "jpeg");
           assets[image.path] =
-            `data:image/${ext};base64,${(await readFile(path.join(source.root, image.path))).toString("base64")}`;
+            `data:image/${ext};base64,${(await readRepositoryFile(source.root, image.path)).toString("base64")}`;
         } else assets[image.path] = publishedImagePath(source, article.metadata.id, image.path);
       }
       return { ...article, assets };

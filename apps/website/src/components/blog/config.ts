@@ -7,5 +7,6 @@ export function configuredBlogSource(): BlogSourceOptionsType {
     origin: getEnv("NEXT_PUBLIC_WEBSITE_URL"),
     approvalsFile: getEnv("BLOG_APPROVALS_FILE"),
     baselineFile: getEnv("BLOG_PUBLISHED_BASELINE_FILE"),
+    evidenceRoot: getEnv("BLOG_EVIDENCE_ROOT"),
   };
 }

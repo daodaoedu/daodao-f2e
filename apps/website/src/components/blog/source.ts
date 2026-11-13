@@ -1,9 +1,11 @@
-import { copyFile, mkdir, readFile, realpath } from "node:fs/promises";
+import { lstat, mkdir, mkdtemp, realpath, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {
   approvalSchema,
   authorsSchema,
   baselineSchema,
+  readPrivateJson,
+  readRepositoryFile,
   topicsSchema,
   type ValidatedArticleType,
   validateRepository,
@@ -15,6 +17,7 @@ export type BlogSourceOptionsType = {
   origin?: string;
   approvalsFile?: string;
   baselineFile?: string;
+  evidenceRoot?: string;
 };
 export type BlogSourceType = {
   root: string | null;
@@ -38,19 +41,21 @@ export async function readBlogSource(options: BlogSourceOptionsType): Promise<Bl
     if (relative !== ".." && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative))
       throw new Error("Approval evidence must be outside content root");
   }
+  if ((options.approvalsFile || options.baselineFile) && !options.evidenceRoot)
+    throw new Error("Private evidence requires trusted BLOG_EVIDENCE_ROOT configuration");
   const approvals = options.approvalsFile
-    ? approvalSchema.parse(JSON.parse(await readFile(options.approvalsFile, "utf8")))
+    ? approvalSchema.parse(await readPrivateJson(options.evidenceRoot || "", options.approvalsFile))
     : [];
   const publishedBaseline = options.baselineFile
-    ? baselineSchema.parse(JSON.parse(await readFile(options.baselineFile, "utf8")))
+    ? baselineSchema.parse(await readPrivateJson(options.evidenceRoot || "", options.baselineFile))
     : undefined;
   const result = await validateRepository(root, { mode, approvals, publishedBaseline });
   if (!result.ok) throw new Error(`Invalid Blog content: ${JSON.stringify(result.errors)}`);
   const authors = authorsSchema.parse(
-    JSON.parse(await readFile(path.join(root, "authors.json"), "utf8"))
+    JSON.parse((await readRepositoryFile(root, "authors.json")).toString("utf8"))
   );
   const topics = topicsSchema.parse(
-    JSON.parse(await readFile(path.join(root, "topics.json"), "utf8"))
+    JSON.parse((await readRepositoryFile(root, "topics.json")).toString("utf8"))
   );
   return {
     root,
@@ -66,17 +71,53 @@ export function publishedImagePath(source: BlogSourceType, id: string, image: st
   if (!digest) throw new Error(`No validated content digest for ${id}`);
   return `/blog-images/${digest}/${image}`;
 }
+/** Prebuild owns this generated directory; public deployments serve the separately built out/. */
 export async function stageBlogAssets(source: BlogSourceType, publicDirectory: string) {
+  await mkdir(publicDirectory, { recursive: true });
+  const work = await mkdtemp(path.join(path.dirname(publicDirectory), ".blog-images-stage-"));
+  const next = path.join(work, "next");
+  const previous = path.join(work, "previous");
+  const destination = path.join(publicDirectory, "blog-images");
   const staged = new Set<string>();
-  if (source.preview || !source.root) return [];
-  for (const article of source.articles)
-    for (const image of article.images) {
-      const url = publishedImagePath(source, article.metadata.id, image.path);
-      if (staged.has(url)) continue;
-      const destination = path.join(publicDirectory, url);
-      await mkdir(path.dirname(destination), { recursive: true });
-      await copyFile(path.join(source.root, image.path), destination);
-      staged.add(url);
+  let phase: "staging" | "backed-up" | "committed" = "staging";
+  try {
+    await mkdir(next);
+    if (!source.preview && source.root) {
+      for (const article of source.articles)
+        for (const image of article.images) {
+          const url = publishedImagePath(source, article.metadata.id, image.path);
+          if (staged.has(url)) continue;
+          const target = path.join(next, url.slice("/blog-images/".length));
+          await mkdir(path.dirname(target), { recursive: true });
+          await writeFile(target, await readRepositoryFile(source.root, image.path));
+          staged.add(url);
+        }
     }
-  return [...staged].sort();
+    let existing = false;
+    try {
+      const current = await lstat(destination);
+      if (!current.isDirectory()) throw new Error("Managed Blog image output must be a directory");
+      existing = true;
+    } catch (error) {
+      if (!(error instanceof Error && "code" in error && error.code === "ENOENT")) throw error;
+    }
+    if (existing) {
+      await rename(destination, previous);
+      phase = "backed-up";
+    }
+    try {
+      await rename(next, destination);
+      phase = "committed";
+    } catch (error) {
+      if (phase === "backed-up") {
+        await rename(previous, destination);
+        phase = "staging";
+      }
+      throw error;
+    }
+    return [...staged].sort();
+  } finally {
+    // If rollback itself fails, retain the previous directory for recovery outside public/.
+    if (phase !== "backed-up") await rm(work, { recursive: true, force: true });
+  }
 }

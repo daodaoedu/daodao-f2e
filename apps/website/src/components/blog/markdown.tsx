@@ -19,7 +19,11 @@ export function BlogMarkdown({ article }: { article: BlogArticleType }) {
           h3: ({ children }) => <h3 id={outline[heading++]?.id}>{children}</h3>,
           table: ({ children }) => (
             // biome-ignore lint/a11y/noNoninteractiveTabindex: Keyboard users must be able to focus and scroll wide tables.
-            <section className="blog-scroll" tabIndex={0} aria-label="Table">
+            <section
+              className="blog-scroll"
+              tabIndex={0}
+              aria-label={article.metadata.lang === "en" ? "Table" : "表格"}
+            >
               <table>{children}</table>
             </section>
           ),
@@ -28,6 +32,7 @@ export function BlogMarkdown({ article }: { article: BlogArticleType }) {
             <pre tabIndex={0}>{children}</pre>
           ),
           img: ({ src, alt, title }) => {
+            if (typeof src !== "string") return null;
             const image = article.images.find((image) => image.path === src);
             if (!image || !src) return null;
             return (

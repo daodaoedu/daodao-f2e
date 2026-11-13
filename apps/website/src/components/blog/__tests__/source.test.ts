@@ -76,7 +76,7 @@ describe("website content boundary and assets", () => {
         },
       ])
     );
-    const published = await readBlogSource({ directory: root, approvalsFile });
+    const published = await readBlogSource({ directory: root, evidenceRoot: dir, approvalsFile });
     const publicDir = path.join(dir, "public");
     const files = await stageBlogAssets(published, publicDir);
     expect(files).toEqual([`/blog-images/${draft.digests.guide}/images/pixel.png`]);
@@ -92,8 +92,115 @@ describe("website content boundary and assets", () => {
     await writeFile(internal, "[]");
     const approvalsFile = path.join(dir, "link.json");
     await symlink(internal, approvalsFile);
-    await expect(readBlogSource({ directory: root, approvalsFile })).rejects.toThrow(
-      "outside content root"
-    );
+    await expect(
+      readBlogSource({ directory: root, evidenceRoot: dir, approvalsFile })
+    ).rejects.toThrow("outside content root");
   });
+});
+
+it("rejects private files outside the separately trusted evidence root", async () => {
+  const { dir, root } = await fixture();
+  const evidenceRoot = path.join(dir, "private");
+  await mkdir(evidenceRoot);
+  const approvalsFile = path.join(dir, "mistaken-credential.json");
+  await writeFile(approvalsFile, '{"token":"sensitive-test-value"}');
+  await expect(readBlogSource({ directory: root, approvalsFile })).rejects.toThrow(
+    "BLOG_EVIDENCE_ROOT"
+  );
+  await expect(readBlogSource({ directory: root, evidenceRoot, approvalsFile })).rejects.toThrow(
+    "authorized root"
+  );
+});
+it("does not echo malformed private JSON bytes", async () => {
+  const { dir, root } = await fixture();
+  const evidenceRoot = path.join(dir, "private");
+  await mkdir(evidenceRoot);
+  const approvalsFile = path.join(evidenceRoot, "approval.json");
+  await writeFile(approvalsFile, "sensitive-test-marker malformed");
+  let failure: unknown;
+  try {
+    await readBlogSource({ directory: root, evidenceRoot, approvalsFile });
+  } catch (error) {
+    failure = error;
+  }
+  expect(failure).toBeInstanceOf(Error);
+  if (!(failure instanceof Error)) throw new Error("Expected private JSON rejection");
+  expect(failure.message).toContain("Invalid JSON");
+  expect(failure.message).not.toContain("sensitive-test-marker");
+});
+
+async function approvedFixture(root: string, dir: string) {
+  const draft = await readBlogSource({
+    directory: root,
+    mode: "draft",
+    origin: "http://localhost",
+  });
+  const approvalsFile = path.join(dir, "fixture-approval.json");
+  await writeFile(
+    approvalsFile,
+    JSON.stringify([
+      {
+        id: "guide",
+        digest: draft.digests.guide,
+        reviewer: "engineering-test",
+        evidence: "test-only fixture",
+      },
+    ])
+  );
+  return readBlogSource({ directory: root, approvalsFile, evidenceRoot: dir });
+}
+it("replaces publication A with exact B assets, then clears removals, draft and empty output", async () => {
+  const { dir, root, png } = await fixture();
+  const publicDir = path.join(dir, "public");
+  const a = await approvedFixture(root, dir);
+  const first = await stageBlogAssets(a, publicDir);
+  const old = first[0];
+  if (!old) throw new Error("Expected first asset");
+  await writeFile(path.join(publicDir, "blog-images/stale.json"), "stale-fixture");
+  for (const folder of ["zh-tw", "en"]) {
+    const file = path.join(root, `articles/${folder}/guide.md`);
+    await writeFile(file, (await readFile(file, "utf8")) + "\nPublication B.\n");
+  }
+  const b = await approvedFixture(root, dir);
+  const second = await stageBlogAssets(b, publicDir);
+  expect(second).not.toEqual(first);
+  const current = second[0];
+  if (!current) throw new Error("Expected replacement asset");
+  expect(await readFile(path.join(publicDir, current))).toEqual(png);
+  await expect(readFile(path.join(publicDir, old))).rejects.toMatchObject({ code: "ENOENT" });
+  await expect(readFile(path.join(publicDir, "blog-images/stale.json"))).rejects.toMatchObject({
+    code: "ENOENT",
+  });
+  for (const folder of ["zh-tw", "en"]) {
+    const file = path.join(root, `articles/${folder}/guide.md`);
+    await writeFile(
+      file,
+      (await readFile(file, "utf8")).replace("![Pixel](images/pixel.png)", "Image removed.")
+    );
+  }
+  const removed = await approvedFixture(root, dir);
+  expect(await stageBlogAssets(removed, publicDir)).toEqual([]);
+  await expect(readFile(path.join(publicDir, current))).rejects.toMatchObject({ code: "ENOENT" });
+  await stageBlogAssets(b, publicDir);
+  const draft = await readBlogSource({
+    directory: root,
+    mode: "draft",
+    origin: "http://localhost",
+  });
+  expect(await stageBlogAssets(draft, publicDir)).toEqual([]);
+  await expect(readFile(path.join(publicDir, current))).rejects.toMatchObject({ code: "ENOENT" });
+  await stageBlogAssets(b, publicDir);
+  expect(await stageBlogAssets(await readBlogSource({}), publicDir)).toEqual([]);
+  await expect(readFile(path.join(publicDir, current))).rejects.toMatchObject({ code: "ENOENT" });
+});
+it("retains the old managed asset set when preparing a new set fails", async () => {
+  const { dir, root, png } = await fixture();
+  const publicDir = path.join(dir, "public");
+  const source = await approvedFixture(root, dir);
+  const urls = await stageBlogAssets(source, publicDir);
+  const image = urls[0];
+  if (!image) throw new Error("Expected staged asset");
+  await rm(path.join(root, "images/pixel.png"));
+  await expect(stageBlogAssets(source, publicDir)).rejects.toThrow();
+  expect(await readFile(path.join(publicDir, image))).toEqual(png);
 });
