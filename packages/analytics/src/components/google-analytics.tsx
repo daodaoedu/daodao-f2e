@@ -1,6 +1,7 @@
 "use client";
 
 import Script from "next/script";
+import { getBlogPageContext } from "../lib/blog-events";
 import { getAnalyticsConfig } from "../lib/config";
 
 declare global {
@@ -34,8 +35,10 @@ export function GoogleAnalytics() {
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
+          const blogPageContext = ${getBlogPageContext.toString()};
           gtag('config', '${measurementId}', {
             page_path: window.location.pathname,
+            ...blogPageContext(window.location.href, document.referrer),
           });
         `}
       </Script>

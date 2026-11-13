@@ -18,11 +18,11 @@ Google官方將AI Overviews/AI Mode的網站流量納入GSC Performance的Web整
 
 ## 事件與隱私
 
-`packages/analytics/src/lib/blog-events.ts` 是共用事件來源。文章ID/slug是公開內容契約ID，locale只有zh-TW/en，CTA只有beta-interest，來源僅回傳direct/search/social/internal/unknown。URLquery、原始referrer、姓名、email、教學筆記、邀請token、組織/成員ID不進Browser Blog事件。
+`packages/analytics/src/lib/blog-events.ts` 是共用事件來源。文章ID/slug是公開內容契約ID，locale只有zh-TW/en，CTA只有beta-interest，來源僅回傳direct/search/social/internal/unknown；沒有referrer也維持unknown，不將被隱藏的來源冒稱直接造訪。URLquery、原始referrer、姓名、email、教學筆記、邀請token、組織/成員ID不進Browser Blog事件。
 
 `createBlogTracker` 的queued僅表示交給SDK/測試transport，不表示Hosted ingest成功。相同interaction_id只排隊一次；transport未就緒或失敗不消耗該ID，可重試。閱讀與CTA為不同事件，不建立submitted事件。來源分類不保留任意UTM值，陌生/無法解析的來源維持unknown。
 
-SDK `before_send` 使用相同經測試的self-contained hook：Blog自動事件不傳送，手動事件只保留限定欄位，移除query/fragment及profile setters；其他產品事件維持原流程。Hosted SDK設定、Session Replay與第三方自動量測仍需在實際環境回讀，不由純函式測試宣稱全平台隱私認證。
+SDK `before_send` 使用相同經測試的self-contained hook：Blog自動事件不傳送，手動事件只保留限定欄位，移除query/fragment及profile setters；其他產品事件維持原流程。網站明確停用Clarity與PostHog Session Replay（產品App預設不變），GA4 Blog context只提供無query/fragment的URL與origin-only referrer。實際網站客戶端的SDK capture測試transport已回讀，但Hosted ingest與第三方遠端設定仍未驗證，不宣稱全平台隱私認證。
 
 ## 30天定義與分母
 
@@ -43,9 +43,10 @@ SDK `before_send` 使用相同經測試的self-contained hook：Blog自動事件
 
 - `daodao-server/src/services/cohort-activation-evidence.service.ts`：同一業務交易內保存首次觀察到的發布/加入audit；advisory lock及NOT EXISTS使併發/重試不重複，不改先前時間。這不是對既有場次首次歷史發布時間的追溯。
 - `cohort.service.ts`：成功建立published場次或狀態轉為published時記錄；單純published編輯不產新事件。
-- `cohort-invitation.service.ts`：既有邀請audit新增enrollmentIds，沒有email/token；只有原本aggregate counts的舊audit不猜收件人。
+- `cohort-invitation.service.ts`：保留既有邀請聚合audit，另以同一SQLstatement/交易新增cohort_activation_invited的enrollmentIds證據，沒有email/token；只有原本aggregate counts的舊audit不猜收件人。
 - `cohort-join.service.ts`：成功加入後同交易保存enrollment/role及管理身分；邀請token本身從不寫audit。
-- `blog-activation-export.service.ts`：只讀IDs與時間，完整輸出指定註冊期間的使用者分類，回傳coverage與來源限制。管理成員參與不計受邀非帶領者；歷史/現有角色快照限制明示。
+- `practice-checkin.service.ts`：實際建立checkin後，在同一交易記錄cohort/checkinId與當時角色/管理身分，沒有note/mood/token；無對應真實checkin資料或角色證據不算參與。
+- `blog-activation-export.service.ts`：只讀IDs與時間，完整輸出指定註冊期間的使用者分類，回傳coverage與來源限制。參與以同交易audit保存的管理身分/場次角色判斷，不拿事後組織快照冒充歷史角色。未有角色證據的歷史打卡維持unknown。註冊受眾分類仍有現有角色快照限制。
 
 `cohorts.updated_at`不能充當首次發布時間；公開加入也可能有`cohort_enrollments.invited_at`預設值，不能拿它證明曾收到邀請。現有聚合邀請audit無enrollmentIds、場次歷史早於instrumentedSince時coverage保守不完整，沒有正向證據就回unknown。新增量測不回填虛構歷史。
 
@@ -80,4 +81,4 @@ GSC/Bing每週按實際文章canonical路徑、語言及品牌/非品牌查詢�
 
 工程目前已用disposable PostgreSQL執行durable writer/export；再把真SQL輸出餵給實際evaluator CLI，正向受控fixture結果：1觀測帶領者、1學員、1未分類、1啟用、成熟分母0(rate=null)。這是本機fixture，不是正式產品成效。
 
-實際UI點擊/SDK測試transport、PR檢查、dev部署/Hosted ingest回讀、Tally授權、完整#539受控旅程須各自記錄。未完成這些，不以單元測試或本文件宣稱#538/#531 Done。
+本機實際Next/React頁面的StrictMode單次閱讀、滑鼠/鍵盤CTA、來源、query/fragment排除及英文列表無虛構文章ID已回讀SDK測試transport。PR檢查、dev部署/Hosted ingest回讀、Tally授權、完整#539受控旅程須各自記錄。未完成這些，不以單元測試或本文件宣稱#538/#531 Done。

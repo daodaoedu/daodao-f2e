@@ -6,10 +6,11 @@ const identifier = z
   .max(100);
 export const blogInteractionSchema = z
   .object({
-    event: z.enum(["blog_article_viewed", "blog_beta_interest_clicked"]),
+    event: z.enum(["blog_article_viewed", "blog_index_viewed", "blog_beta_interest_clicked"]),
     interaction_id: z.string().uuid(),
-    article_id: identifier,
-    article_slug: identifier,
+    page_type: z.enum(["article", "index"]),
+    article_id: identifier.optional(),
+    article_slug: identifier.optional(),
     locale: z.enum(["zh-TW", "en"]),
     source: z.enum(["direct", "search", "social", "internal", "unknown"]),
     cta_target: z.literal("beta-interest").optional(),
@@ -18,6 +19,13 @@ export const blogInteractionSchema = z
   .refine(
     (value) => value.event !== "blog_beta_interest_clicked" || value.cta_target === "beta-interest",
     "CTA clicks require their confirmed target"
+  )
+  .refine(
+    (value) =>
+      value.page_type === "article"
+        ? Boolean(value.article_id && value.article_slug && value.event !== "blog_index_viewed")
+        : !value.article_id && !value.article_slug && value.event !== "blog_article_viewed",
+    "Page identity must match the view event"
   );
 export type BlogInteractionType = z.infer<typeof blogInteractionSchema>;
 export type BlogCaptureType = (event: string, properties: Record<string, unknown>) => void;
@@ -36,7 +44,7 @@ export function classifyBlogSource(
       return "social";
     return "unknown";
   }
-  if (!referrer) return "direct";
+  if (!referrer) return "unknown";
   try {
     const url = new URL(referrer);
     if (!["http:", "https:"].includes(url.protocol)) return "unknown";
@@ -76,7 +84,7 @@ export function createBlogTracker(capture: BlogCaptureType | undefined) {
     const data = parsed.data;
     if (queued.has(data.interaction_id)) return "duplicate";
     const { article_slug, ...properties } = data;
-    const route = `${data.locale === "en" ? "/en" : ""}/blog/${article_slug}`;
+    const route = `${data.locale === "en" ? "/en" : ""}/blog${article_slug ? `/${article_slug}` : ""}`;
     try {
       capture(data.event, {
         ...properties,
@@ -105,7 +113,9 @@ export function sanitizeBlogAnalyticsEvent(
 ): BlogAnalyticsEnvelopeType | null {
   const properties = event.properties ?? {};
   let blogRoute =
-    event.event === "blog_article_viewed" || event.event === "blog_beta_interest_clicked";
+    event.event === "blog_article_viewed" ||
+    event.event === "blog_index_viewed" ||
+    event.event === "blog_beta_interest_clicked";
   try {
     const href = typeof properties.$current_url === "string" ? properties.$current_url : "";
     const pathname = href
@@ -118,7 +128,11 @@ export function sanitizeBlogAnalyticsEvent(
     /* Unknown URLs are not retained on explicit Blog events. */
   }
   if (!blogRoute) return event;
-  if (event.event !== "blog_article_viewed" && event.event !== "blog_beta_interest_clicked")
+  if (
+    event.event !== "blog_article_viewed" &&
+    event.event !== "blog_index_viewed" &&
+    event.event !== "blog_beta_interest_clicked"
+  )
     return null;
   const allowed = new Set([
     "token",
@@ -131,6 +145,7 @@ export function sanitizeBlogAnalyticsEvent(
     "$insert_id",
     "event",
     "interaction_id",
+    "page_type",
     "article_id",
     "locale",
     "source",
@@ -150,4 +165,25 @@ export function sanitizeBlogAnalyticsEvent(
     }
   }
   return { ...event, properties: safe, $set: undefined, $set_once: undefined };
+}
+
+/** GA4 receives a canonical Blog URL and origin-only referrer, not inbound query/fragment data. */
+export function getBlogPageContext(href: string, referrer: string): Record<string, string> {
+  try {
+    const url = new URL(href);
+    if (!/^\/(?:en\/|zh-TW\/)?blog(?:\/|$)/.test(url.pathname)) return {};
+    let referringOrigin = "";
+    try {
+      if (referrer) referringOrigin = new URL(referrer).origin;
+    } catch {
+      /* Invalid referrers stay absent. */
+    }
+    return {
+      page_location: `${url.origin}${url.pathname}`,
+      page_path: url.pathname,
+      page_referrer: referringOrigin,
+    };
+  } catch {
+    return {};
+  }
 }

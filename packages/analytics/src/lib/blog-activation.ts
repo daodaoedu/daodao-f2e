@@ -29,7 +29,12 @@ export const activationEventSchema = z.discriminatedUnion("kind", [
     })
     .strict(),
   base
-    .extend({ kind: z.literal("participated"), participantId: id, isManager: z.boolean() })
+    .extend({
+      kind: z.literal("participated"),
+      participantId: id,
+      isManager: z.boolean(),
+      role: z.enum(["owner", "assistant", "member"]),
+    })
     .strict(),
 ]);
 export const activationInputSchema = z
@@ -115,6 +120,7 @@ export function evaluateLeaderActivation(input: unknown) {
           participation.kind !== "participated" ||
           participation.participantId === registration.leaderId ||
           participation.isManager ||
+          participation.role !== "member" ||
           getTime(parseISO(participation.occurredAt)) < publicationAt
         )
           continue;

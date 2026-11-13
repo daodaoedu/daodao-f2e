@@ -1,10 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { type ActivationInputType, evaluateLeaderActivation } from "../blog-activation";
-import { classifyBlogSource, createBlogTracker, sanitizeBlogAnalyticsEvent } from "../blog-events";
+import {
+  classifyBlogSource,
+  createBlogTracker,
+  getBlogPageContext,
+  sanitizeBlogAnalyticsEvent,
+} from "../blog-events";
 
 const interaction = {
   event: "blog_beta_interest_clicked",
   interaction_id: "a8e6bfc4-bcea-4cb3-b5bd-a69d055cb3a0",
+  page_type: "article",
   article_id: "learning-check-in",
   article_slug: "learning-check-in",
   locale: "zh-TW",
@@ -12,7 +18,12 @@ const interaction = {
   cta_target: "beta-interest",
 };
 const complete = { publications: true, invitations: true, joins: true, participation: true };
-function fixture(): ActivationInputType {
+function fixture(): ActivationInputType & {
+  registrations: [
+    ActivationInputType["registrations"][number],
+    ...ActivationInputType["registrations"],
+  ];
+} {
   const scope = { leaderId: "leader1", organizationId: "org1", cohortId: "cohort1" };
   return {
     asOf: "2026-11-13T00:00:00Z",
@@ -49,6 +60,7 @@ function fixture(): ActivationInputType {
         eventId: "c1",
         occurredAt: "2026-10-05T00:00:00Z",
         kind: "participated",
+        role: "member",
         participantId: "member1",
         isManager: false,
       },
@@ -68,6 +80,7 @@ describe("Blog browser events", () => {
         properties: {
           event: "blog_beta_interest_clicked",
           interaction_id: interaction.interaction_id,
+          page_type: "article",
           article_id: "learning-check-in",
           locale: "zh-TW",
           source: "unknown",
@@ -108,7 +121,32 @@ describe("Blog browser events", () => {
     expect(classifyBlogSource("https://app.daodao.so/private?email=x")).toBe("internal");
     expect(classifyBlogSource("", "private@example.com")).toBe("unknown");
     expect(classifyBlogSource("", "LinkedIn")).toBe("social");
-    expect(classifyBlogSource("")).toBe("direct");
+    expect(classifyBlogSource("")).toBe("unknown");
+  });
+  it("records index views without inventing article attribution and sanitizes GA4 Blog context", () => {
+    const events: unknown[] = [];
+    const track = createBlogTracker((event, properties) => events.push({ event, properties }));
+    expect(
+      track({
+        event: "blog_index_viewed",
+        interaction_id: interaction.interaction_id,
+        page_type: "index",
+        locale: "en",
+        source: "direct",
+      })
+    ).toBe("queued");
+    expect(JSON.stringify(events)).not.toContain("article_id");
+    expect(
+      getBlogPageContext(
+        "https://daodao.so/en/blog?email=private@example.com#token",
+        "https://search.test/query?secret=x"
+      )
+    ).toEqual({
+      page_location: "https://daodao.so/en/blog",
+      page_path: "/en/blog",
+      page_referrer: "https://search.test",
+    });
+    expect(getBlogPageContext("https://app.daodao.so/lighthouse", "")).toEqual({});
   });
   it("uses the actual self-contained SDK hook to suppress automatic Blog events and remove query/profile data", () => {
     const hook = Function(
@@ -221,8 +259,10 @@ describe("30-day leader activation", () => {
   });
   it("deduplicates leader, organization and session independently and refuses conflicting IDs", () => {
     const input = fixture();
-    input.registrations.push({ ...input.registrations[0]! });
-    input.events.push({ ...input.events[0]! });
+    input.registrations.push({ ...input.registrations[0] });
+    const first = input.events[0];
+    if (!first) throw new Error("Expected fixture event");
+    input.events.push({ ...first });
     expect(evaluateLeaderActivation(input).counts.leaders).toBe(1);
     input.registrations.push({
       leaderId: "learner1",
@@ -231,7 +271,7 @@ describe("30-day leader activation", () => {
       source: "blog",
     });
     expect(evaluateLeaderActivation(input).counts.learners).toBe(1);
-    input.events.push({ ...input.events[0]!, occurredAt: "2026-10-03T00:00:00Z" });
+    input.events.push({ ...first, occurredAt: "2026-10-03T00:00:00Z" });
     expect(() => evaluateLeaderActivation(input)).toThrow("Conflicting duplicate eventId");
   });
   it("refuses another organization manager even when their cohort enrollment says member", () => {
@@ -263,7 +303,7 @@ describe("30-day leader activation", () => {
       evaluateLeaderActivation({ ...fixture(), email: "private@example.com" })
     ).toThrow();
     const input = fixture();
-    input.registrations[0]!.leaderId = "private@example.com";
+    input.registrations[0].leaderId = "private@example.com";
     expect(() => evaluateLeaderActivation(input)).toThrow();
     expect(() => evaluateLeaderActivation({ ...fixture(), asOf: "2026-02-30" })).toThrow();
   });

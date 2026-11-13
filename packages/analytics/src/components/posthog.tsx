@@ -20,7 +20,7 @@ declare global {
   }
 }
 
-export function PostHog() {
+export function PostHog({ disableSessionReplay = false }: { disableSessionReplay?: boolean }) {
   const config = getAnalyticsConfig();
 
   if (!config.posthog.enabled || !config.posthog.apiKey) {
@@ -37,6 +37,7 @@ export function PostHog() {
         posthog.init('${apiKey}', {
           api_host: '${apiHost}',
           person_profiles: 'identified_only',
+          disable_session_recording: ${disableSessionReplay},
           capture_pageview: true,
           capture_pageleave: true,
           before_send: ${sanitizeBlogAnalyticsEvent.toString()},

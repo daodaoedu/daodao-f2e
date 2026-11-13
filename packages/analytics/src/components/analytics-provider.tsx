@@ -5,25 +5,33 @@ import { GoogleAnalytics } from "./google-analytics";
 import { PostHog } from "./posthog";
 
 // Component that only renders the analytics scripts
-export function AnalyticsScripts() {
+export function AnalyticsScripts({
+  disableSessionReplay = false,
+}: {
+  disableSessionReplay?: boolean;
+}) {
   return (
     <>
       <GoogleAnalytics />
-      <Clarity />
-      <PostHog />
+      {!disableSessionReplay && <Clarity />}
+      <PostHog disableSessionReplay={disableSessionReplay} />
     </>
   );
 }
 
 interface AnalyticsProviderProps {
   children?: React.ReactNode;
+  disableSessionReplay?: boolean;
 }
 
 // Provider component that wraps children with analytics scripts
-export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
+export function AnalyticsProvider({
+  children,
+  disableSessionReplay = false,
+}: AnalyticsProviderProps) {
   return (
     <>
-      <AnalyticsScripts />
+      <AnalyticsScripts disableSessionReplay={disableSessionReplay} />
       {children}
     </>
   );
