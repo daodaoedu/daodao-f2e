@@ -84,6 +84,12 @@ export type LeaderActivationType = {
 };
 const WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
 
+function compareOpaqueIds(left: string, right: string): number {
+  if (left < right) return -1;
+  if (left > right) return 1;
+  return 0;
+}
+
 /** Inputs must come from trusted durable sources; this evaluator cannot authenticate event producers. */
 export function evaluateLeaderActivation(input: unknown) {
   const data = activationInputSchema.parse(input);
@@ -179,8 +185,8 @@ export function evaluateLeaderActivation(input: unknown) {
       firstActivatedAt:
         firstActivationTime === null ? null : new Date(firstActivationTime).toISOString(),
       timeToActivationMs: firstActivationTime === null ? null : firstActivationTime - start,
-      activatedOrganizations: [...organizations].sort(),
-      activatedCohorts: [...cohorts].sort(),
+      activatedOrganizations: [...organizations].sort(compareOpaqueIds),
+      activatedCohorts: [...cohorts].sort(compareOpaqueIds),
     });
   }
   const mature = rows.filter((row) => getTime(parseISO(row.windowEnd)) <= asOf);

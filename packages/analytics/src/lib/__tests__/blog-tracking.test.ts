@@ -520,3 +520,22 @@ it("retains public first/assist context on the activated leader report without p
     })
   ).toThrow();
 });
+
+describe("Activation report identifier ordering", () => {
+  it("keeps opaque organization and cohort IDs in deterministic code-unit order", () => {
+    const input = fixture();
+    const original = input.events;
+    input.events = ["a", "_z", "Z"].flatMap((scopeId) =>
+      original.map((event) => ({
+        ...event,
+        organizationId: scopeId,
+        cohortId: scopeId,
+        eventId: `${event.eventId}-${scopeId}`,
+        ...("enrollmentId" in event ? { enrollmentId: `enrollment-${scopeId}` } : {}),
+      }))
+    );
+    const result = evaluateLeaderActivation(input);
+    expect(result.rows[0]?.activatedOrganizations).toEqual(["Z", "_z", "a"]);
+    expect(result.rows[0]?.activatedCohorts).toEqual(["Z", "_z", "a"]);
+  });
+});

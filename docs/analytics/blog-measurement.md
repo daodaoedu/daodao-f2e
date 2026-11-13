@@ -61,10 +61,12 @@ firstActivatedAt取第一筆符合完整條件的實際參與時間，timeToActi
 從已部署版本/實際設定記下instrumentedSince。使用唯讀DSN，明確指定註冊起點、asOf和私有輸出，避免不受控報表範圍。
 
 ```sh
+# 由operator／受信任wrapper預先設定既有、絕對路徑的私有目錄；不是CLI argv或模型生成內容決定
+export BLOG_ACTIVATION_EVIDENCE_ROOT=/private/daodao-analytics-evidence
 # daodao-server；BLOG_ACTIVATION_EXPORT_DATABASE_URL由私有環境提供，勿貼進文件/log
-pnpm exec ts-node scripts/export-blog-activation.ts --registered-since "$REGISTERED_SINCE" --as-of "$OBSERVED_AS_OF" --instrumented-since "$INSTRUMENTED_SINCE" --output /private/blog-evidence.json
+pnpm exec ts-node scripts/export-blog-activation.ts --registered-since "$REGISTERED_SINCE" --as-of "$OBSERVED_AS_OF" --instrumented-since "$INSTRUMENTED_SINCE" --output "$BLOG_ACTIVATION_EVIDENCE_ROOT/blog-evidence.json"
 # daodao-f2e
-pnpm --filter @daodao/analytics activation:report --input /private/blog-evidence.json --output /private/blog-report.json
+pnpm --filter @daodao/analytics activation:report --input "$BLOG_ACTIVATION_EVIDENCE_ROOT/blog-evidence.json" --output "$BLOG_ACTIVATION_EVIDENCE_ROOT/blog-report.json"
 ```
 
 先將三個日期變數設定為已查證的ISO時間；OBSERVED_AS_OF不得超過目前實際擷取時間，不能預先產生未來30天結果。輸出前解析真實parent目錄並拒絕public/articles/images（含symlink別名）；輸出檔以0600且不覆蓋既有檔案建立，不可放public/articles/images。opaque IDs仍是內部分析資料，不混進公開文章。CLI不會自行查Tally、發布文章或送事件到Hosted analytics。
@@ -96,3 +98,12 @@ GA4網站頁面一律提供去query的page_location及origin-only page_referrer�
 邀請audit表示目標建立，不是寄達。`invitationTokenUsed`存在raw join audit，實際報表目前以同enrollment邀請歷史配對；退出後改走public link是否仍計受邀、第一來源/助攻如何跨Tally與登入延續，仍需產品定義及真實來源接線，不能把unknown當0或宣稱FR10全部完成。
 
 已確認的網站URL隱私邊界：只保留固定網站路由及動態路由模板（例如/blog/:article）；未知404路徑為/_unrecognized。不能靠slug正規式推定路徑已公開，email或token可能出現在pathname。PostHog/GA4的referrer與initial URL只保留origin；$pathname/page_path/route等欄位同樣使用模板。逐文章歸因使用從已渲染、經內容契約驗證的article_id/article_slug與locale，不從任意網址推導身分。這項website旗標不套用到產品預設。
+
+
+## 私有 CLI 檔案能力邊界
+
+兩支 CLI 皆要求 operator 或受信任 wrapper 固定 `BLOG_ACTIVATION_EVIDENCE_ROOT`；沒有預設值，必須是既有、絕對路徑的私有目錄，不從模型生成的 argv／input／output 推導。相對 CLI 路徑仍依目前 CWD 解析，但解析後必須落在這個 root。上面 `/private/daodao-analytics-evidence` 僅是示例，不會自動建立或選為正式設定。
+
+Input／output／root 的 lexical 路徑及 realpath 都須通過邊界檢查，拒絕 public／articles／images 路徑與 symlink 逃逸；public alias 指向 root 內 private 目錄也不接受。輸出仍用 `wx` 排除覆寫／既有 symlink，權限0600。缺 root、跨 root、失效路徑一律拒絕，不在產出前猜測允許位置。
+
+這限制的是私有 CLI 的讀寫能力，不是整個 shell／LLM 工具 sandbox；不聲稱抵抗同 uid 惡意並行替換目錄，也不新增任何資料保存期限、帳號關聯或分析同意政策。CLI 新證據與較早 f73e production browser／artifact 證據分列，不能更改舊 marker 假裝重建。

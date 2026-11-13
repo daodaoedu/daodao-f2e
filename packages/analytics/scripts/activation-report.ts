@@ -1,7 +1,8 @@
-import { basename, dirname, join, resolve } from "node:path";
-import { readFile, realpath, writeFile } from "node:fs/promises";
+import { constants } from "node:fs";
+import { open, writeFile } from "node:fs/promises";
 import { parseArgs } from "node:util";
 import { evaluateLeaderActivation } from "../src/lib/blog-activation";
+import { resolvePrivateEvidencePaths } from "./private-evidence-paths";
 
 async function main() {
   const { values } = parseArgs({
@@ -9,10 +10,18 @@ async function main() {
   });
   if (!values.input || !values.output)
     throw new Error("--input PRIVATE_EXPORT_JSON --output PRIVATE_REPORT_JSON required");
-  const output = join(await realpath(dirname(resolve(values.output))), basename(values.output));
-  if (/(^|[\\/])(public|articles|images)([\\/]|$)/.test(output))
-    throw new Error("Activation report is private, not a public article asset");
-  const exported = JSON.parse(await readFile(values.input, "utf8"));
+  const { input, output } = await resolvePrivateEvidencePaths(
+    process.env.BLOG_ACTIVATION_EVIDENCE_ROOT,
+    values.input,
+    values.output
+  );
+  const inputFile = await open(input, constants.O_RDONLY | constants.O_NOFOLLOW);
+  let exported: { input: unknown; provenance?: unknown };
+  try {
+    exported = JSON.parse(await inputFile.readFile("utf8"));
+  } finally {
+    await inputFile.close();
+  }
   const result = evaluateLeaderActivation(exported.input);
   await writeFile(
     output,
