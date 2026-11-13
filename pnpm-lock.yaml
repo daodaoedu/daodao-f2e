@@ -674,6 +674,9 @@ importers:
 
   packages/blog-content:
     dependencies:
+      '@daodao/config':
+        specifier: workspace:*
+        version: link:../config
       date-fns:
         specifier: 'catalog:'
         version: 3.6.0
@@ -686,6 +689,12 @@ importers:
       mdast-util-from-markdown:
         specifier: 2.0.2
         version: 2.0.2
+      mdast-util-gfm:
+        specifier: 3.1.0
+        version: 3.1.0
+      micromark-extension-gfm:
+        specifier: 3.0.0
+        version: 3.0.0
       yaml:
         specifier: 2.8.2
         version: 2.8.2
@@ -693,9 +702,6 @@ importers:
         specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
-      '@daodao/config':
-        specifier: workspace:*
-        version: link:../config
       '@types/mdast':
         specifier: ^4.0.4
         version: 4.0.4

@@ -1,12 +1,15 @@
 import { createHash } from "node:crypto";
-import { lstat, readdir, readFile, realpath } from "node:fs/promises";
+import { opendir, realpath } from "node:fs/promises";
 import path from "node:path";
 import { imageSize } from "image-size";
 import type { Nodes } from "mdast";
-import { fromMarkdown } from "mdast-util-from-markdown";
 import { parseDocument } from "yaml";
 import { z } from "zod";
-import { getArticleHeadings } from "./markdown";
+import { isWithinDirectory as isWithin, readRepositoryFile as readConfined } from "./files";
+import { getArticleHeadings, parseArticleMarkdown } from "./markdown";
+
+export * from "./files";
+
 import {
   type ApprovalType,
   type ArticleType,
@@ -47,29 +50,21 @@ export type ValidationOptionsType = {
   >;
 };
 
-function isWithin(root: string, file: string) {
-  const relative = path.relative(root, file);
-  return relative !== ".." && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative);
-}
-async function readConfined(root: string, relative: string) {
-  const file = path.resolve(root, relative);
-  if (
-    !isWithin(root, file) ||
-    !(await lstat(file)).isFile() ||
-    !isWithin(root, await realpath(file))
-  ) {
-    throw new Error(`Expected a regular file inside content root: ${relative}`);
-  }
-  return readFile(file);
-}
 async function markdownFiles(root: string, directory = "articles"): Promise<string[]> {
   const files: string[] = [];
-  for (const entry of await readdir(path.join(root, directory), { withFileTypes: true })) {
-    const file = `${directory}/${entry.name}`;
-    if (entry.isSymbolicLink()) throw new Error(`Symlinks are not allowed: ${file}`);
-    if (entry.isDirectory()) files.push(...(await markdownFiles(root, file)));
-    else if (entry.isFile() && entry.name.endsWith(".md")) files.push(file);
-    else throw new Error(`Only Markdown files are allowed in articles/: ${file}`);
+  const handle = await opendir(path.join(root, directory));
+  try {
+    if (!isWithin(root, await realpath(handle.path)))
+      throw new Error("Article directory escapes the authorized root");
+    for (let entry = await handle.read(); entry !== null; entry = await handle.read()) {
+      const file = `${directory}/${entry.name}`;
+      if (entry.isSymbolicLink()) throw new Error(`Symlinks are not allowed: ${file}`);
+      if (entry.isDirectory()) files.push(...(await markdownFiles(root, file)));
+      else if (entry.isFile() && entry.name.endsWith(".md")) files.push(file);
+      else throw new Error(`Only Markdown files are allowed in articles/: ${file}`);
+    }
+  } finally {
+    await handle.close();
   }
   return files.sort();
 }
@@ -95,7 +90,7 @@ function parseArticle(source: string) {
   return { metadata, body: match[2] };
 }
 function bodyReferences(body: string) {
-  const root = fromMarkdown(body);
+  const root = parseArticleMarkdown(body);
   const definitions = new Map<string, string>();
   const images: string[] = [];
   const links: string[] = [];

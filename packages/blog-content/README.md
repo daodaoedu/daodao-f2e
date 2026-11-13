@@ -44,8 +44,8 @@ Markdown links support HTTP(S), fragment anchors, existing `/blog` or `/en/blog`
 Run from daodao-f2e:
 
 ```sh
-pnpm --filter @daodao/blog-content validate --root /absolute/daodao-blog --mode draft
-pnpm --filter @daodao/blog-content validate --root /absolute/daodao-blog --approvals /private/approvals.json --baseline /private/published-baseline.json
+BLOG_CONTENT_DIR=/absolute/daodao-blog pnpm --filter @daodao/blog-content validate --root /absolute/daodao-blog --mode draft
+BLOG_CONTENT_DIR=/absolute/daodao-blog BLOG_EVIDENCE_ROOT=/private pnpm --filter @daodao/blog-content validate --root /absolute/daodao-blog --approvals /private/approvals.json --baseline /private/published-baseline.json
 ```
 
 The default mode is `publish`. Publish requires an explicit approval file outside the public content root. Draft mode does not imply approval. The CLI prints a JSON result and exits 1 on failure. Validation never writes files. No article list or digest is exposed on a failed validation.
@@ -80,3 +80,11 @@ if (!result.ok) throw new Error(JSON.stringify(result.errors));
 ```
 
 Use this exact validator for every consumer; do not copy its schema into a skill or website. This card exports the integration API; website rendering, CI publication and the publisher skill are separate child issues. Local tests are not deployment evidence.
+
+## Authorized filesystem scopes
+
+The standalone CLI accepts file arguments only within controller-configured scopes: `BLOG_CONTENT_DIR` pins the authorized content checkout, and `BLOG_EVIDENCE_ROOT` pins the private evidence directory outside it. The controller must set these from trusted workspace/CI configuration, never derive authority from the same untrusted file argument. `--root` must select that exact checkout; approval/baseline files must stay inside the private scope. These scopes do not authenticate editorial approval.
+
+The CLI uses `@daodao/config`; initialize its generated public environment module with `pnpm --filter @daodao/config generate:env` during workspace setup, before invoking the read-only validator. Private scope variables are runtime-only and are not included in the generated NEXT_PUBLIC configuration.
+
+`readRepositoryFile(root, relative)` opens a no-follow descriptor, validates the same handle and reads from it, rejecting concurrent file mutation. `readPrivateJson(evidenceRoot, requestedFile)` applies the same confinement and redacts malformed JSON bytes. Consumers must provide immutable, caller-owned checkout/evidence parent directories; this library is not an OS sandbox against a hostile same-user process changing directory ancestors. POSIX `O_NOFOLLOW` support is required; unsupported platforms fail closed rather than silently following symlinks. Do not expose private evidence as website assets.

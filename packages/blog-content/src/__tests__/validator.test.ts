@@ -3,8 +3,31 @@ import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promis
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { afterEach, describe, expect, it } from "vitest";
-import { getArticleHeadings, validateRepository } from "../index";
+import { getEnv } from "@daodao/config";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import {
+  getArticleHeadings,
+  readPrivateJson,
+  readRepositoryFile,
+  validateRepository,
+} from "../index";
+
+const fileRace = vi.hoisted(() => ({ target: "", replacement: "" }));
+vi.mock("node:fs/promises", async (importOriginal) => {
+  const fs = await importOriginal<typeof import("node:fs/promises")>();
+  return {
+    ...fs,
+    realpath: async (file: Parameters<typeof fs.realpath>[0]) => {
+      const resolved = await fs.realpath(file);
+      if (file === fileRace.target) {
+        fileRace.target = "";
+        await fs.rename(file, `${String(file)}.before-race`);
+        await fs.symlink(fileRace.replacement, file);
+      }
+      return resolved;
+    },
+  };
+});
 
 const roots: string[] = [];
 const authors = [
@@ -30,6 +53,8 @@ async function replace(root: string, from: string, to: string, lang = "en") {
   await writeFile(file, (await readFile(file, "utf8")).replace(from, to));
 }
 afterEach(async () => {
+  fileRace.target = "";
+  fileRace.replacement = "";
   await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
 });
 
@@ -318,17 +343,77 @@ describe("shared bilingual content validation", () => {
       getArticleHeadings("## 😀\n\n## !!!\n\n## Section\n").map((heading) => heading.id)
     ).toEqual(["section", "section-1", "section-2"]);
   });
+  it("confines private evidence to the caller-approved root and redacts malformed bytes", async () => {
+    const root = await fixture();
+    const evidenceRoot = await mkdtemp(path.join(os.tmpdir(), "private-blog-evidence-"));
+    roots.push(evidenceRoot);
+    const file = path.join(evidenceRoot, "approvals.json");
+    await writeFile(file, "TOP-SECRET-DO-NOT-ECHO");
+    await expect(readPrivateJson(evidenceRoot, file)).rejects.toThrow(
+      "Invalid JSON in private evidence file"
+    );
+    await expect(readPrivateJson(evidenceRoot, path.join(root, "authors.json"))).rejects.toThrow(
+      "escapes"
+    );
+    await symlink(path.join(root, "authors.json"), path.join(evidenceRoot, "outside.json"));
+    await expect(
+      readPrivateJson(evidenceRoot, path.join(evidenceRoot, "outside.json"))
+    ).rejects.toThrow("escapes");
+  });
+  it("rejects final-component symlinks even to a regular file within the authorized root", async () => {
+    const root = await fixture();
+    await symlink(path.join(root, "authors.json"), path.join(root, "alias.json"));
+    await expect(readRepositoryFile(root, "alias.json")).rejects.toThrow();
+  });
+  it("uses rendered GFM text for outline labels and validates GFM literal source links", async () => {
+    expect(getArticleHeadings("## ~~Old~~ New\n")).toEqual([
+      { depth: 2, id: "old-new", text: "Old New" },
+    ]);
+    const root = await fixture();
+    await replace(root, "Content.", "https://example.com/source");
+    expect((await validateRepository(root, { mode: "draft" })).ok).toBe(false);
+    await replace(root, "sources: []", "sources: [https://example.com/source]");
+    expect((await validateRepository(root, { mode: "draft" })).ok).toBe(true);
+  });
+  it("rejects a symlink swapped in after the path check without exposing outside article bytes", async () => {
+    const root = await fixture();
+    const outside = await fixture();
+    await replace(outside, "Content.", "PRIVATE-OUTSIDE-CONTENT");
+    const fs = await import("node:fs/promises");
+    fileRace.replacement = await fs.realpath(path.join(outside, "articles/en/sample.md"));
+    fileRace.target = await fs.realpath(path.join(root, "articles/en/sample.md"));
+    const result = await validateRepository(root, { mode: "draft" });
+    expect(result.ok).toBe(false);
+    expect(JSON.stringify(result)).not.toContain("PRIVATE-OUTSIDE-CONTENT");
+  });
+  it("does not enumerate filenames through a root articles directory symlink", async () => {
+    const root = await fixture();
+    const outside = await fixture();
+    await rm(path.join(root, "articles"), { recursive: true });
+    await writeFile(path.join(outside, "articles/en/private-filename.md"), article("en"));
+    await symlink(path.join(outside, "articles"), path.join(root, "articles"));
+    const result = await validateRepository(root, { mode: "draft" });
+    expect(result.ok).toBe(false);
+    expect(JSON.stringify(result)).not.toContain("private-filename");
+  });
   it("CLI uses the same validator and fails closed without private approval evidence", async () => {
     const root = await fixture();
     const packageRoot = fileURLToPath(new URL("../../", import.meta.url));
     const cli = path.join(packageRoot, "src/cli.ts");
     const executable = path.join(packageRoot, "node_modules/.bin/tsx");
+    const cliEnv = { PATH: getEnv("PATH") ?? "", BLOG_CONTENT_DIR: root };
     const draft = JSON.parse(
-      execFileSync(executable, [cli, "--root", root, "--mode", "draft"], { encoding: "utf8" })
+      execFileSync(executable, [cli, "--root", root, "--mode", "draft"], {
+        encoding: "utf8",
+        timeout: 5000,
+        env: cliEnv,
+      })
     );
     expect(draft.ok).toBe(true);
     const typo = spawnSync(executable, [cli, "--root", root, "--mode", "typo"], {
       encoding: "utf8",
+      timeout: 5000,
+      env: cliEnv,
     });
     expect(typo.status).toBe(1);
     const evidenceRoot = await mkdtemp(path.join(os.tmpdir(), "blog-evidence-"));
@@ -342,19 +427,25 @@ describe("shared bilingual content validation", () => {
     );
     const approved = spawnSync(executable, [cli, "--root", root, "--approvals", evidence], {
       encoding: "utf8",
+      timeout: 5000,
+      env: { ...cliEnv, BLOG_EVIDENCE_ROOT: evidenceRoot },
     });
     expect(approved.status).toBe(0);
     expect(JSON.parse(approved.stdout).ok).toBe(true);
-    const published = spawnSync(executable, [cli, "--root", root], { encoding: "utf8" });
+    const published = spawnSync(executable, [cli, "--root", root], {
+      encoding: "utf8",
+      timeout: 5000,
+      env: cliEnv,
+    });
     expect(published.status).toBe(1);
     expect(JSON.parse(published.stdout).errors[0].message).toContain("requires --approvals");
     await writeFile(path.join(root, "approvals.json"), "[]");
     const publicEvidence = spawnSync(
       executable,
       [cli, "--root", root, "--approvals", path.join(root, "approvals.json")],
-      { encoding: "utf8" }
+      { encoding: "utf8", timeout: 5000, env: { ...cliEnv, BLOG_EVIDENCE_ROOT: evidenceRoot } }
     );
     expect(publicEvidence.status).toBe(1);
     expect(publicEvidence.stdout).toContain("outside the public content root");
-  });
+  }, 30_000);
 });

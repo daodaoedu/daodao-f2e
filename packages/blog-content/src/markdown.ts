@@ -1,6 +1,12 @@
 import GithubSlugger, { slug } from "github-slugger";
 import type { Nodes } from "mdast";
 import { fromMarkdown } from "mdast-util-from-markdown";
+import { gfmFromMarkdown } from "mdast-util-gfm";
+import { gfm } from "micromark-extension-gfm";
+
+export function parseArticleMarkdown(body: string) {
+  return fromMarkdown(body, { extensions: [gfm()], mdastExtensions: [gfmFromMarkdown()] });
+}
 
 export type ArticleHeadingType = { depth: 2 | 3; id: string; text: string };
 
@@ -22,6 +28,6 @@ export function getArticleHeadings(body: string): ArticleHeadingType[] {
     }
     if ("children" in node) for (const child of node.children) visit(child);
   };
-  visit(fromMarkdown(body));
+  visit(parseArticleMarkdown(body));
   return headings;
 }
