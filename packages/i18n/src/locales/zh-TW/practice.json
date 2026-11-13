@@ -87,6 +87,7 @@
   "edit_title": "編輯實踐",
   "edit_challenge_locked": "這是共同挑戰的實踐：名稱、期間與隱私由挑戰統一設定，無法在這裡修改。",
   "edit_cohort_privacy_locked": "這是本期的實踐，打卡隱私由教練統一設定。",
+  "edit_cohort_schedule_locked": "這是本期的實踐，開始日期與持續天數由教練統一設定。",
   "mobile_edit_challenge_locked": "這是共同挑戰的實踐：名稱、期間與隱私由挑戰統一設定，無法修改；其他欄位可以照常調整。",
   "edit_save_failed": "儲存失敗，請稍後再試",
   "edit_save_success": "實踐已成功更新",

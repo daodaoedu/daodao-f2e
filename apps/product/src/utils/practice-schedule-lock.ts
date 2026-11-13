@@ -1,3 +1,5 @@
+import { PracticeStatus } from "../constants/practice-status";
+
 interface PracticeScheduleLockInput {
   status?: string;
   checkInCount?: number;
@@ -15,12 +17,13 @@ export function isPracticeScheduleLocked(practice: PracticeScheduleLockInput | u
 
 interface EditScheduleLockInput extends PracticeScheduleLockInput {
   isChallenge?: boolean;
+  isLighthouseCohortPractice?: boolean;
 }
 
 /**
  * 編輯頁 Step2 各欄位的鎖定狀態（daodao#385）。
  *
- * - 期間（開始日、天數）：有打卡、或共同挑戰（server CHALLENGE_LOCKED_UPDATE_FIELDS、FRD FR-CC-10）
+ * - 期間（開始日、天數）：有打卡、共同挑戰，或 Lighthouse 場次實踐
  * - 頻率：只在有打卡時鎖（server stripLockedFields），共同挑戰不另外鎖
  */
 export function getEditScheduleLocks(practice: EditScheduleLockInput | undefined): {
@@ -29,7 +32,30 @@ export function getEditScheduleLocks(practice: EditScheduleLockInput | undefined
 } {
   const hasCheckIns = isPracticeScheduleLocked(practice);
   return {
-    periodLocked: hasCheckIns || practice?.isChallenge === true,
+    periodLocked:
+      hasCheckIns ||
+      practice?.isChallenge === true ||
+      practice?.isLighthouseCohortPractice === true,
     frequencyLocked: hasCheckIns,
   };
 }
+
+/** Lighthouse cohort assignments are available to check in only after they leave draft. */
+export function getCohortPracticeDisplayStatus(
+  status: PracticeStatus | undefined,
+  isCohortPractice: boolean
+): PracticeStatus | undefined {
+  return isCohortPractice && status === PracticeStatus.draft ? PracticeStatus.notStarted : status;
+}
+
+/** Avoid submitting unchanged schedule fields for Lighthouse-controlled assignments. */
+export const withoutLighthouseLockedScheduleFields = <T extends object>(
+  request: T,
+  isLighthouseCohortPractice: boolean
+): T | Omit<T, "startDate" | "durationDays"> => {
+  if (!isLighthouseCohortPractice) return request;
+  const editable = { ...request } as Record<string, unknown>;
+  delete editable.startDate;
+  delete editable.durationDays;
+  return editable as Omit<T, "startDate" | "durationDays">;
+};

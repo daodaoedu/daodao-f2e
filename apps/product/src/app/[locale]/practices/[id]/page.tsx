@@ -51,6 +51,7 @@ import { runDeletePracticeFlow } from "@/lib/practice-delete/run-delete-practice
 import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { formatFrequencyRange } from "@/utils/practice-edit-schedule";
 import { resolvePracticeDurationDays } from "@/utils/practice-period";
+import { getCohortPracticeDisplayStatus } from "@/utils/practice-schedule-lock";
 
 interface IPracticeDetailData {
   title: string;
@@ -150,6 +151,12 @@ export default function PracticeDetailPage() {
   });
 
   const isOwner = practiceData?.data?.user?.id === currentUserData?.data?.id;
+  const isCohortPractice =
+    practiceData?.data?.isCohortPractice === true && practiceData?.data?.isChallenge !== true;
+  const practiceStatus = getCohortPracticeDisplayStatus(
+    practiceData?.data?.status,
+    isCohortPractice
+  );
   const { openArchiveDialog } = useArchivePracticeDialog();
   const { openDeleteDialog } = useDeletePracticeDialog();
   const { archivePractice, restorePractice } = useArchivePractice(practiceId);
@@ -467,8 +474,8 @@ export default function PracticeDetailPage() {
           id: practiceId,
           title: practice.title,
           isChallenge: practiceData?.data?.isChallenge === true,
-          isCohortPractice: practiceData?.data?.isCohortPractice === true,
-          status: practiceData?.data?.status,
+          isCohortPractice,
+          status: practiceStatus,
           actionDescription: practice.actionDescription,
           frequency: practice.frequency,
           durationMinutes: practice.durationMinutes,
@@ -537,7 +544,8 @@ export default function PracticeDetailPage() {
                 className="w-full sm:max-w-[288px]"
                 practiceId={practiceId}
                 isChallenge={practiceData?.data?.isChallenge === true}
-                practiceStatus={practiceData?.data?.status}
+                practiceStatus={practiceStatus}
+                disableBeforeStartDate={isCohortPractice}
                 lastCheckInDate={checkInsData?.data?.[0]?.createdAt || undefined}
                 startDate={practice.startDate}
                 endDate={practiceData?.data?.endDate}
