@@ -1,5 +1,7 @@
 name: Linode CD
 
+permissions: {}
+
 # ===== 並發控制設定 =====
 concurrency:
   group: linode-cd-${{ github.ref }}-${{ github.event.workflow_run.event }}
@@ -48,9 +50,11 @@ env:
 jobs:
   # ===== 檢測檔案變更 =====
   detect-changes:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    if: ${{ (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request') || inputs.force_deploy == true }}
+    if: ${{ github.repository == 'daodaoedu/daodao-f2e' && ((github.event_name == 'workflow_run' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request') || (github.event_name == 'workflow_dispatch' && inputs.force_deploy == true)) }}
     outputs:
       build-website: ${{ steps.changes.outputs.website }}
       build-product: ${{ steps.changes.outputs.product }}
@@ -139,6 +143,8 @@ jobs:
 
   # ===== Docker 映像構建階段 - Website =====
   build-website:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     timeout-minutes: 45
     needs: detect-changes
@@ -160,7 +166,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
         with:
           run_install: false
 
@@ -301,6 +307,8 @@ jobs:
 
   # ===== Docker 映像構建階段 - Product =====
   build-product:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     timeout-minutes: 45
     needs: detect-changes
@@ -322,7 +330,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
         with:
           run_install: false
 
@@ -461,7 +469,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: [build-website, build-product]
-    if: ${{ always() && (needs.build-website.result == 'success' || needs.build-product.result == 'success') }}
+    if: ${{ always() && github.repository == 'daodaoedu/daodao-f2e' && ((github.event_name == 'workflow_run' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request') || (github.event_name == 'workflow_dispatch' && inputs.force_deploy == true)) && (needs.build-website.result == 'success' || needs.build-product.result == 'success') }}
     environment: ${{ (needs.build-website.outputs.image-tag || needs.build-product.outputs.image-tag) == 'prod' && 'production' || 'development' }}
     timeout-minutes: 20
     outputs:
@@ -469,11 +477,12 @@ jobs:
       ownership-readable: ${{ steps.ownership.outputs.readable }}
       product: ${{ needs.build-product.result == 'success' }}
     permissions:
-      contents: write
+      contents: read
       actions: read
     steps:
       - uses: actions/checkout@v4
         with:
+          repository: daodaoedu/daodao-f2e
           ref: ${{ github.sha }}
           persist-credentials: false
       - name: Recheck website release ownership
@@ -714,6 +723,7 @@ jobs:
 
   # ===== 部署後驗證 =====
   verify:
+    permissions: {}
     if: ${{ always() && needs.deploy.result == 'success' && (needs.deploy.outputs.website == 'true' || needs.deploy.outputs.product == 'true') }}
     environment: ${{ (needs.build-website.outputs.image-tag || needs.build-product.outputs.image-tag) == 'prod' && 'production' || 'development' }}
     runs-on: ubuntu-latest
@@ -863,6 +873,7 @@ jobs:
 
   # ===== Discord 通知 =====
   notify:
+    permissions: {}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: [detect-changes, build-website, build-product, deploy, verify, update-deploy-ref]

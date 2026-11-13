@@ -12,14 +12,15 @@ on:
       release_id:
         description: Existing immutable release ID for rollback
         type: string
-permissions:
-  contents: read
-  actions: read
+permissions: {}
 concurrency:
   group: blog-website-development
   cancel-in-progress: false
 jobs:
   trust:
+    permissions:
+      contents: read
+      actions: read
     timeout-minutes: 10
     if: github.ref == 'refs/heads/prod' || github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
@@ -44,6 +45,7 @@ jobs:
           MANAGED: ${{ vars.BLOG_RELEASE_MANAGED }}
           READY: ${{ vars.BLOG_DEPLOY_RUNNER_ENABLED }}
           BASE_URL: ${{ vars.BLOG_RELEASE_BASE_URL }}
+          BLOG_RELEASE_BASE_URL: ${{ vars.BLOG_RELEASE_BASE_URL }}
           STORE: ${{ vars.BLOG_RELEASE_STORE }}
           REPOSITORY: ${{ github.repository }}
           OPERATION: ${{ inputs.operation }}
@@ -82,6 +84,8 @@ jobs:
           with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as output: output.write('Frontend policy: '+channel+'; approved SHA '+sha+'; CI '+accepted['html_url']+'\n')
           PY
   prepare:
+    permissions:
+      contents: read
     timeout-minutes: 40
     needs: trust
     if: inputs.operation == 'publish'
@@ -98,7 +102,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20.19.4
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
         with:
           version: 10.20.0
       - name: Prepare pinned website only
@@ -110,6 +114,7 @@ jobs:
           APPROVALS: ${{ secrets.BLOG_APPROVALS_JSON }}
           PUBLIC_ENV: ${{ vars.BLOG_PUBLIC_BUILD_ENV_JSON }}
           BASE_URL: ${{ vars.BLOG_RELEASE_BASE_URL }}
+          BLOG_RELEASE_BASE_URL: ${{ vars.BLOG_RELEASE_BASE_URL }}
           FIRST: ${{ vars.BLOG_FIRST_RELEASE }}
           REPOSITORY: ${{ github.repository }}
         run: |
@@ -137,6 +142,9 @@ jobs:
           path: ${{ runner.temp }}/blog-store/releases/${{ steps.prepare.outputs.release }}/
           if-no-files-found: error
   activate:
+    permissions:
+      contents: read
+      actions: read
     timeout-minutes: 15
     needs: [trust, prepare]
     if: ${{ always() && needs.trust.result == 'success' && (needs.prepare.result == 'success' || inputs.operation == 'rollback') }}
@@ -158,6 +166,7 @@ jobs:
           RELEASE: ${{ needs.prepare.outputs.release || inputs.release_id }}
           STORE: ${{ vars.BLOG_RELEASE_STORE }}
           BASE_URL: ${{ vars.BLOG_RELEASE_BASE_URL }}
+          BLOG_RELEASE_BASE_URL: ${{ vars.BLOG_RELEASE_BASE_URL }}
           MANIFEST_SHA: ${{ needs.prepare.outputs.manifest }}
           GENERATION: ${{ github.run_id }}
           GH_TOKEN: ${{ secrets.BLOG_POLICY_READ_TOKEN || github.token }}

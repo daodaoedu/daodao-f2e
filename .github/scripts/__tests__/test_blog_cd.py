@@ -34,10 +34,20 @@ def expression(text, values):
         ast.Eq,
         ast.NotEq,
         ast.Constant,
+        ast.Name,
+        ast.Load,
     )
     if any(not isinstance(node, allowed) for node in ast.walk(tree)):
         raise ValueError("Unsupported test expression")
-    return eval(compile(tree, "workflow-condition", "eval"), {"__builtins__": {}})
+    if any(
+        isinstance(node, ast.Name) and node.id not in {"true", "false"}
+        for node in ast.walk(tree)
+    ):
+        raise ValueError("Unsupported test expression name")
+    return eval(
+        compile(tree, "workflow-condition", "eval"),
+        {"__builtins__": {}, "true": True, "false": False},
+    )
 
 
 def step(job, name):
@@ -47,6 +57,59 @@ def step(job, name):
 
 
 class BlogCdTests(unittest.TestCase):
+    def test_privileged_legacy_jobs_reject_foreign_workflow_runs(self):
+        base = {
+            "github.repository": "daodaoedu/daodao-f2e",
+            "github.event_name": "workflow_run",
+            "github.event.workflow_run.head_repository.full_name": "outside/fork",
+            "github.event.workflow_run.conclusion": "success",
+            "github.event.workflow_run.event": "push",
+            "inputs.force_deploy": False,
+            "needs.build-website.result": "success",
+            "needs.build-product.result": "skipped",
+        }
+        for job in ("detect-changes", "deploy"):
+            condition = WORKFLOW["jobs"][job]["if"]
+            with self.subTest(job=job, case="foreign push"):
+                self.assertFalse(expression(condition, base))
+            same_repo = {
+                **base,
+                "github.event.workflow_run.head_repository.full_name": "daodaoedu/daodao-f2e",
+            }
+            with self.subTest(job=job, case="same-repository push"):
+                self.assertTrue(expression(condition, same_repo))
+            with self.subTest(job=job, case="same-repository PR"):
+                self.assertFalse(
+                    expression(
+                        condition,
+                        {
+                            **same_repo,
+                            "github.event.workflow_run.event": "pull_request",
+                        },
+                    )
+                )
+            with self.subTest(job=job, case="explicit manual deployment"):
+                self.assertTrue(
+                    expression(
+                        condition,
+                        {
+                            **base,
+                            "github.event_name": "workflow_dispatch",
+                            "inputs.force_deploy": True,
+                        },
+                    )
+                )
+
+    def test_repository_write_is_limited_to_the_deploy_ref_writer(self):
+        for name, job in WORKFLOW["jobs"].items():
+            with self.subTest(job=name):
+                self.assertTrue(
+                    "permissions" in job, f"{name} needs explicit job token permissions"
+                )
+                self.assertNotIn("write-all", job["permissions"])
+                if name != "update-deploy-ref":
+                    self.assertNotIn("write", job["permissions"].values())
+
     def test_managed_skipped_website_does_not_skip_product_verification(self):
         condition = WORKFLOW["jobs"]["verify"]["if"]
         values = {
