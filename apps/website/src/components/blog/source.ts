@@ -71,6 +71,18 @@ export function publishedImagePath(source: BlogSourceType, id: string, image: st
   if (!digest) throw new Error(`No validated content digest for ${id}`);
   return `/blog-images/${digest}/${image}`;
 }
+async function writeBlogImages(source: BlogSourceType, directory: string, staged: Set<string>) {
+  if (source.preview || !source.root) return;
+  for (const article of source.articles)
+    for (const image of article.images) {
+      const url = publishedImagePath(source, article.metadata.id, image.path);
+      if (staged.has(url)) continue;
+      const target = path.join(directory, url.slice("/blog-images/".length));
+      await mkdir(path.dirname(target), { recursive: true });
+      await writeFile(target, await readRepositoryFile(source.root, image.path));
+      staged.add(url);
+    }
+}
 /** Prebuild owns this generated directory; public deployments serve the separately built out/. */
 export async function stageBlogAssets(source: BlogSourceType, publicDirectory: string) {
   await mkdir(publicDirectory, { recursive: true });
@@ -82,17 +94,7 @@ export async function stageBlogAssets(source: BlogSourceType, publicDirectory: s
   let phase: "staging" | "backed-up" | "committed" = "staging";
   try {
     await mkdir(next);
-    if (!source.preview && source.root) {
-      for (const article of source.articles)
-        for (const image of article.images) {
-          const url = publishedImagePath(source, article.metadata.id, image.path);
-          if (staged.has(url)) continue;
-          const target = path.join(next, url.slice("/blog-images/".length));
-          await mkdir(path.dirname(target), { recursive: true });
-          await writeFile(target, await readRepositoryFile(source.root, image.path));
-          staged.add(url);
-        }
-    }
+    await writeBlogImages(source, next, staged);
     let existing = false;
     try {
       const current = await lstat(destination);
@@ -115,7 +117,7 @@ export async function stageBlogAssets(source: BlogSourceType, publicDirectory: s
       }
       throw error;
     }
-    return [...staged].sort();
+    return [...staged].sort((a, b) => a.localeCompare(b, "en"));
   } finally {
     // If rollback itself fails, retain the previous directory for recovery outside public/.
     if (phase !== "backed-up") await rm(work, { recursive: true, force: true });
