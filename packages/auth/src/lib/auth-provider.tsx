@@ -262,7 +262,7 @@ export const AuthProvider = ({
       if (sessionStatus === "authenticated" && response.data?.data?.user) {
         const userData = response.data.data.user;
         const temporary = response.data.data.isTemporary ?? false;
-        if (!temporary) clearBlogSourceContext();
+        if (!temporary) clearBlogSourceContext({ authenticated: true });
         const emailVerified = userData.email_verified ?? false;
 
         setIsTemporary(temporary);
@@ -602,7 +602,7 @@ export const AuthProvider = ({
    * 使用統一的 API 服務登出
    */
   const logout = useCallback(async () => {
-    clearBlogSourceContext();
+    clearBlogSourceContext({ authenticated: false });
     try {
       await apiLogout();
     } catch (error) {

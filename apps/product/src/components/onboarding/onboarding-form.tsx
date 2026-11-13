@@ -234,7 +234,7 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
           undefined,
           sourceContext ? { "X-Daodao-Blog-Context": sourceContext } : undefined
         );
-        clearBlogSourceContext();
+        clearBlogSourceContext({ authenticated: true });
         registrationFlowStorage.remove();
         await refreshToken();
       } else {

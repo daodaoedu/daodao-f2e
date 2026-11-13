@@ -78,6 +78,7 @@ describe("first-party public Blog context", () => {
 });
 
 afterEach(() => {
+  clearBlogSourceContext({ authenticated: false });
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
@@ -140,4 +141,15 @@ it("never throws when browser storage or the tracking preference is blocked", ()
   ).not.toThrow();
   expect(readBlogSourceHeader()).toBeUndefined();
   expect(() => clearBlogSourceContext()).not.toThrow();
+});
+
+it("does not recreate a source after a confirmed permanent user or successful registration; logout permits a fresh journey", () => {
+  browser(false);
+  recordBlogSourceTouch({ ...touch, occurredAt: new Date().toISOString() });
+  clearBlogSourceContext({ authenticated: true });
+  recordBlogSourceTouch({ ...touch, occurredAt: new Date().toISOString() });
+  expect(readBlogSourceHeader()).toBeUndefined();
+  clearBlogSourceContext({ authenticated: false });
+  recordBlogSourceTouch({ ...touch, occurredAt: new Date().toISOString() });
+  expect(readBlogSourceHeader()).toBeDefined();
 });

@@ -46,6 +46,7 @@ export type BlogSourceTouch = z.infer<typeof touchSchema>;
 export type BlogSourceContext = z.infer<typeof contextSchema>;
 export type BlogSourceConfig = { ttlSeconds: number; domain: string };
 const COOKIE = "daodao_blog_context";
+let authenticatedSession = false;
 
 /** No deployment configuration means no context storage or association. */
 export function resolveBlogSourceConfig(
@@ -134,7 +135,8 @@ function rawCookie(): string | null {
     return null;
   }
 }
-export function clearBlogSourceContext(): void {
+export function clearBlogSourceContext(boundary?: { authenticated?: boolean }): void {
+  if (boundary?.authenticated !== undefined) authenticatedSession = boundary.authenticated;
   if (typeof document === "undefined") return;
   const options = config();
   const suffix = options ? `; Domain=${options.domain}` : "";
@@ -148,7 +150,7 @@ export function clearBlogSourceContext(): void {
 export function readBlogSourceHeader(): string | undefined {
   const options = config();
   const state = trackingState();
-  if (!options || state !== "available") {
+  if (authenticatedSession || !options || state !== "available") {
     if (state === "out") clearBlogSourceContext();
     return undefined;
   }
@@ -162,7 +164,7 @@ export function readBlogSourceHeader(): string | undefined {
 export function recordBlogSourceTouch(touch: BlogSourceTouch): boolean {
   const options = config();
   const state = trackingState();
-  if (!options || state !== "available") {
+  if (authenticatedSession || !options || state !== "available") {
     if (state === "out") clearBlogSourceContext();
     return false;
   }
