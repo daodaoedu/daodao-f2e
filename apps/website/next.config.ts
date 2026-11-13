@@ -4,13 +4,14 @@ import { loadEnvConfig } from "@next/env";
 import type { NextConfig } from "next";
 
 // 載入 monorepo 根目錄的環境變數（apps/website -> ../../）
-loadEnvConfig(path.resolve(process.cwd(), "../.."));
+const { combinedEnv } = loadEnvConfig(path.resolve(process.cwd(), "../.."));
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
   output: process.env.NEXT_OUTPUT === "export" ? "export" : undefined,
   reactStrictMode: true,
+  generateBuildId: async () => combinedEnv.BLOG_BUILD_ID || null,
   typedRoutes: true,
   transpilePackages: [
     "@daodao/api",

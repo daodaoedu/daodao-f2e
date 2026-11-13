@@ -496,6 +496,9 @@ importers:
       '@daodao/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@daodao/blog-content':
+        specifier: workspace:*
+        version: link:../../packages/blog-content
       '@daodao/features-action-maker':
         specifier: workspace:*
         version: link:../../packages/features/action-maker
@@ -514,12 +517,18 @@ importers:
       '@next/env':
         specifier: 'catalog:'
         version: 16.1.1
+      date-fns:
+        specifier: 'catalog:'
+        version: 3.6.0
       lottie-react:
         specifier: 'catalog:'
         version: 2.4.1(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       lucide-react:
         specifier: 'catalog:'
         version: 0.475.0(react@19.2.3)
+      mdast-util-from-markdown:
+        specifier: 2.0.2
+        version: 2.0.2
       motion:
         specifier: 'catalog:'
         version: 12.23.26(@emotion/is-prop-valid@0.8.8)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -532,6 +541,15 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.2.3(react@19.2.3)
+      react-markdown:
+        specifier: 'catalog:'
+        version: 10.1.0(@types/react@19.2.7)(react@19.2.3)
+      rehype-sanitize:
+        specifier: 'catalog:'
+        version: 6.0.0
+      remark-gfm:
+        specifier: 'catalog:'
+        version: 4.0.1
     devDependencies:
       '@daodao/config':
         specifier: workspace:*
@@ -539,6 +557,9 @@ importers:
       '@tailwindcss/postcss':
         specifier: 'catalog:'
         version: 4.1.18
+      '@types/mdast':
+        specifier: ^4.0.4
+        version: 4.0.4
       '@types/node':
         specifier: 'catalog:'
         version: 20.19.30
@@ -548,6 +569,9 @@ importers:
       '@types/react-dom':
         specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.7)
+      tsx:
+        specifier: ^4.19.2
+        version: 4.21.0
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
