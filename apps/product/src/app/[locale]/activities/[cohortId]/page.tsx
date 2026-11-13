@@ -77,6 +77,9 @@ export default function ActivityDetailPage() {
   const isEnded = activity.runStatus === "ended";
   const location = resolveLocationDisplay(activity.location, activity.isJoined);
   const practice = resolvePracticeDisplay(activity.templateCount);
+  let locationText = t("detail_location_na");
+  if (location.kind === "visible") locationText = location.value;
+  else if (location.kind === "locked") locationText = t("detail_location_locked");
   const hostIdentifier = activity.host.identifier ?? activity.host.userId;
 
   return (
@@ -177,13 +180,7 @@ export default function ActivityDetailPage() {
 
             {/* 地點：夾在聚會時段與費用之間 */}
             <DetailRow icon={<MapPin />} label={t("detail_location_label")}>
-              <span className="text-sm text-bg-dark">
-                {location.kind === "visible"
-                  ? location.value
-                  : location.kind === "locked"
-                    ? t("detail_location_locked")
-                    : t("detail_location_na")}
-              </span>
+              <span className="text-sm text-bg-dark">{locationText}</span>
             </DetailRow>
 
             {/* 費用 */}
@@ -259,11 +256,11 @@ function HostIdentity({
   host,
   identifier,
   t,
-}: {
+}: Readonly<{
   host: ActivityDetailType["host"];
   identifier: string | number | null;
   t: ReturnType<typeof useTranslations<"explore_activities">>;
-}) {
+}>) {
   const content = (
     <>
       {host.avatar ? (
@@ -294,12 +291,12 @@ function DetailRow({
   label,
   caption,
   children,
-}: {
+}: Readonly<{
   icon: React.ReactElement<{ className?: string }>;
   label: string;
   caption?: string;
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <div className="flex items-start gap-3">
       <span

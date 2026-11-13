@@ -6,6 +6,16 @@ import { useEffect, useState } from "react";
 import { weekdayIndexOf } from "@/utils/activity-detail";
 import { formatSessionForTimezone, type ICohortSessionTime } from "@/utils/cohort-session-timezone";
 
+const weekdayKeys = [
+  "weekday_0",
+  "weekday_1",
+  "weekday_2",
+  "weekday_3",
+  "weekday_4",
+  "weekday_5",
+  "weekday_6",
+] as const;
+
 interface CohortSessionScheduleProps {
   sessions: (ICohortSessionTime & { id: number })[];
   timezone?: string | null;
@@ -20,7 +30,7 @@ export function CohortSessionSchedule({
   timezone,
   hideHeading = false,
   className,
-}: CohortSessionScheduleProps) {
+}: Readonly<CohortSessionScheduleProps>) {
   const t = useTranslations("cohort");
   const [participantTimezone, setParticipantTimezone] = useState<string>();
 
@@ -47,6 +57,8 @@ export function CohortSessionSchedule({
           const display = formatSessionForTimezone(session, timezone, participantTimezone);
           const endDate = display.endDate !== display.date ? display.endDate : null;
           const weekday = weekdayIndexOf(display.date);
+          const weekdayKey = weekday === null ? undefined : weekdayKeys[weekday];
+          const weekdayLabel = weekdayKey ? ` · ${t(weekdayKey)}` : "";
           return (
             <li
               key={session.id}
@@ -54,7 +66,7 @@ export function CohortSessionSchedule({
             >
               <span>
                 {display.date}
-                {weekday !== null ? ` · ${t(`weekday_${weekday}`)}` : ""}
+                {weekdayLabel}
               </span>
               {/* 時間與時區同一組換行，避免時區單獨掉到下一行 */}
               <span>
