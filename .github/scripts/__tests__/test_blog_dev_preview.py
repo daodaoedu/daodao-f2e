@@ -1,5 +1,6 @@
 import ast
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -10,6 +11,83 @@ import yaml
 
 SCRIPT = Path(__file__).resolve().parents[1] / "blog-dev-preview.py"
 WORKFLOW = Path(__file__).resolve().parents[2] / "workflows/linode-cd.yml"
+
+
+def workflow_condition(expression, context):
+    if not expression:
+        return True
+    expression = expression.strip()
+    if expression.startswith("${{") and expression.endswith("}}"):
+        expression = expression[3:-2].strip()
+
+    def token(match):
+        value = match.group()
+        if value.startswith("'"):
+            return repr(value[1:-1].replace("''", "'"))
+        if value in context:
+            return repr(context[value])
+        if value in {"true", "false", "null", "&&", "||"}:
+            return {
+                "true": "True",
+                "false": "False",
+                "null": "None",
+                "&&": " and ",
+                "||": " or ",
+            }[value]
+        if value == "always":
+            return value
+        raise AssertionError(f"Unsupported workflow token: {value}")
+
+    expression = re.sub(
+        r"'(?:''|[^'])*'|[A-Za-z_][A-Za-z0-9_.-]*|&&|\|\|", token, expression
+    )
+
+    def equal(left, right):
+        if isinstance(left, str) and isinstance(right, str):
+            return left.lower() == right.lower()
+        if type(left) is type(right):
+            return left == right
+
+        def number(value):
+            if value is None or value == "":
+                return 0.0
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                return float("nan")
+
+        return number(left) == number(right)
+
+    def value(node):
+        if isinstance(node, ast.Expression):
+            return value(node.body)
+        if isinstance(node, ast.Constant):
+            return node.value
+        if (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "always"
+            and not node.args
+        ):
+            return True
+        if isinstance(node, ast.BoolOp):
+            values = [bool(value(v)) for v in node.values]
+            return all(values) if isinstance(node.op, ast.And) else any(values)
+        if isinstance(node, ast.Compare):
+            left = value(node.left)
+            for op, right_node in zip(node.ops, node.comparators):
+                right = value(right_node)
+                matched = equal(left, right)
+                if not (
+                    (isinstance(op, ast.Eq) and matched)
+                    or (isinstance(op, ast.NotEq) and not matched)
+                ):
+                    return False
+                left = right
+            return True
+        raise AssertionError("Unsupported workflow condition")
+
+    return value(ast.parse(expression.strip(), mode="eval"))
 
 
 class BlogDevPreviewTests(unittest.TestCase):
@@ -224,37 +302,10 @@ class BlogDevPreviewTests(unittest.TestCase):
         )
 
         def enabled(expression, branch, pin):
-            if not expression:
-                return True
-            for key, value in {
-                "env.BRANCH_NAME": branch,
-                "vars.BLOG_DEV_PREVIEW_CONTENT_SHA": pin,
-            }.items():
-                expression = expression.replace(key, repr(value))
-            expression = expression.replace("&&", " and ").replace("||", " or ")
-
-            def value(node):
-                if isinstance(node, ast.Expression):
-                    return value(node.body)
-                if isinstance(node, ast.Constant):
-                    return node.value
-                if isinstance(node, ast.BoolOp):
-                    values = [bool(value(v)) for v in node.values]
-                    return all(values) if isinstance(node.op, ast.And) else any(values)
-                if isinstance(node, ast.Compare):
-                    left = value(node.left)
-                    for op, right_node in zip(node.ops, node.comparators):
-                        right = value(right_node)
-                        if not (
-                            (isinstance(op, ast.Eq) and left == right)
-                            or (isinstance(op, ast.NotEq) and left != right)
-                        ):
-                            return False
-                        left = right
-                    return True
-                raise AssertionError("Unsupported workflow condition")
-
-            return value(ast.parse(expression, mode="eval"))
+            return workflow_condition(
+                expression,
+                {"env.BRANCH_NAME": branch, "vars.BLOG_DEV_PREVIEW_CONTENT_SHA": pin},
+            )
 
         for index, (branch, pin, helper, success, expected) in enumerate(
             [
@@ -381,6 +432,116 @@ class BlogDevPreviewTests(unittest.TestCase):
                     ),
                     expected,
                 )
+
+    def test_privileged_jobs_reject_foreign_forks_before_checkout_or_staging(self):
+        jobs = yaml.safe_load(WORKFLOW.read_text())["jobs"]
+        own = "daodaoedu/daodao-f2e"
+        original = {
+            "github.repository": own,
+            "github.event_name": "workflow_run",
+            "github.event.workflow_run.head_repository.full_name": own,
+            "github.event.workflow_run.head_repository.fork": False,
+            "github.event.workflow_run.conclusion": "success",
+            "github.event.workflow_run.event": "push",
+            "inputs.force_deploy": False,
+            "needs.detect-changes.outputs.build-website": "true",
+            "needs.detect-changes.outputs.build-product": "true",
+            "needs.build-website.result": "success",
+            "needs.build-product.result": "success",
+        }
+        cases = [
+            ("own run", {}, True),
+            (
+                "foreign fork",
+                {
+                    "github.event.workflow_run.head_repository.full_name": "someone/daodao-f2e",
+                    "github.event.workflow_run.head_repository.fork": True,
+                },
+                False,
+            ),
+            (
+                "foreign fork forced",
+                {
+                    "github.event.workflow_run.head_repository.full_name": "someone/daodao-f2e",
+                    "github.event.workflow_run.head_repository.fork": True,
+                    "inputs.force_deploy": True,
+                },
+                False,
+            ),
+            (
+                "fork flag even matching name",
+                {"github.event.workflow_run.head_repository.fork": True},
+                False,
+            ),
+            (
+                "foreign nonfork",
+                {
+                    "github.event.workflow_run.head_repository.full_name": "someone/daodao-f2e"
+                },
+                False,
+            ),
+            (
+                "missing source identity",
+                {"github.event.workflow_run.head_repository.full_name": ""},
+                False,
+            ),
+            (
+                "pull request even forced",
+                {
+                    "github.event.workflow_run.event": "pull_request",
+                    "inputs.force_deploy": True,
+                },
+                False,
+            ),
+            (
+                "failed run even forced",
+                {
+                    "github.event.workflow_run.conclusion": "failure",
+                    "inputs.force_deploy": True,
+                },
+                False,
+            ),
+            (
+                "own manual",
+                {
+                    "github.event_name": "workflow_dispatch",
+                    "inputs.force_deploy": True,
+                    "github.event.workflow_run.head_repository.full_name": "",
+                    "github.event.workflow_run.head_repository.fork": "",
+                },
+                True,
+            ),
+            ("unforced manual", {"github.event_name": "workflow_dispatch"}, False),
+            (
+                "foreign manual",
+                {
+                    "github.repository": "someone/daodao-f2e",
+                    "github.event_name": "workflow_dispatch",
+                    "inputs.force_deploy": True,
+                },
+                False,
+            ),
+            (
+                "unknown event forced",
+                {"github.event_name": "push", "inputs.force_deploy": True},
+                False,
+            ),
+        ]
+        for label, changed, expected in cases:
+            for name in ("detect-changes", "build-website", "build-product", "deploy"):
+                with self.subTest(case=label, job=name):
+                    context = {**original, **changed}
+                    allowed = workflow_condition(jobs[name].get("if"), context)
+                    self.assertEqual(allowed, expected)
+                    operations = [
+                        s
+                        for s in jobs[name]["steps"]
+                        if "checkout@" in s.get("uses", "")
+                        or "blog-dev-preview.py" in s.get("run", "")
+                    ]
+                    if not expected:
+                        executed = operations if allowed else []
+                        self.assertEqual(executed, [])
 
     def test_workflow_records_actual_checkout_separately_from_trigger_sha(self):
         workflow = yaml.safe_load(WORKFLOW.read_text())

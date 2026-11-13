@@ -2,6 +2,8 @@
 
 The normal website CD can render an unapproved draft snapshot on `https://dev.daodao.so`. This is publicly reachable staging, with an editorial preview banner and `noindex`; it is not access control or editorial approval.
 
+Before checkout, build or deployment, CD requires the official frontend repository. A `workflow_run` must be successful, originate from that same non-fork repository, and not be a pull-request run. Only an actual `workflow_dispatch` with the existing force flag uses the manual path; a force value cannot bypass a foreign workflow-run identity.
+
 Set the frontend repository variable `BLOG_DEV_PREVIEW_CONTENT_SHA` to the full lowercase 40-character commit SHA from the official `daodaoedu/daodao-blog` repository. Use a reviewed draft-content PR; do not put source text or approval receipts in this variable. Only the `dev` website build consumes it. Missing configuration keeps the supported empty Blog; invalid or mismatched pins fail the build. Other branches ignore this preview variable. A triggering frontend commit from before preview support keeps its existing build through an explicit capability notice, without fetching content or requiring the newer helper.
 
 Website CD selects the pin before checkout, acquires only the official repository without persisted credentials, verifies HEAD, and stages `authors.json`, `topics.json`, `articles/` and optional `images/` under a unique `RUNNER_TEMP` directory. Top-level symlinks are rejected before copying. Nested symlinks remain links for the authoritative shared content validator to reject. The original checkout stays available for action cleanup and is explicitly excluded from the Docker context and frontend Git status. Content scripts are never executed.

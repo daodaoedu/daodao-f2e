@@ -41,7 +41,7 @@ def directory(environment, name):
     return result
 
 
-def prepare(environment, pin):
+def checked_checkout(environment, pin):
     workspace = directory(environment, "GITHUB_WORKSPACE")
     temporary = directory(environment, "RUNNER_TEMP")
     if temporary.is_relative_to(workspace):
@@ -67,6 +67,10 @@ def prepare(environment, pin):
     ).stdout.strip()
     if actual != pin:
         raise ValueError("Preview checkout does not match the selected commit")
+    return source, temporary
+
+
+def validated_public_roots(source):
     roots = []
     for name, is_directory in PUBLIC_ROOTS:
         candidate = source / name
@@ -82,6 +86,11 @@ def prepare(environment, pin):
                 f"Preview {name} must be a regular {'directory' if is_directory else 'file'}"
             )
         roots.append((candidate, is_directory))
+    return roots
+
+
+def snapshot_public_content(source, temporary):
+    roots = validated_public_roots(source)
     snapshot = Path(tempfile.mkdtemp(prefix="daodao-blog-preview-", dir=temporary))
     try:
         for candidate, is_directory in roots:
@@ -94,6 +103,10 @@ def prepare(environment, pin):
     except Exception:
         shutil.rmtree(snapshot)
         raise
+    return snapshot
+
+
+def write_draft_environment(environment, snapshot, pin):
     values = {
         "BLOG_CONTENT_DIR": str(snapshot),
         "BLOG_CONTENT_MODE": "draft",
@@ -105,6 +118,12 @@ def prepare(environment, pin):
     with Path(environment["GITHUB_ENV"]).open("a") as output:
         output.writelines(f"{key}={value}\n" for key, value in values.items())
     print(f"Dev draft preview content: {pin}")
+
+
+def prepare(environment, pin):
+    source, temporary = checked_checkout(environment, pin)
+    snapshot = snapshot_public_content(source, temporary)
+    write_draft_environment(environment, snapshot, pin)
 
 
 def main():
