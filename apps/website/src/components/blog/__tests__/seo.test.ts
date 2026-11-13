@@ -218,6 +218,32 @@ describe("validated Blog search metadata", () => {
     );
     expect(sitemap.some((row) => row.url.includes("empty-topic"))).toBe(false);
   });
+  it("uses the latest date regardless of article order and only advertises existing topic locales", () => {
+    const { data, zh } = fixture();
+    const newer = structuredClone(zh);
+    newer.metadata.id = "new-guide";
+    newer.metadata.slug = "new-guide";
+    newer.metadata.published_at = "2026-12-01";
+    delete newer.metadata.updated_at;
+    data.articles = [newer, ...data.articles];
+    const english = data.articles.find((a) => a.metadata.lang === "en");
+    if (!english) throw new Error("Expected English fixture");
+    english.metadata.topic = "empty-topic";
+    const sitemap = buildBlogSitemap(data, production);
+    expect(sitemap.find((row) => row.url === `${production}/blog`)).toMatchObject({
+      lastModified: "2026-12-01",
+    });
+    expect(sitemap.find((row) => row.url === `${production}/blog/topic/teaching`)).toMatchObject({
+      lastModified: "2026-12-01",
+      alternates: {
+        languages: {
+          "zh-TW": `${production}/blog/topic/teaching`,
+          "x-default": `${production}/blog/topic/teaching`,
+        },
+      },
+    });
+    expect(sitemap.some((row) => row.url === `${production}/en/blog/topic/teaching`)).toBe(false);
+  });
   it("preserves existing main-site rows and avoids duplicate Blog URLs", () => {
     const { data } = fixture();
     const combined = mergeWebsiteSitemap(

@@ -170,28 +170,37 @@ export function serializeBlogJsonLd(value: unknown) {
 function latestDate(articles: BlogArticleType[]) {
   return articles
     .map((a) => a.metadata.updated_at || a.metadata.published_at)
-    .sort()
+    .sort((a, b) => a.localeCompare(b, "en"))
     .at(-1);
+}
+function collectionSitemapPath(locale: BlogLocaleType, topic?: string) {
+  const base = blogPath(locale);
+  return topic ? `${base}/topic/${topic}` : base;
+}
+function collectionSitemapRows(data: BlogSeoDataType, topic?: string): MetadataRoute.Sitemap {
+  const languages: Record<string, string> = {};
+  for (const locale of locales)
+    if (collectionArticles(data, locale, topic).length)
+      languages[locale] = absolute(collectionSitemapPath(locale, topic));
+  if (languages["zh-TW"]) languages["x-default"] = languages["zh-TW"];
+  const rows: MetadataRoute.Sitemap = [];
+  for (const locale of locales) {
+    const articles = collectionArticles(data, locale, topic);
+    if (articles.length)
+      rows.push({
+        url: absolute(collectionSitemapPath(locale, topic)),
+        lastModified: latestDate(articles),
+        alternates: { languages },
+      });
+  }
+  return rows;
 }
 export function buildBlogSitemap(
   data: BlogSeoDataType,
   websiteUrl: string | undefined
 ): MetadataRoute.Sitemap {
   if (data.preview || !isProductionWebsite(websiteUrl) || !data.articles.length) return [];
-  const rows: MetadataRoute.Sitemap = [];
-  for (const locale of locales) {
-    const articles = collectionArticles(data, locale);
-    if (!articles.length) continue;
-    const languages: Record<string, string> = {};
-    for (const lang of locales)
-      if (collectionArticles(data, lang).length) languages[lang] = absolute(blogPath(lang));
-    if (languages["zh-TW"]) languages["x-default"] = languages["zh-TW"];
-    rows.push({
-      url: absolute(blogPath(locale)),
-      lastModified: latestDate(articles),
-      alternates: { languages },
-    });
-  }
+  const rows = collectionSitemapRows(data);
   for (const article of data.articles)
     rows.push({
       url: absolute(blogPath(article.metadata.lang, article.metadata.slug)),
@@ -200,22 +209,7 @@ export function buildBlogSitemap(
         languages: languageUrls(data.articles.filter((a) => a.metadata.id === article.metadata.id)),
       },
     });
-  for (const topic of data.topics) {
-    const languages: Record<string, string> = {};
-    for (const locale of locales)
-      if (collectionArticles(data, locale, topic.id).length)
-        languages[locale] = absolute(`${blogPath(locale)}/topic/${topic.id}`);
-    if (languages["zh-TW"]) languages["x-default"] = languages["zh-TW"];
-    for (const locale of locales) {
-      const articles = collectionArticles(data, locale, topic.id);
-      if (articles.length)
-        rows.push({
-          url: absolute(`${blogPath(locale)}/topic/${topic.id}`),
-          lastModified: latestDate(articles),
-          alternates: { languages },
-        });
-    }
-  }
+  for (const topic of data.topics) rows.push(...collectionSitemapRows(data, topic.id));
   return rows.sort((a, b) => {
     if (a.url === b.url) return 0;
     return a.url < b.url ? -1 : 1;
