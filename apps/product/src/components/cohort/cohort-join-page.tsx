@@ -8,6 +8,7 @@ import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { ArrowUpRight, Users } from "lucide-react";
 import { useState } from "react";
+import { formatActivityPeriod } from "@/utils/activity-detail";
 import { resolveJoinConsentCopy } from "@/utils/cohort-join-consent";
 import { resolveJoinUnavailableCopy } from "@/utils/cohort-join-unavailable";
 import { CohortSessionSchedule } from "./cohort-session-schedule";
@@ -94,10 +95,16 @@ export function CohortJoinPage({ joinToken }: { joinToken: string }) {
           {info.organization.name}
         </p>
         <h1 className="mt-3 text-2xl font-semibold tracking-[-0.04em]">{info.displayName}</h1>
-        <p className="mt-3 text-[#5A7B79]">{info.inviteMessage || t("join_default_message")}</p>
-        <p className="mt-2 text-xs text-[#78928F]">
-          {info.startDate.slice(0, 10)} — {info.endDate.slice(0, 10)}
+        {/* 保留 Lighthouse 邀請訊息的段落與換行 */}
+        <p className="mt-3 whitespace-pre-line text-[#5A7B79]">
+          {info.inviteMessage || t("join_default_message")}
         </p>
+        <section className="mt-4" aria-label={t("event_period")}>
+          <h2 className="mb-1 text-sm font-medium text-text-dark">{t("event_period")}</h2>
+          <p className="text-sm text-text-dark">
+            {formatActivityPeriod(info.startDate, info.endDate)}
+          </p>
+        </section>
         <CohortSessionSchedule sessions={info.sessions} timezone={info.timezone} />
         <label className="mt-8 flex items-start gap-3 rounded-2xl bg-[#FFF6E8] p-4 text-sm leading-6">
           <input
