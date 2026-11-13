@@ -50,7 +50,7 @@ jobs:
   detect-changes:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    if: ${{ (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request') || inputs.force_deploy == true }}
+    if: ${{ github.repository == 'daodaoedu/daodao-f2e' && ((github.event_name == 'workflow_run' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_repository.fork == false && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request') || (github.event_name == 'workflow_dispatch' && inputs.force_deploy == true)) }}
     outputs:
       build-website: ${{ steps.changes.outputs.website }}
       build-product: ${{ steps.changes.outputs.product }}
@@ -120,7 +120,7 @@ jobs:
           echo "$CHANGED_FILES"
 
           # 檢查是否需要 build website
-          if echo "$CHANGED_FILES" | grep -qE '^(apps/website/|packages/|turbo.json|package.json|pnpm-lock.yaml|pnpm-workspace.yaml|docker/)'; then
+          if echo "$CHANGED_FILES" | grep -qE '^(apps/website/|packages/|turbo.json|package.json|pnpm-lock.yaml|pnpm-workspace.yaml|docker/|\.dockerignore$|\.github/workflows/linode-cd\.yml$|\.github/scripts/blog-dev-preview\.py$)'; then
             echo "website=true" >> $GITHUB_OUTPUT
             echo "✅ Website needs rebuild"
           else
@@ -143,7 +143,7 @@ jobs:
     timeout-minutes: 45
     needs: detect-changes
     # 只在 CI 成功或手動強制部署時執行，且 website 有變更
-    if: ${{ ((github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request') || inputs.force_deploy == true) && needs.detect-changes.outputs.build-website == 'true' }}
+    if: ${{ github.repository == 'daodaoedu/daodao-f2e' && ((github.event_name == 'workflow_run' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_repository.fork == false && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request') || (github.event_name == 'workflow_dispatch' && inputs.force_deploy == true)) && needs.detect-changes.outputs.build-website == 'true' }}
     outputs:
       image-tag: ${{ steps.meta.outputs.image-tag }}
       image-digest: ${{ steps.build.outputs.digest }}
@@ -153,6 +153,19 @@ jobs:
         with:
           fetch-depth: 1
           ref: ${{ env.BRANCH_NAME }}
+
+      - name: Record actual website source revision
+        id: website-source
+        run: |
+          actual_sha=$(git rev-parse HEAD)
+          echo "Actual website frontend SHA: $actual_sha"
+          echo "Website trigger/image tag SHA: $COMMIT_SHA"
+          echo "frontend-sha=$actual_sha" >> "$GITHUB_OUTPUT"
+          {
+            echo '### Website build source'
+            echo "Actual frontend checkout SHA: $actual_sha"
+            echo "Trigger/image tag SHA: $COMMIT_SHA"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -203,6 +216,35 @@ jobs:
 
           cp .env apps/website/.env
           cp .env apps/product/.env
+
+      - name: Select dev Blog draft preview
+        id: blog-preview
+        if: env.BRANCH_NAME == 'dev' && vars.BLOG_DEV_PREVIEW_CONTENT_SHA != ''
+        env:
+          BLOG_DEV_PREVIEW_CONTENT_SHA: ${{ vars.BLOG_DEV_PREVIEW_CONTENT_SHA }}
+        run: |
+          helper=.github/scripts/blog-dev-preview.py
+          if [ -f "$helper" ] && [ ! -L "$helper" ]; then
+            python3 "$helper" select
+          else
+            echo '::notice::This frontend commit does not provide a regular dev Blog preview helper; keeping its normal website build.'
+            echo 'enabled=false' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout pinned dev Blog draft content
+        if: steps.blog-preview.outputs.enabled == 'true'
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          repository: daodaoedu/daodao-blog
+          ref: ${{ steps.blog-preview.outputs.content-sha }}
+          path: .blog-dev-preview-source
+          persist-credentials: false
+
+      - name: Stage dev Blog draft snapshot
+        if: steps.blog-preview.outputs.enabled == 'true'
+        env:
+          BLOG_DEV_PREVIEW_CONTENT_SHA: ${{ steps.blog-preview.outputs.content-sha }}
+        run: python3 .github/scripts/blog-dev-preview.py prepare
 
       - name: Install dependencies and build
         run: |
@@ -298,7 +340,7 @@ jobs:
     timeout-minutes: 45
     needs: detect-changes
     # 只在 CI 成功或手動強制部署時執行，且 product 有變更
-    if: ${{ ((github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request') || inputs.force_deploy == true) && needs.detect-changes.outputs.build-product == 'true' }}
+    if: ${{ github.repository == 'daodaoedu/daodao-f2e' && ((github.event_name == 'workflow_run' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_repository.fork == false && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request') || (github.event_name == 'workflow_dispatch' && inputs.force_deploy == true)) && needs.detect-changes.outputs.build-product == 'true' }}
     outputs:
       image-tag: ${{ steps.meta.outputs.image-tag }}
       image-digest: ${{ steps.build.outputs.digest }}
@@ -454,7 +496,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: [build-website, build-product]
-    if: ${{ always() && (needs.build-website.result == 'success' || needs.build-product.result == 'success') }}
+    if: ${{ always() && github.repository == 'daodaoedu/daodao-f2e' && ((github.event_name == 'workflow_run' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_repository.fork == false && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request') || (github.event_name == 'workflow_dispatch' && inputs.force_deploy == true)) && (needs.build-website.result == 'success' || needs.build-product.result == 'success') }}
     environment: ${{ needs.build-website.outputs.image-tag == 'prod' && 'production' || 'development' }}
     timeout-minutes: 20
     permissions:
