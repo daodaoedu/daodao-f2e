@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>探索活動課程 | 島島阿學</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #0d3036;
+        --text: #295e5c;
+        --muted: #789092;
+        --teal: #16b9b3;
+        --line: #dcebea;
+        --tint: #f5fffd;
+        font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+        color: var(--ink);
+        background: #fff;
+        font-synthesis: none;
+      }
+      *, *::before, *::after { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body { min-width: 320px; margin: 0; background: #fff; }
+      button, a { font: inherit; }
+      button { cursor: pointer; }
+      button:focus-visible, a:focus-visible { outline: 3px solid rgba(22, 185, 179, .42); outline-offset: 3px; }
+
+      .page {
+        display: flex;
+        width: 100%;
+        max-width: 960px;
+        flex-direction: column;
+        gap: 24px;
+        margin: 0 auto;
+        padding: 32px 16px 112px;
+      }
+      .back-link { display: flex; align-items: center; gap: 6px; color: rgba(41, 94, 92, .7); font-size: 14px; line-height: 20px; text-decoration: none; }
+      .back-link:hover { color: var(--text); }
+      .back-link svg { width: 16px; height: 16px; }
+      .heading-block { display: flex; flex-direction: column; gap: 12px; }
+      .heading-meta { display: flex; align-items: center; gap: 8px; }
+      .status { display: inline-flex; min-height: 24px; align-items: center; padding: 3px 10px; border-radius: 999px; background: #f5fffd; color: var(--text); font-size: 12px; line-height: 18px; }
+      h1 { margin: 0; color: var(--ink); font-size: 24px; font-weight: 700; line-height: 1.35; }
+      .tagline { margin: 0; color: var(--text); font-size: 14px; line-height: 1.65; }
+      .card { display: flex; flex-direction: column; gap: 20px; padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+      .details-layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr); align-items: start; gap: 24px; }
+      .main-column { display: flex; min-width: 0; flex-direction: column; gap: 24px; }
+      .side-column { display: flex; min-width: 0; flex-direction: column; gap: 16px; }
+      .detail-row { display: flex; align-items: flex-start; gap: 12px; }
+      .detail-label { display: flex; flex: none; align-items: center; justify-content: center; width: 18px; min-height: 21px; color: rgba(41, 94, 92, .62); }
+      .detail-label span { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+      .detail-label svg { width: 16px; height: 16px; flex: none; stroke-width: 1.6; }
+      .detail-value { min-width: 0; color: var(--ink); font-size: 14px; line-height: 1.5; }
+      .detail-caption { display: block; margin-bottom: 2px; color: var(--muted); font-size: 11px; line-height: 16px; }
+      .details-list { display: flex; flex-direction: column; gap: 20px; }
+      .avatar-row { display: flex; align-items: center; gap: 8px; }
+      .avatar { display: grid; width: 24px; height: 24px; flex: none; place-items: center; border-radius: 50%; background: #f1f8f7; color: var(--text); }
+      .avatar svg { width: 18px; height: 18px; }
+      .mode-row { display: flex; flex-wrap: wrap; gap: 6px; }
+      .mode { display: inline-flex; min-height: 24px; align-items: center; padding: 2px 8px; border-radius: 999px; background: #f5fffd; color: var(--text); font-size: 12px; line-height: 18px; }
+      .session-list { display: flex; flex-direction: column; gap: 6px; }
+      .session { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; row-gap: 2px; }
+      .timezone { color: rgba(41, 94, 92, .65); font-size: 12px; }
+      .section-card { display: flex; flex-direction: column; gap: 12px; padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+      .org-about { display: flex; flex-direction: column; gap: 8px; }
+      h2 { margin: 0; color: var(--ink); font-size: 16px; font-weight: 700; line-height: 24px; }
+      .org-name { margin: 0; color: var(--ink); font-size: 14px; font-weight: 500; line-height: 21px; }
+      .org-bio { margin: 0; color: rgba(41, 94, 92, .7); font-size: 14px; line-height: 1.6; }
+      .host-heading { display: flex; align-items: center; gap: 6px; }
+      .host-heading svg { width: 16px; height: 16px; stroke-width: 1.6; }
+      .host-aside { display: flex; align-items: center; gap: 8px; }
+      .host-link { display: flex; align-items: center; gap: 8px; border-radius: 6px; color: inherit; text-decoration: none; }
+      .host-link:hover .org-name { text-decoration: underline; text-underline-offset: 3px; }
+      .host-link:focus-visible { outline: 3px solid rgba(22, 185, 179, .42); outline-offset: 3px; }
+      .program-about { display: flex; flex-direction: column; gap: 12px; }
+      .program-name { margin: 0; color: var(--ink); font-size: 14px; font-weight: 700; line-height: 1.5; }
+      .program-copy { margin: 0; color: var(--text); font-size: 13px; line-height: 1.7; }
+      .invite-copy { margin: 0; color: var(--text); font-size: 14px; line-height: 1.6; white-space: pre-line; }
+      .join-action { width: 100%; }
+      .join-button {
+        display: flex;
+        width: 100%;
+        min-height: 40px;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 16px;
+        border: 0;
+        border-radius: 999px;
+        background: var(--teal);
+        color: #fff;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 20px;
+        text-decoration: none;
+        transition: background .16s ease, transform .16s ease;
+      }
+      .join-button:hover { background: #13aaa5; }
+      .join-button:active { transform: scale(.98); }
+      .prototype-note { margin: 0; padding-top: 2px; color: #789092; font-size: 11px; text-align: center; }
+
+      dialog { width: min(420px, calc(100% - 32px)); padding: 0; border: 1px solid var(--line); border-radius: 18px; color: var(--ink); }
+      dialog::backdrop { background: rgba(13, 48, 54, .32); }
+      .dialog-body { padding: 24px; }
+      .dialog-title { margin: 0 0 10px; font-size: 18px; }
+      .dialog-copy { margin: 0; color: var(--text); font-size: 14px; line-height: 1.7; }
+      .dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
+      .dialog-actions button { min-height: 40px; padding: 0 16px; border-radius: 999px; font-size: 13px; font-weight: 700; }
+      .cancel { border: 1px solid var(--line); background: #fff; color: var(--text); }
+      .confirm { border: 0; background: var(--teal); color: #fff; }
+      .toast { position: fixed; z-index: 30; right: 16px; bottom: 20px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 12px; background: #fff; box-shadow: 0 8px 24px rgba(13,48,54,.12); color: var(--text); font-size: 13px; opacity: 0; pointer-events: none; transform: translateY(8px); transition: .18s ease; }
+      .toast.visible { opacity: 1; transform: translateY(0); }
+      @media (max-width: 760px) {
+        .page { max-width: 640px; }
+        .details-layout { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+      }
+      @media (max-width: 480px) {
+        .page { gap: 22px; padding-top: 28px; }
+        h1 { font-size: 22px; }
+        .card, .section-card { padding: 18px; }
+      }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition-duration: .01ms !important; } }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <a class="back-link" href="#" aria-label="返回探索活動">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6M20 12H9"/></svg>
+        <span>返回探索活動</span>
+      </a>
+
+      <section class="heading-block" aria-labelledby="activity-title">
+        <div class="heading-meta"><span class="status">未開始</span></div>
+        <h1 id="activity-title">Tiny Experiment｜2026.11.14–11.28</h1>
+        <p class="tagline">每個人決定接下來二個星期想嘗試的行動，check-in 用來分享實際經驗與發現！</p>
+      </section>
+
+      <div class="details-layout">
+      <div class="main-column">
+      <section class="card" aria-label="活動資訊">
+        <div class="details-list">
+        <div class="detail-row">
+          <div class="detail-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 10v3M6 6v11M10 3v18M14 8v7M18 5v13M22 10v3"/></svg><span>互動方式</span></div>
+          <div class="detail-value mode-row"><span class="mode">線上非同步</span><span class="mode">線上同步</span></div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg><span>期間</span></div>
+          <div class="detail-value"><span class="detail-caption" aria-hidden="true">活動期間</span><time datetime="2026-11-14">2026/11/14</time> – <time datetime="2026-11-28">2026/11/28</time></div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.925 3.047a9 9 0 0 1 7.616 6.11"/><path d="M13 22a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2"/><path d="M3 12a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2"/><path d="M3.889 15.9a9 9 0 0 0 5.247 4.632"/><circle cx="17" cy="14" r="2"/><circle cx="7" cy="4" r="2"/></svg><span>聚會時段</span></div>
+          <div class="detail-value session-list"><span class="detail-caption" aria-hidden="true">聚會時段</span><div class="session"><span>2026/11/15 · 星期日</span><span>20:30 – 21:00 <span class="timezone">Asia/Taipei</span></span></div></div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11s-8-6-8-11a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>地點</span></div>
+          <div class="detail-value">N/A</div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span>費用</span></div>
+          <div class="detail-value">免費</div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m13 7 4.3 4.3"/><path d="m8 6 2-2"/><path d="m18 16 2-2"/><path d="M21.2 6.8a1 1 0 0 0-4-4L3.8 16.2a2 2 0 0 0-.5.8L2 21.4a.5.5 0 0 0 .6.6L7 20.7a2 2 0 0 0 .8-.5z"/><path d="m15 5 4 4"/><path d="m7 13 4 4"/></svg><span>進行實踐</span></div>
+          <div class="detail-value" id="practice-count-value">將進行 1 個實踐</div>
+        </div>
+        </div>
+      </section>
+      <div class="join-action">
+        <a class="join-button" id="join-button" href="join.html">報名加入</a>
+      </div>
+      <section class="program-about" aria-labelledby="program-about-title">
+        <h2 id="program-about-title">關於這個系列</h2>
+        <p class="program-name">Tiny Experiment（微小實驗）</p>
+        <p class="program-copy">靈感來自 Anne-Laure Le Cunff《Tiny Experiments》，透過小行動探索並從經驗中學習。微小實驗是出於好奇，選一個小而可行的行動，在限定時間內親自嘗試。重點不是達成目標或養成習慣，而是觀察過程、從結果中學習，再決定是否繼續、調整或停止。</p>
+      </section>
+      </div>
+
+      <aside class="side-column" aria-label="活動介紹">
+        <section class="section-card" aria-labelledby="host-title">
+          <h2 class="host-heading" id="host-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="7" r="3.5"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="m19 3 .9 2.1L22 6l-2.1.9L19 9l-.9-2.1L16 6l2.1-.9L19 3Z"/></svg>發起人</h2>
+          <a class="host-link" href="https://app-dev.daodao.so/users/peggy-test2" target="_blank" rel="noopener noreferrer" aria-label="查看 Peggy test2 的個人檔案"><span class="avatar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.6-3.3 2.8-5 6.5-5s5.9 1.7 6.5 5"/></svg></span><p class="org-name">Peggy test2</p></a>
+        </section>
+        <section class="org-about" aria-label="主辦組織">
+          <p class="org-name">PM驗收專用組織</p>
+          <p class="org-bio">PM驗收專用空間；僅放QA資料，保留供後續驗收重用。</p>
+        </section>
+      </aside>
+      </div>
+
+      <p class="prototype-note">互動原型 · 報名加入會開啟本地 Cohort 加入頁</p>
+    </main>
+    <script>
+      const practiceCount = 1;
+      document.querySelector("#practice-count-value").textContent = practiceCount > 0
+        ? `將進行 ${practiceCount} 個實踐`
+        : "N/A";
+    </script>
+  </body>
+</html>
