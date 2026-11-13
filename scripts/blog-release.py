@@ -5,27 +5,31 @@ import argparse
 import fcntl
 import hashlib
 import json
-import mimetypes
 import os
 import re
 import shutil
 import stat
 import subprocess
 import sys
-import tarfile
 import tempfile
 import threading
 import time
 import uuid
 from contextlib import contextmanager, nullcontext
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from dataclasses import dataclass
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path, PurePosixPath
-from urllib.error import HTTPError, URLError
+from typing import ClassVar
+from urllib.error import HTTPError
 from urllib.parse import unquote, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 SHA = re.compile(r"^[a-f0-9]{40}$")
 RELEASE = re.compile(r"^[a-f0-9]{64}$")
+RELEASE_MANIFEST = "release.json"
+BLOG_ROUTE = "/blog"
+RELEASE_MARKER_ROUTE = "/blog-release.json"
+BASELINE_ROUTE = "/blog-published-baseline.json"
 
 
 class ReleaseError(Exception):
@@ -114,6 +118,7 @@ def tooling_environment():
     return {
         **{key: value for key, value in os.environ.items() if key in keys},
         "GIT_TERMINAL_PROMPT": "0",
+        "GIT_NO_REPLACE_OBJECTS": "1",
         "GIT_CONFIG_GLOBAL": os.devnull,
         "GIT_CONFIG_NOSYSTEM": "1",
     }
@@ -148,149 +153,151 @@ def command(stage, arguments, cwd, env, log):
     return result.stdout
 
 
-def checkout(repo, revision, destination, log):
-    if "://" in repo:
-        parsed = urlsplit(repo)
+def _source_location(repo):
+    if "://" not in repo:
+        try:
+            path = Path(repo).resolve(strict=True)
+        except OSError as error:
+            raise ReleaseError(
+                "fetch", "Local source repository is unavailable"
+            ) from error
+        if not path.is_dir():
+            raise ReleaseError("fetch", "Local source repository does not exist")
+        return str(path), False
+    parsed = urlsplit(repo)
+    try:
+        valid_port = parsed.port
+    except ValueError as error:
+        raise ReleaseError("fetch", "Invalid source HTTPS URL") from error
+    if (
+        parsed.scheme != "https"
+        or not parsed.hostname
+        or parsed.username
+        or parsed.password
+        or parsed.query
+        or parsed.fragment
+        or (valid_port is not None and valid_port < 1)
+    ):
+        raise ReleaseError("fetch", "Remote repos must use credential-free HTTPS URLs")
+    return repo, True
+
+
+@contextmanager
+def _git_source(repo, parent, log):
+    source, remote = _source_location(repo)
+    if not remote:
+        yield source
+        return
+    with tempfile.TemporaryDirectory(prefix="blog-objects-", dir=parent) as temporary:
+        objects = Path(temporary) / "objects.git"
+        command(
+            "fetch",
+            ["git", "clone", "--bare", "--no-hardlinks", "--", source, str(objects)],
+            None,
+            None,
+            log,
+        )
+        yield str(objects)
+
+
+def _git_tree(source, revision):
+    raw = subprocess.check_output(
+        ["git", "-C", source, "ls-tree", "-rz", revision], env=tooling_environment()
+    )
+    entries = {}
+    for entry in filter(None, raw.split(b"\0")):
+        fields, name = entry.split(b"\t", 1)
+        mode, kind, object_id = fields.decode().split()
+        relative = name.decode()
+        parts = safe_relative(relative).parts
         if (
-            parsed.scheme != "https"
-            or parsed.username
-            or parsed.password
-            or parsed.query
-            or parsed.fragment
+            kind != "blob"
+            or mode not in ("100644", "100755")
+            or any(part.casefold() == ".git" for part in parts)
         ):
             raise ReleaseError(
-                "fetch", "Remote repos must use credential-free HTTPS URLs"
+                "fetch",
+                "Source tree contains unsupported symlinks/submodules or Git metadata",
             )
-    elif not Path(repo).is_dir():
-        raise ReleaseError("fetch", "Local source repository does not exist")
-    if "://" not in repo:
-        # Avoid copying the object database on disk-constrained local hosts. Verify every
-        # archive member against the commit tree so export attributes cannot change inputs.
+        entries[relative] = (sha(object_id), mode)
+    return entries
+
+
+def _write_git_blob(process, target, object_id, mode):
+    process.stdin.write((object_id + "\n").encode())
+    process.stdin.flush()
+    header = process.stdout.readline(256).decode().split()
+    if (
+        len(header) != 3
+        or header[0] != object_id
+        or header[1] != "blob"
+        or not header[2].isdigit()
+    ):
+        raise ReleaseError("fetch", "Git did not return the exact pinned blob")
+    remaining = int(header[2])
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with target.open("xb") as output:
+        while remaining:
+            chunk = process.stdout.read(min(remaining, 1024 * 1024))
+            if not chunk:
+                raise ReleaseError("fetch", "Pinned Git blob ended prematurely")
+            output.write(chunk)
+            remaining -= len(chunk)
+    if process.stdout.read(1) != b"\n":
+        raise ReleaseError("fetch", "Invalid Git blob framing")
+    target.chmod(0o755 if mode == "100755" else 0o644)
+
+
+def _materialize_git_tree(source, entries, destination, log):
+    destination.mkdir()
+    with log.open("ab") as errors:
+        process = subprocess.Popen(
+            ["git", "-C", source, "cat-file", "--batch"],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=errors,
+            env=tooling_environment(),
+        )
+        try:
+            for relative, (object_id, mode) in entries.items():
+                _write_git_blob(process, destination / relative, object_id, mode)
+            process.stdin.close()
+            if process.wait(timeout=30):
+                raise ReleaseError("fetch", "Git source materialization failed")
+        finally:
+            if process.poll() is None:
+                process.terminate()
+                process.wait(timeout=30)
+            process.stdin.close()
+            process.stdout.close()
+
+
+def checkout(repo, revision, destination, log):
+    revision = sha(revision)
+    with _git_source(repo, destination.parent, log) as source:
         object_type = command(
-            "fetch", ["git", "-C", repo, "cat-file", "-t", revision], None, None, log
+            "fetch", ["git", "-C", source, "cat-file", "-t", revision], None, None, log
         ).strip()
         if object_type != "commit":
             raise ReleaseError("fetch", "Requested object is not a commit")
-        listing = subprocess.check_output(
-            ["git", "-C", repo, "ls-tree", "-rz", revision], env=tooling_environment()
+        # Git cat-file reports the requested object ID without recomputing its digest.
+        # Native fsck verifies pinned object bytes before any source is materialized.
+        command(
+            "fetch",
+            ["git", "-C", source, "fsck", "--strict", "--no-reflogs", revision],
+            None,
+            None,
+            log,
         )
-        expected = {}
-        for entry in listing.split(b"\0"):
-            if not entry:
-                continue
-            fields, name = entry.split(b"\t", 1)
-            mode, kind, object_id = fields.decode().split()
-            if kind != "blob" or mode not in ("100644", "100755"):
-                raise ReleaseError(
-                    "fetch", "Source tree contains unsupported symlinks/submodules"
-                )
-            expected[name.decode()] = (object_id, mode)
-        destination.mkdir()
-        seen = set()
-        with log.open("ab") as errors:
-            process = subprocess.Popen(
-                ["git", "-C", repo, "archive", "--format=tar", revision],
-                stdout=subprocess.PIPE,
-                stderr=errors,
-                env=tooling_environment(),
-            )
-            try:
-                with tarfile.open(fileobj=process.stdout, mode="r|") as archive:
-                    for member in archive:
-                        name = member.name.rstrip("/")
-                        safe_relative(name)
-                        target = destination / name
-                        if member.isdir():
-                            target.mkdir(parents=True, exist_ok=True)
-                            continue
-                        if not member.isfile() or name not in expected:
-                            raise ReleaseError(
-                                "fetch", "Archive member is not in the pinned tree"
-                            )
-                        target.parent.mkdir(parents=True, exist_ok=True)
-                        source = archive.extractfile(member)
-                        blob = hashlib.sha1(
-                            ("blob " + str(member.size) + "\0").encode()
-                        )
-                        with target.open("wb") as output:
-                            while chunk := source.read(1024 * 1024):
-                                output.write(chunk)
-                                blob.update(chunk)
-                        if blob.hexdigest() != expected[name][0]:
-                            raise ReleaseError(
-                                "fetch", "Archive content differs from pinned Git blob"
-                            )
-                        target.chmod(0o755 if expected[name][1] == "100755" else 0o644)
-                        seen.add(name)
-                if process.wait() or seen != set(expected):
-                    raise ReleaseError(
-                        "fetch",
-                        "Archive did not contain the exact complete source tree",
-                    )
-            finally:
-                if process.poll() is None:
-                    process.terminate()
-                    process.wait()
-                process.stdout.close()
+        entries = _git_tree(source, revision)
+        _materialize_git_tree(source, entries, destination, log)
         return command(
             "fetch",
-            ["git", "-C", repo, "show", "-s", "--format=%ct", revision],
+            ["git", "-C", source, "show", "-s", "--format=%ct", revision],
             None,
             None,
             log,
         ).strip()
-    command(
-        "fetch",
-        [
-            "git",
-            "clone",
-            "--no-checkout",
-            "--no-hardlinks",
-            "--",
-            repo,
-            str(destination),
-        ],
-        None,
-        None,
-        log,
-    )
-    command("fetch", ["git", "checkout", "--detach", revision], destination, None, log)
-    actual = command(
-        "fetch", ["git", "rev-parse", "HEAD"], destination, None, log
-    ).strip()
-    if actual != revision:
-        raise ReleaseError("fetch", "Resolved checkout differs from requested SHA")
-    listing = subprocess.check_output(
-        ["git", "-C", str(destination), "ls-tree", "-rz", revision],
-        env=tooling_environment(),
-    )
-    root_fd = os.open(destination, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
-    try:
-        for entry in listing.split(b"\0"):
-            if not entry:
-                continue
-            fields, name = entry.split(b"\t", 1)
-            mode, kind, object_id = fields.decode().split()
-            if kind != "blob" or mode not in ("100644", "100755"):
-                raise ReleaseError(
-                    "fetch", "Source tree contains unsupported symlinks/submodules"
-                )
-            with confined_file(root_fd, name.decode()) as source:
-                blob = hashlib.sha1(
-                    ("blob " + str(os.fstat(source.fileno()).st_size) + "\0").encode()
-                )
-                while chunk := source.read(1024 * 1024):
-                    blob.update(chunk)
-            if blob.hexdigest() != object_id:
-                raise ReleaseError(
-                    "fetch", "Checked-out bytes differ from pinned Git blob"
-                )
-    finally:
-        os.close(root_fd)
-
-    return command(
-        "fetch", ["git", "show", "-s", "--format=%ct", revision], destination, None, log
-    ).strip()
 
 
 def tree_hashes(root):
@@ -308,16 +315,84 @@ def tree_hashes(root):
 
 
 def route_file(site, route):
-    relative = route.lstrip("/")
+    if not isinstance(route, str) or not route.startswith("/"):
+        raise ReleaseError("build", "Expected an absolute website route")
+    relative = route.strip("/")
+    if relative:
+        safe_relative(relative)
     candidates = [relative, relative + ".html", relative + "/index.html"]
-    if route == "/" or not relative:
+    if not relative:
         candidates = ["index.html", "zh-TW.html", "zh-TW/index.html"]
-    if route.startswith("/blog"):
-        candidates += ["zh-TW/" + value for value in list(candidates)]
+    if route.startswith(BLOG_ROUTE):
+        candidates += ["zh-TW/" + value for value in candidates]
+    root = site.resolve()
+    entries = {file.relative_to(root).as_posix(): file for file in root.rglob("*")}
     for candidate in candidates:
-        if candidate and (site / candidate).is_file():
-            return candidate
+        file = entries.get(safe_relative(candidate).as_posix()) if candidate else None
+        if file is None:
+            continue
+        if file.is_symlink() or not file.resolve().is_relative_to(root):
+            raise ReleaseError("build", "Static route escapes the approved website")
+        if file.is_file():
+            return file.relative_to(root).as_posix()
     raise ReleaseError("build", f"Missing static output for route {route}")
+
+
+def _manifest_identity(manifest):
+    if (
+        not isinstance(manifest, dict)
+        or manifest.get("schema") != 1
+        or not RELEASE.fullmatch(manifest["id"])
+    ):
+        raise ValueError("Invalid release manifest")
+    sha(manifest["frontend_sha"])
+    sha(manifest["content_sha"])
+    if digest(canonical(manifest["inputs"])) != manifest["id"] or any(
+        manifest["inputs"].get(key) != manifest[key]
+        for key in ("frontend_sha", "content_sha")
+    ):
+        raise ValueError("Release ID does not bind the recorded source inputs")
+
+
+def _manifest_public_markers(site, manifest):
+    public = json.loads((site / "blog-release.json").read_text())
+    if public != {
+        key: manifest[key]
+        for key in ("id", "frontend_sha", "content_sha", "baseline_sha256")
+    }:
+        raise ValueError("Public version marker differs from release manifest")
+    if (
+        digest((site / "blog-published-baseline.json").read_bytes())
+        != manifest["baseline_sha256"]
+        or digest(canonical(manifest["baseline"])) != manifest["baseline_sha256"]
+    ):
+        raise ValueError("Published baseline differs from version marker")
+
+
+def _manifest_routes(site, manifest, files):
+    baseline, smoke = manifest["baseline"], manifest["smoke"]
+    if not isinstance(baseline, dict) or not baseline or not isinstance(smoke, dict):
+        raise ValueError(
+            "Release requires a nonempty published article baseline and smoke routes"
+        )
+    required = {BLOG_ROUTE, "/en/blog", RELEASE_MARKER_ROUTE, BASELINE_ROUTE}
+    for article in baseline.values():
+        required.update(
+            ("/blog/" + article["slugs"]["zh-TW"], "/en/blog/" + article["slugs"]["en"])
+        )
+    # Verify homepage bytes even when an older registered manifest omitted their routes.
+    for route in ("/", "/en"):
+        smoke[route] = route_file(site, route)
+    if not required.issubset(smoke):
+        raise ValueError("Required article/list/version smoke routes missing")
+    for route, relative in smoke.items():
+        if (
+            not isinstance(route, str)
+            or not route.startswith("/")
+            or relative not in files
+        ):
+            raise ValueError("Invalid smoke route/file mapping")
+        safe_relative(relative)
 
 
 def verify_release(directory):
@@ -328,57 +403,15 @@ def verify_release(directory):
     ):
         raise ReleaseError("artifact", "Release must be a regular immutable directory")
     try:
-        manifest = json.loads((directory / "release.json").read_text())
-        if manifest.get("schema") != 1 or not RELEASE.fullmatch(manifest["id"]):
-            raise ValueError("Invalid release manifest")
-        sha(manifest["frontend_sha"])
-        sha(manifest["content_sha"])
-        if digest(canonical(manifest["inputs"])) != manifest["id"] or any(
-            manifest["inputs"].get(key) != manifest[key]
-            for key in ("frontend_sha", "content_sha")
-        ):
-            raise ValueError("Release ID does not bind the recorded source inputs")
+        manifest = json.loads((directory / RELEASE_MANIFEST).read_text())
+        _manifest_identity(manifest)
         files = tree_hashes(directory / "site")
         if not files or files != manifest["files"]:
             raise ValueError("Website artifact bytes differ from the recorded hashes")
-        public = json.loads((directory / "site/blog-release.json").read_text())
-        if public != {
-            key: manifest[key]
-            for key in ("id", "frontend_sha", "content_sha", "baseline_sha256")
-        }:
-            raise ValueError("Public version marker differs from release manifest")
-        if (
-            digest((directory / "site/blog-published-baseline.json").read_bytes())
-            != manifest["baseline_sha256"]
-            or digest(canonical(manifest["baseline"])) != manifest["baseline_sha256"]
-        ):
-            raise ValueError("Published baseline differs from version marker")
-        required = {
-            "/blog",
-            "/en/blog",
-            "/blog-release.json",
-            "/blog-published-baseline.json",
-        }
-        if not isinstance(manifest["baseline"], dict) or not manifest["baseline"]:
-            raise ValueError("Release requires a nonempty published article baseline")
-        for article in manifest["baseline"].values():
-            required.update(
-                (
-                    "/blog/" + article["slugs"]["zh-TW"],
-                    "/en/blog/" + article["slugs"]["en"],
-                )
-            )
-        # Derive homepage readback from verified bytes even for an older registered manifest.
-        for route in ("/", "/en"):
-            manifest["smoke"][route] = route_file(directory / "site", route)
-        if not required.issubset(manifest["smoke"]):
-            raise ValueError("Required article/list/version smoke routes missing")
-        for route, relative in manifest["smoke"].items():
-            if not route.startswith("/") or relative not in files:
-                raise ValueError("Invalid smoke route/file mapping")
-            safe_relative(relative)
+        _manifest_public_markers(directory / "site", manifest)
+        _manifest_routes(directory / "site", manifest, files)
         return manifest
-    except (KeyError, OSError, ValueError, TypeError) as error:
+    except (ReleaseError, KeyError, OSError, ValueError, TypeError) as error:
         raise ReleaseError("artifact", str(error)) from error
 
 
@@ -408,7 +441,7 @@ def stored_release(store, identifier):
     ):
         raise ReleaseError("artifact", "Release path escapes the trusted store")
     expected = catalog(store).get(identifier)
-    if not expected or digest((target / "release.json").read_bytes()) != expected:
+    if not expected or digest((target / RELEASE_MANIFEST).read_bytes()) != expected:
         raise ReleaseError(
             "artifact", "Stored manifest differs from trusted producer evidence"
         )
@@ -441,394 +474,535 @@ def caller_input(path, evidence_root):
         os.close(descriptor)
 
 
-def prepare(args):
-    frontend_sha, content_sha = sha(args.frontend_sha), sha(args.content_sha)
-    if frontend_sha != sha(args.approved_frontend_sha):
-        raise ReleaseError(
-            "approval", "Frontend SHA is not the caller-provided trusted approved pin"
-        )
-    store = release_store(args.store)
-    store.mkdir(parents=True, exist_ok=True)
-    configured_root = os.environ.get("BLOG_EVIDENCE_ROOT")
-    if not configured_root:
+@dataclass(frozen=True)
+class ReleaseRequest:
+    frontend_sha: str
+    content_sha: str
+    approval_bytes: bytes
+    baseline_bytes: bytes | None
+    public_environment: dict
+    inputs: dict
+    identifier: str
+
+
+@dataclass(frozen=True)
+class WebsiteBuild:
+    frontend: Path
+    content: Path
+    private: Path
+    approvals: Path
+    baseline: Path | None
+    environment: dict
+    executable: str
+    log: Path
+
+
+def _private_inputs(args):
+    configured = os.environ.get("BLOG_EVIDENCE_ROOT")
+    if not configured:
         raise ReleaseError(
             "approval",
             "Trusted caller BLOG_EVIDENCE_ROOT is required; never derive it from input paths",
         )
-    evidence_root = Path(configured_root).resolve(strict=True)
-    approvals = Path(os.path.abspath(args.approvals))
-    baseline = Path(os.path.abspath(args.baseline)) if args.baseline else None
-    if "://" not in args.content_repo and approvals.is_relative_to(
-        Path(args.content_repo).resolve()
-    ):
-        raise ReleaseError(
-            "approval",
-            "Approval evidence must be outside the source content repository",
-        )
+    root = Path(configured).resolve(strict=True)
     if "://" not in args.content_repo:
-        public_root = Path(args.content_repo).resolve()
-        if evidence_root.is_relative_to(public_root) or public_root.is_relative_to(
-            evidence_root
-        ):
+        public = Path(args.content_repo).resolve()
+        if root.is_relative_to(public) or public.is_relative_to(root):
             raise ReleaseError(
                 "approval", "Trusted evidence root must be disjoint from public content"
             )
-    approval_bytes = caller_input(approvals, evidence_root)
-    baseline_bytes = caller_input(baseline, evidence_root) if baseline else None
-    build_env = (
-        json.loads(caller_input(args.build_env, evidence_root))
-        if args.build_env
-        else {}
+    approvals = caller_input(args.approvals, root)
+    baseline = caller_input(args.baseline, root) if args.baseline else None
+    return root, approvals, baseline
+
+
+def _public_environment(args, private_root):
+    values = (
+        json.loads(caller_input(args.build_env, private_root)) if args.build_env else {}
     )
-    if not isinstance(build_env, dict) or any(
+    if not isinstance(values, dict) or any(
         not key.startswith("NEXT_PUBLIC_") or not isinstance(value, str)
-        for key, value in build_env.items()
+        for key, value in values.items()
     ):
         raise ReleaseError(
             "input",
             "Build environment accepts only explicit NEXT_PUBLIC_* string values",
         )
     for key in ("NEXT_PUBLIC_APP_URL", "NEXT_PUBLIC_WEBSITE_URL"):
-        try:
-            origin = urlsplit(build_env.get(key, ""))
-            _ = origin.port
-        except ValueError as error:
-            raise ReleaseError("input", "Invalid public navigation origin") from error
-        if (
-            origin.scheme != "https"
-            or not origin.netloc
-            or not origin.hostname
-            or any(character.isspace() for character in origin.netloc)
-            or origin.username
-            or origin.password
-            or origin.query
-            or origin.fragment
-            or origin.path not in ("", "/")
-        ):
-            raise ReleaseError(
-                "input",
-                f"Build environment requires an explicit credential-free HTTPS origin for {key}",
-            )
+        _public_origin(values.get(key, ""), key)
+    return values
+
+
+def _public_origin(value, key):
+    try:
+        origin = urlsplit(value)
+        _ = origin.port
+    except ValueError as error:
+        raise ReleaseError("input", "Invalid public navigation origin") from error
+    invalid = (
+        origin.scheme != "https"
+        or not origin.hostname
+        or any(character.isspace() for character in origin.netloc)
+        or origin.username
+        or origin.password
+        or origin.query
+        or origin.fragment
+        or origin.path not in ("", "/")
+    )
+    if invalid:
+        raise ReleaseError(
+            "input",
+            f"Build environment requires an explicit credential-free HTTPS origin for {key}",
+        )
+
+
+def _release_request(args):
+    frontend_sha, content_sha = sha(args.frontend_sha), sha(args.content_sha)
+    if frontend_sha != sha(args.approved_frontend_sha):
+        raise ReleaseError(
+            "approval", "Frontend SHA is not the caller-provided trusted approved pin"
+        )
+    root, approval_bytes, baseline_bytes = _private_inputs(args)
+    environment = _public_environment(args, root)
     inputs = {
         "frontend_sha": frontend_sha,
         "content_sha": content_sha,
         "approvals_hash": digest(approval_bytes),
         "baseline_hash": digest(baseline_bytes) if baseline_bytes is not None else None,
-        "build_env_hash": digest(canonical(build_env)),
+        "build_env_hash": digest(canonical(environment)),
         "runner_hash": digest(Path(__file__).read_bytes()),
     }
-    release_id = digest(canonical(inputs))
-    destination = store / "releases" / release_id
-    with locked(store):
-        if destination.exists() and release_id in catalog(store):
-            manifest = stored_release(store, release_id)
-            if manifest["inputs"] != inputs:
-                raise ReleaseError("artifact", "Release identity collision")
-            return {
-                "ok": True,
-                "stage": "prepared",
-                "id": release_id,
-                "reused": True,
-                "manifest": manifest,
-                "manifest_sha256": digest((destination / "release.json").read_bytes()),
-            }
-    (store / "logs").mkdir(exist_ok=True)
-    log = store / "logs" / (release_id + "-" + uuid.uuid4().hex + ".log")
-    executable = shutil.which("pnpm")
-    if not executable:
-        raise ReleaseError("tools", "pnpm unavailable; no build attempted")
-    with tempfile.TemporaryDirectory(prefix="blog-release-") as workspace:
-        workspace = Path(workspace).resolve()
-        frontend = workspace / "frontend"
-        content = workspace / "content"
-        private = workspace / "private"
-        private.mkdir(mode=0o700)
-        approvals = private / "approvals.json"
-        approvals.write_bytes(approval_bytes)
-        if baseline_bytes is not None:
-            baseline = private / "baseline.json"
-            baseline.write_bytes(baseline_bytes)
-        timestamp = checkout(args.frontend_repo, frontend_sha, frontend, log)
-        checkout(args.content_repo, content_sha, content, log)
-        allowed_environment = {
-            "PATH",
-            "HOME",
-            "TMPDIR",
-            "TMP",
-            "TEMP",
-            "CI",
-            "LANG",
-            "LC_ALL",
-            "TZ",
-            "PNPM_HOME",
-            "XDG_CACHE_HOME",
-            "XDG_DATA_HOME",
-            "SSL_CERT_FILE",
-            "SSL_CERT_DIR",
-            "NODE_EXTRA_CA_CERTS",
-            "NPM_CONFIG_CACHE",
-        }
-        inherited = {
-            key: value
-            for key, value in os.environ.items()
-            if key in allowed_environment
-        }
-        env = {
-            **inherited,
-            **build_env,
-            "NEXT_OUTPUT": "export",
-            "BLOG_CONTENT_DIR": str(content),
-            "BLOG_CONTENT_MODE": "publish",
-            "BLOG_APPROVALS_FILE": str(approvals),
-            "BLOG_EVIDENCE_ROOT": str(private),
-            "BLOG_CONTENT_SHA": content_sha,
-            "BLOG_FRONTEND_SHA": frontend_sha,
-            "BLOG_BUILD_ID": release_id[:32],
-        }
-        # Do not inherit a stale baseline from another release invocation.
-        env.pop("BLOG_PUBLISHED_BASELINE_FILE", None)
-        if baseline:
-            env["BLOG_PUBLISHED_BASELINE_FILE"] = str(baseline)
-        env["SOURCE_DATE_EPOCH"] = timestamp
-        command(
+    return ReleaseRequest(
+        frontend_sha,
+        content_sha,
+        approval_bytes,
+        baseline_bytes,
+        environment,
+        inputs,
+        digest(canonical(inputs)),
+    )
+
+
+def _build_environment(request, content, private, approvals, baseline, timestamp):
+    allowed = {
+        "PATH",
+        "HOME",
+        "TMPDIR",
+        "TMP",
+        "TEMP",
+        "CI",
+        "LANG",
+        "LC_ALL",
+        "TZ",
+        "PNPM_HOME",
+        "XDG_CACHE_HOME",
+        "XDG_DATA_HOME",
+        "SSL_CERT_FILE",
+        "SSL_CERT_DIR",
+        "NODE_EXTRA_CA_CERTS",
+        "NPM_CONFIG_CACHE",
+    }
+    inherited = {key: value for key, value in os.environ.items() if key in allowed}
+    environment = {
+        **inherited,
+        **request.public_environment,
+        "NEXT_OUTPUT": "export",
+        "BLOG_CONTENT_DIR": str(content),
+        "BLOG_CONTENT_MODE": "publish",
+        "BLOG_APPROVALS_FILE": str(approvals),
+        "BLOG_EVIDENCE_ROOT": str(private),
+        "BLOG_CONTENT_SHA": request.content_sha,
+        "BLOG_FRONTEND_SHA": request.frontend_sha,
+        "BLOG_BUILD_ID": request.identifier[:32],
+        "SOURCE_DATE_EPOCH": timestamp,
+    }
+    if baseline:
+        environment["BLOG_PUBLISHED_BASELINE_FILE"] = str(baseline)
+    return environment
+
+
+def _prepare_sources(args, request, workspace, executable, log):
+    frontend, content, private = (
+        workspace / "frontend",
+        workspace / "content",
+        workspace / "private",
+    )
+    private.mkdir(mode=0o700)
+    approvals = private / "approvals.json"
+    approvals.write_bytes(request.approval_bytes)
+    baseline = None
+    if request.baseline_bytes is not None:
+        baseline = private / "baseline.json"
+        baseline.write_bytes(request.baseline_bytes)
+    timestamp = checkout(args.frontend_repo, request.frontend_sha, frontend, log)
+    checkout(args.content_repo, request.content_sha, content, log)
+    environment = _build_environment(
+        request, content, private, approvals, baseline, timestamp
+    )
+    return WebsiteBuild(
+        frontend, content, private, approvals, baseline, environment, executable, log
+    )
+
+
+def _install_website(build):
+    command(
+        "install",
+        [
+            build.executable,
             "install",
-            [
-                executable,
-                "install",
-                "--frozen-lockfile",
-                "--filter",
-                "@daodao/website...",
-                "--filter",
-                "@daodao/blog-content",
-            ],
-            frontend,
-            env,
-            log,
-        )
-        command(
-            "configure",
-            [executable, "--filter", "@daodao/config", "generate:env"],
-            frontend,
-            env,
-            log,
-        )
-        validate = [
-            executable,
+            "--frozen-lockfile",
+            "--filter",
+            "@daodao/website...",
             "--filter",
             "@daodao/blog-content",
+        ],
+        build.frontend,
+        build.environment,
+        build.log,
+    )
+    command(
+        "configure",
+        [build.executable, "--filter", "@daodao/config", "generate:env"],
+        build.frontend,
+        build.environment,
+        build.log,
+    )
+
+
+def _validation_result(output):
+    try:
+        result = json.loads(output[output.index("{") :])
+    except ValueError as error:
+        raise ReleaseError(
+            "validate", "Validator did not return its JSON result"
+        ) from error
+    if (
+        not isinstance(result, dict)
+        or not result.get("ok")
+        or result.get("mode") != "publish"
+        or not result.get("articles")
+    ):
+        raise ReleaseError(
             "validate",
-            "--root",
-            str(content),
-            "--approvals",
-            str(approvals),
-        ]
-        if baseline:
-            validate += ["--baseline", str(baseline)]
-        output = command("validate", validate, frontend, env, log)
-        try:
-            validated = json.loads(output[output.index("{") :])
-        except (ValueError, json.JSONDecodeError) as error:
-            raise ReleaseError(
-                "validate", "Validator did not return its JSON result"
-            ) from error
-        if (
-            not validated.get("ok")
-            or validated.get("mode") != "publish"
-            or not validated.get("articles")
-        ):
-            raise ReleaseError(
-                "validate",
-                "Publish-mode validator did not return nonempty approved content",
-            )
-        if baseline_bytes is not None and set(json.loads(baseline_bytes)) - {
-            article["metadata"]["id"] for article in validated["articles"]
-        }:
-            raise ReleaseError(
-                "approval",
-                "Published articles cannot disappear in an ordinary publication; explicit unpublish policy is not implemented",
-            )
-        command(
-            "build",
-            [executable, "--filter", "@daodao/website", "build"],
-            frontend,
-            env,
-            log,
+            "Publish-mode validator did not return nonempty approved content",
         )
-        output_site = frontend / "apps/website/out"
-        if not output_site.is_dir():
-            raise ReleaseError("build", "Static website output is missing")
-        smoke = {
-            route: route_file(output_site, route)
-            for route in ("/", "/en", "/blog", "/en/blog")
-        }
-        article_baseline = {}
-        for article in validated["articles"]:
-            metadata = article["metadata"]
-            language = metadata["lang"]
-            article_id = metadata["id"]
-            route = ("/en/blog/" if language == "en" else "/blog/") + metadata["slug"]
-            smoke[route] = route_file(output_site, route)
-            previous = article_baseline.setdefault(
-                article_id, {"published_at": metadata["published_at"], "slugs": {}}
+    return result
+
+
+def _build_website(build):
+    _install_website(build)
+    arguments = [
+        build.executable,
+        "--filter",
+        "@daodao/blog-content",
+        "validate",
+        "--root",
+        str(build.content),
+        "--mode",
+        "publish",
+        "--approvals",
+        str(build.approvals),
+    ]
+    if build.baseline:
+        arguments += ["--baseline", str(build.baseline)]
+    validated = _validation_result(
+        command("validate", arguments, build.frontend, build.environment, build.log)
+    )
+    if build.baseline and set(json.loads(build.baseline.read_bytes())) - {
+        article["metadata"]["id"] for article in validated["articles"]
+    }:
+        raise ReleaseError(
+            "approval",
+            "Published articles cannot disappear in an ordinary publication; explicit unpublish policy is not implemented",
+        )
+    command(
+        "build",
+        [build.executable, "--filter", "@daodao/website", "build"],
+        build.frontend,
+        build.environment,
+        build.log,
+    )
+    site = build.frontend / "apps/website/out"
+    if not site.is_dir():
+        raise ReleaseError("build", "Static website output is missing")
+    return validated, site
+
+
+def _confined_digest(root, relative):
+    descriptor = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        with confined_file(descriptor, relative) as source:
+            return hashlib.file_digest(source, "sha256").hexdigest()
+    finally:
+        os.close(descriptor)
+
+
+def _image_route(site, content, image, pair_digest):
+    relative = "blog-images/" + pair_digest + "/" + image["path"]
+    safe_relative(relative)
+    if _confined_digest(site, relative) != _confined_digest(content, image["path"]):
+        raise ReleaseError("build", "Published image differs from approved content")
+    return relative
+
+
+def _publication_maps(site, content, validated):
+    smoke = {
+        route: route_file(site, route) for route in ("/", "/en", BLOG_ROUTE, "/en/blog")
+    }
+    baseline = {}
+    for article in validated["articles"]:
+        metadata = article["metadata"]
+        article_id, language = metadata["id"], metadata["lang"]
+        route = ("/en/blog/" if language == "en" else "/blog/") + metadata["slug"]
+        smoke[route] = route_file(site, route)
+        baseline.setdefault(
+            article_id, {"published_at": metadata["published_at"], "slugs": {}}
+        )["slugs"][language] = metadata["slug"]
+        for image in article.get("images", []):
+            relative = _image_route(
+                site, content, image, validated["digests"][article_id]
             )
-            previous["slugs"][language] = metadata["slug"]
-            for image in article.get("images", []):
-                relative = (
-                    "blog-images/"
-                    + validated["digests"][article_id]
-                    + "/"
-                    + image["path"]
-                )
-                if (
-                    not (output_site / relative).is_file()
-                    or (output_site / relative).read_bytes()
-                    != (content / image["path"]).read_bytes()
-                ):
-                    raise ReleaseError(
-                        "build",
-                        "Published image is missing or differs from approved content",
-                    )
-                smoke["/" + relative] = relative
-        baseline_bytes = canonical(article_baseline)
-        (output_site / "blog-published-baseline.json").write_bytes(baseline_bytes)
-        public = {
-            "id": release_id,
-            "frontend_sha": frontend_sha,
-            "content_sha": content_sha,
-            "baseline_sha256": digest(baseline_bytes),
+            smoke["/" + relative] = relative
+    return smoke, baseline
+
+
+def _release_manifest(site, content, validated, request):
+    smoke, baseline = _publication_maps(site, content, validated)
+    baseline_bytes = canonical(baseline)
+    (site / "blog-published-baseline.json").write_bytes(baseline_bytes)
+    public = {
+        "id": request.identifier,
+        "frontend_sha": request.frontend_sha,
+        "content_sha": request.content_sha,
+        "baseline_sha256": digest(baseline_bytes),
+    }
+    (site / "blog-release.json").write_bytes(canonical(public))
+    smoke.update(
+        {
+            BASELINE_ROUTE: "blog-published-baseline.json",
+            RELEASE_MARKER_ROUTE: "blog-release.json",
         }
-        smoke["/blog-published-baseline.json"] = "blog-published-baseline.json"
-        (output_site / "blog-release.json").write_bytes(canonical(public))
-        smoke["/blog-release.json"] = "blog-release.json"
-        manifest = {
-            "schema": 1,
-            **public,
-            "inputs": inputs,
-            "digests": validated["digests"],
-            "baseline": article_baseline,
-            "files": tree_hashes(output_site),
-            "smoke": smoke,
-        }
-        staging = store / ("stage-" + uuid.uuid4().hex)
-        staging.mkdir()
-        try:
-            shutil.copytree(output_site, staging / "site")
-            (staging / "release.json").write_bytes(canonical(manifest))
-            verify_release(staging)
-            with locked(store):
-                destination.parent.mkdir(exist_ok=True)
-                if destination.exists():
-                    manifest = verify_release(destination)
-                    if manifest["inputs"] != inputs or manifest["files"] != tree_hashes(
-                        staging / "site"
-                    ):
-                        raise ReleaseError(
-                            "artifact",
-                            "Concurrent artifact differs for the same pinned inputs",
-                        )
-                else:
-                    os.rename(staging, destination)
-                register_artifact(
-                    store,
-                    release_id,
-                    digest((destination / "release.json").read_bytes()),
-                )
-        finally:
-            if staging.exists():
-                shutil.rmtree(staging)
+    )
+    return {
+        "schema": 1,
+        **public,
+        "inputs": request.inputs,
+        "digests": validated["digests"],
+        "baseline": baseline,
+        "files": tree_hashes(site),
+        "smoke": smoke,
+    }
+
+
+def _artifact_result(store, manifest, reused):
+    file = store / "releases" / manifest["id"] / RELEASE_MANIFEST
     return {
         "ok": True,
         "stage": "prepared",
-        "id": release_id,
-        "reused": False,
+        "id": manifest["id"],
+        "reused": reused,
         "manifest": manifest,
-        "manifest_sha256": digest((destination / "release.json").read_bytes()),
+        "manifest_sha256": digest(file.read_bytes()),
     }
 
 
-def website_handler(site_provider):
-    class Handler(BaseHTTPRequestHandler):
-        def do_GET(self):
-            try:
-                route = unquote(urlsplit(self.path).path)
+def _cached_artifact(store, request):
+    destination = store / "releases" / request.identifier
+    with locked(store):
+        if not destination.exists() or request.identifier not in catalog(store):
+            return None
+        manifest = stored_release(store, request.identifier)
+        if manifest["inputs"] != request.inputs:
+            raise ReleaseError("artifact", "Release identity collision")
+        return _artifact_result(store, manifest, True)
+
+
+def _store_artifact(store, site, manifest):
+    staging = store / ("stage-" + uuid.uuid4().hex)
+    destination = store / "releases" / manifest["id"]
+    staging.mkdir()
+    try:
+        shutil.copytree(site, staging / "site")
+        (staging / RELEASE_MANIFEST).write_bytes(canonical(manifest))
+        verify_release(staging)
+        with locked(store):
+            destination.parent.mkdir(exist_ok=True)
+            if destination.exists():
+                existing = verify_release(destination)
                 if (
-                    not route.startswith("/")
-                    or "\\" in route
-                    or any(value in (".", "..") for value in route.split("/"))
+                    existing["inputs"] != manifest["inputs"]
+                    or existing["files"] != manifest["files"]
                 ):
-                    raise ValueError("Invalid route")
-                site = site_provider().resolve()
-                relative = route_file(site, route)
-                file = site / relative
-                if file.is_symlink() or not file.resolve().is_relative_to(site):
-                    raise ValueError("Unsafe resource")
-                data = file.read_bytes()
-                self.send_response(200)
-                self.send_header("Content-Length", str(len(data)))
-                content_type = (
-                    "text/javascript"
-                    if file.suffix in (".js", ".mjs")
-                    else (
-                        mimetypes.guess_type(file.name)[0] or "application/octet-stream"
+                    raise ReleaseError(
+                        "artifact",
+                        "Concurrent artifact differs for the same pinned inputs",
                     )
-                )
-                self.send_header("Content-Type", content_type)
-                self.send_header("X-Content-Type-Options", "nosniff")
-                self.end_headers()
-                self.wfile.write(data)
+                manifest = existing
+            else:
+                os.rename(staging, destination)
+            register_artifact(
+                store,
+                manifest["id"],
+                digest((destination / RELEASE_MANIFEST).read_bytes()),
+            )
+    finally:
+        if staging.exists():
+            shutil.rmtree(staging)
+    return manifest
+
+
+def prepare(args):
+    request = _release_request(args)
+    store = release_store(args.store)
+    store.mkdir(parents=True, exist_ok=True)
+    cached = _cached_artifact(store, request)
+    if cached:
+        return cached
+    executable = shutil.which("pnpm")
+    if not executable:
+        raise ReleaseError("tools", "pnpm unavailable; no build attempted")
+    (store / "logs").mkdir(exist_ok=True)
+    log = store / "logs" / (request.identifier + "-" + uuid.uuid4().hex + ".log")
+    with tempfile.TemporaryDirectory(prefix="blog-release-") as workspace:
+        build = _prepare_sources(
+            args, request, Path(workspace).resolve(), executable, log
+        )
+        validated, site = _build_website(build)
+        manifest = _store_artifact(
+            store, site, _release_manifest(site, build.content, validated, request)
+        )
+    return _artifact_result(store, manifest, False)
+
+
+def website_handler(site_provider):
+    class Handler(SimpleHTTPRequestHandler):
+        extensions_map: ClassVar[dict[str, str]] = {
+            **SimpleHTTPRequestHandler.extensions_map,
+            ".js": "text/javascript",
+            ".mjs": "text/javascript",
+        }
+
+        def translate_path(self, path):
+            site = site_provider().resolve()
+            try:
+                route = unquote(urlsplit(path).path)
+                relative = route_file(site, route)
+                return str(site / relative)
             except (OSError, ValueError, ReleaseError):
-                self.send_error(404)
+                return str(site / (".missing-" + uuid.uuid4().hex))
+
+        def end_headers(self):
+            self.send_header("X-Content-Type-Options", "nosniff")
+            super().end_headers()
 
         def log_message(self, *_args):
-            pass
+            # Smoke logs must not expose requested URLs or private deployment paths.
+            return None
 
     return Handler
 
 
-def http_readback(base_url, manifest):
-    parsed = urlsplit(base_url)
-    if (
-        parsed.scheme not in ("http", "https")
-        or not parsed.netloc
+def trusted_origin(requested):
+    configured = os.environ.get("BLOG_RELEASE_BASE_URL", "")
+    if not configured:
+        raise ReleaseError(
+            "network-policy",
+            "Trusted caller BLOG_RELEASE_BASE_URL is required; a request cannot authorize its own origin",
+        )
+    try:
+        parsed = urlsplit(configured)
+        port = parsed.port
+    except ValueError as error:
+        raise ReleaseError(
+            "network-policy", "Invalid configured release origin"
+        ) from error
+    invalid = (
+        parsed.scheme not in ("https", "http")
+        or not parsed.hostname
         or parsed.username
         or parsed.password
         or parsed.query
         or parsed.fragment
+        or parsed.path not in ("", "/")
+        or any(character.isspace() for character in configured)
+        or (port is not None and port < 1)
+    )
+    if invalid or (
+        parsed.scheme == "http" and parsed.hostname not in ("127.0.0.1", "::1")
     ):
-        raise ReleaseError("smoke", "Expected credential-free HTTP(S) base URL")
+        raise ReleaseError(
+            "network-policy",
+            "Configured release origin must use HTTPS, except literal loopback HTTP for controlled tests",
+        )
+    if not isinstance(requested, str) or requested.rstrip("/") != configured.rstrip(
+        "/"
+    ):
+        raise ReleaseError(
+            "network-policy",
+            "Requested origin is outside the independently configured release capability",
+        )
+    return configured.rstrip("/")
+
+
+def _readback_file(base_url, route, expected, identifier):
+    target = (
+        base_url
+        + route
+        + "?blog_release_readback="
+        + identifier
+        + "-"
+        + uuid.uuid4().hex
+    )
+    request = Request(
+        target, headers={"Accept-Encoding": "identity", "Cache-Control": "no-cache"}
+    )
+    try:
+        with HTTP.open(request, timeout=10) as response:
+            if response.status != 200 or response.geturl() != target:
+                raise ValueError("Unexpected response or redirect")
+            received = hashlib.sha256()
+            deadline = time.monotonic() + 30
+            while chunk := response.read1(1024 * 1024):
+                received.update(chunk)
+                if time.monotonic() > deadline:
+                    raise ValueError("Readback deadline exceeded")
+            if received.hexdigest() != expected:
+                raise ValueError(f"Wrong deployed bytes at {route}")
+    except (OSError, ValueError) as error:
+        if isinstance(error, HTTPError):
+            error.close()
+        raise ReleaseError("smoke", str(error)) from error
+
+
+def _readback_origin(base_url, manifest):
     for route, relative in manifest["smoke"].items():
-        target_url = (
-            base_url.rstrip("/")
-            + route
-            + "?blog_release_readback="
-            + manifest["id"]
-            + "-"
-            + uuid.uuid4().hex
-        )
-        request = Request(
-            target_url,
-            headers={"Accept-Encoding": "identity", "Cache-Control": "no-cache"},
-        )
-        try:
-            with HTTP.open(request, timeout=10) as response:
-                if response.status != 200 or response.geturl() != target_url:
-                    raise ValueError("Unexpected response or redirect")
-                received = hashlib.sha256()
-                deadline = time.monotonic() + 30
-                while chunk := response.read1(1024 * 1024):
-                    received.update(chunk)
-                    if time.monotonic() > deadline:
-                        raise ValueError("Readback deadline exceeded")
-                if received.hexdigest() != manifest["files"][relative]:
-                    raise ValueError(f"Wrong deployed bytes at {route}")
-        except (HTTPError, URLError, OSError, ValueError) as error:
-            raise ReleaseError("smoke", str(error)) from error
+        _readback_file(base_url, route, manifest["files"][relative], manifest["id"])
+
+
+def http_readback(base_url, manifest):
+    _readback_origin(trusted_origin(base_url), manifest)
 
 
 def switch_pointer(store, release_id):
     temporary = store / ("current-" + uuid.uuid4().hex)
     temporary.symlink_to(Path("releases") / release_id)
     os.replace(temporary, store / "current")
+
+
+def _journal_was_committed(store, base_url, pending, state, pointer, target):
+    committed = (
+        state
+        and state["id"] == pending["id"]
+        and state["generation"] == pending["generation"]
+        and pointer.resolve() == target.resolve()
+    )
+    if not committed:
+        return False
+    try:
+        http_readback(base_url, stored_release(store, pending["id"]))
+    except ReleaseError:
+        return False
+    return True
 
 
 def recover_pending(store, base_url):
@@ -844,19 +1018,9 @@ def recover_pending(store, base_url):
     state = json.loads(state_file.read_text()) if state_file.exists() else None
     pointer = store / "current"
     target = store / "releases" / identifier
-    if (
-        state
-        and state["id"] == identifier
-        and state["generation"] == pending["generation"]
-        and pointer.resolve() == target.resolve()
-    ):
-        try:
-            http_readback(base_url, stored_release(store, identifier))
-        except ReleaseError:
-            pass  # A committed-but-unacknowledged candidate that no longer reads back falls back below.
-        else:
-            file.unlink()
-            return
+    if _journal_was_committed(store, base_url, pending, state, pointer, target):
+        file.unlink()
+        return
     allowed = {target.resolve()}
     if old:
         allowed.add((store / "releases" / old["id"]).resolve())
@@ -913,169 +1077,182 @@ def verify_freshness(repository, manifest):
         )
 
 
+def _assert_published_identity(previous, candidate, retain_current):
+    if retain_current and set(previous) - set(candidate):
+        raise ReleaseError(
+            "approval", "Published articles cannot disappear in an ordinary publication"
+        )
+    for article_id, prior in previous.items():
+        if article_id in candidate and candidate[article_id] != prior:
+            raise ReleaseError(
+                "approval",
+                "Previously published dates/slugs differ from verified release history",
+            )
+
+
+def _active_state(store, manifest, operation):
+    file = store / "active.json"
+    old = json.loads(file.read_text()) if file.exists() else None
+    if old:
+        if not RELEASE.fullmatch(old.get("id", "")):
+            raise ReleaseError("state", "Invalid active release identity")
+        current = stored_release(store, old["id"])
+        _assert_published_identity(
+            current["baseline"], manifest["baseline"], operation != "rollback"
+        )
+        for historical in old.get("history", []):
+            previous = stored_release(store, historical)
+            _assert_published_identity(
+                previous["baseline"], manifest["baseline"], False
+            )
+    if operation == "rollback" and (
+        not old or manifest["id"] not in old.get("history", [])
+    ):
+        raise ReleaseError(
+            "approval", "Rollback target was not a previously verified active release"
+        )
+    return old
+
+
+def _check_active_pointer(store, old):
+    pointer = store / "current"
+    if pointer.exists() or pointer.is_symlink():
+        if not old or pointer.resolve() != (store / "releases" / old["id"]).resolve():
+            raise ReleaseError(
+                "state", "Current pointer does not match the trusted active state"
+            )
+    elif old:
+        raise ReleaseError("state", "Recorded active release has no current pointer")
+
+
+def _accept_generation(store, old, identifier, generation):
+    file = store / "generation.json"
+    current_generation = old["generation"] if old else 0
+    owner = old["id"] if old else None
+    water = (
+        json.loads(file.read_text())
+        if file.exists()
+        else {"generation": current_generation, "id": owner}
+    )
+    if generation < water["generation"] or (
+        generation == water["generation"] and water["id"] != identifier
+    ):
+        raise ReleaseError(
+            "superseded", "A newer generation already owns this deployment"
+        )
+    atomic_json(file, {"generation": generation, "id": identifier})
+
+
+def _check_freshness(args, manifest):
+    repository = getattr(args, "freshness_repository", None)
+    if repository and getattr(args, "operation", "activate") != "rollback":
+        verify_freshness(repository, manifest)
+
+
+def _reuse_active(args, store, old, manifest):
+    _check_freshness(args, manifest)
+    http_readback(args.base_url, manifest)
+    if args.generation > old["generation"]:
+        atomic_json(store / "active.json", {**old, "generation": args.generation})
+    return {
+        "ok": True,
+        "stage": "active",
+        "id": args.release,
+        "reused": True,
+        "generation": max(old["generation"], args.generation),
+        "adapter": "filesystem-http",
+    }
+
+
+def _smoke_candidate(site, manifest):
+    candidate = ThreadingHTTPServer(("127.0.0.1", 0), website_handler(lambda: site))
+    thread = threading.Thread(target=candidate.serve_forever, daemon=True)
+    thread.start()
+    try:
+        _readback_origin("http://127.0.0.1:" + str(candidate.server_port), manifest)
+    finally:
+        candidate.shutdown()
+        candidate.server_close()
+        thread.join()
+
+
+def _restore_previous(store, old, base_url):
+    if old:
+        switch_pointer(store, old["id"])
+        atomic_json(store / "active.json", old)
+        http_readback(base_url, stored_release(store, old["id"]))
+    else:
+        (store / "current").unlink(missing_ok=True)
+        (store / "active.json").unlink(missing_ok=True)
+
+
+def _activation_state(old, identifier, generation):
+    history = old.get("history", []) if old else []
+    return {
+        "id": identifier,
+        "generation": generation,
+        "previous": old["id"] if old else None,
+        "history": list(dict.fromkeys([*history, identifier])),
+    }
+
+
+def _commit_activation(args, store, old, manifest):
+    journal = store / "pending.json"
+    atomic_json(
+        journal, {"id": args.release, "generation": args.generation, "old": old}
+    )
+    switch_pointer(store, args.release)
+    try:
+        http_readback(args.base_url, manifest)
+        atomic_json(
+            store / "active.json", _activation_state(old, args.release, args.generation)
+        )
+        journal.unlink()
+    except Exception as candidate_error:
+        try:
+            _restore_previous(store, old, args.base_url)
+        except (
+            ReleaseError,
+            OSError,
+            ValueError,
+            TypeError,
+            KeyError,
+        ) as recovery_error:
+            # Retain the journal until recovery succeeds; do not mask either failure.
+            raise ReleaseError(
+                "recovery",
+                f"Candidate failed: {candidate_error}; restoring prior version could not be verified: {recovery_error}",
+            ) from candidate_error
+        journal.unlink(missing_ok=True)
+        raise
+    return {
+        "ok": True,
+        "stage": "active",
+        "id": args.release,
+        "generation": args.generation,
+        "previous": old["id"] if old else None,
+        "adapter": "filesystem-http",
+        "frontend_sha": manifest["frontend_sha"],
+        "content_sha": manifest["content_sha"],
+    }
+
+
 def activate(args):
     if not RELEASE.fullmatch(args.release) or args.generation < 1:
         raise ReleaseError("input", "Release ID and positive generation required")
+    trusted_origin(args.base_url)
     store = release_store(args.store)
     with locked(store):
         recover_pending(store, args.base_url)
-        target = store / "releases" / args.release
         manifest = stored_release(store, args.release)
-        state_file = store / "active.json"
-        old = json.loads(state_file.read_text()) if state_file.exists() else None
-        if old:
-            if not RELEASE.fullmatch(old.get("id", "")):
-                raise ReleaseError("state", "Invalid active release identity")
-            previous_manifest = stored_release(store, old["id"])
-            for article_id, prior in previous_manifest["baseline"].items():
-                if (
-                    article_id in manifest["baseline"]
-                    and manifest["baseline"][article_id] != prior
-                ):
-                    raise ReleaseError(
-                        "approval",
-                        "Published dates/slugs differ from active trusted baseline",
-                    )
-            if getattr(args, "operation", "activate") != "rollback" and set(
-                previous_manifest["baseline"]
-            ) - set(manifest["baseline"]):
-                raise ReleaseError(
-                    "approval",
-                    "Published articles cannot disappear in an ordinary publication",
-                )
-            for historical in old.get("history", []):
-                prior_manifest = stored_release(store, historical)
-                for article_id, prior in prior_manifest["baseline"].items():
-                    if (
-                        article_id in manifest["baseline"]
-                        and manifest["baseline"][article_id] != prior
-                    ):
-                        raise ReleaseError(
-                            "approval",
-                            "Previously published identity differs from verified release history",
-                        )
-        if getattr(args, "operation", "activate") == "rollback" and (
-            not old or args.release not in old.get("history", [])
-        ):
-            raise ReleaseError(
-                "approval",
-                "Rollback target was not a previously verified active release",
-            )
-        generation = old["generation"] if old else 0
-        pointer = store / "current"
-        if pointer.exists() or pointer.is_symlink():
-            if (
-                not old
-                or not RELEASE.fullmatch(old["id"])
-                or pointer.resolve() != (store / "releases" / old["id"]).resolve()
-            ):
-                raise ReleaseError(
-                    "state", "Current pointer does not match the trusted active state"
-                )
-        elif old:
-            raise ReleaseError(
-                "state", "Recorded active release has no current pointer"
-            )
-        water_file = store / "generation.json"
-        water = (
-            json.loads(water_file.read_text())
-            if water_file.exists()
-            else {"generation": generation, "id": old["id"] if old else None}
-        )
-        if args.generation < water["generation"] or (
-            args.generation == water["generation"] and water["id"] != args.release
-        ):
-            raise ReleaseError(
-                "superseded", "A newer generation already owns this deployment"
-            )
-        atomic_json(water_file, {"generation": args.generation, "id": args.release})
+        old = _active_state(store, manifest, getattr(args, "operation", "activate"))
+        _check_active_pointer(store, old)
+        _accept_generation(store, old, args.release, args.generation)
         if old and old["id"] == args.release:
-            if (
-                getattr(args, "freshness_repository", None)
-                and getattr(args, "operation", "activate") != "rollback"
-            ):
-                verify_freshness(args.freshness_repository, manifest)
-            http_readback(args.base_url, manifest)
-            if args.generation > generation:
-                atomic_json(state_file, {**old, "generation": args.generation})
-            return {
-                "ok": True,
-                "stage": "active",
-                "id": args.release,
-                "reused": True,
-                "generation": max(generation, args.generation),
-                "adapter": "filesystem-http",
-            }
-        # Validate every candidate URL before changing the visible pointer.
-        candidate = ThreadingHTTPServer(
-            ("127.0.0.1", 0), website_handler(lambda: target / "site")
-        )
-        thread = threading.Thread(target=candidate.serve_forever, daemon=True)
-        thread.start()
-        try:
-            http_readback("http://127.0.0.1:" + str(candidate.server_port), manifest)
-        finally:
-            candidate.shutdown()
-            candidate.server_close()
-            thread.join()
-        if (
-            getattr(args, "freshness_repository", None)
-            and getattr(args, "operation", "activate") != "rollback"
-        ):
-            verify_freshness(args.freshness_repository, manifest)
-        journal = store / "pending.json"
-        atomic_json(
-            journal, {"id": args.release, "generation": args.generation, "old": old}
-        )
-        switch_pointer(store, args.release)
-        try:
-            http_readback(args.base_url, manifest)
-            history = list(
-                dict.fromkeys([*(old.get("history", []) if old else []), args.release])
-            )
-            atomic_json(
-                state_file,
-                {
-                    "id": args.release,
-                    "generation": args.generation,
-                    "previous": old["id"] if old else None,
-                    "history": history,
-                },
-            )
-            journal.unlink()
-        except Exception as candidate_error:
-            try:
-                if old:
-                    switch_pointer(store, old["id"])
-                    atomic_json(state_file, old)
-                    http_readback(args.base_url, stored_release(store, old["id"]))
-                else:
-                    (store / "current").unlink(missing_ok=True)
-                    state_file.unlink(missing_ok=True)
-            except (
-                ReleaseError,
-                OSError,
-                ValueError,
-                TypeError,
-                KeyError,
-            ) as recovery_error:
-                # Keep the journal for a later verified recovery; neither failure is hidden.
-                raise ReleaseError(
-                    "recovery",
-                    f"Candidate failed: {candidate_error}; restoring prior version could not be verified: {recovery_error}",
-                ) from candidate_error
-            journal.unlink(missing_ok=True)
-            raise
-        return {
-            "ok": True,
-            "stage": "active",
-            "id": args.release,
-            "generation": args.generation,
-            "previous": old["id"] if old else None,
-            "adapter": "filesystem-http",
-            "frontend_sha": manifest["frontend_sha"],
-            "content_sha": manifest["content_sha"],
-        }
+            return _reuse_active(args, store, old, manifest)
+        _smoke_candidate(store / "releases" / args.release / "site", manifest)
+        _check_freshness(args, manifest)
+        return _commit_activation(args, store, old, manifest)
 
 
 def confined_file(root_fd, relative):
@@ -1131,7 +1308,7 @@ def import_release(args):
     descriptor = os.open(source, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
     staging = None
     try:
-        with confined_file(descriptor, "release.json") as file:
+        with confined_file(descriptor, RELEASE_MANIFEST) as file:
             manifest_bytes = file.read(16 * 1024 * 1024 + 1)
         if (
             len(manifest_bytes) > 16 * 1024 * 1024
@@ -1152,7 +1329,7 @@ def import_release(args):
             destination = store / "releases" / identifier
             if destination.exists():
                 if (
-                    digest((destination / "release.json").read_bytes())
+                    digest((destination / RELEASE_MANIFEST).read_bytes())
                     != args.manifest_sha256
                 ):
                     raise ReleaseError(
@@ -1169,7 +1346,7 @@ def import_release(args):
                 }
             staging = store / ("import-" + uuid.uuid4().hex)
             (staging / "site").mkdir(parents=True)
-            (staging / "release.json").write_bytes(manifest_bytes)
+            (staging / RELEASE_MANIFEST).write_bytes(manifest_bytes)
             transfer_artifact_files(descriptor, manifest["files"], staging / "site")
             verify_release(staging)
             destination.parent.mkdir(exist_ok=True)
@@ -1183,32 +1360,22 @@ def import_release(args):
 
 
 def fetch_baseline(args):
-    parsed = urlsplit(args.base_url)
-    if (
-        parsed.scheme not in ("http", "https")
-        or not parsed.netloc
-        or parsed.username
-        or parsed.password
-        or parsed.query
-        or parsed.fragment
-    ):
-        raise ReleaseError(
-            "baseline", "Expected a credential-free trusted HTTP(S) base URL"
-        )
+    base_url = trusted_origin(args.base_url)
     try:
-        marker_url = args.base_url.rstrip("/") + "/blog-release.json"
+        marker_url = base_url + RELEASE_MARKER_ROUTE
         try:
             with HTTP.open(marker_url, timeout=10) as response:
                 if response.geturl() != marker_url:
                     raise ValueError("Unexpected baseline marker redirect")
                 marker = json.loads(response.read(65537))
         except HTTPError as error:
+            error.close()
             if error.code == 404:
                 raise ReleaseError(
                     "baseline-missing", "No prior release marker exists"
                 ) from error
             raise
-        baseline_url = args.base_url.rstrip("/") + "/blog-published-baseline.json"
+        baseline_url = base_url + BASELINE_ROUTE
         with HTTP.open(baseline_url, timeout=10) as response:
             if response.geturl() != baseline_url:
                 raise ValueError("Unexpected baseline redirect")
@@ -1225,6 +1392,8 @@ def fetch_baseline(args):
         json.loads(data)
         args.output.write_bytes(data)
     except (OSError, ValueError, KeyError) as error:
+        if isinstance(error, HTTPError):
+            error.close()
         raise ReleaseError("baseline", str(error)) from error
     return {"ok": True, "stage": "baseline", "release": marker["id"]}
 
@@ -1265,7 +1434,7 @@ def main():
     serve = commands.add_parser("serve")
     serve.add_argument("--store", type=Path, required=True)
     serve.add_argument("--port", type=int, default=8536)
-    serve.add_argument("--host", default="127.0.0.1")
+    serve.add_argument("--host", choices=("127.0.0.1",), default="127.0.0.1")
     args = parser.parse_args()
     try:
         if args.operation == "prepare":
@@ -1278,7 +1447,7 @@ def main():
             result = fetch_baseline(args)
         else:
             server = ThreadingHTTPServer(
-                (args.host, args.port),
+                ("127.0.0.1", args.port),
                 website_handler(lambda: args.store / "current/site"),
             )
             print(

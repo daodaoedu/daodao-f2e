@@ -8,6 +8,8 @@ import sys
 import tempfile
 import threading
 import unittest
+import zlib
+from http.server import BaseHTTPRequestHandler
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -42,8 +44,11 @@ class LocalReleaseTests(unittest.TestCase):
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
         self.url = "http://127.0.0.1:" + str(self.server.server_port)
+        self.origin = patch.dict(os.environ, {"BLOG_RELEASE_BASE_URL": self.url})
+        self.origin.start()
 
     def tearDown(self):
+        self.origin.stop()
         self.server.shutdown()
         self.server.server_close()
         self.thread.join()
@@ -196,6 +201,50 @@ class LocalReleaseTests(unittest.TestCase):
         )
         self.assertTrue((self.store / "pending.json").exists())
         self.assertEqual(self.activate(second, 2)["id"], second)
+
+    def test_requested_url_cannot_grant_its_own_network_capability(self):
+        identifier = self.artifact("a")
+        manifest = json.loads(
+            (self.store / "releases" / identifier / "release.json").read_text()
+        )
+        requests = []
+
+        class Unexpected(BaseHTTPRequestHandler):
+            def do_GET(self):
+                requests.append(self.path)
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(b"untrusted origin")
+
+            def log_message(self, *_args):
+                return None
+
+        server = release.ThreadingHTTPServer(("127.0.0.1", 0), Unexpected)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            with (
+                patch.dict(os.environ, {"BLOG_RELEASE_BASE_URL": self.url}),
+                self.assertRaises(release.ReleaseError),
+            ):
+                release.http_readback(
+                    "http://127.0.0.1:" + str(server.server_port), manifest
+                )
+            self.assertEqual(requests, [])
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join()
+
+    def test_route_resolution_cannot_escape_site_even_without_http_handler(self):
+        site = self.root / "public"
+        site.mkdir()
+        (self.root / "private.txt").write_text("private input")
+        with self.assertRaises(release.ReleaseError):
+            release.route_file(site, "/../private.txt")
+        (site / "escape.txt").symlink_to(self.root / "private.txt")
+        with self.assertRaises(release.ReleaseError):
+            release.route_file(site, "/escape.txt")
 
     def test_missing_homepage_cannot_replace_entire_website(self):
         first, second = self.artifact("a"), self.artifact("b")
@@ -403,6 +452,7 @@ class LocalReleaseTests(unittest.TestCase):
         first, second = self.artifact("a"), self.artifact("b")
         self.activate(first, 1)
         code = """import importlib.util,os,sys
+from http.server import BaseHTTPRequestHandler
 from pathlib import Path
 from types import SimpleNamespace
 spec=importlib.util.spec_from_file_location('release',sys.argv[1]);module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
@@ -546,7 +596,7 @@ module.activate(SimpleNamespace(store=Path(sys.argv[2]),release=sys.argv[3],gene
         )
 
     def test_redirected_missing_marker_is_not_first_release_permission(self):
-        class Redirect(release.BaseHTTPRequestHandler):
+        class Redirect(BaseHTTPRequestHandler):
             def do_GET(self):
                 if self.path == "/blog-release.json":
                     self.send_response(302)
@@ -562,7 +612,16 @@ module.activate(SimpleNamespace(store=Path(sys.argv[2]),release=sys.argv[3],gene
         thread = threading.Thread(target=server.serve_forever, daemon=True)
         thread.start()
         try:
-            with self.assertRaises(release.ReleaseError) as caught:
+            with (
+                patch.dict(
+                    os.environ,
+                    {
+                        "BLOG_RELEASE_BASE_URL": "http://127.0.0.1:"
+                        + str(server.server_port)
+                    },
+                ),
+                self.assertRaises(release.ReleaseError) as caught,
+            ):
                 release.fetch_baseline(
                     SimpleNamespace(
                         base_url="http://127.0.0.1:" + str(server.server_port),
@@ -706,6 +765,18 @@ elif '@daodao/website' in args:
             store=self.root / "store",
         )
 
+    def test_source_checkout_rejects_option_shaped_revision_before_git(self):
+        destination = self.root / "snapshot"
+        with self.assertRaises(release.ReleaseError) as caught:
+            release.checkout(
+                str(self.content),
+                "--batch-all-objects",
+                destination,
+                self.root / "fetch.log",
+            )
+        self.assertEqual(caught.exception.stage, "input")
+        self.assertFalse(destination.exists())
+
     def test_legacy_checkout_cannot_hold_release_store(self):
         args = self.args()
         args.store = Path("/root/daodao-f2e/releases")
@@ -735,8 +806,9 @@ elif '@daodao/website' in args:
         ]:
             with self.subTest(values=values):
                 self.build_env.write_text(json.dumps(values))
+                args = self.args()
                 with self.assertRaises(release.ReleaseError) as caught:
-                    release.prepare(self.args())
+                    release.prepare(args)
                 self.assertEqual(caught.exception.stage, "input")
                 self.assertFalse((self.root / "store" / "releases").exists())
 
@@ -810,17 +882,77 @@ elif '@daodao/website' in args:
 
     def test_validation_failure_creates_no_empty_release(self):
         (self.bin / "failure").write_text("validate")
+        args = self.args()
         with self.assertRaises(release.ReleaseError) as caught:
-            release.prepare(self.args())
+            release.prepare(args)
         self.assertEqual(caught.exception.stage, "validate")
         self.assertFalse((self.root / "store/releases").exists())
 
     def test_build_failure_creates_no_empty_release(self):
         (self.bin / "failure").write_text("build")
+        args = self.args()
         with self.assertRaises(release.ReleaseError) as caught:
-            release.prepare(self.args())
+            release.prepare(args)
         self.assertEqual(caught.exception.stage, "build")
         self.assertFalse((self.root / "store/releases").exists())
+
+    def test_git_replace_refs_cannot_override_the_pinned_source(self):
+        args = self.args()
+        (self.content / "readme").write_text("substituted")
+        subprocess.run(["git", "-C", str(self.content), "add", "readme"], check=True)
+        subprocess.run(
+            [
+                "git",
+                "-C",
+                str(self.content),
+                "-c",
+                "user.name=Fixture",
+                "-c",
+                "user.email=fixture@example.invalid",
+                "commit",
+                "-qm",
+                "replacement",
+            ],
+            check=True,
+        )
+        subprocess.run(
+            [
+                "git",
+                "-C",
+                str(self.content),
+                "replace",
+                args.content_sha,
+                "HEAD",
+            ],
+            check=True,
+        )
+        destination = self.root / "unreplaced-snapshot"
+        release.checkout(
+            str(self.content),
+            args.content_sha,
+            destination,
+            self.root / "replacement-checkout.log",
+        )
+        self.assertEqual((destination / "readme").read_bytes(), b"content")
+
+    def test_corrupt_pinned_git_blob_cannot_publish_substituted_bytes(self):
+        args = self.args()
+        object_id = subprocess.check_output(
+            ["git", "-C", str(self.content), "rev-parse", args.content_sha + ":readme"],
+            text=True,
+        ).strip()
+        object_file = self.content / ".git/objects" / object_id[:2] / object_id[2:]
+        object_file.chmod(0o600)
+        object_file.write_bytes(zlib.compress(b"blob 7\0changed"))
+        with self.assertRaises(release.ReleaseError) as caught:
+            release.checkout(
+                str(self.content),
+                args.content_sha,
+                self.root / "corrupt-snapshot",
+                self.root / "corrupt-checkout.log",
+            )
+        self.assertEqual(caught.exception.stage, "fetch")
+        self.assertFalse((self.root / "corrupt-snapshot").exists())
 
     def test_archive_export_filter_cannot_silently_drop_pinned_source(self):
         (self.content / ".gitattributes").write_text("readme export-ignore\n")
@@ -842,8 +974,15 @@ elif '@daodao/website' in args:
             ],
             check=True,
         )
-        with self.assertRaisesRegex(release.ReleaseError, "complete source tree"):
-            release.prepare(self.args())
+        args = self.args()
+        destination = self.root / "native-snapshot"
+        release.checkout(
+            str(self.content), args.content_sha, destination, self.root / "snapshot.log"
+        )
+        self.assertEqual((destination / "readme").read_bytes(), b"content")
+        self.assertEqual(
+            (destination / ".gitattributes").read_text(), "readme export-ignore\n"
+        )
 
     def test_public_receipt_is_not_accepted_via_clone_path_trick(self):
         args = self.args()
