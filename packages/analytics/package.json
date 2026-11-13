@@ -26,7 +26,8 @@
   "dependencies": {
     "@daodao/config": "workspace:*",
     "date-fns": "catalog:",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "@daodao/shared": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "catalog:",

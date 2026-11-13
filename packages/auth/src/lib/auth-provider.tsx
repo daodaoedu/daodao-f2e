@@ -8,7 +8,7 @@ import {
 } from "@daodao/api";
 import { usePathname } from "@daodao/i18n/navigation";
 import { routing } from "@daodao/i18n/routing";
-import { getStorage, getStorageKey, StorageEnum } from "@daodao/shared";
+import { clearBlogSourceContext, getStorage, getStorageKey, StorageEnum } from "@daodao/shared";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { LoginDialog } from "../components/login-dialog";
 import type { AuthContextValue, StoredUser } from "../types";
@@ -262,6 +262,7 @@ export const AuthProvider = ({
       if (sessionStatus === "authenticated" && response.data?.data?.user) {
         const userData = response.data.data.user;
         const temporary = response.data.data.isTemporary ?? false;
+        if (!temporary) clearBlogSourceContext();
         const emailVerified = userData.email_verified ?? false;
 
         setIsTemporary(temporary);
@@ -601,6 +602,7 @@ export const AuthProvider = ({
    * 使用統一的 API 服務登出
    */
   const logout = useCallback(async () => {
+    clearBlogSourceContext();
     try {
       await apiLogout();
     } catch (error) {

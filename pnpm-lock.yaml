@@ -581,6 +581,9 @@ importers:
       '@daodao/config':
         specifier: workspace:*
         version: link:../config
+      '@daodao/shared':
+        specifier: workspace:*
+        version: link:../shared
       date-fns:
         specifier: 'catalog:'
         version: 3.6.0

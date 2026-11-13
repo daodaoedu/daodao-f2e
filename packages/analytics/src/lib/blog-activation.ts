@@ -1,3 +1,7 @@
+import {
+  type BlogSourceReportContext,
+  blogSourceReportContextSchema,
+} from "@daodao/shared/lib/blog-source-context";
 import { addMilliseconds, getTime, isValid, parseISO } from "date-fns";
 import { z } from "zod";
 
@@ -49,6 +53,7 @@ export const activationInputSchema = z
           registeredAt: instant,
           audience: z.enum(["leader", "learner", "unclassified"]),
           source: z.enum(["blog", "other", "unknown"]),
+          sourceContext: blogSourceReportContextSchema.optional(),
         })
         .strict()
     ),
@@ -68,6 +73,7 @@ export type ActivationEventType = z.infer<typeof activationEventSchema>;
 export type LeaderActivationType = {
   leaderId: string;
   source: "blog" | "other" | "unknown";
+  sourceContext?: BlogSourceReportContext;
   registeredAt: string;
   windowEnd: string;
   status: "activated" | "observing" | "not_activated" | "unknown";
@@ -166,6 +172,7 @@ export function evaluateLeaderActivation(input: unknown) {
     rows.push({
       leaderId: registration.leaderId,
       source: registration.source,
+      ...(registration.sourceContext ? { sourceContext: registration.sourceContext } : {}),
       registeredAt: registration.registeredAt,
       windowEnd: new Date(deadline).toISOString(),
       status,

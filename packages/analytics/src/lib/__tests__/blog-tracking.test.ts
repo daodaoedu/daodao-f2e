@@ -481,3 +481,42 @@ it("groups slug-like secrets instead of assuming that a dynamic path is a public
   expect(sanitizeWebsitePath("/quiz/result/secret-id")).toBe("/quiz/result/:result");
   expect(sanitizeWebsitePath("/en/about")).toBe("/en/about");
 });
+
+it("retains public first/assist context on the activated leader report without private identity fields", () => {
+  const input = fixture();
+  const sourceContext = {
+    contextId: "62220e18-ee33-40f3-af1e-aa8081295774",
+    confidence: "browser_reported",
+    first: {
+      articleId: "learning-group-check-in",
+      articleSlug: "learning-group-check-in",
+      locale: "zh-TW",
+      source: "search",
+      occurredAt: "2026-09-30T23:58:00Z",
+    },
+    lastAssist: {
+      articleId: "learning-group-check-in",
+      articleSlug: "learning-group-check-in",
+      locale: "zh-TW",
+      source: "internal",
+      occurredAt: "2026-09-30T23:59:00Z",
+    },
+  };
+  const raw = {
+    ...input,
+    registrations: [{ ...input.registrations[0], source: "blog", sourceContext }],
+  };
+  const report = evaluateLeaderActivation(raw);
+  expect(report.rows[0]).toMatchObject({ source: "blog", sourceContext, status: "activated" });
+  expect(() =>
+    evaluateLeaderActivation({
+      ...raw,
+      registrations: [
+        {
+          ...raw.registrations[0],
+          sourceContext: { ...sourceContext, email: "private@example.invalid" },
+        },
+      ],
+    })
+  ).toThrow();
+});

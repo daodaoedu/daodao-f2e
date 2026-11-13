@@ -1,6 +1,6 @@
-# Blog 同瀏覽器來源接線提案（待產品確認，未實作）
+# Blog 來源接線：歷史提案與最小工程契約
 
-## 現況與驗收狀態
+## 歷史提案時的驗收狀態（04932daa；不冒稱現在）
 
 這份文件不改原 FR-10，也不把兩套測試拼成同一條通過旅程。
 
@@ -74,3 +74,18 @@ private audit 才由server加上 newUserId、registeredAt、capturedAt、associa
 ## 核准後的具名連續旅程驗證
 
 用同一瀏覽器、相同具名QA帳號，從真實文章 CTA 開始；Tally權限仍未取得時標明該支UNKNOWN，不能用placeholder算真提交。再沿實際產品登入／註冊到發布、邀請、學員加入及真實參與，回讀同context的私有來源audit與權威操作audit、SDK事件不重複。另驗清cookie／拒絕cookie／換裝置／共享瀏覽器／重送／非法或過期context，全部不可錯綁或變成Direct。驗證可用JWT fixture與Google OAuth證據分開，Hosted收件與本機transport分開；只有真的串過的分支才標PASS。
+
+## 後續工程契約：沿原 FR-10 實作（正式設定未啟用）
+
+前文「purpose/account association 全部待確認」過於寬泛。原 PRD FR-10 已明訂跨登入來源保存與 first/assist 分開，這兩項是既有需求。此次最小接線沿這項授權，不新增 vendor identify，不複製 SDK persistence，不改 referralSource。
+
+- 第一方 context 僅包含 version、context UUID、設定 TTL、first／lastAssist 的公開 article ID／slug、語言、粗來源分類和時間。來源自述信心為 browser_reported，不能當身分憑證。
+- 唯一身分邊界是已驗證 temporary account 成功完成 permanent registration 的同一業務交易；帳號由 server 決定，不接受 header 中的 actor。既有帳號不回寫。
+- Private audit 僅使用既有 audit_logs.admin_id 關聯帳號；target_id 是 context UUID，JSON 不複製 userId／orgId／memberId。既有 migration043 FK 在刪除帳號時 SET NULL，已以真正 PostgreSQL 執行確認；完整產品刪除旅程仍須另驗。
+- Client `NEXT_PUBLIC_BLOG_SOURCE_CONTEXT_TTL_SECONDS` 與 server `BLOG_SOURCE_CONTEXT_TTL_SECONDS` 必須一致，並分別設定同一第一方 DOMAIN；server 以 `BLOG_SOURCE_PUBLISHED_ORIGIN` 固定可信 origin 的既有 `/blog-release.json` 與 `/blog-published-baseline.json` 自動驗證公開文章及 manifest baseline hash；不新增每篇文章手動設定的 registry。取檔在註冊交易外，固定路徑、無 redirect、短 timeout、bounded body，失敗保留 unknown。缺設定不新增 cookie／association，來源 unknown。沒有預設保存天數；本機明示 TESTONLY 值不能當作正式設定或使用者個別同意。
+- 明確 opt-out 不保存；工具／偏好不可用時保留 unknown，不推定同意。新條款、同意 UI、vendor 身分合併均不在本次實作範圍。
+- 測試與部署證據另列；此節記錄實作契約，不表示完整 UI／HTTP／Hosted／Tally／dev／PM 驗收已通過。前面的 historical blocked audit 不重新標綠。
+
+本機新分支已完成同一 HTTPS browser 的文章／實際外連 CTA、完整 PostHog SDK1.448.0、本機 actual onboarding／verified temporary JWT 的 permanent registration201、同帳號發布／邀請／受邀非帶領者參與、private export CLI 及 evaluator CLI 回讀同 context。這不等於 Google OAuth、Hosted ingest、Tally 表單提交或正式部署。TESTONLY 公開 release protocol fixture 來自536 frontend8f28fc1b／content28731aff，與538受測前端版本不同，未冒充同版發布或真人稿件批准。正式TTL/domain/origin仍未設定；缺值維持unknown。
+
+瀏覽器另重現既有 `<Script id="posthog">` 產生 `window.posthog` 同名 HTMLScriptElement，導致 SDK 接管前 query stub 的 `t.push` 失敗；將 Next script 去重 ID 改成 `daodao-posthog-bootstrap`，保留 vendor namespace。此修復不呼叫 identify／reset，也不更改同意或 session recording 政策。

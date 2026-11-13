@@ -2,6 +2,7 @@
 
 import { classifyBlogSource, createBlogTracker } from "@daodao/analytics";
 import { getAnalyticsConfig } from "@daodao/analytics/lib/config";
+import { recordBlogSourceTouch } from "@daodao/shared";
 import { useEffect, useRef } from "react";
 
 type TrackingSessionType = {
@@ -45,6 +46,19 @@ export function BlogTelemetry({
       document.referrer,
       new URLSearchParams(window.location.search).get("utm_source") ?? undefined
     );
+    const touchTime = new Date().toISOString();
+    let sourceRecorded = false;
+    const recordSource = (occurredAt = touchTime) => {
+      if (articleId && articleSlug)
+        sourceRecorded = recordBlogSourceTouch({
+          articleId,
+          articleSlug,
+          locale,
+          source: source === "direct" ? "unknown" : source,
+          occurredAt,
+        });
+    };
+    recordSource();
     const identity =
       articleId && articleSlug
         ? { page_type: "article", article_id: articleId, article_slug: articleSlug }
@@ -60,8 +74,9 @@ export function BlogTelemetry({
     view();
     const timer = window.setInterval(() => {
       attempts++;
+      if (!sourceRecorded) recordSource();
       const result = view();
-      if (result === "queued" || result === "duplicate" || attempts >= 20)
+      if (((result === "queued" || result === "duplicate") && sourceRecorded) || attempts >= 20)
         window.clearInterval(timer);
     }, 250);
     const click = (event: MouseEvent) => {
@@ -69,13 +84,15 @@ export function BlogTelemetry({
         event.target instanceof Element
           ? event.target.closest('a[data-blog-cta="beta-interest"]')
           : null;
-      if (anchor)
+      if (anchor) {
+        recordSource(new Date().toISOString());
         current.track({
           ...properties,
           event: "blog_beta_interest_clicked",
           interaction_id: crypto.randomUUID(),
           cta_target: "beta-interest",
         });
+      }
     };
     document.addEventListener("click", click);
     return () => {
