@@ -1,17 +1,33 @@
+import { getEnv } from "@daodao/config";
 import { notFound } from "next/navigation";
 import { loadBlog } from "@/components/blog/content";
 import { blogLocale } from "@/components/blog/copy";
 import { BlogList } from "@/components/blog/pages";
+import { buildBlogCollectionMetadata } from "@/components/blog/seo";
 export const dynamicParams = false;
 export async function generateStaticParams() {
   const data = await loadBlog();
+  // Next 15 static export rejects zero paths; this invalid topic ID renders only notFound().
+  if (data.topics.length === 0)
+    return ["zh-TW", "en"].map((locale) => ({ locale, topic: "_empty" }));
   return data.topics.flatMap((topic) =>
     ["zh-TW", "en"].map((locale) => ({ locale, topic: topic.id }))
   );
 }
-export async function generateMetadata() {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; topic: string }>;
+}) {
+  const { locale, topic } = await params;
   const data = await loadBlog();
-  return { ...(data.preview ? { robots: { index: false, follow: false } } : {}) };
+  if (!data.topics.some((t) => t.id === topic)) notFound();
+  return buildBlogCollectionMetadata(
+    data,
+    blogLocale(locale),
+    getEnv("NEXT_PUBLIC_WEBSITE_URL"),
+    topic
+  );
 }
 export default async function Page({
   params,
