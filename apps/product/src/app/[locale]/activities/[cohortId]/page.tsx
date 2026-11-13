@@ -80,7 +80,7 @@ export default function ActivityDetailPage() {
   const hostIdentifier = activity.host.identifier ?? activity.host.userId;
 
   return (
-    <main className="mx-auto flex w-full max-w-[960px] flex-col gap-6 px-4 pt-8 pb-18">
+    <main className="mx-auto flex w-full max-w-[960px] flex-col gap-[22px] px-4 pt-7 pb-18 min-[481px]:gap-6 min-[481px]:pt-8">
       {/* 返回連結 */}
       <Link
         href="/activities"
@@ -102,14 +102,19 @@ export default function ActivityDetailPage() {
                   : "outline-logo"
             }
             size="sm"
+            className="border-0 px-2.5 py-[3px] text-xs leading-[18px]"
           >
             {t(`status_${activity.runStatus}`)}
           </Badge>
         </div>
-        <h1 className="text-2xl font-bold text-bg-dark">{activity.displayName}</h1>
-        {activity.tagline && <p className="text-sm text-text-dark">{activity.tagline}</p>}
+        <h1 className="text-[22px] font-bold leading-[1.35] text-bg-dark min-[481px]:text-2xl">
+          {activity.displayName}
+        </h1>
+        {activity.tagline && (
+          <p className="text-sm leading-[1.65] text-text-dark">{activity.tagline}</p>
+        )}
         {!activity.tagline && activity.description && (
-          <p className="text-sm text-text-dark">{activity.description}</p>
+          <p className="text-sm leading-[1.65] text-text-dark">{activity.description}</p>
         )}
       </div>
 
@@ -125,13 +130,18 @@ export default function ActivityDetailPage() {
         <div className="flex min-w-0 flex-col gap-6">
           <section
             aria-label={t("detail_info_label")}
-            className="flex flex-col gap-5 rounded-[16px] border border-[#DCEBEA] bg-white p-5"
+            className="flex flex-col gap-5 rounded-[16px] border border-[#DCEBEA] bg-white p-[18px] min-[481px]:p-5"
           >
             {/* 互動方式 */}
             <DetailRow icon={<AudioLines />} label={t("detail_mode_label")}>
               <div className="flex flex-wrap gap-1.5">
                 {activity.interactionModes.map((mode) => (
-                  <Badge key={mode} variant="very-light-blue" size="sm">
+                  <Badge
+                    key={mode}
+                    variant="very-light-blue"
+                    size="sm"
+                    className="border-0 px-2 py-0.5 text-xs leading-[18px]"
+                  >
                     {t(MODE_LABEL[mode] ?? mode)}
                   </Badge>
                 ))}
@@ -157,6 +167,7 @@ export default function ActivityDetailPage() {
                 caption={t("detail_sessions_caption")}
               >
                 <CohortSessionSchedule
+                  className="[&_li]:text-bg-dark"
                   sessions={activity.sessions}
                   timezone={activity.timezone}
                   hideHeading
@@ -211,7 +222,7 @@ export default function ActivityDetailPage() {
 
         {/* 右欄：發起人 → 組織介紹 */}
         <aside aria-label={t("detail_about_label")} className="flex min-w-0 flex-col gap-4">
-          <section className="flex flex-col gap-3 rounded-[16px] border border-[#DCEBEA] bg-white p-5">
+          <section className="flex flex-col gap-3 rounded-[16px] border border-[#DCEBEA] bg-white p-[18px] min-[481px]:p-5">
             <h2 className="flex items-center gap-1.5 text-base font-bold text-bg-dark">
               <UserStar className="size-4" strokeWidth={1.6} aria-hidden="true" />
               {t("detail_host_label")}
@@ -223,7 +234,7 @@ export default function ActivityDetailPage() {
           <section className="flex flex-col gap-2" aria-label={t("detail_org_label")}>
             <p className="text-sm font-medium text-bg-dark">{activity.organization.name}</p>
             {activity.organization.bio && (
-              <p className="text-sm text-text-dark/70">{activity.organization.bio}</p>
+              <p className="text-sm leading-[1.6] text-text-dark/70">{activity.organization.bio}</p>
             )}
             {activity.organization.externalLink && (
               <a
@@ -327,7 +338,10 @@ function DetailCta({
       return (
         <Link
           href={cta.href}
-          className={cn(buttonVariants({ variant: "default" }), "w-full no-underline")}
+          className={cn(
+            buttonVariants({ variant: "default" }),
+            "w-full text-sm font-bold no-underline"
+          )}
         >
           {t("cta_joined")}
         </Link>
@@ -338,7 +352,10 @@ function DetailCta({
           href={cta.href}
           target="_blank"
           rel="noopener noreferrer"
-          className={cn(buttonVariants({ variant: "default" }), "w-full no-underline")}
+          className={cn(
+            buttonVariants({ variant: "default" }),
+            "w-full text-sm font-bold no-underline"
+          )}
         >
           {t("detail_external_signup")}
         </a>
@@ -347,7 +364,10 @@ function DetailCta({
       return (
         <Link
           href={cta.href}
-          className={cn(buttonVariants({ variant: "default" }), "w-full no-underline")}
+          className={cn(
+            buttonVariants({ variant: "default" }),
+            "w-full text-sm font-bold no-underline"
+          )}
         >
           {t("detail_join")}
         </Link>

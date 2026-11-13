@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "@daodao/i18n";
+import { cn } from "@daodao/ui/lib/utils";
 import { useEffect, useState } from "react";
 import { weekdayIndexOf } from "@/utils/activity-detail";
 import { formatSessionForTimezone, type ICohortSessionTime } from "@/utils/cohort-session-timezone";
@@ -10,6 +11,7 @@ interface CohortSessionScheduleProps {
   timezone?: string | null;
   /** 隱藏區塊標題（詳情頁以資訊列圖示與小標呈現）。 */
   hideHeading?: boolean;
+  className?: string;
 }
 
 /** Shared by the public activity, join, and participant pages. */
@@ -17,6 +19,7 @@ export function CohortSessionSchedule({
   sessions,
   timezone,
   hideHeading = false,
+  className,
 }: CohortSessionScheduleProps) {
   const t = useTranslations("cohort");
   const [participantTimezone, setParticipantTimezone] = useState<string>();
@@ -33,7 +36,7 @@ export function CohortSessionSchedule({
 
   return (
     <section
-      className={hideHeading ? "min-w-0" : "my-4 min-w-0"}
+      className={cn(hideHeading ? "min-w-0" : "my-4 min-w-0", className)}
       aria-label={t("meeting_schedule")}
     >
       {!hideHeading && (
@@ -53,15 +56,20 @@ export function CohortSessionSchedule({
                 {display.date}
                 {weekday !== null ? ` · ${t(`weekday_${weekday}`)}` : ""}
               </span>
-              {(display.startTime || display.endTime) && (
-                <span>
-                  {display.startTime}
-                  {display.startTime && display.endTime ? " – " : ""}
-                  {endDate ? `${endDate} ` : ""}
-                  {display.endTime}
+              {/* 時間與時區同一組換行，避免時區單獨掉到下一行 */}
+              <span>
+                {(display.startTime || display.endTime) && (
+                  <>
+                    {display.startTime}
+                    {display.startTime && display.endTime ? " – " : ""}
+                    {endDate ? `${endDate} ` : ""}
+                    {display.endTime}{" "}
+                  </>
+                )}
+                <span className="break-all text-xs leading-[18px] text-text-dark/60">
+                  {display.timezone}
                 </span>
-              )}
-              <span className="break-all text-xs text-text-dark/60">{display.timezone}</span>
+              </span>
             </li>
           );
         })}
