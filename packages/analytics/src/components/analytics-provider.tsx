@@ -7,14 +7,16 @@ import { PostHog } from "./posthog";
 // Component that only renders the analytics scripts
 export function AnalyticsScripts({
   disableSessionReplay = false,
+  websitePrivacy = false,
 }: {
   disableSessionReplay?: boolean;
+  websitePrivacy?: boolean;
 }) {
   return (
     <>
       <GoogleAnalytics />
       {!disableSessionReplay && <Clarity />}
-      <PostHog disableSessionReplay={disableSessionReplay} />
+      <PostHog disableSessionReplay={disableSessionReplay} websitePrivacy={websitePrivacy} />
     </>
   );
 }
@@ -22,16 +24,21 @@ export function AnalyticsScripts({
 interface AnalyticsProviderProps {
   children?: React.ReactNode;
   disableSessionReplay?: boolean;
+  websitePrivacy?: boolean;
 }
 
 // Provider component that wraps children with analytics scripts
 export function AnalyticsProvider({
   children,
   disableSessionReplay = false,
+  websitePrivacy = false,
 }: AnalyticsProviderProps) {
   return (
     <>
-      <AnalyticsScripts disableSessionReplay={disableSessionReplay} />
+      <AnalyticsScripts
+        disableSessionReplay={disableSessionReplay}
+        websitePrivacy={websitePrivacy}
+      />
       {children}
     </>
   );

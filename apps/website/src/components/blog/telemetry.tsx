@@ -27,11 +27,17 @@ export function BlogTelemetry({
       session.current = {
         key,
         viewId: crypto.randomUUID(),
-        track: createBlogTracker((event, properties) => {
-          if (typeof window.posthog?.capture !== "function")
-            throw new Error("Analytics SDK unavailable");
-          window.posthog.capture(event, properties);
-        }),
+        track: createBlogTracker(
+          (event, properties) => {
+            if (typeof window.posthog?.capture !== "function")
+              throw new Error("Analytics SDK unavailable");
+            window.posthog.capture(event, properties);
+          },
+          {
+            environment:
+              window.location.origin === "https://daodao.so" ? "production" : "nonproduction",
+          }
+        ),
       };
     }
     const current = session.current;

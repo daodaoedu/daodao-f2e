@@ -75,7 +75,10 @@ export function classifyBlogSource(
 }
 
 /** One tracker per mounted page. Queue success is not server delivery or form submission. */
-export function createBlogTracker(capture: BlogCaptureType | undefined) {
+export function createBlogTracker(
+  capture: BlogCaptureType | undefined,
+  context: { environment: "production" | "nonproduction" } = { environment: "nonproduction" }
+) {
   const queued = new Set<string>();
   return (input: unknown): "queued" | "duplicate" | "unavailable" | "invalid" | "failed" => {
     const parsed = blogInteractionSchema.safeParse(input);
@@ -91,6 +94,7 @@ export function createBlogTracker(capture: BlogCaptureType | undefined) {
         route,
         $current_url: `https://daodao.so${route}`,
         $process_person_profile: false,
+        measurement_environment: context.environment,
       });
       queued.add(data.interaction_id);
       return "queued";
@@ -111,11 +115,53 @@ export type BlogAnalyticsEnvelopeType = {
 export function sanitizeBlogAnalyticsEvent(
   event: BlogAnalyticsEnvelopeType
 ): BlogAnalyticsEnvelopeType | null {
+  const urlKeys = new Set([
+    "$current_url",
+    "$referrer",
+    "$initial_current_url",
+    "$initial_referrer",
+    "page_location",
+    "page_referrer",
+  ]);
+  const cleanRecord = (input: object): { record: Record<string, unknown>; changed: boolean } => {
+    const record: Record<string, unknown> = {};
+    let changed = false;
+    for (const [key, value] of Object.entries(input)) {
+      if (urlKeys.has(key) && typeof value === "string" && value) {
+        try {
+          const url = new URL(value);
+          if (!["https:", "http:"].includes(url.protocol)) {
+            changed = true;
+            continue;
+          }
+          const safe = `${url.origin}${url.pathname}`;
+          record[key] = safe;
+          changed ||= safe !== value;
+        } catch {
+          changed = true;
+        }
+      } else if (
+        (key === "$set" || key === "$set_once") &&
+        value &&
+        typeof value === "object" &&
+        !Array.isArray(value)
+      ) {
+        const nested = cleanRecord(value);
+        record[key] = nested.record;
+        changed ||= nested.changed;
+      } else record[key] = value;
+    }
+    return { record, changed };
+  };
   const properties = event.properties ?? {};
-  let blogRoute =
-    event.event === "blog_article_viewed" ||
-    event.event === "blog_index_viewed" ||
-    event.event === "blog_beta_interest_clicked";
+  const cleaned = cleanRecord(properties);
+  const profile = event.$set ? cleanRecord(event.$set) : undefined;
+  const initialProfile = event.$set_once ? cleanRecord(event.$set_once) : undefined;
+  let blogRoute = [
+    "blog_article_viewed",
+    "blog_index_viewed",
+    "blog_beta_interest_clicked",
+  ].includes(event.event);
   try {
     const href = typeof properties.$current_url === "string" ? properties.$current_url : "";
     const pathname = href
@@ -125,13 +171,21 @@ export function sanitizeBlogAnalyticsEvent(
         : "";
     blogRoute ||= /^\/(?:en\/|zh-TW\/)?blog(?:\/|$)/.test(pathname);
   } catch {
-    /* Unknown URLs are not retained on explicit Blog events. */
+    /* Explicit Blog events still use the restricted properties below. */
   }
-  if (!blogRoute) return event;
+  if (!blogRoute) {
+    if (!cleaned.changed && !profile?.changed && !initialProfile?.changed) return event;
+    return {
+      ...event,
+      properties: cleaned.record,
+      ...(profile ? { $set: profile.record } : {}),
+      ...(initialProfile ? { $set_once: initialProfile.record } : {}),
+    };
+  }
   if (
-    event.event !== "blog_article_viewed" &&
-    event.event !== "blog_index_viewed" &&
-    event.event !== "blog_beta_interest_clicked"
+    !["blog_article_viewed", "blog_index_viewed", "blog_beta_interest_clicked"].includes(
+      event.event
+    )
   )
     return null;
   const allowed = new Set([
@@ -153,17 +207,11 @@ export function sanitizeBlogAnalyticsEvent(
     "route",
     "$current_url",
     "$process_person_profile",
+    "measurement_environment",
   ]);
   const safe: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(properties)) if (allowed.has(key)) safe[key] = value;
-  if (typeof safe.$current_url === "string") {
-    try {
-      const url = new URL(safe.$current_url);
-      safe.$current_url = `${url.origin}${url.pathname}`;
-    } catch {
-      delete safe.$current_url;
-    }
-  }
+  for (const [key, value] of Object.entries(cleaned.record))
+    if (allowed.has(key)) safe[key] = value;
   return { ...event, properties: safe, $set: undefined, $set_once: undefined };
 }
 

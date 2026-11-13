@@ -27,6 +27,8 @@ function fixture(): ActivationInputType & {
   const scope = { leaderId: "leader1", organizationId: "org1", cohortId: "cohort1" };
   return {
     asOf: "2026-11-13T00:00:00Z",
+    capturedAt: "2026-11-13T00:00:00Z",
+    evidenceMode: "fixture",
     registrations: [
       {
         leaderId: "leader1",
@@ -88,6 +90,7 @@ describe("Blog browser events", () => {
           route: "/blog/learning-check-in",
           $current_url: "https://daodao.so/blog/learning-check-in",
           $process_person_profile: false,
+          measurement_environment: "nonproduction",
         },
       },
     ]);
@@ -149,14 +152,30 @@ describe("Blog browser events", () => {
     expect(getBlogPageContext("https://app.daodao.so/lighthouse", "")).toEqual({});
   });
   it("redacts Blog-derived URLs and profile origin fields after navigation to a non-Blog page", () => {
-    const secret="fixture@example.invalid";
-    const event={event:"$pageview",properties:{$current_url:"https://daodao.so/about",$referrer:`https://daodao.so/blog/learning-check-in?email=${secret}#token`,$initial_current_url:`https://daodao.so/blog/learning-check-in?token=${secret}`},$set_once:{$initial_referrer:`https://daodao.so/blog/learning-check-in?email=${secret}`}};
-    const hook=Function(`return (${sanitizeBlogAnalyticsEvent.toString()})`)() as typeof sanitizeBlogAnalyticsEvent;
-    const safe=hook(event);
+    const secret = "fixture@example.invalid";
+    const event = {
+      event: "$pageview",
+      properties: {
+        $current_url: "https://daodao.so/about",
+        $referrer: `https://daodao.so/blog/learning-check-in?email=${secret}#token`,
+        $initial_current_url: `https://daodao.so/blog/learning-check-in?token=${secret}`,
+      },
+      $set_once: { $initial_referrer: `https://daodao.so/blog/learning-check-in?email=${secret}` },
+    };
+    const hook = Function(
+      `return (${sanitizeBlogAnalyticsEvent.toString()})`
+    )() as typeof sanitizeBlogAnalyticsEvent;
+    const safe = hook(event);
     expect(safe?.event).toBe("$pageview");
     expect(safe?.properties?.$current_url).toBe("https://daodao.so/about");
     expect(JSON.stringify(safe)).not.toContain(secret);
     expect(JSON.stringify(safe)).not.toContain("?token=");
+  });
+  it("labels nonproduction measurement without presenting it as production traffic", () => {
+    const events: Record<string, unknown>[] = [];
+    const track = createBlogTracker((_name, props) => events.push(props));
+    expect(track(interaction)).toBe("queued");
+    expect(events[0]?.measurement_environment).toBe("nonproduction");
   });
   it("uses the actual self-contained SDK hook to suppress automatic Blog events and remove query/profile data", () => {
     const hook = Function(
@@ -213,7 +232,13 @@ describe("30-day leader activation", () => {
       cohorts: 1,
     });
     expect(result.rows[0]?.source).toBe("unknown");
-    expect(result.matureCohort).toEqual({ denominator: 1, activated: 1, rate: 1 });
+    expect(result.matureCohort).toEqual({
+      denominator: 1,
+      known: 1,
+      unknown: 0,
+      activated: 1,
+      rate: 1,
+    });
   });
   it.each([
     "published",
@@ -231,7 +256,9 @@ describe("30-day leader activation", () => {
     input.coverage = { ...complete, invitations: false };
     expect(evaluateLeaderActivation(input).rows[0]?.status).toBe("unknown");
     expect(evaluateLeaderActivation(input).matureCohort).toEqual({
-      denominator: 0,
+      denominator: 1,
+      known: 0,
+      unknown: 1,
       activated: 0,
       rate: null,
     });
@@ -307,6 +334,37 @@ describe("30-day leader activation", () => {
     const result = evaluateLeaderActivation(input);
     expect(result.counts.unclassified).toBe(1);
     expect(result.matureCohort.denominator).toBe(1);
+  });
+  it("bounds maturity by captured observation time and labels a future synthetic clock as a fixture", () => {
+    const input = fixture();
+    input.events = [];
+    input.asOf = "2027-01-01T00:00:00Z";
+    expect(() => evaluateLeaderActivation(input)).toThrow("captured observation coverage");
+    input.capturedAt = input.asOf;
+    expect(evaluateLeaderActivation(input).evidenceMode).toBe("fixture");
+    expect(evaluateLeaderActivation(input).matureCohort.denominator).toBe(1);
+    input.evidenceMode = "observed";
+    input.capturedAt = "2999-01-01T00:00:00Z";
+    expect(() => evaluateLeaderActivation(input)).toThrow("future");
+  });
+  it("does not publish a positive-only mature point rate when another eligible leader remains unknown", () => {
+    const input = fixture();
+    input.coverage.publications = false;
+    input.registrations.push({
+      leaderId: "unknown-leader",
+      registeredAt: "2026-10-01T00:00:00Z",
+      audience: "leader",
+      source: "unknown",
+    });
+    const result = evaluateLeaderActivation(input);
+    expect(result.counts.activated).toBe(1);
+    expect(result.matureCohort).toEqual({
+      denominator: 2,
+      known: 1,
+      unknown: 1,
+      activated: 1,
+      rate: null,
+    });
   });
   it("runtime rejects PII identifiers, malformed instants and unknown fields", () => {
     expect(() =>

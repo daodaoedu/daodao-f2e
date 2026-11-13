@@ -26,16 +26,20 @@ SDK `before_send` 使用相同經測試的self-contained hook：Blog自動事件
 
 ## 30天定義與分母
 
+實際exporter拒絕未來asOf並記錄capturedAt；evaluator必須收到capturedAt及evidenceMode。asOf不能超過已擷取覆蓋時間；observed模式也拒絕未來擷取時間，只有明確fixture可使用已宣告覆蓋的合成時鐘，輸出會保留fixture標示。
+
 `evaluateLeaderActivation` 使用註冊時間起算30×24小時的半開區間 [registeredAt, registeredAt+30days)，檢查至明確asOf。資格仍以註冊日起算，不改成取得組織身分的日期。
+
+目前「新帶領者接手既有已發布活動是否計啟用」仍待產品確認。實際匯出保留原始publisher actor，但publicationCreditPolicyConfirmed=false且publication coverage維持未知；不得把actor-only模型冒稱已批准。完整正向交集證據在兩種候選定義下均可成立；缺正向證據暫不能推出not_activated。
 
 同一帶領者、組織、場次須有真實發布證據；至少一位不同於該帶領者、在場次中是member且不是組織管理成員的人，有可配對enrollment的邀請與加入證據，並在發布後完成實際參與。現在的實際參與映射是practice_checkins.created_at透過practices.cohort_id，不讀note/mood/images。加入或信件排隊不能替代打卡。
 
 - activated：已有完整正向證據，即使觀察窗未滿也可確認已發生。
 - observing：來源完整但30天未滿，不能當失敗或進成熟分母。
 - not_activated：窗已滿且必需來源完整，仍無完整正向證據。
-- unknown：缺必需來源且無可證明的正向結果，從成熟率分母排除。
+- unknown：缺必需來源或政策未確認且無可證明的正向結果，列為成熟未知，不混成已確認未啟用。
 
-結果分開去重leaderId、organizationId、cohortId；重送eventId不重算，衝突eventId直接拒絕。learner與unclassified另外計數。分母沒有資料時rate=null，不能寫0%。不把尚未滿窗者放進成熟率分母。
+結果分開去重leaderId、organizationId、cohortId；重送eventId不重算，衝突eventId直接拒絕。learner與unclassified另外計數。matureCohort.denominator保留所有已滿窗的可觀測帶領者，known與unknown分開列；只要存在成熟未知，point rate就是null，不能只拿已知正向者算100%。分母為0時也回null，不把尚未滿窗者放進成熟分母。
 
 目前source exporter將「目前有active組織管理權限的人」標為observed platform leader，依現有assertProgram的organization_members管理權限判定；場次member另列learner，其餘unclassified。這不是老師身分辨識，也不是所有新註冊者的帶領者轉換率。身分為回讀時快照，無歷史角色變動時無法還原註冊當下意圖；不只挑已發布者當分母。若要量測所有教師/社群負責人，仍需可驗證且有授權的角色/來源資料。
 
@@ -43,8 +47,8 @@ SDK `before_send` 使用相同經測試的self-contained hook：Blog自動事件
 
 - `daodao-server/src/services/cohort-activation-evidence.service.ts`：同一業務交易內保存首次觀察到的發布/加入audit；advisory lock及NOT EXISTS使併發/重試不重複，不改先前時間。這不是對既有場次首次歷史發布時間的追溯。
 - `cohort.service.ts`：成功建立published場次或狀態轉為published時記錄；單純published編輯不產新事件。
-- `cohort-invitation.service.ts`：保留既有邀請聚合audit，另以同一SQLstatement/交易新增cohort_activation_invited的enrollmentIds證據，沒有email/token；只有原本aggregate counts的舊audit不猜收件人。
-- `cohort-join.service.ts`：成功加入後同交易保存enrollment/role及管理身分；邀請token本身從不寫audit。
+- `cohort-invitation.service.ts`：保留既有邀請聚合audit，另以同一SQLstatement/交易新增cohort_activation_invited的enrollmentIds證據。這代表target-created定向意圖，不代表整個API操作成功、queue已接收、已寄出、送達或開信；queue在交易後可能失敗，這些階段不可互相代替。沒有email/token；只有原本aggregate counts的舊audit不猜收件人。
+- `cohort-join.service.ts`：成功加入後同交易保存enrollment/role及管理身分；v2以持久化joined_at作同次加入的穩定joinTransition，同enrollment退出/再邀請/再加入會保留新時間與角色，重試不多算。public link已加入的同帳號重試也不重寫joined_at。邀請token本身從不寫audit。
 - `practice-checkin.service.ts`：實際建立checkin後，在同一交易記錄cohort/checkinId與當時角色/管理身分，沒有note/mood/token；無對應真實checkin資料或角色證據不算參與。
 - `blog-activation-export.service.ts`：只讀IDs與時間，完整輸出指定註冊期間的使用者分類，回傳coverage與來源限制。參與以同交易audit保存的管理身分/場次角色判斷，不拿事後組織快照冒充歷史角色。未有角色證據的歷史打卡維持unknown。註冊受眾分類仍有現有角色快照限制。
 
@@ -56,24 +60,22 @@ SDK `before_send` 使用相同經測試的self-contained hook：Blog自動事件
 
 ```sh
 # daodao-server；BLOG_ACTIVATION_EXPORT_DATABASE_URL由私有環境提供，勿貼進文件/log
-pnpm exec ts-node scripts/export-blog-activation.ts --registered-since 2026-11-13T00:00:00Z --as-of 2026-12-14T00:00:00Z --instrumented-since 2026-11-13T00:00:00Z --output /private/blog-evidence.json
+pnpm exec ts-node scripts/export-blog-activation.ts --registered-since "$REGISTERED_SINCE" --as-of "$OBSERVED_AS_OF" --instrumented-since "$INSTRUMENTED_SINCE" --output /private/blog-evidence.json
 # daodao-f2e
 pnpm --filter @daodao/analytics activation:report --input /private/blog-evidence.json --output /private/blog-report.json
 ```
 
-日期是操作格式範例，並非已部署日期。輸出檔以0600且不覆蓋既有檔案建立，不可放public/articles/images。opaque IDs仍是內部分析資料，不混進公開文章。CLI不會自行查Tally、發布文章或送事件到Hosted analytics。
+先將三個日期變數設定為已查證的ISO時間；OBSERVED_AS_OF不得超過目前實際擷取時間，不能預先產生未來30天結果。輸出檔以0600且不覆蓋既有檔案建立，不可放public/articles/images。opaque IDs仍是內部分析資料，不混進公開文章。CLI不會自行查Tally、發布文章或送事件到Hosted analytics。
 
-## 固定AEO樣本與例行讀取
+## 固定AEO樣本與每月人工紀錄
 
-每週使用同一問題集、語言、可見模型版本、地區/登入條件，保存實際回覆/引用URL與取得時間；條件改變另開序列。以下是量測題，不是宣稱已被AI引用：
+固定題庫在[aeo-questions.json](aeo-questions.json)：版本1共20個問題ID，各有zh-TW/en prompt。18題為非品牌情境，2題為明示品牌情境；分段讀取，不將品牌題和一般題合併成有利的提及率。題庫不是已取得的模型回答。
 
-1. 老師如何規劃每週學習小組？
-2. 學習社群成員不發言怎麼辦？
-3. 線上讀書會如何追蹤參與？
-4. 如何帶學員每週回顧學習進度？
-5. 帶領學習社群可以使用哪些工具？
+每月複製[aeo-monthly-observations.template.csv](aeo-monthly-observations.template.csv)為當月私有紀錄，20題×2語共40列。保留question_version/id/prompt，填實際period、observed_at、模型及可見版本、區域和登入條件；版本/區域不可取得就留unknown。條件改變另開序列，不覆寫舊基準。
 
-每題分別記「是否提及島島」「是否引用daodao.so文章」「引用是否支持主張」「產品描述是否正確」，未取得回覆留未測。人工固定問題測試不等於所有人結果；不將chatbot referrer點擊直接標為其模型引用，未知referrer維持unknown。
+模板全部status=not_measured、提及/引用/正確性=unknown，沒有預填回覆、引用或排名。真正量測時才填observed、保存實際回答artifact及引用URL，再逐項判讀是否提及島島、是否引用daodao.so、來源是否支持主張、產品描述是否符合當時核准事實。受阻寫blocked與原因；未測/受阻不算0。月度總表同時列eligible題數、observed、blocked、not_measured；只有實測回覆才進提及/引用率分母，分母0回unknown，不能拿缺測算沒有引用。
+
+這是固定問題的人工抽樣，不代表所有使用者/模型結果；不得將chatbot referrer點擊直接當成模型引用證據。未知來源維持unknown。每週網站流量巡檢可另做，不能替代原FR-06要求的每月固定樣本/條件/結果紀錄。
 
 GSC/Bing每週按實際文章canonical路徑、語言及品牌/非品牌查詢讀取，分開保留收錄狀態與流量。GA4看整站來源/頁面，PostHog看明確漏斗，不將兩者匿名ID強拼成跨裝置身分。表單提交/營運Demo/產品啟用的串接鍵需要另有授權證據，未建立就分表報告。
 

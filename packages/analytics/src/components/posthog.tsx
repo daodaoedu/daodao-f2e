@@ -20,7 +20,13 @@ declare global {
   }
 }
 
-export function PostHog({ disableSessionReplay = false }: { disableSessionReplay?: boolean }) {
+export function PostHog({
+  disableSessionReplay = false,
+  websitePrivacy = false,
+}: {
+  disableSessionReplay?: boolean;
+  websitePrivacy?: boolean;
+}) {
   const config = getAnalyticsConfig();
 
   if (!config.posthog.enabled || !config.posthog.apiKey) {
@@ -40,7 +46,7 @@ export function PostHog({ disableSessionReplay = false }: { disableSessionReplay
           disable_session_recording: ${disableSessionReplay},
           capture_pageview: true,
           capture_pageleave: true,
-          before_send: ${sanitizeBlogAnalyticsEvent.toString()},
+          before_send: ${websitePrivacy ? sanitizeBlogAnalyticsEvent.toString() : "undefined"},
         });
       `}
     </Script>

@@ -40,6 +40,8 @@ export const activationEventSchema = z.discriminatedUnion("kind", [
 export const activationInputSchema = z
   .object({
     asOf: instant,
+    capturedAt: instant,
+    evidenceMode: z.enum(["observed", "fixture"]),
     registrations: z.array(
       z
         .object({
@@ -92,6 +94,12 @@ export function evaluateLeaderActivation(input: unknown) {
     events.set(event.eventId, event);
   }
   const asOf = getTime(parseISO(data.asOf));
+  const capturedAt = getTime(parseISO(data.capturedAt));
+  if (asOf > capturedAt) throw new Error("asOf exceeds captured observation coverage");
+  if (data.evidenceMode === "observed" && capturedAt > getTime(new Date()))
+    throw new Error(
+      "Observed capture time is in the future; only declared fixtures may use a synthetic clock"
+    );
   const rows: LeaderActivationType[] = [];
   for (const registration of registrations.values()) {
     if (registration.audience !== "leader") continue;
@@ -160,13 +168,15 @@ export function evaluateLeaderActivation(input: unknown) {
       activatedCohorts: [...cohorts].sort(),
     });
   }
-  const mature = rows.filter(
-    (row) => getTime(parseISO(row.windowEnd)) <= asOf && row.status !== "unknown"
-  );
+  const mature = rows.filter((row) => getTime(parseISO(row.windowEnd)) <= asOf);
+  const matureUnknown = mature.filter((row) => row.status === "unknown").length;
   const organizations = new Set(rows.flatMap((row) => row.activatedOrganizations));
   const cohorts = new Set(rows.flatMap((row) => row.activatedCohorts));
   return {
     asOf: data.asOf,
+    capturedAt: data.capturedAt,
+    evidenceMode: data.evidenceMode,
+    coverage: data.coverage,
     rows: rows.sort((a, b) => a.leaderId.localeCompare(b.leaderId)),
     counts: {
       leaders: rows.length,
@@ -181,10 +191,13 @@ export function evaluateLeaderActivation(input: unknown) {
     },
     matureCohort: {
       denominator: mature.length,
+      known: mature.length - matureUnknown,
+      unknown: matureUnknown,
       activated: mature.filter((row) => row.status === "activated").length,
-      rate: mature.length
-        ? mature.filter((row) => row.status === "activated").length / mature.length
-        : null,
+      rate:
+        mature.length && matureUnknown === 0
+          ? mature.filter((row) => row.status === "activated").length / mature.length
+          : null,
     },
   };
 }
