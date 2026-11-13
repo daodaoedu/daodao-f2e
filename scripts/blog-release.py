@@ -30,6 +30,11 @@ RELEASE_MANIFEST = "release.json"
 BLOG_ROUTE = "/blog"
 RELEASE_MARKER_ROUTE = "/blog-release.json"
 BASELINE_ROUTE = "/blog-published-baseline.json"
+PUBLIC_MARKER_FILE = "blog-release.json"
+PUBLISHED_BASELINE_FILE = "blog-published-baseline.json"
+ACTIVE_STATE_FILE = "active.json"
+FRONTEND_SOURCE_URL = "https://github.com/daodaoedu/daodao-f2e.git"
+CONTENT_SOURCE_URL = "https://github.com/daodaoedu/daodao-blog.git"
 
 
 class ReleaseError(Exception):
@@ -179,7 +184,11 @@ def _source_location(repo):
         or (valid_port is not None and valid_port < 1)
     ):
         raise ReleaseError("fetch", "Remote repos must use credential-free HTTPS URLs")
-    return repo, True
+    if repo == FRONTEND_SOURCE_URL:
+        return FRONTEND_SOURCE_URL, True
+    if repo == CONTENT_SOURCE_URL:
+        return CONTENT_SOURCE_URL, True
+    raise ReleaseError("fetch", "Remote source is outside the two release repositories")
 
 
 @contextmanager
@@ -202,7 +211,7 @@ def _git_source(repo, parent, log):
 
 def _git_tree(source, revision):
     raw = subprocess.check_output(
-        ["git", "-C", source, "ls-tree", "-rz", revision], env=tooling_environment()
+        ["git", "ls-tree", "-rz", revision], cwd=source, env=tooling_environment()
     )
     entries = {}
     for entry in filter(None, raw.split(b"\0")):
@@ -252,7 +261,8 @@ def _materialize_git_tree(source, entries, destination, log):
     destination.mkdir()
     with log.open("ab") as errors:
         process = subprocess.Popen(
-            ["git", "-C", source, "cat-file", "--batch"],
+            ["git", "cat-file", "--batch"],
+            cwd=source,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=errors,
@@ -276,7 +286,7 @@ def checkout(repo, revision, destination, log):
     revision = sha(revision)
     with _git_source(repo, destination.parent, log) as source:
         object_type = command(
-            "fetch", ["git", "-C", source, "cat-file", "-t", revision], None, None, log
+            "fetch", ["git", "cat-file", "-t", revision], source, None, log
         ).strip()
         if object_type != "commit":
             raise ReleaseError("fetch", "Requested object is not a commit")
@@ -284,8 +294,8 @@ def checkout(repo, revision, destination, log):
         # Native fsck verifies pinned object bytes before any source is materialized.
         command(
             "fetch",
-            ["git", "-C", source, "fsck", "--strict", "--no-reflogs", revision],
-            None,
+            ["git", "fsck", "--strict", "--no-reflogs", revision],
+            source,
             None,
             log,
         )
@@ -293,8 +303,8 @@ def checkout(repo, revision, destination, log):
         _materialize_git_tree(source, entries, destination, log)
         return command(
             "fetch",
-            ["git", "-C", source, "show", "-s", "--format=%ct", revision],
-            None,
+            ["git", "show", "-s", "--format=%ct", revision],
+            source,
             None,
             log,
         ).strip()
@@ -355,14 +365,14 @@ def _manifest_identity(manifest):
 
 
 def _manifest_public_markers(site, manifest):
-    public = json.loads((site / "blog-release.json").read_text())
+    public = json.loads((site / PUBLIC_MARKER_FILE).read_text())
     if public != {
         key: manifest[key]
         for key in ("id", "frontend_sha", "content_sha", "baseline_sha256")
     }:
         raise ValueError("Public version marker differs from release manifest")
     if (
-        digest((site / "blog-published-baseline.json").read_bytes())
+        digest((site / PUBLISHED_BASELINE_FILE).read_bytes())
         != manifest["baseline_sha256"]
         or digest(canonical(manifest["baseline"])) != manifest["baseline_sha256"]
     ):
@@ -769,18 +779,18 @@ def _publication_maps(site, content, validated):
 def _release_manifest(site, content, validated, request):
     smoke, baseline = _publication_maps(site, content, validated)
     baseline_bytes = canonical(baseline)
-    (site / "blog-published-baseline.json").write_bytes(baseline_bytes)
+    (site / PUBLISHED_BASELINE_FILE).write_bytes(baseline_bytes)
     public = {
         "id": request.identifier,
         "frontend_sha": request.frontend_sha,
         "content_sha": request.content_sha,
         "baseline_sha256": digest(baseline_bytes),
     }
-    (site / "blog-release.json").write_bytes(canonical(public))
+    (site / PUBLIC_MARKER_FILE).write_bytes(canonical(public))
     smoke.update(
         {
-            BASELINE_ROUTE: "blog-published-baseline.json",
-            RELEASE_MARKER_ROUTE: "blog-release.json",
+            BASELINE_ROUTE: PUBLISHED_BASELINE_FILE,
+            RELEASE_MARKER_ROUTE: PUBLIC_MARKER_FILE,
         }
     )
     return {
@@ -1014,7 +1024,7 @@ def recover_pending(store, base_url):
     old = pending["old"]
     if not RELEASE.fullmatch(identifier) or (old and not RELEASE.fullmatch(old["id"])):
         raise ReleaseError("state", "Invalid interrupted activation journal")
-    state_file = store / "active.json"
+    state_file = store / ACTIVE_STATE_FILE
     state = json.loads(state_file.read_text()) if state_file.exists() else None
     pointer = store / "current"
     target = store / "releases" / identifier
@@ -1091,7 +1101,7 @@ def _assert_published_identity(previous, candidate, retain_current):
 
 
 def _active_state(store, manifest, operation):
-    file = store / "active.json"
+    file = store / ACTIVE_STATE_FILE
     old = json.loads(file.read_text()) if file.exists() else None
     if old:
         if not RELEASE.fullmatch(old.get("id", "")):
@@ -1153,7 +1163,7 @@ def _reuse_active(args, store, old, manifest):
     _check_freshness(args, manifest)
     http_readback(args.base_url, manifest)
     if args.generation > old["generation"]:
-        atomic_json(store / "active.json", {**old, "generation": args.generation})
+        atomic_json(store / ACTIVE_STATE_FILE, {**old, "generation": args.generation})
     return {
         "ok": True,
         "stage": "active",
@@ -1179,11 +1189,11 @@ def _smoke_candidate(site, manifest):
 def _restore_previous(store, old, base_url):
     if old:
         switch_pointer(store, old["id"])
-        atomic_json(store / "active.json", old)
+        atomic_json(store / ACTIVE_STATE_FILE, old)
         http_readback(base_url, stored_release(store, old["id"]))
     else:
         (store / "current").unlink(missing_ok=True)
-        (store / "active.json").unlink(missing_ok=True)
+        (store / ACTIVE_STATE_FILE).unlink(missing_ok=True)
 
 
 def _activation_state(old, identifier, generation):
@@ -1205,7 +1215,8 @@ def _commit_activation(args, store, old, manifest):
     try:
         http_readback(args.base_url, manifest)
         atomic_json(
-            store / "active.json", _activation_state(old, args.release, args.generation)
+            store / ACTIVE_STATE_FILE,
+            _activation_state(old, args.release, args.generation),
         )
         journal.unlink()
     except Exception as candidate_error:

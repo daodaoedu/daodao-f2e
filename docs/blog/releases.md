@@ -6,6 +6,7 @@ This workflow is website-only. It does not call `linode-cd.yml` force deployment
 
 ```sh
 export BLOG_EVIDENCE_ROOT=/private/approved-release-inputs
+export BLOG_RELEASE_BASE_URL=https://verified-development-origin
 python3 scripts/blog-release.py prepare \
   --frontend-repo /path/to/daodao-f2e --frontend-sha FULL_SHA \
   --approved-frontend-sha TRUSTED_PROTECTED_PIN \
@@ -16,6 +17,8 @@ python3 scripts/blog-release.py import --store /path/to/deployment-store --artif
 python3 scripts/blog-release.py activate --store /path/to/deployment-store --release RELEASE_ID --generation MONOTONIC_INTEGER --base-url https://verified-development-origin
 python3 scripts/blog-release.py rollback --store /path/to/deployment-store --release PREVIOUS_RELEASE_ID --generation NEWER_INTEGER --base-url https://verified-development-origin
 ```
+
+Remote sources are limited to `https://github.com/daodaoedu/daodao-f2e.git` and `https://github.com/daodaoedu/daodao-blog.git`. Caller-owned local Git checkouts/fixtures remain supported. Local repository paths are used only as subprocess working directories, not Git option arguments. Other HTTPS repositories are rejected before clone.
 
 `prepare` is not deployment. It checks out both full40-character SHAs (dirty source worktrees are ignored), compares the frontend to a trusted caller-supplied pin, installs frozen dependencies, runs the single publish validator and `pnpm --filter @daodao/website build`. The website's own prebuild stages validated images at `public/blog-images/<pair-digest>/images/...`; the runner verifies staged bytes, not a second content schema. No product build is invoked.
 

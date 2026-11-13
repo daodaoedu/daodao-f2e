@@ -202,6 +202,27 @@ class LocalReleaseTests(unittest.TestCase):
         self.assertTrue((self.store / "pending.json").exists())
         self.assertEqual(self.activate(second, 2)["id"], second)
 
+    def test_controlled_static_server_rejects_non_loopback_binds(self):
+        for host in ("0.0.0.0", "::", "192.0.2.1"):
+            with self.subTest(host=host):
+                result = subprocess.run(
+                    [
+                        sys.executable,
+                        str(SCRIPT),
+                        "serve",
+                        "--store",
+                        str(self.store),
+                        "--host",
+                        host,
+                    ],
+                    capture_output=True,
+                    text=True,
+                    timeout=5,
+                    check=False,
+                )
+                self.assertEqual(result.returncode, 2)
+                self.assertIn("invalid choice", result.stderr)
+
     def test_requested_url_cannot_grant_its_own_network_capability(self):
         identifier = self.artifact("a")
         manifest = json.loads(
@@ -764,6 +785,20 @@ elif '@daodao/website' in args:
             build_env=self.build_env,
             store=self.root / "store",
         )
+
+    def test_remote_sources_are_limited_to_the_two_release_repositories(self):
+        for source in (
+            "https://example.invalid/substitute.git",
+            "https://github.com/untrusted/daodao-blog.git",
+            "https://github.com/daodaoedu/daodao-blog.git/extra",
+        ):
+            with self.subTest(source=source), self.assertRaises(release.ReleaseError):
+                release._source_location(source)
+        for source in (
+            "https://github.com/daodaoedu/daodao-f2e.git",
+            "https://github.com/daodaoedu/daodao-blog.git",
+        ):
+            self.assertEqual(release._source_location(source), (source, True))
 
     def test_source_checkout_rejects_option_shaped_revision_before_git(self):
         destination = self.root / "snapshot"
