@@ -18,7 +18,8 @@
     "clean": "pnpm dlx rimraf .next out node_modules",
     "test:blog": "vitest run --config vitest.blog.config.ts",
     "prebuild": "pnpm --filter @daodao/config generate:env && tsx scripts/prepare-blog-assets.ts",
-    "test": "pnpm run test:blog"
+    "test": "pnpm run test:blog",
+    "postbuild": "tsx scripts/finalize-blog-export.ts"
   },
   "dependencies": {
     "@daodao/analytics": "workspace:*",
