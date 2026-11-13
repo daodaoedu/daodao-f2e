@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import { access, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -9,9 +10,10 @@ const roots: string[] = [];
 afterEach(async () => {
   await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
 });
-async function fixture() {
-  const root = await mkdtemp(path.join(os.tmpdir(), "blog-export-"));
-  roots.push(root);
+async function fixture(nested = false) {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), "blog-export-"));
+  roots.push(temporary);
+  const root = nested ? path.join(temporary, "apps/website") : temporary;
   for (const locale of ["zh-TW", "en"])
     for (const route of ["blog/_empty", "blog/topic/_empty"]) {
       const relative = `${locale}/${route}`;
@@ -23,6 +25,10 @@ async function fixture() {
       await writeFile(`${file}.txt`, "not found RSC");
       await writeFile(meta, JSON.stringify({ status: 404 }));
     }
+  await writeFile(
+    path.join(root, ".next/required-server-files.json"),
+    JSON.stringify({ config: { output: "export" } })
+  );
   return root;
 }
 it("removes only placeholder documents, preserving real articles, lists, assets and 404", async () => {
@@ -69,4 +75,61 @@ it("uses a placeholder excluded by the existing topic identifier contract", () =
   expect(
     topicsSchema.safeParse([{ id: "_empty", name: { "zh-TW": "測試", en: "Test" } }]).success
   ).toBe(false);
+});
+
+it.each([
+  "root",
+  "app",
+])("runs postbuild cleanup when export is configured only in the %s environment file", async (scope) => {
+  const app = await fixture(true);
+  const envFile =
+    scope === "app" ? path.join(app, ".env.production") : path.resolve(app, "../../.env");
+  await writeFile(envFile, "NEXT_OUTPUT=export\n");
+  const env: NodeJS.ProcessEnv = { ...process.env, NODE_ENV: "production" };
+  delete env.NEXT_OUTPUT;
+  const child = spawnSync(
+    process.execPath,
+    [
+      path.resolve("node_modules/tsx/dist/cli.mjs"),
+      path.resolve("scripts/finalize-blog-export.ts"),
+    ],
+    { cwd: app, env, encoding: "utf8", timeout: 10000 }
+  );
+  expect(child.status, child.stderr).toBe(0);
+  expect(child.stdout).toContain("Removed 8 empty Blog export artifacts");
+  await expect(access(path.join(app, "out/en/blog/_empty.html"))).rejects.toThrow();
+});
+it("preserves server-build output even when a stale export directory exists", async () => {
+  const app = await fixture(true);
+  await writeFile(
+    path.join(app, ".next/required-server-files.json"),
+    JSON.stringify({ config: {} })
+  );
+  const env: NodeJS.ProcessEnv = { ...process.env, NODE_ENV: "production" };
+  delete env.NEXT_OUTPUT;
+  const child = spawnSync(
+    process.execPath,
+    [
+      path.resolve("node_modules/tsx/dist/cli.mjs"),
+      path.resolve("scripts/finalize-blog-export.ts"),
+    ],
+    { cwd: app, env, encoding: "utf8", timeout: 10000 }
+  );
+  expect(child.status, child.stderr).toBe(0);
+  expect(await readFile(path.join(app, "out/en/blog/_empty.html"), "utf8")).toBe("not found page");
+});
+
+it("fails closed when the completed build configuration is unavailable", async () => {
+  const app = await fixture(true);
+  await rm(path.join(app, ".next/required-server-files.json"));
+  const child = spawnSync(
+    process.execPath,
+    [
+      path.resolve("node_modules/tsx/dist/cli.mjs"),
+      path.resolve("scripts/finalize-blog-export.ts"),
+    ],
+    { cwd: app, env: process.env, encoding: "utf8", timeout: 10000 }
+  );
+  expect(child.status).toBe(1);
+  expect(await readFile(path.join(app, "out/en/blog/_empty.html"), "utf8")).toBe("not found page");
 });

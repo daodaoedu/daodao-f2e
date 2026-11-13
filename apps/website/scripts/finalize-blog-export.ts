@@ -1,12 +1,16 @@
+import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { loadEnvConfig } from "@next/env";
 import { removeEmptyBlogExports } from "../src/components/blog/static-export";
 
-loadEnvConfig(path.resolve("../.."));
-if (process.env.NEXT_OUTPUT === "export")
-  removeEmptyBlogExports(path.resolve("."))
-    .then((files) => console.log(`Removed ${files.length} empty Blog export artifacts`))
-    .catch((error) => {
-      console.error(error);
-      process.exitCode = 1;
-    });
+async function main() {
+  const manifest = JSON.parse(
+    await readFile(path.resolve(".next/required-server-files.json"), "utf8")
+  );
+  if (manifest.config.output !== "export") return;
+  const files = await removeEmptyBlogExports(path.resolve("."));
+  console.log(`Removed ${files.length} empty Blog export artifacts`);
+}
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
