@@ -15,7 +15,10 @@
     "check": "biome check .",
     "check:fix": "biome check --write .",
     "typecheck": "tsc --noEmit",
-    "clean": "pnpm dlx rimraf .next out node_modules"
+    "clean": "pnpm dlx rimraf .next out node_modules",
+    "test:blog": "vitest run --config vitest.blog.config.ts",
+    "prebuild": "pnpm --filter @daodao/config generate:env && tsx scripts/prepare-blog-assets.ts",
+    "test": "pnpm run test:blog"
   },
   "dependencies": {
     "@daodao/analytics": "workspace:*",
@@ -33,7 +36,13 @@
     "motion": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "@daodao/blog-content": "workspace:*",
+    "react-markdown": "catalog:",
+    "remark-gfm": "catalog:",
+    "rehype-sanitize": "catalog:",
+    "date-fns": "catalog:",
+    "mdast-util-from-markdown": "2.0.2"
   },
   "devDependencies": {
     "@daodao/config": "workspace:*",
@@ -41,6 +50,8 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "@types/mdast": "^4.0.4",
+    "tsx": "^4.19.2"
   }
 }
