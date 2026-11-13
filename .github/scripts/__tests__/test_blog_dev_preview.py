@@ -382,6 +382,33 @@ class BlogDevPreviewTests(unittest.TestCase):
                     expected,
                 )
 
+    def test_workflow_records_actual_checkout_separately_from_trigger_sha(self):
+        workflow = yaml.safe_load(WORKFLOW.read_text())
+        step = next(
+            s
+            for s in workflow["jobs"]["build-website"]["steps"]
+            if s.get("id") == "website-source"
+        )
+        summary = self.root / "step-summary"
+        trigger = "0" * 40
+        result = subprocess.run(
+            ["bash", "-e", "-c", step["run"]],
+            cwd=self.source,
+            env={
+                **self.env,
+                "COMMIT_SHA": trigger,
+                "GITHUB_STEP_SUMMARY": str(summary),
+            },
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=10,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.output_file.read_text(), f"frontend-sha={self.sha}\n")
+        self.assertIn(f"Actual frontend checkout SHA: {self.sha}", summary.read_text())
+        self.assertIn(f"Trigger/image tag SHA: {trigger}", summary.read_text())
+
     def test_workflow_uses_guarded_official_checkout_before_build(self):
         workflow = yaml.safe_load(WORKFLOW.read_text())
         steps = workflow["jobs"]["build-website"]["steps"]
@@ -416,7 +443,7 @@ class BlogDevPreviewTests(unittest.TestCase):
         frontend_checkout = next(
             step for step in steps if step.get("name") == "Checkout code"
         )
-        self.assertEqual(frontend_checkout["with"]["ref"], "${{ env.COMMIT_SHA }}")
+        self.assertEqual(frontend_checkout["with"]["ref"], "${{ env.BRANCH_NAME }}")
         self.assertIn(
             ".blog-dev-preview-source/",
             WORKFLOW.parents[2].joinpath(".dockerignore").read_text().splitlines(),
