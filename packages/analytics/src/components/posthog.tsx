@@ -1,7 +1,7 @@
 "use client";
 
 import Script from "next/script";
-import { sanitizeBlogAnalyticsEvent } from "../lib/blog-events";
+import { sanitizeBlogAnalyticsEvent, sanitizeWebsitePath } from "../lib/blog-events";
 import { getAnalyticsConfig } from "../lib/config";
 
 declare global {
@@ -46,7 +46,7 @@ export function PostHog({
           disable_session_recording: ${disableSessionReplay},
           capture_pageview: true,
           capture_pageleave: true,
-          before_send: ${websitePrivacy ? sanitizeBlogAnalyticsEvent.toString() : "undefined"},
+          before_send: ${websitePrivacy ? `(event) => (${sanitizeBlogAnalyticsEvent.toString()})(event, (${sanitizeWebsitePath.toString()}))` : "undefined"},
         });
       `}
     </Script>

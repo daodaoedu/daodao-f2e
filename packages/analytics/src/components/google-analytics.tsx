@@ -1,7 +1,7 @@
 "use client";
 
 import Script from "next/script";
-import { getBlogPageContext } from "../lib/blog-events";
+import { getBlogPageContext, sanitizeWebsitePath } from "../lib/blog-events";
 import { getAnalyticsConfig } from "../lib/config";
 
 declare global {
@@ -38,7 +38,7 @@ export function GoogleAnalytics({ websitePrivacy = false }: { websitePrivacy?: b
           const blogPageContext = ${getBlogPageContext.toString()};
           gtag('config', '${measurementId}', {
             page_path: window.location.pathname,
-            ...blogPageContext(window.location.href, document.referrer, ${websitePrivacy}),
+            ...blogPageContext(window.location.href, document.referrer, ${websitePrivacy}, (${sanitizeWebsitePath.toString()})),
           });
         `}
       </Script>

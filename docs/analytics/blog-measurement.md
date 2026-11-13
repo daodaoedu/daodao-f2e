@@ -94,3 +94,5 @@ GA4網站頁面一律提供去query的page_location及origin-only page_referrer�
 既有server對已額滿或過加入期限的public join重試仍回409；這是base既有可用性規則，本卡不改報名政策。可重試的既有加入保持joined_at且無重複audit；完整API「任意時點都回201」不在此卡承諾。
 
 邀請audit表示目標建立，不是寄達。`invitationTokenUsed`存在raw join audit，實際報表目前以同enrollment邀請歷史配對；退出後改走public link是否仍計受邀、第一來源/助攻如何跨Tally與登入延續，仍需產品定義及真實來源接線，不能把unknown當0或宣稱FR10全部完成。
+
+已確認的網站URL隱私邊界：只保留固定網站路由及動態路由模板（例如/blog/:article）；未知404路徑為/_unrecognized。不能靠slug正規式推定路徑已公開，email或token可能出現在pathname。PostHog/GA4的referrer與initial URL只保留origin；$pathname/page_path/route等欄位同樣使用模板。逐文章歸因使用從已渲染、經內容契約驗證的article_id/article_slug與locale，不從任意網址推導身分。這項website旗標不套用到產品預設。

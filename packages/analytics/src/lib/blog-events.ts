@@ -86,8 +86,8 @@ export function createBlogTracker(
     if (!capture) return "unavailable";
     const data = parsed.data;
     if (queued.has(data.interaction_id)) return "duplicate";
-    const { article_slug, ...properties } = data;
-    const route = `${data.locale === "en" ? "/en" : ""}/blog${article_slug ? `/${article_slug}` : ""}`;
+    const properties = data;
+    const route = `${data.locale === "en" ? "/en" : ""}/blog${data.page_type === "article" ? "/:article" : ""}`;
     try {
       capture(data.event, {
         ...properties,
@@ -111,9 +111,39 @@ export type BlogAnalyticsEnvelopeType = {
   $set_once?: Record<string, unknown>;
 };
 
-/** Self-contained so the same tested hook can be serialized into the SDK initialization. */
+/** Dynamic route values are grouped, never inferred public from slug-like syntax. */
+export function sanitizeWebsitePath(pathname: string): string {
+  const locale = /^\/(en|zh-TW)(?=\/|$)/.exec(pathname)?.[0] ?? "";
+  const route = (pathname.slice(locale.length) || "/").replace(/\/$/, "") || "/";
+  const fixed = new Set([
+    "/",
+    "/about",
+    "/blog",
+    "/dev/design-system",
+    "/quiz",
+    "/quiz/result",
+    "/action-maker",
+    "/action-maker/actions",
+    "/action-maker/category",
+    "/action-maker/result",
+    "/action-maker/topic",
+    "/action-maker/detail",
+    "/action-maker/nickname",
+    "/learning-marathons/2025S1",
+  ]);
+  if (fixed.has(route)) return route === "/" ? locale || "/" : `${locale}${route}`;
+  if (/^\/blog\/topic\/[^/]+$/.test(route)) return `${locale}/blog/topic/:topic`;
+  if (/^\/blog\/[^/]+$/.test(route)) return `${locale}/blog/:article`;
+  if (/^\/quiz\/questions\/[^/]+$/.test(route)) return `${locale}/quiz/questions/:question`;
+  if (/^\/quiz\/result\/[^/]+$/.test(route)) return `${locale}/quiz/result/:result`;
+  if (/^\/terms\/[^/]+$/.test(route)) return `${locale}/terms/:type`;
+  return `${locale}/_unrecognized`;
+}
+
+/** Serialized with the explicit path sanitizer, so no module closure enters the SDK hook. */
 export function sanitizeBlogAnalyticsEvent(
-  event: BlogAnalyticsEnvelopeType
+  event: BlogAnalyticsEnvelopeType,
+  safePath: typeof sanitizeWebsitePath = sanitizeWebsitePath
 ): BlogAnalyticsEnvelopeType | null {
   const urlKeys = new Set([
     "$current_url",
@@ -136,12 +166,21 @@ export function sanitizeBlogAnalyticsEvent(
             changed = true;
             continue;
           }
-          const safe = `${url.origin}${url.pathname}`;
+          const safe =
+            key === "$current_url" || key === "page_location"
+              ? `${url.origin}${safePath(url.pathname)}`
+              : url.origin;
           record[key] = safe;
           changed ||= safe !== value;
         } catch {
           changed = true;
         }
+      } else if (
+        ["$pathname", "$initial_pathname", "pathname", "page_path", "route"].includes(key) &&
+        typeof value === "string"
+      ) {
+        record[key] = safePath(value);
+        changed ||= record[key] !== value;
       } else if (
         (key === "$set" || key === "$set_once") &&
         value &&
@@ -203,6 +242,7 @@ export function sanitizeBlogAnalyticsEvent(
     "interaction_id",
     "page_type",
     "article_id",
+    "article_slug",
     "locale",
     "source",
     "cta_target",
@@ -221,7 +261,8 @@ export function sanitizeBlogAnalyticsEvent(
 export function getBlogPageContext(
   href: string,
   referrer: string,
-  websitePrivacy = false
+  websitePrivacy = false,
+  safePath: typeof sanitizeWebsitePath = sanitizeWebsitePath
 ): Record<string, string> {
   try {
     const url = new URL(href);
@@ -233,8 +274,8 @@ export function getBlogPageContext(
       /* Invalid referrers stay absent. */
     }
     return {
-      page_location: `${url.origin}${url.pathname}`,
-      page_path: url.pathname,
+      page_location: `${url.origin}${safePath(url.pathname)}`,
+      page_path: safePath(url.pathname),
       page_referrer: referringOrigin,
     };
   } catch {

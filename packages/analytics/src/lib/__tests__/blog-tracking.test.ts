@@ -5,6 +5,7 @@ import {
   createBlogTracker,
   getBlogPageContext,
   sanitizeBlogAnalyticsEvent,
+  sanitizeWebsitePath,
 } from "../blog-events";
 
 const interaction = {
@@ -84,11 +85,12 @@ describe("Blog browser events", () => {
           interaction_id: interaction.interaction_id,
           page_type: "article",
           article_id: "learning-check-in",
+          article_slug: "learning-check-in",
           locale: "zh-TW",
           source: "unknown",
           cta_target: "beta-interest",
-          route: "/blog/learning-check-in",
-          $current_url: "https://daodao.so/blog/learning-check-in",
+          route: "/blog/:article",
+          $current_url: "https://daodao.so/blog/:article",
           $process_person_profile: false,
           measurement_environment: "nonproduction",
         },
@@ -163,7 +165,7 @@ describe("Blog browser events", () => {
       $set_once: { $initial_referrer: `https://daodao.so/blog/learning-check-in?email=${secret}` },
     };
     const hook = Function(
-      `return (${sanitizeBlogAnalyticsEvent.toString()})`
+      `return event => (${sanitizeBlogAnalyticsEvent.toString()})(event, (${sanitizeWebsitePath.toString()}))`
     )() as typeof sanitizeBlogAnalyticsEvent;
     const safe = hook(event);
     expect(safe?.event).toBe("$pageview");
@@ -179,7 +181,7 @@ describe("Blog browser events", () => {
   });
   it("uses the actual self-contained SDK hook to suppress automatic Blog events and remove query/profile data", () => {
     const hook = Function(
-      `return (${sanitizeBlogAnalyticsEvent.toString()})`
+      `return event => (${sanitizeBlogAnalyticsEvent.toString()})(event, (${sanitizeWebsitePath.toString()}))`
     )() as typeof sanitizeBlogAnalyticsEvent;
     const safe = hook({
       event: "blog_article_viewed",
@@ -198,7 +200,7 @@ describe("Blog browser events", () => {
       token: "public_project_key",
       distinct_id: "anonymous",
       article_id: "learning-check-in",
-      $current_url: "https://daodao.so/blog/learning-check-in",
+      $current_url: "https://daodao.so/blog/:article",
     });
     expect(safe?.$set).toBeUndefined();
     expect(
@@ -212,7 +214,7 @@ describe("Blog browser events", () => {
     ).toBeNull();
     const other = {
       event: "existing_product_event",
-      properties: { $current_url: "https://app.daodao.so/lighthouse" },
+      properties: { $current_url: "https://daodao.so/about" },
     };
     expect(hook(other)).toBe(other);
   });
@@ -439,4 +441,43 @@ it("reports a UTC window boundary independent of the operator timezone", () => {
     if (previous === undefined) delete process.env.TZ;
     else process.env.TZ = previous;
   }
+});
+
+it("removes unsupported private pathnames from website URL and pathname fields", () => {
+  const privatePath = "/token-secret/private@example.invalid";
+  const safe = sanitizeBlogAnalyticsEvent({
+    event: "$pageview",
+    properties: {
+      $current_url: `https://daodao.so${privatePath}`,
+      $pathname: privatePath,
+      $referrer: `https://daodao.so${privatePath}`,
+      $set_once: { $initial_current_url: `https://daodao.so${privatePath}` },
+    },
+  });
+  expect(safe?.properties).toEqual({
+    $current_url: "https://daodao.so/_unrecognized",
+    $pathname: "/_unrecognized",
+    $referrer: "https://daodao.so",
+    $set_once: { $initial_current_url: "https://daodao.so" },
+  });
+});
+it("groups unknown GA4 website paths without retaining their raw private segments", () => {
+  expect(
+    getBlogPageContext(
+      "https://daodao.so/token-secret/private@example.invalid",
+      "https://example.test/private@example.invalid",
+      true
+    )
+  ).toEqual({
+    page_location: "https://daodao.so/_unrecognized",
+    page_path: "/_unrecognized",
+    page_referrer: "https://example.test",
+  });
+});
+
+it("groups slug-like secrets instead of assuming that a dynamic path is a public article", () => {
+  expect(sanitizeWebsitePath("/blog/token-secret")).toBe("/blog/:article");
+  expect(sanitizeWebsitePath("/en/blog/topic/token-secret")).toBe("/en/blog/topic/:topic");
+  expect(sanitizeWebsitePath("/quiz/result/secret-id")).toBe("/quiz/result/:result");
+  expect(sanitizeWebsitePath("/en/about")).toBe("/en/about");
 });
