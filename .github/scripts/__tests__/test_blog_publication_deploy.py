@@ -142,6 +142,14 @@ class PublicationDeployTests(unittest.TestCase):
             self.assertLess(DEPLOY.generation_base(str(run), "99") + 99, 2**53)
         for run, attempt in [
             ("0", "1"),
+            ("١", "1"),
+            ("１", "1"),
+            ("1", "١"),
+            ("1", "１"),
+            ("1١", "1"),
+            ("1１", "1"),
+            ("1", "1١"),
+            ("1", "1１"),
             ("01", "1"),
             ("-1", "1"),
             ("1", "0"),
@@ -204,8 +212,9 @@ class PublicationDeployTests(unittest.TestCase):
             producer = copy.deepcopy(self.producer)
             change(producer)
             data = encoded(producer)
+            expected_hash = sha(data)
             with self.subTest(producer=producer), self.assertRaises(ValueError):
-                DEPLOY.validate_producer(data, sha(data), SOURCE)
+                DEPLOY.validate_producer(data, expected_hash, SOURCE)
 
     def test_distinct_content_and_official_synthetic_kind_are_required(self):
         for alteration in ["same-content", "kind-swap"]:
@@ -216,8 +225,9 @@ class PublicationDeployTests(unittest.TestCase):
             else:
                 producer["artifacts"][0]["kind"] = "synthetic-TEST-ONLY-B"
             raw = encoded(producer)
+            expected_hash = sha(raw)
             with self.subTest(alteration=alteration), self.assertRaises(ValueError):
-                DEPLOY.validate_producer(raw, sha(raw), SOURCE)
+                DEPLOY.validate_producer(raw, expected_hash, SOURCE)
 
     def test_preflight_rejects_linked_oversize_and_unknown_data_before_ssh(self):
         outside = self.root / "private-marker"
@@ -278,8 +288,9 @@ class PublicationDeployTests(unittest.TestCase):
         self.producer["artifacts"][0]["manifestSha256"] = sha(raw)
         producer = encoded(self.producer)
         (self.data / "producer.json").write_bytes(producer)
+        expected_hash = sha(producer)
         with self.assertRaises(ValueError):
-            DEPLOY.verify_transfer(self.data, sha(producer), SOURCE)
+            DEPLOY.verify_transfer(self.data, expected_hash, SOURCE)
 
     def test_tampered_site_fails_unchanged_importer(self):
         item = self.producer["artifacts"][0]

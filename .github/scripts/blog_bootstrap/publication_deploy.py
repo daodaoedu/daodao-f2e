@@ -30,8 +30,8 @@ def module(name):
 
 
 def generation_base(run_id, attempt):
-    if not re.fullmatch(r"[1-9][0-9]{0,11}", run_id) or not re.fullmatch(
-        r"[1-9][0-9]?", attempt
+    if not re.fullmatch(r"[1-9]\d{0,11}", run_id, flags=re.ASCII) or not re.fullmatch(
+        r"[1-9]\d?", attempt, flags=re.ASCII
     ):
         raise ValueError("Actual workflow run ID/attempt required")
     result = int(run_id) * 10000 + int(attempt) * 100
@@ -79,6 +79,20 @@ def preflight_transfer(data_root):
     return observed
 
 
+def validate_artifact_identity(item, index, source_sha, expected_content):
+    if item.get("kind") != ["official-A", "synthetic-TEST-ONLY-B"][index]:
+        raise ValueError("Official/synthetic provenance labels differ")
+    if not SHA.fullmatch(item.get("id", "")) or not SHA.fullmatch(
+        item.get("manifestSha256", "")
+    ):
+        raise ValueError("Pinned artifact identity required")
+    if (
+        item.get("frontendSha") != source_sha
+        or item.get("contentSha") != expected_content[index]
+    ):
+        raise ValueError("Artifact source pair differs from producer")
+
+
 def validate_producer(data, expected_sha, source_sha):
     if (
         not SHA.fullmatch(expected_sha)
@@ -103,17 +117,7 @@ def validate_producer(data, expected_sha, source_sha):
         raise ValueError("Distinct official A and synthetic B required")
     expected_content = [producer["officialContentSha"], producer["syntheticContentSha"]]
     for index, item in enumerate(items):
-        if item.get("kind") != ["official-A", "synthetic-TEST-ONLY-B"][index]:
-            raise ValueError("Official/synthetic provenance labels differ")
-        if not SHA.fullmatch(item.get("id", "")) or not SHA.fullmatch(
-            item.get("manifestSha256", "")
-        ):
-            raise ValueError("Pinned artifact identity required")
-        if (
-            item.get("frontendSha") != source_sha
-            or item.get("contentSha") != expected_content[index]
-        ):
-            raise ValueError("Artifact source pair differs from producer")
+        validate_artifact_identity(item, index, source_sha, expected_content)
     return producer
 
 

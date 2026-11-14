@@ -102,10 +102,16 @@ class PublicationSupervisorTests(unittest.TestCase):
                     SUPERVISOR,
                     "phase",
                     side_effect=[
-                        {"summary": {"ok": True}},
+                        {"summary": {"ok": True, "id": "a" * 64}},
                         RuntimeError("public readback failed"),
+                        {
+                            "summary": {
+                                "localRecoveryVerified": True,
+                                "publicRecoveryVerified": False,
+                            }
+                        },
                     ],
-                ),
+                ) as phase_calls,
                 patch.object(SUPERVISOR.signal, "signal"),
                 patch.object(SUPERVISOR, "uid_processes", return_value=[]),
             ):
@@ -115,9 +121,34 @@ class PublicationSupervisorTests(unittest.TestCase):
                         base,
                         {"baseComposeSha256": "b" * 64, "producerSha256": "c" * 64},
                     )
-                adapter.restore_previous.assert_called_once_with(
-                    {**snapshot, "ownedOperationParent": str(base.parent)}, "b" * 64
+                self.assertEqual(phase_calls.call_count, 3)
+                self.assertEqual(phase_calls.call_args.args[2], "recover")
+                self.assertEqual(phase_calls.call_args.kwargs["recovery"], "a" * 64)
+                adapter.restore_previous.assert_called_once()
+                self.assertFalse(
+                    adapter.restore_previous.call_args.args[0]["managedMounts"]
                 )
+                self.assertEqual(adapter.restore_previous.call_args.args[1], "b" * 64)
+
+    def test_legacy_container_restore_runs_even_when_local_recovery_fails(self):
+        adapter = SimpleNamespace(restore_previous=Mock(), record_journal=Mock())
+        snapshot = {"managedMounts": False}
+        with patch.object(
+            SUPERVISOR, "phase", side_effect=RuntimeError("local TLS unavailable")
+        ):
+            SUPERVISOR.recover_snapshot(
+                adapter,
+                Path("/owned/namespace"),
+                {"baseComposeSha256": "b" * 64, "producerSha256": "c" * 64},
+                snapshot,
+                {"summary": {"id": "a" * 64}},
+                True,
+            )
+        adapter.restore_previous.assert_called_once_with(snapshot, "b" * 64)
+        state, _producer, outcome = adapter.record_journal.call_args.args
+        self.assertTrue(state["legacyContainerRestored"])
+        self.assertFalse(state["recovery"]["localRecoveryVerified"])
+        self.assertEqual(outcome, "recovery-failed")
 
     def test_public_input_dirs_are_traversable_under_private_umask(self):
         contents = {name: b"source" for name in SUPERVISOR.SOURCE_NAMES}
@@ -159,12 +190,11 @@ class PublicationSupervisorTests(unittest.TestCase):
                 item = tarfile.TarInfo(name)
                 item.size = 1
                 archive.addfile(item, io.BytesIO(b"x"))
-            with (
-                tempfile.TemporaryDirectory() as temporary,
-                self.subTest(name=name),
-                self.assertRaises(ValueError),
-            ):
-                SUPERVISOR.unpack(stream.getvalue(), Path(temporary))
+            with tempfile.TemporaryDirectory() as temporary:
+                data = stream.getvalue()
+                incoming = Path(temporary)
+                with self.subTest(name=name), self.assertRaises(ValueError):
+                    SUPERVISOR.unpack(data, incoming)
 
     def test_reserved_exit_waits_for_owned_descendants_without_killing_any_process(
         self,

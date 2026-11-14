@@ -144,10 +144,21 @@ jobs:
           BRANCH_NAME: ${{ env.BRANCH_NAME }}
           BLOG_DEV_RELEASE_MANAGED: ${{ vars.BLOG_DEV_RELEASE_MANAGED }}
           REQUESTED: ${{ steps.changes.outputs.website }}
+          TRUSTED_WORKFLOW_SHA: ${{ github.workflow_sha }}
         run: |
           # Job vars are snapshots, not a live lease. Set true and drain old dev CD before cutover.
           if [ "$BRANCH_NAME" = "dev" ]; then
-            python3 .github/scripts/blog-cd-ownership.py --branch "$BRANCH_NAME" --requested "$REQUESTED"
+            if ! [[ "$TRUSTED_WORKFLOW_SHA" =~ ^[a-f0-9]{40}$ ]]; then
+              echo 'Invalid trusted workflow source SHA' >&2
+              exit 1
+            fi
+            trusted_helper=$(mktemp "$RUNNER_TEMP/blog-cd-policy.XXXXXX.py")
+            trap 'rm -f "$trusted_helper"' EXIT
+            if ! GIT_NO_REPLACE_OBJECTS=1 git -c core.hooksPath=/dev/null -c core.fsmonitor=false cat-file -e "$TRUSTED_WORKFLOW_SHA^{commit}"; then
+              GIT_NO_REPLACE_OBJECTS=1 git -c core.hooksPath=/dev/null -c core.fsmonitor=false fetch --no-tags --depth=1 https://github.com/daodaoedu/daodao-f2e.git "$TRUSTED_WORKFLOW_SHA"
+            fi
+            GIT_NO_REPLACE_OBJECTS=1 git -c core.hooksPath=/dev/null -c core.fsmonitor=false show "$TRUSTED_WORKFLOW_SHA:.github/scripts/blog-cd-ownership.py" > "$trusted_helper"
+            python3 "$trusted_helper" --branch "$BRANCH_NAME" --requested "$REQUESTED"
           else
             # Old prod/feature source does not need the newly introduced helper.
             printf 'website=%s\ndev=false\nmanaged=false\n' "$REQUESTED" >> "$GITHUB_OUTPUT"

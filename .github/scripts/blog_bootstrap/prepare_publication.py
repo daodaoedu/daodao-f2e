@@ -101,7 +101,9 @@ def engineering_receipt(digests, actor, run_url):
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9-]{0,38}(?:\[bot\])?", actor):
         raise ValueError("Actual authenticated manual actor is required")
     if not re.fullmatch(
-        r"https://github.com/daodaoedu/daodao-f2e/actions/runs/[0-9]+", run_url
+        r"https://github.com/daodaoedu/daodao-f2e/actions/runs/\d+",
+        run_url,
+        flags=re.ASCII,
     ):
         raise ValueError("Actual official engineering run URL is required")
     return [

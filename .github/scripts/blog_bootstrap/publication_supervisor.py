@@ -21,6 +21,15 @@ from pathlib import Path
 
 MAX_BYTES = 300 * 1024 * 1024
 CONTROLLER = "4929785774e7799a6b51090ded6542c958b4df1e244db1b7cc9170461e02f962"
+PROVENANCE_NAME = "provenance.json"
+RECOVERY_ERRORS = (
+    OSError,
+    ValueError,
+    RuntimeError,
+    KeyError,
+    TypeError,
+    subprocess.SubprocessError,
+)
 SOURCE_NAMES = {
     "blog-release.py",
     "nginx.conf",
@@ -70,6 +79,30 @@ def wait_for_reserved_exit():
         time.sleep(0.1)
 
 
+def extract_member(archive, member, incoming, observed):
+    name = Path(member.name)
+    if (
+        not member.isfile()
+        or name.is_absolute()
+        or ".." in name.parts
+        or member.name in observed
+    ):
+        raise ValueError("Only distinct regular confined archive files accepted")
+    if member.name not in SOURCE_NAMES | {
+        PROVENANCE_NAME
+    } and not member.name.startswith("data/"):
+        raise ValueError("Unexpected privileged publication input")
+    observed.add(member.name)
+    target = incoming / name
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with (
+        archive.extractfile(member) as source,
+        target.open("xb") as destination,
+    ):
+        shutil.copyfileobj(source, destination)
+    target.chmod(0o444)
+
+
 def unpack(data, incoming):
     observed = set()
     with tarfile.open(fileobj=io.BytesIO(data), mode="r:gz") as archive:
@@ -77,35 +110,13 @@ def unpack(data, incoming):
         if len(members) > 2010 or sum(member.size for member in members) > MAX_BYTES:
             raise ValueError("Publication archive exceeds bounds")
         for member in members:
-            name = Path(member.name)
-            if (
-                not member.isfile()
-                or name.is_absolute()
-                or ".." in name.parts
-                or member.name in observed
-            ):
-                raise ValueError(
-                    "Only distinct regular confined archive files accepted"
-                )
-            if member.name not in SOURCE_NAMES | {
-                "provenance.json"
-            } and not member.name.startswith("data/"):
-                raise ValueError("Unexpected privileged publication input")
-            observed.add(member.name)
-            target = incoming / name
-            target.parent.mkdir(parents=True, exist_ok=True)
-            with (
-                archive.extractfile(member) as source,
-                target.open("xb") as destination,
-            ):
-                shutil.copyfileobj(source, destination)
-            target.chmod(0o444)
+            extract_member(archive, member, incoming, observed)
     incoming.chmod(0o755)
     for path in incoming.rglob("*"):
         if path.is_dir():
             path.chmod(0o755)
-    config = json.loads((incoming / "provenance.json").read_text())
-    if observed != set(config["inputHashes"]) | {"provenance.json"}:
+    config = json.loads((incoming / PROVENANCE_NAME).read_text())
+    if observed != set(config["inputHashes"]) | {PROVENANCE_NAME}:
         raise ValueError("Publication archive inventory differs")
     for name, digest in config["inputHashes"].items():
         if hashlib.sha256((incoming / name).read_bytes()).hexdigest() != digest:
@@ -227,6 +238,38 @@ def publish(base, config):
     return execute_adapter(adapter, base, config)
 
 
+def recover_snapshot(adapter, base, config, snapshot, initial, mounting):
+    key = "previousId" if snapshot["managedMounts"] else "id"
+    previous = initial["summary"][key]
+    if not re.fullmatch("[a-f0-9]{64}", previous):
+        raise ValueError("Verified recovery identity missing")
+    recovery = {"localRecoveryVerified": False, "publicRecoveryVerified": False}
+    restored_container = snapshot["managedMounts"]
+    try:
+        recovered = phase(base, config, "recover", recovery=previous)
+        recovery = recovered["summary"]
+    except RECOVERY_ERRORS:
+        recovery["stage"] = "capless-recovery-failed"
+    finally:
+        if mounting and not snapshot["managedMounts"]:
+            try:
+                adapter.restore_previous(snapshot, config["baseComposeSha256"])
+                restored_container = True
+            except RECOVERY_ERRORS:
+                recovery["legacyRestoreFailed"] = True
+    state = {
+        **snapshot,
+        "recovery": recovery,
+        "legacyContainerRestored": restored_container
+        if not snapshot["managedMounts"]
+        else None,
+    }
+    completed = recovery.get("localRecoveryVerified") is True and restored_container
+    adapter.record_journal(
+        state, config["producerSha256"], "restored" if completed else "recovery-failed"
+    )
+
+
 def execute_adapter(adapter, base, config):
     snapshot = {**adapter.inspect_container(), "ownedOperationParent": str(base.parent)}
     adoption = adapter.classify_adoption(snapshot)
@@ -236,8 +279,8 @@ def execute_adapter(adapter, base, config):
     initial = phase(
         base, config, "import-only" if snapshot["managedMounts"] else "seed"
     )
-    if snapshot["managedMounts"]:
-        snapshot = {**snapshot, "verifiedPreimage": initial["summary"]}
+    verified_key = "verifiedPreimage" if snapshot["managedMounts"] else "verifiedSeed"
+    snapshot = {**snapshot, verified_key: initial["summary"]}
     adapter.record_journal(snapshot, config["producerSha256"], "seeded")
     mounting = False
     try:
@@ -263,16 +306,7 @@ def execute_adapter(adapter, base, config):
         for number in [signal.SIGHUP, signal.SIGTERM, signal.SIGINT]:
             signal.signal(number, signal.SIG_IGN)
         wait_for_reserved_exit()
-        if snapshot["managedMounts"]:
-            previous = initial["summary"]["previousId"]
-            if not re.fullmatch("[a-f0-9]{64}", previous):
-                raise ValueError("Verified managed recovery identity missing")
-            recovered = phase(base, config, "recover", recovery=previous)
-            snapshot = {**snapshot, "recovery": recovered["summary"]}
-            adapter.record_journal(snapshot, config["producerSha256"], "restored")
-        if mounting and not snapshot["managedMounts"]:
-            adapter.restore_previous(snapshot, config["baseComposeSha256"])
-            adapter.record_journal(snapshot, config["producerSha256"], "restored")
+        recover_snapshot(adapter, base, config, snapshot, initial, mounting)
         raise
 
 

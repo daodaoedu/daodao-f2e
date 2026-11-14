@@ -85,6 +85,27 @@ class SiteClientTests(unittest.TestCase):
             with self.subTest(origin=origin), self.assertRaises(ValueError):
                 CLIENT.allowed_origin(origin)
 
+    def test_file_supplied_release_cannot_become_controller_option(self):
+        for identifier in ["--store=/foreign", "a" * 63, "g" * 64, "a" * 64 + "\n", ""]:
+            with (
+                self.subTest(identifier=identifier),
+                patch.object(CLIENT.subprocess, "run") as process,
+            ):
+                with self.assertRaises(ValueError):
+                    CLIENT.invoke("negative", "activate", identifier, 1000)
+                process.assert_not_called()
+        with (
+            patch.object(
+                CLIENT,
+                "PRODUCER",
+                {"artifacts": [{"id": "--store=/foreign", "manifestSha256": "a" * 64}]},
+            ),
+            patch.object(CLIENT.subprocess, "run") as process,
+        ):
+            with self.assertRaises(ValueError):
+                CLIENT.import_pair()
+            process.assert_not_called()
+
     def test_headers_require_three_dev_controls(self):
         CLIENT.noindex_headers(POLICY)
         for changed in [

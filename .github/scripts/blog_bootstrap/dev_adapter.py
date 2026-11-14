@@ -16,6 +16,7 @@ STORE = Path("/srv/daodao-blog-dev-releases")
 OPERATOR = Path("/srv/daodao-blog-dev-operator")
 LEGACY = Path("/root/daodao-f2e")
 BASE_COMPOSE = LEGACY / "docker-compose.yaml"
+OWNED_BASE_NAME = "base-compose.yaml"
 OVERLAY = OPERATOR / "compose.json"
 NGINX = OPERATOR / "nginx.conf"
 IMAGE = re.compile(r"^sha256:[a-f0-9]{64}$")
@@ -118,7 +119,7 @@ def compose_command(overlay=None):
         "--env-file",
         str(LEGACY / ".env.dev"),
         "-f",
-        str(OPERATOR / "base-compose.yaml"),
+        str(OPERATOR / OWNED_BASE_NAME),
     ]
     if overlay is not None:
         if Path(overlay) not in (OVERLAY, OPERATOR / "restore.json"):
@@ -336,7 +337,7 @@ def apply_overlay(snapshot, expected_compose_digest, nginx_source, run=subproces
         if json.loads(read_owned_file(OVERLAY)) != overlay_payload(snapshot["image"]):
             raise ValueError("Managed compose provenance changed; unchanged")
         return current
-    atomic_owned_write(OPERATOR / "base-compose.yaml", base_bytes)
+    atomic_owned_write(OPERATOR / OWNED_BASE_NAME, base_bytes)
     write_owned_overlay(snapshot["image"], nginx_source)
     run(
         compose_command(OVERLAY),
@@ -352,7 +353,7 @@ def apply_overlay(snapshot, expected_compose_digest, nginx_source, run=subproces
 def restore_previous(snapshot, expected_compose_digest, run=subprocess.run):
     """Restore only the captured dev website image/mount selection; never stop the stack."""
     establish_operator()
-    saved_base = read_owned_file(OPERATOR / "base-compose.yaml")
+    saved_base = read_owned_file(OPERATOR / OWNED_BASE_NAME)
     if hashlib.sha256(saved_base).hexdigest() != expected_compose_digest:
         raise ValueError("Saved reviewed compose differs; no restore mutation")
     if snapshot["managedMounts"]:
@@ -416,7 +417,14 @@ def classify_adoption(snapshot, marker_check=legacy_markers_absent):
 def record_journal(snapshot, producer_sha, phase):
     if not re.fullmatch(r"[a-f0-9]{64}", producer_sha):
         raise ValueError("Pinned preparation producer digest required")
-    allowed = {"prepared", "seeded", "mounting", "public-verified", "restored"}
+    allowed = {
+        "prepared",
+        "seeded",
+        "mounting",
+        "public-verified",
+        "restored",
+        "recovery-failed",
+    }
     if phase not in allowed:
         raise ValueError("Unknown adoption journal phase")
     payload = {

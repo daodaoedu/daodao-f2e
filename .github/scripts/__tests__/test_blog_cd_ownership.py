@@ -89,6 +89,56 @@ class BlogCdOwnershipTests(unittest.TestCase):
                 target = root / ".github/scripts/blog-cd-ownership.py"
                 target.parent.mkdir(parents=True)
                 target.write_bytes(HELPER.read_bytes())
+            trusted_sha = "a" * 40
+            mutable_sentinel = root / "mutable-helper-executed"
+            if helper_present and job == "detect-changes" and branch == "dev":
+                for args in [
+                    ["init", "-q"],
+                    ["add", ".github/scripts/blog-cd-ownership.py"],
+                    [
+                        "-c",
+                        "user.name=Fixture",
+                        "-c",
+                        "user.email=fixture@example.invalid",
+                        "commit",
+                        "-qm",
+                        "trusted workflow source",
+                    ],
+                ]:
+                    subprocess.run(
+                        ["git", "-C", str(root), *args], check=True, capture_output=True
+                    )
+                trusted_sha = subprocess.check_output(
+                    ["git", "-C", str(root), "rev-parse", "HEAD"], text=True
+                ).strip()
+                target.write_text(
+                    "from pathlib import Path\nPath("
+                    + repr(str(mutable_sentinel))
+                    + ").touch()\nraise SystemExit(75)\n"
+                )
+            mutable_head = trusted_sha
+            if helper_present and job == "detect-changes" and branch == "dev":
+                for args in [
+                    ["add", ".github/scripts/blog-cd-ownership.py"],
+                    [
+                        "-c",
+                        "user.name=Fixture",
+                        "-c",
+                        "user.email=fixture@example.invalid",
+                        "commit",
+                        "-qm",
+                        "mutable branch helper",
+                    ],
+                ]:
+                    subprocess.run(
+                        ["git", "-C", str(root), *args], check=True, capture_output=True
+                    )
+                mutable_head = subprocess.check_output(
+                    ["git", "-C", str(root), "rev-parse", "HEAD"], text=True
+                ).strip()
+                self.assertNotEqual(mutable_head, trusted_sha)
+            temporary = root / "runner-temp"
+            temporary.mkdir()
             output = root / "output"
             sentinel = root / "network-command-called"
             bin_dir = root / "bin"
@@ -100,6 +150,8 @@ class BlogCdOwnershipTests(unittest.TestCase):
             env = {
                 **os.environ,
                 "BRANCH_NAME": branch,
+                "TRUSTED_WORKFLOW_SHA": trusted_sha,
+                "RUNNER_TEMP": str(temporary),
                 "BLOG_DEV_RELEASE_MANAGED": flag,
                 "REQUESTED": str(requested).lower(),
                 "GITHUB_OUTPUT": str(output),
@@ -116,7 +168,25 @@ class BlogCdOwnershipTests(unittest.TestCase):
             )
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertFalse(sentinel.exists())
+            self.assertFalse(mutable_sentinel.exists())
+            if helper_present and job == "detect-changes" and branch == "dev":
+                self.assertEqual(
+                    subprocess.check_output(
+                        ["git", "-C", str(root), "rev-parse", "HEAD"], text=True
+                    ).strip(),
+                    mutable_head,
+                )
+            self.assertFalse(list(temporary.iterdir()))
             return dict(line.split("=", 1) for line in output.read_text().splitlines())
+
+    def test_detector_executes_trusted_git_object_not_mutable_branch_helper(self):
+        self.assertEqual(
+            self.run_policy_shell("detect-changes", "dev", "true")["website"], "false"
+        )
+        step = self.step("detect-changes", "ownership")
+        self.assertEqual(
+            step["env"]["TRUSTED_WORKFLOW_SHA"], "${{ github.workflow_sha }}"
+        )
 
     def test_actual_detect_and_deploy_shell_policy_matrix(self):
         for job in ["detect-changes", "deploy"]:

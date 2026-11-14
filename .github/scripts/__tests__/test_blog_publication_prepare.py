@@ -26,6 +26,8 @@ class DevelopmentPrepareTests(unittest.TestCase):
         for actor, url in [
             ("", "https://github.com/daodaoedu/daodao-f2e/actions/runs/123"),
             ("actor", "https://outside.example/123"),
+            ("actor", "https://github.com/daodaoedu/daodao-f2e/actions/runs/１２３"),
+            ("actor", "https://github.com/daodaoedu/daodao-f2e/actions/runs/١٢٣"),
         ]:
             with self.subTest(actor=actor), self.assertRaises(ValueError):
                 PREPARE.engineering_receipt({"article": "a" * 64}, actor, url)

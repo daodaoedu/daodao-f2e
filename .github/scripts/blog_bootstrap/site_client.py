@@ -4,6 +4,7 @@ import hashlib
 import importlib.util
 import json
 import os
+import re
 import ssl
 import subprocess
 import sys
@@ -11,7 +12,7 @@ import threading
 import time
 from http.server import ThreadingHTTPServer
 from pathlib import Path
-from urllib.error import HTTPError, URLError
+from urllib.error import HTTPError
 from urllib.parse import quote, urlsplit
 from urllib.request import HTTPRedirectHandler, build_opener
 
@@ -21,6 +22,9 @@ DEV_ORIGIN = "https://dev.daodao.so"
 CONFIG = {}
 PRODUCER = {}
 BASE = 0
+CONTROLLER_PATH = "/code/blog-release.py"
+JSON_SUFFIX = ".json"
+HEX_SHA_PATTERN = r"[a-f0-9]{64}"
 
 
 class RejectRedirect(HTTPRedirectHandler):
@@ -49,7 +53,7 @@ def allowed_origin(origin):
 
 
 def controller_module():
-    path = Path("/code/blog-release.py")
+    path = Path(CONTROLLER_PATH)
     if hashlib.sha256(path.read_bytes()).hexdigest() != CONFIG["controllerSha256"]:
         raise ValueError("Controller source binding differs")
     spec = importlib.util.spec_from_file_location("site_release", path)
@@ -60,11 +64,24 @@ def controller_module():
 
 def invoke(name, operation, identifier, generation, origin=DEV_ORIGIN, expected=0):
     allowed_origin(origin)
+    if operation not in {"activate", "rollback"} or expected not in {0, 1}:
+        raise ValueError("Fixed controller operation/result required")
+    if (
+        not isinstance(identifier, str)
+        or re.fullmatch(HEX_SHA_PATTERN, identifier) is None
+    ):
+        raise ValueError(
+            "Validated exact release ID required before controller arguments"
+        )
+    if type(generation) is not int or not 0 < generation < 2**53:
+        raise ValueError("Exact positive generation required")
+    if re.fullmatch(r"[a-z0-9-]+", name) is None:
+        raise ValueError("Fixed evidence label required")
     command = [
         sys.executable,
         "-I",
         "-S",
-        "/code/blog-release.py",
+        CONTROLLER_PATH,
         operation,
         "--store",
         str(STORE),
@@ -88,7 +105,7 @@ def invoke(name, operation, identifier, generation, origin=DEV_ORIGIN, expected=
         timeout=180,
         check=False,
     )
-    (OUT / (name + ".json")).write_text(process.stdout)
+    (OUT / (name + JSON_SUFFIX)).write_text(process.stdout)
     if process.returncode != expected:
         raise RuntimeError("Development controller operation failed: " + name)
     return json.loads(process.stdout)
@@ -96,19 +113,30 @@ def invoke(name, operation, identifier, generation, origin=DEV_ORIGIN, expected=
 
 def import_pair():
     for item in PRODUCER["artifacts"]:
+        identifier = item["id"]
+        manifest_sha = item["manifestSha256"]
+        if (
+            not isinstance(identifier, str)
+            or not isinstance(manifest_sha, str)
+            or re.fullmatch(HEX_SHA_PATTERN, identifier) is None
+            or re.fullmatch(HEX_SHA_PATTERN, manifest_sha) is None
+        ):
+            raise ValueError(
+                "Validated pinned artifact identity required before import"
+            )
         process = subprocess.run(
             [
                 sys.executable,
                 "-I",
                 "-S",
-                "/code/blog-release.py",
+                CONTROLLER_PATH,
                 "import",
                 "--store",
                 str(STORE),
                 "--artifact",
-                "/input/data/artifacts/" + item["id"],
+                "/input/data/artifacts/" + identifier,
                 "--manifest-sha256",
-                item["manifestSha256"],
+                manifest_sha,
             ],
             env={"PATH": "/usr/bin"},
             capture_output=True,
@@ -118,7 +146,7 @@ def import_pair():
         )
         if process.returncode != 0:
             raise RuntimeError("Validated artifact import failed")
-        (OUT / ("import-" + item["id"] + ".json")).write_text(process.stdout)
+        (OUT / ("import-" + item["id"] + JSON_SUFFIX)).write_text(process.stdout)
 
 
 def request(path, origin=DEV_ORIGIN, timeout=15):
@@ -207,7 +235,7 @@ def full(identifier, label):
         ):
             raise ValueError("Public development route differs: " + route)
         noindex_headers(headers)
-    (OUT / (label + ".json")).write_text(
+    (OUT / (label + JSON_SUFFIX)).write_text(
         json.dumps(
             {"id": identifier, "files": observations, "routes": manifest["smoke"]},
             indent=2,
@@ -391,7 +419,7 @@ def wait_for_seeded_public_a(identifier):
             status, body, _headers = request("/blog-release.json", timeout=3)
             if status == 200 and json.loads(body)["id"] == identifier:
                 return
-        except (OSError, ValueError, KeyError, URLError):
+        except (OSError, ValueError, KeyError):
             pass
         time.sleep(1)
     raise ValueError("Development proxy did not settle to the seeded official artifact")
@@ -444,7 +472,7 @@ def recover_previous(previous):
     try:
         full(previous, "supervised-recovery-all-files")
         public_verified = True
-    except (OSError, ValueError, URLError):
+    except (OSError, ValueError):
         pass
     return {
         "ok": True,

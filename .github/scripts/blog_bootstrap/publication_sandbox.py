@@ -93,6 +93,9 @@ def confined(root, uid):
 import ipaddress
 import socket
 
+LOCAL_CERT_NAME = "local-cert.pem"
+LOCAL_KEY_NAME = "local-key.pem"
+
 PHASES = {"seed", "import-only", "public-matrix", "recover"}
 
 
@@ -105,12 +108,18 @@ def validate_base(base):
         assert stat.S_IMODE(metadata.st_mode) == 0o700
 
 
+def validate_generation(value):
+    if re.fullmatch(r"\d{1,16}", value, flags=re.ASCII) is None:
+        raise ValueError("ASCII generation capability required")
+    return value
+
+
 def child(root):
     assert root.name == "client"
     validate_base(root.parent)
     phase = os.environ["DEV_PHASE"]
-    generation = os.environ["DEV_GENERATION_BASE"]
-    assert phase in PHASES and re.fullmatch("[0-9]{1,16}", generation)
+    generation = validate_generation(os.environ["DEV_GENERATION_BASE"])
+    assert phase in PHASES
     waiting = os.environ.get("DEV_WAIT_FOR_SEEDED_A", "false")
     recovery = os.environ.get("DEV_RECOVERY_ID", "")
     assert not recovery or re.fullmatch("[a-f0-9]{64}", recovery)
@@ -150,7 +159,7 @@ def system_hosts(base):
 
 
 def local_seed_certificate(base):
-    key, cert = base / "local-key.pem", base / "local-cert.pem"
+    key, cert = base / LOCAL_KEY_NAME, base / LOCAL_CERT_NAME
     run(
         "openssl",
         "req",
@@ -196,8 +205,8 @@ def client_mounts(base, root):
         "dev/null",
         "dev/urandom",
         "system-ca.pem",
-        "local-cert.pem",
-        "local-key.pem",
+        LOCAL_CERT_NAME,
+        LOCAL_KEY_NAME,
         "etc/hosts",
         "etc/nsswitch.conf",
     ]:
@@ -220,8 +229,8 @@ def client_mounts(base, root):
     mount(hosts, root / "etc/hosts", True)
     mount(switch, root / "etc/nsswitch.conf", True)
     cert, key = local_seed_certificate(base)
-    mount(cert, root / "local-cert.pem", True)
-    mount(key, root / "local-key.pem", True)
+    mount(cert, root / LOCAL_CERT_NAME, True)
+    mount(key, root / LOCAL_KEY_NAME, True)
     run(
         "mount",
         "-t",
