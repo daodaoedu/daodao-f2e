@@ -2,6 +2,9 @@ name: Blog development bootstrap probe
 on:
   workflow_dispatch:
 permissions: {}
+concurrency:
+  group: blog-development-bootstrap-runtime
+  cancel-in-progress: false
 jobs:
   probe:
     if: github.repository == 'daodaoedu/daodao-f2e' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/dev'

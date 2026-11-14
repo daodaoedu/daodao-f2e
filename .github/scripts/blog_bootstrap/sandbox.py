@@ -8,9 +8,11 @@ import pathlib
 import re
 import select
 import shutil
+import stat
 import subprocess
 import sys
 
+PYTHON = "/usr/bin/python3.10"
 P = pathlib.Path
 ACTOR = 611536
 SERVER = 611537
@@ -36,7 +38,7 @@ def mount(source, target, readonly=False):
 
 
 def copy_runtime(root):
-    binary = P("/usr/bin/python3.10")
+    binary = P(PYTHON)
     std = P("/usr/lib/python3.10")
     items = {binary}
     # Stdlib only; no site/dist packages, host /etc, /run or customer mounts.
@@ -71,7 +73,7 @@ def confined(root, uid):
         os.setsid()
         os.chroot(root)
         os.chdir("/")
-        os.umask(0o022)
+        os.umask(0o077)
         lib = ctypes.CDLL(None, use_errno=True)
         for cap in range(64):
             result = lib.prctl(
@@ -88,21 +90,31 @@ def confined(root, uid):
     return preexec
 
 
-if len(sys.argv) == 3 and sys.argv[1] == "--child":
-    child_root = P(sys.argv[2])
-    assert child_root.name == "client" and child_root.parent.parent == P("/var/tmp")
-    assert re.fullmatch("daodao-blog-cloud-test-[a-f0-9]{32}", child_root.parent.name)
+if len(sys.argv) == 2 and sys.argv[1] == "--child":
+    child_root = P.cwd()
+    assert child_root.name == "client" and child_root.parent.name == "namespace"
+    private_parent = child_root.parent.parent
+    assert private_parent.parent == P("/root") and re.fullmatch(
+        "daodao-blog-bootstrap-private-[a-f0-9]{32}", private_parent.name
+    )
+    for directory in [private_parent, child_root.parent]:
+        metadata = directory.lstat()
+        assert stat.S_ISDIR(metadata.st_mode) and metadata.st_uid == 0
+        assert stat.S_IMODE(metadata.st_mode) == 0o700
     confined(child_root, 611536)()
     os.execve(
-        "/usr/bin/python3.10",
-        ["/usr/bin/python3.10", "-I", "-S", "/code/probe.py"],
+        PYTHON,
+        [PYTHON, "-I", "-S", "/code/probe.py"],
         {"PATH": "/usr/bin"},
     )
-assert len(sys.argv) == 3 and sys.argv[1] == "--inside"
-base = P(sys.argv[2])
-assert base.parent == P("/var/tmp") and re.fullmatch(
-    "daodao-blog-cloud-test-[a-f0-9]{32}", base.name
-)
+assert os.geteuid() == 0 and len(sys.argv) == 2 and sys.argv[1] == "--inside"
+base = P.cwd()
+assert base.name == "namespace" and base.parent.parent == P("/root")
+assert re.fullmatch("daodao-blog-bootstrap-private-[a-f0-9]{32}", base.parent.name)
+for directory in [base.parent, base]:
+    metadata = directory.lstat()
+    assert stat.S_ISDIR(metadata.st_mode) and metadata.st_uid == 0
+    assert stat.S_IMODE(metadata.st_mode) == 0o700
 run("mount", "--make-rprivate", "/")
 run("mount", "-t", "proc", "-o", "nosuid,nodev,noexec", "proc", "/proc")
 run("ip", "link", "set", "lo", "up")
@@ -144,7 +156,8 @@ run(
     str(root / "tmp"),
 )
 child = subprocess.Popen(
-    [sys.executable, "-I", "-S", __file__, "--child", str(root)],
+    [sys.executable, "-I", "-S", __file__, "--child"],
+    cwd=root,
     env={"PATH": "/usr/bin"},
     close_fds=True,
     stdin=subprocess.PIPE,
@@ -157,7 +170,12 @@ try:
     first_line = child.stdout.readline()
     assert json.loads(first_line) == {"ready": True, "uid": 611536}
     status = P(f"/proc/{child.pid}/status").read_text()
-    fields = dict(line.split(":", 1) for line in status.splitlines() if ":" in line)
+    fields = {
+        key: value
+        for line in status.splitlines()
+        if ":" in line
+        for key, value in [line.split(":", 1)]
+    }
     assert set(fields["Uid"].split()) == {"611536"}
     assert set(fields["Gid"].split()) == {"611536"}
     assert fields["Groups"].strip() == ""

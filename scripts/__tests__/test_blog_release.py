@@ -306,8 +306,9 @@ class LocalReleaseTests(unittest.TestCase):
             self.assertIsInstance(
                 untrusted.exception.reason, ssl.SSLCertVerificationError
             )
+            plaintext_url = origin.replace("https:", "http:") + "/blog"
             with self.assertRaises((URLError, OSError)):
-                urlopen(origin.replace("https:", "http:") + "/blog", timeout=3)
+                urlopen(plaintext_url, timeout=3)
         finally:
             server.terminate()
             server.communicate(timeout=5)

@@ -1,11 +1,15 @@
 import importlib.util
 import io
 import json
+import stat
 import subprocess
 import tarfile
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
+
+import yaml
 
 ROOT = Path(__file__).resolve().parents[3]
 SPEC = importlib.util.spec_from_file_location(
@@ -16,6 +20,45 @@ SPEC.loader.exec_module(BOOT)
 
 
 class BootstrapTests(unittest.TestCase):
+    def test_host_runtime_is_serialized_without_canceling_an_active_probe(self):
+        workflow = yaml.safe_load(
+            (ROOT / ".github/workflows/blog-dev-bootstrap.yml").read_text()
+        )
+        self.assertEqual(
+            workflow["concurrency"]["group"], "blog-development-bootstrap-runtime"
+        )
+        self.assertIs(workflow["concurrency"]["cancel-in-progress"], False)
+        self.assertEqual(
+            workflow["jobs"]["probe"]["permissions"],
+            {"contents": "read", "actions": "read"},
+        )
+
+    def test_private_directory_rejects_symlink_permissions_owner_and_identity_changes(
+        self,
+    ):
+        source = ROOT / ".github/scripts/blog_bootstrap/supervisor.py"
+        spec = importlib.util.spec_from_file_location("supervisor_boundary", source)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        valid = {"st_mode": stat.S_IFDIR | 0o700, "st_uid": 0, "st_dev": 1, "st_ino": 2}
+        module.validate_directory(
+            SimpleNamespace(**valid), private=True, expected_identity=(1, 2)
+        )
+        for changed in [
+            {"st_mode": stat.S_IFLNK | 0o700},
+            {"st_mode": stat.S_IFDIR | 0o777},
+            {"st_uid": 1000},
+            {"st_ino": 3},
+        ]:
+            metadata = SimpleNamespace(**{**valid, **changed})
+            with self.subTest(changed=changed), self.assertRaises(ValueError):
+                module.validate_directory(
+                    metadata, private=True, expected_identity=(1, 2)
+                )
+        writable_anchor = SimpleNamespace(**{**valid, "st_mode": stat.S_IFDIR | 0o775})
+        with self.assertRaises(ValueError):
+            module.validate_directory(writable_anchor)
+
     def test_only_official_dev_manual_context_is_allowed(self):
         valid = {
             "GITHUB_REPOSITORY": "daodaoedu/daodao-f2e",
@@ -52,18 +95,18 @@ class BootstrapTests(unittest.TestCase):
             return invoke
 
         self.assertEqual(BOOT.check_source({"GITHUB_SHA": sha}, caller()), sha)
+        stale_caller = caller(current="b" * 40)
         with self.assertRaises(ValueError):
-            BOOT.check_source({"GITHUB_SHA": sha}, caller(current="b" * 40))
+            BOOT.check_source({"GITHUB_SHA": sha}, stale_caller)
         for field, value in [
             ("head_sha", "b" * 40),
             ("event", "pull_request"),
             ("head_branch", "prod"),
             ("conclusion", "failure"),
         ]:
+            invalid_caller = caller(candidate={**run, field: value})
             with self.subTest(field=field), self.assertRaises(ValueError):
-                BOOT.check_source(
-                    {"GITHUB_SHA": sha}, caller(candidate={**run, field: value})
-                )
+                BOOT.check_source({"GITHUB_SHA": sha}, invalid_caller)
 
     def test_archive_binds_exact_controller_and_regular_fixed_source(self):
         archive = BOOT.pack()

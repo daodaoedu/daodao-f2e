@@ -9,11 +9,12 @@ import sys
 import time
 
 P = pathlib.Path
-status = dict(
-    line.split(":", 1)
+status = {
+    key: value
     for line in P("/proc/self/status").read_text().splitlines()
     if ":" in line
-)
+    for key, value in [line.split(":", 1)]
+}
 assert os.getuid() == 611536 and os.getgid() == 611536
 assert all(
     int(status[key].strip(), 16) == 0

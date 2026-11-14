@@ -142,9 +142,12 @@ def validate_report(report, archive_sha):
     observer = json.loads(report["payload"]["attestation/privileged-observer.json"])[
         "client"
     ]
-    fields = dict(
-        line.split(":", 1) for line in observer["status"].splitlines() if ":" in line
-    )
+    fields = {
+        key: value
+        for line in observer["status"].splitlines()
+        if ":" in line
+        for key, value in [line.split(":", 1)]
+    }
     if set(fields["Uid"].split()) != {"611536"} or fields["NoNewPrivs"].strip() != "1":
         raise ValueError(
             "Privileged observer did not verify the dedicated capless process"
