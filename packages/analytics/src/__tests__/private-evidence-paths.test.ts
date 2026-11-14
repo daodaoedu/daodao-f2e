@@ -50,7 +50,9 @@ beforeEach(async () => {
 afterEach(async () => {
   await rm(folder, { recursive: true, force: true });
 });
-describe("Private activation CLI capability boundary", () => {
+// Every case spawns the real tsx CLI; cold start on loaded CI runners reaches
+// ~5.6s, past Vitest's 5s default (PR1209/PR1210 timed out on the first case).
+describe("Private activation CLI capability boundary", { timeout: 30_000 }, () => {
   it("requires an explicitly configured evidence root before reading or writing", async () => {
     const output = join(root, "report.json");
     expect(invoke(input, output, null)).not.toBe(0);
