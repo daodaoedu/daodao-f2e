@@ -6,6 +6,7 @@ import { type BlogLocaleType, blogCopy, blogPath } from "./copy";
 import { articleOutline, readingMinutes } from "./helpers";
 import { BlogMarkdown } from "./markdown";
 import { BlogShell, ShareArticle } from "./shell";
+import { BlogTelemetry } from "./telemetry";
 export function dateLabel(date: string, locale: BlogLocaleType) {
   return format(parseISO(date), locale === "en" ? "MMM d, yyyy" : "yyyy 年 M 月 d 日", {
     locale: locale === "en" ? enUS : zhTW,
@@ -19,6 +20,7 @@ export async function BlogList({ locale, topic }: { locale: BlogLocaleType; topi
     .sort((a, b) => b.metadata.published_at.localeCompare(a.metadata.published_at));
   return (
     <BlogShell locale={locale} preview={data.preview}>
+      <BlogTelemetry locale={locale} />
       <main className="blog-list" id="blog-main" tabIndex={-1}>
         <div className="blog-intro">
           <h1>{t.title}</h1>
@@ -118,6 +120,10 @@ export async function BlogArticle({
       preview={data.preview}
       alternate={alternate ? blogPath(alternate.metadata.lang, alternate.metadata.slug) : undefined}
     >
+      <BlogTelemetry
+        locale={locale}
+        article={{ id: article.metadata.id, slug: article.metadata.slug }}
+      />
       <main className="blog-reader" id="blog-main" tabIndex={-1}>
         <a className="blog-back" href={blogPath(locale)}>
           ← {t.back}
@@ -168,7 +174,7 @@ export async function BlogArticle({
           <aside className="blog-cta">
             <h2>{t.ctaTitle}</h2>
             <p>{t.ctaBody}</p>
-            <a className="blog-join" href="https://tally.so/r/44WXdk">
+            <a className="blog-join" href="https://tally.so/r/44WXdk" data-blog-cta="beta-interest">
               {t.apply}
             </a>
           </aside>

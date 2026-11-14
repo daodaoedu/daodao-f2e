@@ -63,6 +63,7 @@ class BlogCdTests(unittest.TestCase):
             "github.event_name": "workflow_run",
             "github.event.workflow_run.head_repository.full_name": "outside/fork",
             "github.event.workflow_run.conclusion": "success",
+            "github.event.workflow_run.head_repository.fork": False,
             "github.event.workflow_run.event": "push",
             "inputs.force_deploy": False,
             "needs.build-website.result": "success",
@@ -99,6 +100,131 @@ class BlogCdTests(unittest.TestCase):
                         },
                     )
                 )
+
+    def test_same_name_fork_cannot_run_privileged_jobs(self):
+        values = {
+            "github.repository": "daodaoedu/daodao-f2e",
+            "github.event_name": "workflow_run",
+            "github.event.workflow_run.head_repository.full_name": "daodaoedu/daodao-f2e",
+            "github.event.workflow_run.head_repository.fork": True,
+            "github.event.workflow_run.conclusion": "success",
+            "github.event.workflow_run.event": "push",
+            "needs.detect-changes.outputs.build-website": "true",
+            "needs.build-website.result": "success",
+        }
+        for job in ("detect-changes", "build-website", "build-product", "deploy"):
+            with self.subTest(job=job):
+                self.assertFalse(expression(WORKFLOW["jobs"][job]["if"], values))
+
+    def test_managed_website_skips_without_blocking_product(self):
+        values = {
+            "github.repository": "daodaoedu/daodao-f2e",
+            "github.event_name": "workflow_dispatch",
+            "inputs.force_deploy": True,
+            "needs.detect-changes.outputs.build-website": "true",
+            "needs.detect-changes.outputs.build-product": "true",
+            "vars.BLOG_RELEASE_MANAGED": "true",
+        }
+        self.assertFalse(expression(WORKFLOW["jobs"]["build-website"]["if"], values))
+        self.assertTrue(expression(WORKFLOW["jobs"]["build-product"]["if"], values))
+        values["vars.BLOG_RELEASE_MANAGED"] = ""
+        self.assertTrue(expression(WORKFLOW["jobs"]["build-website"]["if"], values))
+
+    def test_validated_dev_preview_can_pass_legacy_blog_guard(self):
+        item = step("build-website", "Require pinned Blog publication pipeline")
+        for branch, preview, expected in [
+            ("dev", "true", 0),
+            ("dev", "false", 1),
+            ("prod", "true", 1),
+            ("dev", "", 1),
+        ]:
+            with (
+                self.subTest(branch=branch, preview=preview),
+                tempfile.TemporaryDirectory() as temporary,
+            ):
+                root = Path(temporary)
+                (root / "packages/blog-content").mkdir(parents=True)
+                result = subprocess.run(
+                    ["bash", "-c", item["run"]],
+                    cwd=root,
+                    check=False,
+                    env={
+                        **os.environ,
+                        "BRANCH_NAME": branch,
+                        "BLOG_PREVIEW_ENABLED": preview,
+                    },
+                    capture_output=True,
+                )
+                self.assertEqual(result.returncode, expected)
+        self.assertEqual(
+            item["env"]["BLOG_PREVIEW_ENABLED"],
+            "${{ steps.blog-preview.outputs.enabled }}",
+        )
+        steps = WORKFLOW["jobs"]["build-website"]["steps"]
+        self.assertLess(
+            steps.index(step("build-website", "Stage dev Blog draft snapshot")),
+            steps.index(item),
+        )
+
+    def test_delayed_ci_uses_current_branch_not_old_trigger(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            subprocess.run(["git", "init", "-q", "-b", "dev", str(root)], check=True)
+            commits = []
+            for revision in ("A", "B", "C"):
+                (root / "apps/website").mkdir(parents=True, exist_ok=True)
+                (root / "apps/website/version").write_text(revision)
+                subprocess.run(["git", "-C", str(root), "add", "."], check=True)
+                subprocess.run(
+                    [
+                        "git",
+                        "-C",
+                        str(root),
+                        "-c",
+                        "user.name=Fixture",
+                        "-c",
+                        "user.email=fixture@example.invalid",
+                        "commit",
+                        "-qm",
+                        revision,
+                    ],
+                    check=True,
+                )
+                commits.append(
+                    subprocess.check_output(
+                        ["git", "-C", str(root), "rev-parse", "HEAD"], text=True
+                    ).strip()
+                )
+            subprocess.run(
+                ["git", "-C", str(root), "update-ref", "refs/deploy/dev", commits[1]],
+                check=True,
+            )
+            for job in ("detect-changes", "build-website"):
+                checkout = step(job, "Checkout code")
+                selected = (
+                    checkout["with"]["ref"]
+                    .replace("${{ env.BRANCH_NAME }}", "dev")
+                    .replace("${{ env.COMMIT_SHA }}", commits[0])
+                )
+                subprocess.run(
+                    ["git", "-C", str(root), "checkout", "-q", selected], check=True
+                )
+                self.assertEqual((root / "apps/website/version").read_text(), "C", job)
+            output = root / "output"
+            subprocess.run(
+                ["bash", "-c", step("detect-changes", "Detect file changes")["run"]],
+                cwd=root,
+                env={
+                    **os.environ,
+                    "BRANCH_NAME": "dev",
+                    "EVENT_NAME": "workflow_run",
+                    "APP_INPUT": "",
+                    "GITHUB_OUTPUT": str(output),
+                },
+                capture_output=True,
+                check=True,
+            )
+            self.assertIn("website=true", output.read_text())
 
     def test_repository_write_is_limited_to_the_deploy_ref_writer(self):
         for name, job in WORKFLOW["jobs"].items():
