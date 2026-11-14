@@ -33,6 +33,8 @@ class RejectRedirect(HTTPRedirectHandler):
 
 
 HTTP = build_opener(RejectRedirect())
+# Cloudflare rejects the default "Python-urllib/*" agent with 403 before Nginx is reached.
+HTTP.addheaders = [("User-Agent", "daodao-blog-publisher/1")]
 
 
 def allowed_origin(origin):
@@ -483,6 +485,50 @@ def recover_previous(previous):
     }
 
 
+def failure_metadata(phase, error):
+    detail = {"phase": phase, "errorType": type(error).__name__}
+    message = str(error).replace("\n", " ")
+    allowed = (
+        "Public development",
+        "Fresh development",
+        "Development proxy",
+        "Development controller",
+        "Validated artifact",
+        "Actual prepared",
+        "Cached asset",
+        "Synthetic B",
+        "Official A",
+        "Paired rollback",
+        "Stale publication",
+        "Failed publication",
+        "Same-generation",
+        "Removed development",
+        "Private state",
+    )
+    if message.startswith(allowed):
+        detail["message"] = message[:300]
+    return detail
+
+
+def perform_phase(phase):
+    import_pair()
+    public_permissions()
+    if phase == "public-matrix" and os.environ.get("DEV_WAIT_FOR_SEEDED_A") == "true":
+        wait_for_seeded_public_a(PRODUCER["artifacts"][0]["id"])
+    if phase == "seed":
+        result = loopback_operation(
+            PRODUCER["artifacts"][0]["id"], "activate", BASE + 10
+        )
+    elif phase == "import-only":
+        result = verified_preimage()
+    elif phase == "recover":
+        previous = os.environ["DEV_RECOVERY_ID"]
+        result = recover_previous(previous)
+    else:
+        result = public_matrix()
+    return result
+
+
 def main():
     global CONFIG, PRODUCER, BASE
     CONFIG = json.loads(Path("/input/provenance.json").read_text())
@@ -508,21 +554,11 @@ def main():
     if sys.stdin.readline().strip() != "observed-capless":
         raise ValueError("Privileged observer did not acknowledge confinement")
     phase = os.environ["DEV_PHASE"]
-    import_pair()
-    public_permissions()
-    if phase == "public-matrix" and os.environ.get("DEV_WAIT_FOR_SEEDED_A") == "true":
-        wait_for_seeded_public_a(PRODUCER["artifacts"][0]["id"])
-    if phase == "seed":
-        result = loopback_operation(
-            PRODUCER["artifacts"][0]["id"], "activate", BASE + 10
-        )
-    elif phase == "import-only":
-        result = verified_preimage()
-    elif phase == "recover":
-        previous = os.environ["DEV_RECOVERY_ID"]
-        result = recover_previous(previous)
-    else:
-        result = public_matrix()
+    try:
+        result = perform_phase(phase)
+    except Exception as error:
+        (OUT / "failure.json").write_text(json.dumps(failure_metadata(phase, error)))
+        raise
     (OUT / "summary.json").write_text(json.dumps(result, indent=2))
     print(json.dumps(result), flush=True)
 

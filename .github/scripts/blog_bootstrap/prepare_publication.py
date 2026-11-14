@@ -38,7 +38,7 @@ def controller():
     source = ROOT / "scripts/blog-release.py"
     if (
         hashlib.sha256(source.read_bytes()).hexdigest()
-        != "4929785774e7799a6b51090ded6542c958b4df1e244db1b7cc9170461e02f962"
+        != "54a17ae652155397832665fbbc2352c9a9ee9b24a4f9da1a533143c5488a1783"
     ):
         raise ValueError("Reviewed controller changed")
     spec = importlib.util.spec_from_file_location("development_release", source)

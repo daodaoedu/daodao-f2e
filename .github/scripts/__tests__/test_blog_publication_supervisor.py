@@ -23,6 +23,11 @@ SPEC.loader.exec_module(SUPERVISOR)
 
 class PublicationSupervisorTests(unittest.TestCase):
     def managed_failure(self, failure):
+        failure.diagnostic = {
+            "phase": "public-matrix",
+            "errorType": type(failure).__name__,
+            "message": "Public development bytes differ: en.txt",
+        }
         snapshot = {"managedMounts": True}
         adapter = SimpleNamespace(
             inspect_container=Mock(return_value=snapshot),
@@ -69,6 +74,7 @@ class PublicationSupervisorTests(unittest.TestCase):
                 self.assertEqual(calls[-1], ("recover", {"recovery": previous}))
                 self.assertEqual(signals.call_count, 3)
                 journal = adapter.record_journal.call_args.args[0]
+                self.assertEqual(journal["primaryFailure"], failure.diagnostic)
                 self.assertTrue(journal["recovery"]["localRecoveryVerified"])
                 self.assertFalse(journal["recovery"]["publicRecoveryVerified"])
                 adapter.restore_previous.assert_not_called()

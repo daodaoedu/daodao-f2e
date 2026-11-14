@@ -60,15 +60,48 @@ def validate_container(value):
         r"(?:docker.io/)?([a-z0-9][a-z0-9_.-]*)/daodao-website:[A-Za-z0-9_.-]+",
         reference,
     )
+    restored_namespace = None
     if not mounts and registry is None:
-        raise ValueError("Existing legacy website image namespace is required")
+        if reference != value["Image"]:
+            raise ValueError("Existing legacy website image namespace is required")
+        restored_namespace = restored_legacy_namespace(value["Image"])
     return {
-        "registryNamespace": registry.group(1) if registry else None,
+        "registryNamespace": registry.group(1) if registry else restored_namespace,
         "id": value["Id"],
         "image": value["Image"],
         "name": value["Name"],
         "managedMounts": bool(mounts),
     }
+
+
+def restored_legacy_namespace(image):
+    """Read existing root-owned restore provenance; never establish or guess it."""
+    try:
+        validate_directory(OPERATOR.parent.lstat(), 0)
+        validate_directory(OPERATOR.lstat(), 0)
+        if (
+            json.loads(read_owned_file(OPERATOR / "ownership.json"))
+            != ownership_marker()
+        ):
+            raise ValueError("Foreign operator ownership marker")
+        journal = json.loads(read_owned_file(OPERATOR / "adoption.json"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise ValueError("Restored legacy image lacks owned provenance") from error
+    snapshot = journal.get("snapshot", {})
+    namespace = snapshot.get("registryNamespace", "")
+    if (
+        journal.get("schema") != 1
+        or journal.get("service") != SERVICE
+        or journal.get("phase")
+        not in {"prepared", "seeded", "mounting", "restored", "recovery-failed"}
+        or not RELEASE.fullmatch(journal.get("producerSha256", ""))
+        or snapshot.get("image") != image
+        or snapshot.get("managedMounts") is not False
+        or not isinstance(namespace, str)
+        or not re.fullmatch(r"[a-z0-9][a-z0-9_.-]*", namespace)
+    ):
+        raise ValueError("Restored legacy image provenance does not match")
+    return namespace
 
 
 def inspect_container(call=subprocess.check_output):

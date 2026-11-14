@@ -2,7 +2,9 @@ import hashlib
 import importlib.util
 import json
 import tempfile
+import threading
 import unittest
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from unittest.mock import patch
 
@@ -72,6 +74,30 @@ class SiteClientTests(unittest.TestCase):
         )
         self.assertEqual(operations[-1][1:3], ("rollback", a))
 
+    def test_public_requests_pass_edge_that_blocks_default_python_agent(self):
+        # dev.daodao.so (Cloudflare) answers 403 to "Python-urllib/*"; installed run 43596629134 failed on it.
+        class Edge(BaseHTTPRequestHandler):
+            def do_GET(self):
+                blocked = self.headers.get("User-Agent", "").startswith("Python-urllib")
+                self.send_response(403 if blocked else 200)
+                self.end_headers()
+                self.wfile.write(b"blocked" if blocked else b"origin")
+
+            def log_message(self, *_args):
+                pass
+
+        server = ThreadingHTTPServer(("127.0.0.1", 0), Edge)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            url = "http://127.0.0.1:" + str(server.server_port) + "/en.txt"
+            with CLIENT.HTTP.open(url, timeout=5) as response:
+                self.assertEqual((response.status, response.read()), (200, b"origin"))
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join()
+
     def test_fixed_dev_and_owned_loopback_origins(self):
         for origin in ["https://dev.daodao.so", "https://127.0.0.1:12345"]:
             CLIENT.allowed_origin(origin)
@@ -105,6 +131,19 @@ class SiteClientTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 CLIENT.import_pair()
             process.assert_not_called()
+
+    def test_failure_metadata_retains_public_cause_but_redacts_arbitrary_exception_text(
+        self,
+    ):
+        detail = CLIENT.failure_metadata(
+            "public-matrix", ValueError("Public development bytes differ: en.txt")
+        )
+        self.assertEqual(detail["message"], "Public development bytes differ: en.txt")
+        redacted = CLIENT.failure_metadata(
+            "seed", RuntimeError("token=PRIVATE_SENTINEL host=PRIVATE_HOST")
+        )
+        self.assertEqual(redacted, {"phase": "seed", "errorType": "RuntimeError"})
+        self.assertNotIn("PRIVATE", json.dumps(redacted))
 
     def test_headers_require_three_dev_controls(self):
         CLIENT.noindex_headers(POLICY)

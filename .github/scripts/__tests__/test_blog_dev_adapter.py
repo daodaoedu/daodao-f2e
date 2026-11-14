@@ -1,5 +1,6 @@
 import hashlib
 import importlib.util
+import json
 import os
 import stat
 import tempfile
@@ -32,6 +33,73 @@ class DevAdapterTests(unittest.TestCase):
             "State": {"Status": "running"},
             "Mounts": [],
         }
+
+    def test_bare_image_requires_exact_owned_restore_provenance(self):
+        value = self.fixture()
+        snapshot = ADAPTER.validate_container(value)
+        value["Config"]["Image"] = value["Image"]
+        with tempfile.TemporaryDirectory() as temporary:
+            operator = Path(temporary) / "operator"
+            operator.mkdir(mode=0o700)
+            marker = operator / "ownership.json"
+            journal = operator / "adoption.json"
+            marker.write_text(json.dumps(ADAPTER.ownership_marker()))
+            payload = {
+                "schema": 1,
+                "service": ADAPTER.SERVICE,
+                "producerSha256": "b" * 64,
+                "phase": "mounting",
+                "snapshot": snapshot,
+            }
+            journal.write_text(json.dumps(payload))
+            original_lstat = Path.lstat
+
+            def root_owned(path):
+                metadata = original_lstat(path)
+                fields = list(metadata)
+                fields[4] = 0  # Model root-owned host files without local privilege.
+                return os.stat_result(fields)
+
+            with (
+                patch.object(ADAPTER, "OPERATOR", operator),
+                patch.object(Path, "lstat", root_owned),
+            ):
+                result = ADAPTER.validate_container(value)
+                self.assertEqual(result["registryNamespace"], "fixture")
+                for key, bad in [
+                    ("image", "sha256:" + "c" * 64),
+                    ("managedMounts", True),
+                    ("registryNamespace", "../foreign"),
+                ]:
+                    changed = {**payload, "snapshot": {**snapshot, key: bad}}
+                    journal.write_text(json.dumps(changed))
+                    with self.assertRaises(ValueError):
+                        ADAPTER.validate_container(value)
+                journal.write_text(json.dumps(payload))
+                marker.write_text("{}")
+                with self.assertRaises(ValueError):
+                    ADAPTER.validate_container(value)
+                marker.write_text(json.dumps(ADAPTER.ownership_marker()))
+                journal.rename(operator / "saved.json")
+                journal.symlink_to(operator / "saved.json")
+                with self.assertRaises(ValueError):
+                    ADAPTER.validate_container(value)
+                journal.unlink()
+                with self.assertRaises(ValueError):
+                    ADAPTER.validate_container(value)
+
+    def test_bare_image_without_provenance_and_wrong_service_rejected(self):
+        value = self.fixture()
+        value["Config"]["Image"] = value["Image"]
+        with (
+            tempfile.TemporaryDirectory() as temporary,
+            patch.object(ADAPTER, "OPERATOR", Path(temporary) / "absent"),
+        ):
+            with self.assertRaises(ValueError):
+                ADAPTER.validate_container(value)
+            value["Config"]["Labels"]["com.docker.compose.service"] = "prod_website"
+            with self.assertRaises(ValueError):
+                ADAPTER.validate_container(value)
 
     def test_actual_dev_identity_is_required(self):
         self.assertEqual(

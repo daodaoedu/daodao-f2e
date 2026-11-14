@@ -780,6 +780,38 @@ module.activate(SimpleNamespace(store=Path(sys.argv[2]),release=sys.argv[3],gene
             server.server_close()
             thread.join()
 
+    def test_public_readback_is_not_rejected_by_edge_blocking_default_python_agent(
+        self,
+    ):
+        # dev.daodao.so (Cloudflare) answers 403 to "Python-urllib/*"; installed run 43596629134 failed on it.
+        class Edge(BaseHTTPRequestHandler):
+            def do_GET(self):
+                if self.headers.get("User-Agent", "").startswith("Python-urllib"):
+                    self.send_error(403)
+                else:
+                    self.send_error(404)
+
+            def log_message(self, *_args):
+                pass
+
+        server = release.ThreadingHTTPServer(("127.0.0.1", 0), Edge)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        origin = "http://127.0.0.1:" + str(server.server_port)
+        try:
+            with (
+                patch.dict(os.environ, {"BLOG_RELEASE_BASE_URL": origin}),
+                self.assertRaises(release.ReleaseError) as caught,
+            ):
+                release.fetch_baseline(
+                    SimpleNamespace(base_url=origin, output=self.root / "edge.json")
+                )
+            self.assertEqual(caught.exception.stage, "baseline-missing")
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join()
+
     def test_http_adapter_serves_browser_usable_resource_types(self):
         identifier = self.artifact("a")
         self.activate(identifier, 1)
