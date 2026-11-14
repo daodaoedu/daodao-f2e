@@ -1,0 +1,23 @@
+name: Blog release contract
+on:
+  pull_request:
+    paths: ['scripts/blog-release.py', 'scripts/blog-cd-ownership.py', 'scripts/__tests__/**', '.github/workflows/blog-release*.yml', '.github/workflows/linode-cd.yml', '.github/scripts/__tests__/test_blog_cd.py']
+  push:
+    branches: [dev, prod]
+    paths: ['scripts/blog-release.py', 'scripts/blog-cd-ownership.py', 'scripts/__tests__/**', '.github/workflows/blog-release*.yml', '.github/workflows/linode-cd.yml', '.github/scripts/__tests__/test_blog_cd.py']
+permissions: {}
+jobs:
+  contract:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 -m unittest discover -s scripts/__tests__ -p 'test_blog*.py' -v
+      - run: 'python3 -m pip install --only-binary=:all: PyYAML==6.0.2'
+      - run: python3 -m unittest discover -s .github/scripts/__tests__ -p 'test_blog_cd.py' -v

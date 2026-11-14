@@ -1,0 +1,186 @@
+name: Pinned Blog website release
+on:
+  workflow_dispatch:
+    inputs:
+      content_sha:
+        description: Full approved content SHA (prepare only)
+        type: string
+      operation:
+        type: choice
+        options: [publish, rollback]
+        default: publish
+      release_id:
+        description: Existing immutable release ID for rollback
+        type: string
+permissions: {}
+concurrency:
+  group: blog-website-development
+  cancel-in-progress: false
+jobs:
+  trust:
+    permissions:
+      contents: read
+      actions: read
+    timeout-minutes: 10
+    if: github.ref == 'refs/heads/prod' || github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    environment: development
+    outputs:
+      frontend: ${{ steps.pins.outputs.frontend }}
+      channel: ${{ steps.pins.outputs.channel }}
+      runner: ${{ steps.pins.outputs.runner }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify protected setup and approved formal frontend
+        id: pins
+        env:
+          GH_TOKEN: ${{ secrets.BLOG_POLICY_READ_TOKEN || github.token }}
+          APPROVED: ${{ vars.BLOG_APPROVED_FRONTEND_SHA }}
+          RUNNER: ${{ vars.BLOG_APPROVED_RUNNER_SHA }}
+          CHANNEL: ${{ vars.BLOG_FRONTEND_CHANNEL }}
+          WORKFLOW_REF: ${{ github.ref }}
+          MANAGED: ${{ vars.BLOG_RELEASE_MANAGED }}
+          READY: ${{ vars.BLOG_DEPLOY_RUNNER_ENABLED }}
+          BASE_URL: ${{ vars.BLOG_RELEASE_BASE_URL }}
+          BLOG_RELEASE_BASE_URL: ${{ vars.BLOG_RELEASE_BASE_URL }}
+          STORE: ${{ vars.BLOG_RELEASE_STORE }}
+          REPOSITORY: ${{ github.repository }}
+          OPERATION: ${{ inputs.operation }}
+        run: |
+          python3 - <<'PY'
+          import json,os,pathlib,re,subprocess
+          from urllib.parse import urlsplit
+          channel=os.environ['CHANNEL']; channels={'approved-dev-bootstrap':('refs/heads/dev','dev'),'formal-prod':('refs/heads/prod','prod')}
+          if channel not in channels or os.environ['WORKFLOW_REF']!=channels[channel][0]: raise SystemExit('Workflow ref does not match protected frontend channel')
+          branch=channels[channel][1];sha=os.environ['APPROVED'];url=urlsplit(os.environ['BASE_URL']);repository=os.environ['REPOSITORY']
+          if os.environ['MANAGED']!='true' or os.environ['READY']!='true': raise SystemExit('Managed ownership and runner setup must be verified first')
+          managed=subprocess.check_output(['gh','api','repos/'+repository+'/actions/variables/BLOG_RELEASE_MANAGED','--jq','.value'],text=True).strip()
+          if managed!='true': raise SystemExit('Repository-level legacy website ownership guard is not active')
+          environment=json.loads(subprocess.check_output(['gh','api','repos/'+repository+'/environments/development'],text=True))
+          if not any(rule.get('type')=='required_reviewers' for rule in environment.get('protection_rules',[])): raise SystemExit('Development deployment requires explicit environment reviewer approval')
+          if not (environment.get('deployment_branch_policy') or {}).get('custom_branch_policies'): raise SystemExit('Development environment requires selected reviewed-branch policy')
+          policies=json.loads(subprocess.check_output(['gh','api','repos/'+repository+'/environments/development/deployment-branch-policies'],text=True))['branch_policies']
+          if not policies or any(policy['name'] not in ('dev','prod') or policy.get('type','branch')!='branch' for policy in policies) or branch not in [policy['name'] for policy in policies]: raise SystemExit('Environment branch policy must allow only reviewed dev/prod branches')
+          if url.scheme!='https' or not url.netloc or url.username or url.password: raise SystemExit('Protected HTTPS development readback URL required')
+          if not os.environ['STORE'].startswith('/'): raise SystemExit('Protected absolute release store required')
+          store=pathlib.PurePosixPath(os.environ['STORE'])
+          if '..' in store.parts or store==pathlib.PurePosixPath('/root/daodao-f2e') or pathlib.PurePosixPath('/root/daodao-f2e') in store.parents: raise SystemExit('Release store must be outside legacy checkout/git-clean scope')
+          runner=os.environ['RUNNER']
+          if not re.fullmatch('[a-f0-9]{40}',runner): raise SystemExit('Missing independently approved release runner SHA')
+          subprocess.run(['git','merge-base','--is-ancestor',runner,'origin/'+branch],check=True)
+          runner_runs=json.loads(subprocess.check_output(['gh','api','repos/'+repository+'/actions/runs?head_sha='+runner+'&event=push&branch='+branch+'&status=success&per_page=100'],text=True))['workflow_runs']
+          if not any(run['name']=='Linode CI' and run['head_sha']==runner for run in runner_runs): raise SystemExit('Approved release runner lacks successful protected-channel CI')
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output: output.write('runner='+runner+'\n')
+          if os.environ['OPERATION']=='rollback': raise SystemExit(0)
+          if not re.fullmatch('[a-f0-9]{40}',sha): raise SystemExit('Missing protected approved frontend SHA')
+          subprocess.run(['git','merge-base','--is-ancestor',sha,'origin/'+branch],check=True)
+          runs=json.loads(subprocess.check_output(['gh','api','repos/'+repository+'/actions/runs?head_sha='+sha+'&event=push&branch='+branch+'&status=success&per_page=100'],text=True))['workflow_runs']
+          accepted=next((run for run in runs if run['name']=='Linode CI' and run['head_sha']==sha),None)
+          if not accepted: raise SystemExit('Approved frontend lacks successful CI on the protected source channel; no force bypass')
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output: output.write('frontend='+sha+'\nchannel='+channel+'\n')
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as output: output.write('Frontend policy: '+channel+'; approved SHA '+sha+'; CI '+accepted['html_url']+'\n')
+          PY
+  prepare:
+    permissions:
+      contents: read
+    timeout-minutes: 40
+    needs: trust
+    if: inputs.operation == 'publish'
+    runs-on: ubuntu-latest
+    environment: development
+    outputs:
+      release: ${{ steps.prepare.outputs.release }}
+      manifest: ${{ steps.prepare.outputs.manifest }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.trust.outputs.runner }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.19.4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: 10.20.0
+      - name: Prepare pinned website only
+        id: prepare
+        env:
+          FRONTEND: ${{ needs.trust.outputs.frontend }}
+          CONTENT: ${{ inputs.content_sha }}
+          GH_TOKEN: ${{ secrets.BLOG_POLICY_READ_TOKEN || github.token }}
+          APPROVALS: ${{ secrets.BLOG_APPROVALS_JSON }}
+          PUBLIC_ENV: ${{ vars.BLOG_PUBLIC_BUILD_ENV_JSON }}
+          BASE_URL: ${{ vars.BLOG_RELEASE_BASE_URL }}
+          BLOG_RELEASE_BASE_URL: ${{ vars.BLOG_RELEASE_BASE_URL }}
+          FIRST: ${{ vars.BLOG_FIRST_RELEASE }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import json,os,pathlib,re,subprocess
+          if not re.fullmatch('[a-f0-9]{40}',os.environ['CONTENT']): raise SystemExit('Full content SHA required')
+          head=subprocess.check_output(['gh','api','repos/daodaoedu/daodao-blog/git/ref/heads/main','--jq','.object.sha'],text=True).strip()
+          if head!=os.environ['CONTENT']: raise SystemExit('Superseded content request; main has advanced')
+          if not os.environ['APPROVALS']: raise SystemExit('Missing private approval evidence')
+          private=pathlib.Path(os.environ['RUNNER_TEMP']).resolve()/'blog-private'; private.mkdir(mode=0o700)
+          os.environ['BLOG_EVIDENCE_ROOT']=str(private)
+          receipt=private/'approvals.json'; receipt.write_text(os.environ['APPROVALS']); receipt.chmod(0o600)
+          environment=private/'public-env.json';environment.write_text(os.environ['PUBLIC_ENV'] or '{}')
+          command=['python3','scripts/blog-release.py','prepare','--frontend-repo','https://github.com/'+os.environ['REPOSITORY']+'.git','--frontend-sha',os.environ['FRONTEND'],'--approved-frontend-sha',os.environ['FRONTEND'],'--content-repo','https://github.com/daodaoedu/daodao-blog.git','--content-sha',os.environ['CONTENT'],'--approvals',str(receipt),'--build-env',str(environment),'--store',str(pathlib.Path(os.environ['RUNNER_TEMP'])/'blog-store')]
+          baseline=private/'baseline.json'
+          previous=subprocess.run(['python3','scripts/blog-release.py','fetch-baseline','--base-url',os.environ['BASE_URL'],'--output',str(baseline)],text=True,capture_output=True)
+          if previous.returncode==0: command += ['--baseline',str(baseline)]
+          elif os.environ['FIRST']!='true' or json.loads(previous.stdout).get('stage')!='baseline-missing': raise SystemExit('Prior release baseline could not be verified; existing website unchanged')
+          output=json.loads(subprocess.check_output(command,text=True))
+          with open(os.environ['GITHUB_OUTPUT'],'a') as stream:stream.write('release='+output['id']+'\nmanifest='+output['manifest_sha256']+'\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: blog-release-${{ steps.prepare.outputs.release }}
+          path: ${{ runner.temp }}/blog-store/releases/${{ steps.prepare.outputs.release }}/
+          if-no-files-found: error
+  activate:
+    permissions:
+      contents: read
+      actions: read
+    timeout-minutes: 15
+    needs: [trust, prepare]
+    if: ${{ always() && needs.trust.result == 'success' && (needs.prepare.result == 'success' || inputs.operation == 'rollback') }}
+    runs-on: [self-hosted, blog-development]
+    environment: development
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.trust.outputs.runner }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        if: inputs.operation == 'publish'
+        with:
+          name: blog-release-${{ needs.prepare.outputs.release }}
+          path: ${{ runner.temp }}/blog-import
+      - name: Import and atomically activate/read back
+        env:
+          OPERATION: ${{ inputs.operation }}
+          RELEASE: ${{ needs.prepare.outputs.release || inputs.release_id }}
+          STORE: ${{ vars.BLOG_RELEASE_STORE }}
+          BASE_URL: ${{ vars.BLOG_RELEASE_BASE_URL }}
+          BLOG_RELEASE_BASE_URL: ${{ vars.BLOG_RELEASE_BASE_URL }}
+          MANIFEST_SHA: ${{ needs.prepare.outputs.manifest }}
+          GENERATION: ${{ github.run_id }}
+          GH_TOKEN: ${{ secrets.BLOG_POLICY_READ_TOKEN || github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import json,os,pathlib,subprocess
+          if os.environ['OPERATION']=='publish':
+            approved=subprocess.check_output(['gh','api','repos/'+os.environ['REPOSITORY']+'/environments/development/variables/BLOG_APPROVED_FRONTEND_SHA','--jq','.value'],text=True).strip()
+            manifest=json.loads((pathlib.Path(os.environ['RUNNER_TEMP'])/'blog-import/release.json').read_text())
+            head=subprocess.check_output(['gh','api','repos/daodaoedu/daodao-blog/git/ref/heads/main','--jq','.object.sha'],text=True).strip()
+            if head!=manifest['content_sha'] or approved!=manifest['frontend_sha']: raise SystemExit('Superseded source/approval pin; no activation')
+          if os.environ['OPERATION']=='publish':subprocess.run(['python3','scripts/blog-release.py','import','--store',os.environ['STORE'],'--artifact',os.environ['RUNNER_TEMP']+'/blog-import','--manifest-sha256',os.environ['MANIFEST_SHA']],check=True)
+          command=['python3','scripts/blog-release.py','rollback' if os.environ['OPERATION']=='rollback' else 'activate','--store',os.environ['STORE'],'--release',os.environ['RELEASE'],'--generation',os.environ['GENERATION'],'--base-url',os.environ['BASE_URL']]
+          if os.environ['OPERATION']=='publish':command += ['--freshness-repository',os.environ['REPOSITORY']]
+          subprocess.run(command,check=True)
+          PY

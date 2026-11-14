@@ -437,6 +437,7 @@ class BlogDevPreviewTests(unittest.TestCase):
         jobs = yaml.safe_load(WORKFLOW.read_text())["jobs"]
         own = "daodaoedu/daodao-f2e"
         original = {
+            "vars.BLOG_RELEASE_MANAGED": "",
             "github.repository": own,
             "github.event_name": "workflow_run",
             "github.event.workflow_run.head_repository.full_name": own,
