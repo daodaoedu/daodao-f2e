@@ -51,6 +51,8 @@ class RejectRedirect(HTTPRedirectHandler):
 
 # A redirected 404 must never become first-release permission, and smoke must not contact a redirect target.
 HTTP = build_opener(RejectRedirect())
+# Cloudflare rejects the default "Python-urllib/*" agent with 403 before Nginx is reached.
+HTTP.addheaders = [("User-Agent", "daodao-blog-publisher/1")]
 
 
 def canonical(value):

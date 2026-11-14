@@ -20,7 +20,7 @@ import uuid
 from pathlib import Path
 
 MAX_BYTES = 300 * 1024 * 1024
-CONTROLLER = "4929785774e7799a6b51090ded6542c958b4df1e244db1b7cc9170461e02f962"
+CONTROLLER = "54a17ae652155397832665fbbc2352c9a9ee9b24a4f9da1a533143c5488a1783"
 PROVENANCE_NAME = "provenance.json"
 RECOVERY_ERRORS = (
     OSError,
@@ -194,7 +194,16 @@ def phase(base, config, name, seeded=False, recovery=""):
             }[name]
         )
         if process.returncode:
-            raise RuntimeError("Capless development publication phase failed: " + name)
+            failure = RuntimeError(
+                "Capless development publication phase failed: " + name
+            )
+            path = base / "result/failure.json"
+            failure.diagnostic = (
+                bounded_json(path)
+                if path.exists()
+                else {"phase": name, "errorType": "ChildProcessFailure"}
+            )
+            raise failure
     finally:
         if process.poll() is None:
             os.killpg(process.pid, signal.SIGKILL)
@@ -276,9 +285,19 @@ def execute_adapter(adapter, base, config):
     adapter.verify_base_compose(config["baseComposeSha256"])
     adapter.establish_store()
     adapter.record_journal(snapshot, config["producerSha256"], "prepared")
-    initial = phase(
-        base, config, "import-only" if snapshot["managedMounts"] else "seed"
-    )
+    try:
+        initial = phase(
+            base, config, "import-only" if snapshot["managedMounts"] else "seed"
+        )
+    except BaseException as error:
+        failed = {
+            **snapshot,
+            "primaryFailure": getattr(
+                error, "diagnostic", {"errorType": type(error).__name__}
+            ),
+        }
+        adapter.record_journal(failed, config["producerSha256"], "recovery-failed")
+        raise
     verified_key = "verifiedPreimage" if snapshot["managedMounts"] else "verifiedSeed"
     snapshot = {**snapshot, verified_key: initial["summary"]}
     adapter.record_journal(snapshot, config["producerSha256"], "seeded")
@@ -302,7 +321,13 @@ def execute_adapter(adapter, base, config):
             "public": actual,
             "persistentStoreRetained": True,
         }
-    except BaseException:
+    except BaseException as error:
+        snapshot = {
+            **snapshot,
+            "primaryFailure": getattr(
+                error, "diagnostic", {"errorType": type(error).__name__}
+            ),
+        }
         for number in [signal.SIGHUP, signal.SIGTERM, signal.SIGINT]:
             signal.signal(number, signal.SIG_IGN)
         wait_for_reserved_exit()
