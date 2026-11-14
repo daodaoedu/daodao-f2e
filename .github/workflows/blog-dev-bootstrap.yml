@@ -1,0 +1,49 @@
+name: Blog development bootstrap probe
+on:
+  workflow_dispatch:
+permissions: {}
+jobs:
+  probe:
+    if: github.repository == 'daodaoedu/daodao-f2e' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/dev'
+    permissions:
+      contents: read
+      actions: read
+    runs-on: ubuntu-latest
+    environment: development
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify entrypoint before SSH identity is materialized
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import runpy,os
+          source=runpy.run_path('.github/scripts/blog_bootstrap/runner.py')
+          source['check_context'](os.environ)
+          source['check_source'](os.environ)
+          PY
+      - name: Probe isolated development runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BLOG_SSH_HOST: ${{ secrets.LINODE_INSTANCE_IP }}
+          BLOG_SSH_PRIVATE_KEY: ${{ secrets.LINODE_SSH_PRIVATE_KEY }}
+        run: |
+          identity=$(mktemp "$RUNNER_TEMP/blog-dev-key.XXXXXX")
+          trap 'rm -f "$identity"' EXIT
+          chmod 600 "$identity"
+          printf '%s\n' "$BLOG_SSH_PRIVATE_KEY" > "$identity"
+          unset BLOG_SSH_PRIVATE_KEY
+          BLOG_SSH_KEY_FILE="$identity" python3 .github/scripts/blog_bootstrap/runner.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: blog-development-bootstrap-proof
+          path: ${{ runner.temp }}/blog-bootstrap-proof/summary.json
+          if-no-files-found: error
+          retention-days: 7

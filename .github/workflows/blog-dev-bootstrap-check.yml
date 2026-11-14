@@ -1,0 +1,22 @@
+name: Blog development bootstrap contract
+on:
+  pull_request:
+    paths: ['.github/scripts/blog_bootstrap/**', '.github/scripts/__tests__/test_blog_bootstrap.py', '.github/workflows/blog-dev-bootstrap*.yml', '.github/known-hosts/linode-dev.pub', 'scripts/blog-release.py', 'scripts/__tests__/test_blog_release.py']
+  push:
+    branches: [dev]
+    paths: ['.github/scripts/blog_bootstrap/**', '.github/scripts/__tests__/test_blog_bootstrap.py', '.github/workflows/blog-dev-bootstrap*.yml', '.github/known-hosts/linode-dev.pub', 'scripts/blog-release.py', 'scripts/__tests__/test_blog_release.py']
+permissions: {}
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 -m unittest discover -s .github/scripts/__tests__ -p 'test_blog_bootstrap.py' -v
+      - run: python3 -m unittest discover -s scripts/__tests__ -p 'test_blog_release.py' -v
