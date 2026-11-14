@@ -141,6 +141,31 @@ class LocalReleaseTests(unittest.TestCase):
             )
         )
 
+    def test_stale_generation_is_superseded_before_newer_article_identity_check(self):
+        # Installed dev run 43611983230: stale A after B (B adds an article)
+        # reported "approval" instead of "superseded".
+        sample = {
+            "published_at": "2026-11-13",
+            "slugs": {"zh-TW": "sample", "en": "sample"},
+        }
+        fixture = {
+            "published_at": "2026-11-13",
+            "slugs": {"zh-TW": "fixture", "en": "fixture"},
+        }
+        official = self.artifact("a", {"sample": sample})
+        newer = self.artifact("b", {"sample": sample, "fixture": fixture})
+        self.activate(official, 10)
+        self.activate(newer, 20)
+        with self.assertRaises(release.ReleaseError) as caught:
+            self.activate(official, 10)
+        self.assertEqual(caught.exception.stage, "superseded")
+        self.assertEqual(
+            json.loads((self.store / "active.json").read_text())["id"], newer
+        )
+        self.assertEqual(
+            json.loads((self.store / "generation.json").read_text())["generation"], 20
+        )
+
     def test_rollback_retains_historical_identity_of_temporarily_removed_article(self):
         first = self.artifact("a")
         baseline = json.loads(

@@ -1138,6 +1138,25 @@ def _check_active_pointer(store, old):
         raise ReleaseError("state", "Recorded active release has no current pointer")
 
 
+def _reject_stale_generation(store, identifier, generation):
+    """Classify an older writer as superseded before content-identity checks.
+
+    Read-only: the watermark is only written by _accept_generation after every
+    other check passes. Without this, a stale release that lacks an article the
+    newer one added is reported as an approval failure instead.
+    """
+    file = store / "generation.json"
+    if not file.exists():
+        return
+    water = json.loads(file.read_text())
+    if generation < water["generation"] or (
+        generation == water["generation"] and water["id"] != identifier
+    ):
+        raise ReleaseError(
+            "superseded", "A newer generation already owns this deployment"
+        )
+
+
 def _accept_generation(store, old, identifier, generation):
     file = store / "generation.json"
     current_generation = old["generation"] if old else 0
@@ -1259,6 +1278,7 @@ def activate(args):
     with locked(store):
         recover_pending(store, args.base_url)
         manifest = stored_release(store, args.release)
+        _reject_stale_generation(store, args.release, args.generation)
         old = _active_state(store, manifest, getattr(args, "operation", "activate"))
         _check_active_pointer(store, old)
         _accept_generation(store, old, args.release, args.generation)
