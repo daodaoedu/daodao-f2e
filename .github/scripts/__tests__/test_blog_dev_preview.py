@@ -445,6 +445,7 @@ class BlogDevPreviewTests(unittest.TestCase):
             "github.event.workflow_run.event": "push",
             "inputs.force_deploy": False,
             "needs.detect-changes.outputs.build-website": "true",
+            "needs.detect-changes.outputs.legacy-website": "true",
             "needs.detect-changes.outputs.build-product": "true",
             "needs.build-website.result": "success",
             "needs.build-product.result": "success",

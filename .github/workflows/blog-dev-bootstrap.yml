@@ -1,13 +1,25 @@
 name: Blog development bootstrap probe
 on:
   workflow_dispatch:
+    inputs:
+      operation:
+        description: 'Development operation; publication-test changes only the dev website'
+        type: choice
+        options: [probe, publication-test]
+        default: probe
+        required: true
+      content_sha:
+        description: 'Optional full content commit for the DEV engineering test'
+        type: string
+        default: '0daa4231bb2072657c807813e960919b982f9d8e'
+        required: false
 permissions: {}
 concurrency:
   group: blog-development-bootstrap-runtime
   cancel-in-progress: false
 jobs:
   probe:
-    if: github.repository == 'daodaoedu/daodao-f2e' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/dev'
+    if: github.repository == 'daodaoedu/daodao-f2e' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/dev' && (inputs.operation == 'probe' || inputs.operation == '')
     permissions:
       contents: read
       actions: read
@@ -19,7 +31,7 @@ jobs:
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.12'
       - name: Verify entrypoint before SSH identity is materialized
@@ -48,5 +60,138 @@ jobs:
         with:
           name: blog-development-bootstrap-proof
           path: ${{ runner.temp }}/blog-bootstrap-proof/summary.json
+          if-no-files-found: error
+          retention-days: 7
+
+  prepare:
+    if: github.repository == 'daodaoedu/daodao-f2e' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/dev' && inputs.operation == 'publication-test'
+    permissions:
+      contents: read
+      actions: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    outputs:
+      producer_sha: ${{ steps.prepare.outputs.producer_sha }}
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Check immutable development source before build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PYCODE'
+          import runpy,os
+          source=runpy.run_path('.github/scripts/blog_bootstrap/runner.py')
+          source['check_context'](os.environ)
+          source['check_source'](os.environ)
+          PYCODE
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '20.19.4'
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: '10.20.0'
+      - name: Install frozen shared validator
+        run: pnpm install --frozen-lockfile --filter "@daodao/blog-content..."
+      - name: Generate validator configuration
+        run: pnpm --filter @daodao/config generate:env
+      - name: Prepare data-only development publication
+        id: prepare
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CONTENT_SHA: ${{ inputs.content_sha }}
+        run: |
+          python3 .github/scripts/blog_bootstrap/prepare_publication.py --content-sha "${CONTENT_SHA:-0daa4231bb2072657c807813e960919b982f9d8e}"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        id: upload
+        with:
+          name: dev-publication-data
+          path: ${{ runner.temp }}/blog-development-publication/transfer
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: prepare
+    if: github.repository == 'daodaoedu/daodao-f2e' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/dev' && inputs.operation == 'publication-test' && needs.prepare.result == 'success' && vars.BLOG_DEV_RELEASE_MANAGED == 'true'
+    permissions:
+      contents: read
+      actions: read
+    runs-on: ubuntu-latest
+    environment: development
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Recheck immutable development source before data and SSH
+        id: source-guard
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PYCODE'
+          import runpy,os
+          source=runpy.run_path('.github/scripts/blog_bootstrap/runner.py')
+          source['check_context'](os.environ)
+          source['check_source'](os.environ)
+          PYCODE
+      - name: Validate trusted producer handles
+        id: artifact-identity
+        env:
+          ARTIFACT_ID: ${{ needs.prepare.outputs.artifact_id }}
+          EXPECTED_PRODUCER_SHA: ${{ needs.prepare.outputs.producer_sha }}
+        run: |
+          python3 - <<'PYCODE'
+          import os,re
+          if not re.fullmatch(r'[1-9][0-9]*', os.environ['ARTIFACT_ID']):
+              raise ValueError('Missing or invalid producer artifact ID')
+          if not re.fullmatch(r'[a-f0-9]{64}', os.environ['EXPECTED_PRODUCER_SHA']):
+              raise ValueError('Missing or invalid trusted producer hash')
+          PYCODE
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        id: download
+        with:
+          artifact-ids: ${{ needs.prepare.outputs.artifact_id }}
+          run-id: ${{ github.run_id }}
+          github-token: ${{ github.token }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/blog-development-publication-input
+      - name: Verify data-only publication before SSH identity
+        id: data-guard
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BLOG_DEV_RELEASE_MANAGED: ${{ vars.BLOG_DEV_RELEASE_MANAGED }}
+          EXPECTED_PRODUCER_SHA: ${{ needs.prepare.outputs.producer_sha }}
+        run: |
+          python3 .github/scripts/blog_bootstrap/publication_deploy.py --verify-only --data-dir "$RUNNER_TEMP/blog-development-publication-input" --producer-sha "$EXPECTED_PRODUCER_SHA"
+      - name: Run development publication test
+        id: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BLOG_DEV_RELEASE_MANAGED: ${{ vars.BLOG_DEV_RELEASE_MANAGED }}
+          EXPECTED_PRODUCER_SHA: ${{ needs.prepare.outputs.producer_sha }}
+          BLOG_SSH_HOST: ${{ secrets.LINODE_INSTANCE_IP }}
+          BLOG_SSH_PRIVATE_KEY: ${{ secrets.LINODE_SSH_PRIVATE_KEY }}
+        run: |
+          identity=$(mktemp "$RUNNER_TEMP/blog-dev-key.XXXXXX")
+          trap 'rm -f "$identity"' EXIT
+          chmod 600 "$identity"
+          printf '%s\n' "$BLOG_SSH_PRIVATE_KEY" > "$identity"
+          unset BLOG_SSH_PRIVATE_KEY
+          BLOG_SSH_KEY_FILE="$identity" python3 .github/scripts/blog_bootstrap/publication_deploy.py --data-dir "$RUNNER_TEMP/blog-development-publication-input" --producer-sha "$EXPECTED_PRODUCER_SHA" > "$RUNNER_TEMP/blog-development-publication-proof.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: ${{ always() && steps.publish.outcome == 'success' }}
+        with:
+          name: blog-development-publication-proof
+          path: ${{ runner.temp }}/blog-development-publication-proof.json
           if-no-files-found: error
           retention-days: 7
