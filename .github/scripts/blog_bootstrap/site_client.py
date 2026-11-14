@@ -174,8 +174,12 @@ def noindex_headers(headers):
         "noindex" not in lowered.get("x-robots-tag", "").lower()
         or "nofollow" not in lowered.get("x-robots-tag", "").lower()
         or "no-store" not in lowered.get("cache-control", "").lower()
+        # Cloudflare Email Obfuscation rewrites HTML unless the origin forbids it.
+        or "no-transform" not in lowered.get("cache-control", "").lower()
     ):
-        raise ValueError("Fresh development response lacks noindex/no-store policy")
+        raise ValueError(
+            "Fresh development response lacks noindex/no-store/no-transform policy"
+        )
 
 
 def check_mime(filename, headers):
