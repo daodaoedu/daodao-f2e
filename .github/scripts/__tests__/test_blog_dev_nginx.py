@@ -153,7 +153,7 @@ class DevelopmentPublicationNginx(unittest.TestCase):
                     for line in response.stderr.lower().splitlines()
                     if line.startswith("cache-control:")
                 ]
-                self.assertEqual(cache_controls, ["no-store"])
+                self.assertEqual(cache_controls, ["no-store, no-transform"])
                 if route in ("/blog-release.json", "/blog-published-baseline.json"):
                     self.assertIn(
                         "content-type: application/json", response.stderr.lower()

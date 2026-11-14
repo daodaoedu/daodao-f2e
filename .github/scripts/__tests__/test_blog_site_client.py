@@ -14,7 +14,10 @@ SPEC = importlib.util.spec_from_file_location(
 )
 CLIENT = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(CLIENT)
-POLICY = {"x-robots-tag": "noindex, nofollow", "cache-control": "no-store"}
+POLICY = {
+    "x-robots-tag": "noindex, nofollow",
+    "cache-control": "no-store, no-transform",
+}
 
 
 class SiteClientTests(unittest.TestCase):
@@ -151,6 +154,9 @@ class SiteClientTests(unittest.TestCase):
             {"x-robots-tag": "noindex"},
             {"x-robots-tag": "nofollow"},
             {"cache-control": "public, max-age=999"},
+            # Without no-transform Cloudflare Email Obfuscation rewrites HTML and
+            # byte readback fails (installed run 43609786339, public-a).
+            {"cache-control": "no-store"},
         ]:
             with self.subTest(changed=changed), self.assertRaises(ValueError):
                 CLIENT.noindex_headers({**POLICY, **changed})
