@@ -65,6 +65,14 @@ class DevelopmentPrepareTests(unittest.TestCase):
             environment["NEXT_PUBLIC_WEBSITE_URL"], "https://dev.daodao.so"
         )
 
+    def test_api_url_is_the_bare_origin_the_api_client_expects(self):
+        # packages/api appends "/api/v1/..." itself (same as ENV_DEV used by CD);
+        # a "/api/v1" suffix made dev Blog call /api/v1/api/v1/auth/me -> 404.
+        environment = PREPARE.safe_environment()
+        self.assertEqual(
+            environment["NEXT_PUBLIC_API_URL"], "https://server-dev.daodao.so"
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

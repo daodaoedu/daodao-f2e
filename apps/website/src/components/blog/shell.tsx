@@ -1,9 +1,10 @@
 "use client";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Footer } from "@/components/layout/footer";
 import { type BlogLocaleType, blogCopy, blogPath } from "./copy";
+import { readBlogDark, writeBlogDark } from "./theme";
 import "./blog.css";
 export function BlogShell({
   children,
@@ -17,6 +18,13 @@ export function BlogShell({
   preview: boolean;
 }) {
   const [dark, setDark] = useState(false);
+  // Static export renders light; restore the saved choice after hydration.
+  useEffect(() => setDark(readBlogDark(globalThis.localStorage)), []);
+  const toggleDark = () => {
+    const next = !dark;
+    setDark(next);
+    writeBlogDark(globalThis.localStorage, next);
+  };
   const t = blogCopy[locale];
   return (
     <div className="blog-site" data-blog-theme={dark ? "dark" : "light"}>
@@ -52,7 +60,7 @@ export function BlogShell({
               className="blog-theme"
               aria-label={t.theme}
               aria-pressed={dark}
-              onClick={() => setDark(!dark)}
+              onClick={toggleDark}
             >
               ◐
             </Button>
