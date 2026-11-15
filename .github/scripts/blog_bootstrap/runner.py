@@ -12,7 +12,7 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-CONTROLLER_SHA256 = "54a17ae652155397832665fbbc2352c9a9ee9b24a4f9da1a533143c5488a1783"
+CONTROLLER_SHA256 = "6f0d4a482d1194e1eb83f187d55a318fcee85d4b314e4d18f057a41412460a18"
 ALIAS = "daodao-blog-development"
 
 
