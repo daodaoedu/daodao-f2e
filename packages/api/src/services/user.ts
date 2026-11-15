@@ -302,11 +302,13 @@ const buildUserFormData = (data: UpdateUserFormDataRequest, photoFile?: File): F
 const sendUserFormDataRequest = async <T>(
   method: "POST" | "PUT",
   formData: FormData,
-  errorMessage: string
+  errorMessage: string,
+  headers?: Record<string, string>
 ): Promise<T> => {
   const baseUrl = getApiBaseUrl();
   const response = await unauthorizedHandler.wrapFetch(`${baseUrl}/api/v1/users/me`, {
     method,
+    headers,
     body: formData,
     credentials: "include",
   });
@@ -366,10 +368,11 @@ type CreateUserResponse =
  */
 export const createCurrentUserWithFormData = async (
   data: UpdateUserFormDataRequest,
-  photoFile?: File
+  photoFile?: File,
+  headers?: Record<string, string>
 ): Promise<CreateUserResponse> => {
   const formData = buildUserFormData(data, photoFile);
-  return sendUserFormDataRequest<CreateUserResponse>("POST", formData, "創建失敗");
+  return sendUserFormDataRequest<CreateUserResponse>("POST", formData, "創建失敗", headers);
 };
 
 /**

@@ -319,6 +319,8 @@ export const lighthouseParticipantCheckinsResponseSchema = apiSuccessSchema(
     participant: lighthouseParticipantSchema,
     practice: z.object({
       id: z.number().int(),
+      // Newer server builds may include the public identifier for a participant-page link.
+      externalId: z.string().uuid().nullable().optional(),
       title: z.string(),
       startDate: z.string().nullable(),
       endDate: z.string().nullable(),
@@ -998,6 +1000,8 @@ export const lighthouseOutcomeSchema = z.object({
       progressPercentage: z.number().int().nonnegative(),
       checkinCount: z.number().int().nonnegative(),
       responseCount: z.number().int().nonnegative(),
+      // Older local API builds may omit authored comment counts.
+      publishedCommentCount: z.number().int().nonnegative().optional(),
       lastActivityAt: nullableDateTimeSchema,
     })
   ),

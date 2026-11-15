@@ -1,0 +1,9 @@
+# Development runtime bootstrap prerequisite
+
+This separate entrypoint runs the reviewed release controller's `--help` inside an ephemeral capless Linux sandbox on the existing development host. It installs no persistent runner/store, builds no articles, and changes neither legacy CD ownership nor the formal publication workflow.
+
+The workflow is manual, official-repository/dev only. Before SSH it requires an immutable checkout equal to current dev with successful matching dev-push Linode CI. It references the existing development SSH secrets and a public host key copied from the existing trusted local SSH known-hosts record. SSH verifies that fixed key through a fixed HostKeyAlias; no runtime keyscan or insecure fallback is used. Only source files from the reviewed entrypoint are transferred, bound by archive and file SHA256. The controller must retain SHA256 `6f0d4a482d1194e1eb83f187d55a318fcee85d4b314e4d18f057a41412460a18`.
+
+The root transport only creates an owned temporary namespace/chroot. It executes the controller after clearing the environment and inherited descriptors, setting a dedicated UID/GID, dropping capabilities and setting no-new-privileges. The client receives no host/customer mounts or network egress. Its result must attest controller-help success, isolated namespaces and process/directory cleanup. No SSH or TLS keys are generated.
+
+Own acceptance: policy/transport/archive/rejection tests, independent security review, and actual isolated remote help-probe evidence. Installing the workflow on dev and invoking it there are separate postmerge checks. This prerequisite does not claim full Task536 completion, current-article preparation, public website publication, cross-repo dispatch or formal editorial approval. Development testing uses the user's engineering authorization; future article tests reuse the unchanged validated-artifact pipeline separately.

@@ -86,6 +86,8 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
   useLighthouseOrganizationGuard(Boolean(csv || emailsInput || preview.length), busy);
   const sendDisabledReason = summary ? getInvitationSendDisabledReason(summary) : null;
   const joinOpen = Boolean(cohort?.joinToken) && !cohort?.joinPaused;
+  // AC-06（#521）：草稿場次發佈前不可使用邀請連結與 email 邀請
+  const isDraft = cohort?.status === "draft";
 
   async function confirm(title: string, message: string, actionLabel: string, danger = false) {
     const result = await openWarningDialog({
@@ -262,6 +264,9 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
           <h2 id="roster-invite-title" className="text-xl font-semibold">
             {t("invite_people")}
           </h2>
+          <p className="mt-3 text-sm leading-6 text-[#5A7B79]">
+            {t("roster_google_account_reminder")}
+          </p>
           <label htmlFor="invite-emails" className="mt-5 grid gap-2 text-sm font-medium">
             {t("email_list")}
             <Textarea
@@ -309,14 +314,20 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
               variant="outline"
               className="border-[#CDEBE8] bg-white"
               onClick={copyJoinLink}
-              disabled={!joinUrl || !joinOpen}
+              disabled={!joinUrl || !joinOpen || isDraft}
+              title={isDraft ? t("cohort_draft_invite_inactive") : undefined}
             >
               <Copy className="size-4" aria-hidden="true" />
               {t("copy_link")}
             </Button>
           </div>
           {joinOpen && cohort?.joinToken ? (
-            <JoinCode joinToken={cohort.joinToken} hideCopyButton />
+            <JoinCode
+              joinToken={cohort.joinToken}
+              hideCopyButton
+              inactive={isDraft}
+              inactiveMessage={isDraft ? t("cohort_draft_invite_inactive") : undefined}
+            />
           ) : (
             <p className="mt-4 text-sm text-[#5A7B79]">{t("joining_is_paused")}</p>
           )}
@@ -378,8 +389,14 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
             </h2>
             <Button
               onClick={() => setConfirmingInvitations(true)}
-              disabled={busy || sendDisabledReason !== null || !organization || !cohort}
-              aria-describedby={sendDisabledReason ? "roster-send-disabled-reason" : undefined}
+              disabled={busy || isDraft || sendDisabledReason !== null || !organization || !cohort}
+              aria-describedby={
+                isDraft
+                  ? "roster-send-draft-reason"
+                  : sendDisabledReason
+                    ? "roster-send-disabled-reason"
+                    : undefined
+              }
             >
               <Send className="size-4" aria-hidden="true" />
               {t("send_invitations")}
@@ -394,6 +411,14 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
               })}
             </p>
           )}
+          {isDraft && (
+            <p
+              id="roster-send-draft-reason"
+              className="mt-3 rounded-2xl bg-[#FFF6E8] px-4 py-3 text-sm leading-6 text-[#A95D00]"
+            >
+              {t("cohort_draft_email_invite_disabled")}
+            </p>
+          )}
           {sendDisabledReason && (
             <p
               id="roster-send-disabled-reason"
@@ -401,7 +426,9 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
               className="mt-3 rounded-2xl bg-[#FFF6E8] px-4 py-3 text-sm leading-6 text-[#A95D00]"
             >
               {t(`invitation_send_disabled_${sendDisabledReason}`, {
-                date: (cohort?.joinDeadline ?? cohort?.endDate ?? "").slice(0, 10),
+                date: (cohort?.joinDeadline ?? cohort?.endDate ?? "")
+                  .slice(0, 10)
+                  .replaceAll("-", "/"),
               })}
             </p>
           )}
