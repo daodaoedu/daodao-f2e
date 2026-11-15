@@ -83,3 +83,6 @@ README.md
 .cursor
 .specstory
 
+
+# Dev-only checkout is staged outside the build context before website build.
+.blog-dev-preview-source/

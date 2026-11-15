@@ -74,3 +74,6 @@ pnpm-debug.log*
 .worktrees/
 
 .omc
+
+# Ephemeral dev Blog content checkout; never commit staging content into frontend.
+.blog-dev-preview-source/
