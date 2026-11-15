@@ -83,6 +83,7 @@ private audit 才由server加上 newUserId、registeredAt、capturedAt、associa
 - 唯一身分邊界是已驗證 temporary account 成功完成 permanent registration 的同一業務交易；帳號由 server 決定，不接受 header 中的 actor。既有帳號不回寫。
 - Private audit 僅使用既有 audit_logs.admin_id 關聯帳號；target_id 是 context UUID，JSON 不複製 userId／orgId／memberId。既有 migration043 FK 在刪除帳號時 SET NULL，已以真正 PostgreSQL 執行確認；完整產品刪除旅程仍須另驗。
 - Client `NEXT_PUBLIC_BLOG_SOURCE_CONTEXT_TTL_SECONDS` 與 server `BLOG_SOURCE_CONTEXT_TTL_SECONDS` 必須一致，並分別設定同一第一方 DOMAIN；server 以 `BLOG_SOURCE_PUBLISHED_ORIGIN` 固定可信 origin 的既有 `/blog-release.json` 與 `/blog-published-baseline.json` 自動驗證公開文章及 manifest baseline hash；不新增每篇文章手動設定的 registry。取檔在註冊交易外，固定路徑、無 redirect、短 timeout、bounded body，失敗保留 unknown。缺設定不新增 cookie／association，來源 unknown。沒有預設保存天數；本機明示 TESTONLY 值不能當作正式設定或使用者個別同意。
+- 2026-11-15（#538）：保存期間定為 30 天（2592000 秒）。dev 與 production 只能共用 `daodao.so` cookie 網域，dev 另設 `NEXT_PUBLIC_BLOG_SOURCE_CONTEXT_COOKIE=daodao_blog_context_dev`；production 不設定，沿用 `daodao_blog_context`。
 - 明確 opt-out 不保存；工具／偏好不可用時保留 unknown，不推定同意。新條款、同意 UI、vendor 身分合併均不在本次實作範圍。
 - 測試與部署證據另列；此節記錄實作契約，不表示完整 UI／HTTP／Hosted／Tally／dev／PM 驗收已通過。前面的 historical blocked audit 不重新標綠。
 

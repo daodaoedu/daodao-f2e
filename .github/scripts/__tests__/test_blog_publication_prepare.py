@@ -73,6 +73,21 @@ class DevelopmentPrepareTests(unittest.TestCase):
             environment["NEXT_PUBLIC_API_URL"], "https://server-dev.daodao.so"
         )
 
+    def test_dev_blog_source_context_uses_its_own_cookie_and_30_day_window(self):
+        # Decided 2026-11-15 (#538): 30-day attribution window; dev must not
+        # share the production cookie name on the common daodao.so domain.
+        environment = PREPARE.safe_environment()
+        self.assertEqual(
+            environment["NEXT_PUBLIC_BLOG_SOURCE_CONTEXT_TTL_SECONDS"], "2592000"
+        )
+        self.assertEqual(
+            environment["NEXT_PUBLIC_BLOG_SOURCE_CONTEXT_DOMAIN"], "daodao.so"
+        )
+        self.assertEqual(
+            environment["NEXT_PUBLIC_BLOG_SOURCE_CONTEXT_COOKIE"],
+            "daodao_blog_context_dev",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

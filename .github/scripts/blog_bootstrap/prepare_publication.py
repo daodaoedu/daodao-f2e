@@ -20,6 +20,9 @@ PUBLIC_ENV = {
     "NEXT_PUBLIC_WEBSITE_URL": "https://dev.daodao.so",
     "NEXT_PUBLIC_PRODUCT_URL": "https://app-dev.daodao.so",
     "NEXT_PUBLIC_API_URL": "https://server-dev.daodao.so",
+    "NEXT_PUBLIC_BLOG_SOURCE_CONTEXT_TTL_SECONDS": "2592000",
+    "NEXT_PUBLIC_BLOG_SOURCE_CONTEXT_DOMAIN": "daodao.so",
+    "NEXT_PUBLIC_BLOG_SOURCE_CONTEXT_COOKIE": "daodao_blog_context_dev",
 }
 SHA = re.compile(r"^[a-f0-9]{40}$")
 FIXTURE_ID = "development-rollback-fixture"
