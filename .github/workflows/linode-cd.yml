@@ -184,6 +184,38 @@ jobs:
           cp .env apps/website/.env
           cp .env apps/product/.env
 
+      - name: Select dev Blog draft preview
+        id: blog-preview
+        if: (env.BRANCH_NAME == 'dev' && vars.BLOG_DEV_PREVIEW_CONTENT_SHA != '') || (env.BRANCH_NAME == 'prod' && vars.BLOG_PROD_CONTENT_SHA != '')
+        env:
+          BLOG_DEV_PREVIEW_CONTENT_SHA: ${{ vars.BLOG_DEV_PREVIEW_CONTENT_SHA }}
+          BLOG_PROD_CONTENT_SHA: ${{ vars.BLOG_PROD_CONTENT_SHA }}
+        run: |
+          helper=.github/scripts/blog-dev-preview.py
+          if [ -f "$helper" ] && [ ! -L "$helper" ]; then
+            python3 "$helper" select
+          else
+            echo '::notice::This frontend commit does not provide a regular dev Blog preview helper; keeping its normal website build.'
+            echo 'enabled=false' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout pinned dev Blog draft content
+        if: steps.blog-preview.outputs.enabled == 'true'
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          repository: daodaoedu/daodao-blog
+          ref: ${{ steps.blog-preview.outputs.content-sha }}
+          path: .blog-dev-preview-source
+          persist-credentials: false
+
+      - name: Stage dev Blog draft snapshot
+        if: steps.blog-preview.outputs.enabled == 'true'
+        env:
+          BLOG_DEV_PREVIEW_CONTENT_SHA: ${{ env.BRANCH_NAME == 'dev' && steps.blog-preview.outputs.content-sha || '' }}
+          BLOG_PROD_CONTENT_SHA: ${{ env.BRANCH_NAME == 'prod' && steps.blog-preview.outputs.content-sha || '' }}
+          BLOG_PROD_APPROVALS: ${{ vars.BLOG_PROD_APPROVALS }}
+        run: python3 .github/scripts/blog-dev-preview.py prepare
+
       - name: Install dependencies and build
         run: |
           pnpm install --frozen-lockfile
