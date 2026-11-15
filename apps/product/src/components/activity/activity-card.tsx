@@ -7,6 +7,7 @@ import { Link } from "@daodao/i18n/navigation";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid, parseISO } from "date-fns";
 import { Calendar, ChevronRight, Globe, MapPin } from "lucide-react";
+import { resolveActivityCardHref } from "@/constants/activity-card-href";
 import { activityColorKey } from "@/constants/activity-color";
 import { PracticeTheme, practiceThemeSvgMap } from "@/constants/practice-theme";
 
@@ -38,7 +39,7 @@ export const ActivityCard = ({ activity, onHostClick }: ActivityCardProps) => {
           : PracticeTheme.pink;
   const ThemeSvg = practiceThemeSvgMap[themeName] ?? practiceThemeSvgMap[PracticeTheme.blue];
 
-  const href = activity.isJoined ? `/cohorts/${activity.id}` : `/activities/${activity.id}`;
+  const href = resolveActivityCardHref(activity);
 
   const modes = activity.interactionModes ?? [];
   const showLocation = modes.length > 0;
