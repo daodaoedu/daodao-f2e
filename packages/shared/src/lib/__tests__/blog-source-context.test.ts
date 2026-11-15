@@ -153,3 +153,47 @@ it("does not recreate a source after a confirmed permanent user or successful re
   recordBlogSourceTouch({ ...touch, occurredAt: new Date().toISOString() });
   expect(readBlogSourceHeader()).toBeDefined();
 });
+describe("per-environment context cookie", () => {
+  // dev.daodao.so and daodao.so share the daodao.so cookie domain; without a
+  // separate name a dev test visit would be attributed on production.
+  const contextCookie = (name: string) =>
+    `${name}=${encodeURIComponent(JSON.stringify(buildBlogSourceContext(null, { ...touch, occurredAt: new Date().toISOString() }, config, Date.now(), uuid)))}`;
+  function browserWith(cookie: string) {
+    vi.stubGlobal("window", {
+      location: { hostname: "app.daodao.test", protocol: "https:" },
+      posthog: { has_opted_out_capturing: () => false },
+    });
+    vi.stubGlobal("document", { cookie });
+  }
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
+
+  it("writes the configured environment cookie name", () => {
+    const { writes } = browser(false);
+    vi.stubEnv("NEXT_PUBLIC_BLOG_SOURCE_CONTEXT_COOKIE", "daodao_blog_context_dev");
+    recordBlogSourceTouch({ ...touch, occurredAt: new Date().toISOString() });
+    expect(writes[0]).toMatch(/^daodao_blog_context_dev=/);
+  });
+
+  it("ignores the other environment's context cookie", () => {
+    vi.stubEnv("NEXT_PUBLIC_BLOG_SOURCE_CONTEXT_TTL_SECONDS", "600");
+    vi.stubEnv("NEXT_PUBLIC_BLOG_SOURCE_CONTEXT_DOMAIN", "daodao.test");
+    vi.stubEnv("NEXT_PUBLIC_BLOG_SOURCE_CONTEXT_COOKIE", "daodao_blog_context_dev");
+    browserWith(contextCookie("daodao_blog_context"));
+    expect(readBlogSourceHeader()).toBeUndefined();
+    browserWith(contextCookie("daodao_blog_context_dev"));
+    expect(readBlogSourceHeader()).toBeDefined();
+  });
+
+  it("keeps the production name when unset or invalid", () => {
+    vi.stubEnv("NEXT_PUBLIC_BLOG_SOURCE_CONTEXT_TTL_SECONDS", "600");
+    vi.stubEnv("NEXT_PUBLIC_BLOG_SOURCE_CONTEXT_DOMAIN", "daodao.test");
+    for (const value of ["", "bad;name=x", "Upper"]) {
+      vi.stubEnv("NEXT_PUBLIC_BLOG_SOURCE_CONTEXT_COOKIE", value);
+      browserWith(contextCookie("daodao_blog_context"));
+      expect(readBlogSourceHeader()).toBeDefined();
+    }
+  });
+});

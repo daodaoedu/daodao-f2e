@@ -45,7 +45,16 @@ export type BlogSourceReportContext = z.infer<typeof blogSourceReportContextSche
 export type BlogSourceTouch = z.infer<typeof touchSchema>;
 export type BlogSourceContext = z.infer<typeof contextSchema>;
 export type BlogSourceConfig = { ttlSeconds: number; domain: string };
-const COOKIE = "daodao_blog_context";
+const DEFAULT_COOKIE = "daodao_blog_context";
+/**
+ * dev and production share the daodao.so cookie domain, so dev sets its own
+ * name (NEXT_PUBLIC_BLOG_SOURCE_CONTEXT_COOKIE) to keep test visits out of
+ * production attribution. Unset or invalid keeps the production name.
+ */
+function cookieName(): string {
+  const configured = process.env.NEXT_PUBLIC_BLOG_SOURCE_CONTEXT_COOKIE;
+  return configured && /^[a-z0-9_]+$/.test(configured) ? configured : DEFAULT_COOKIE;
+}
 let authenticatedSession = false;
 
 /** No deployment configuration means no context storage or association. */
@@ -127,10 +136,10 @@ function rawCookie(): string | null {
   const value = cookies
     .split(";")
     .map((v) => v.trim())
-    .find((v) => v.startsWith(`${COOKIE}=`));
+    .find((v) => v.startsWith(`${cookieName()}=`));
   if (!value) return null;
   try {
-    return decodeURIComponent(value.slice(COOKIE.length + 1));
+    return decodeURIComponent(value.slice(cookieName().length + 1));
   } catch {
     return null;
   }
@@ -142,7 +151,7 @@ export function clearBlogSourceContext(boundary?: { authenticated?: boolean }): 
   const suffix = options ? `; Domain=${options.domain}` : "";
   try {
     // biome-ignore lint/suspicious/noDocumentCookie: Cookie Store API is not available in every supported browser; the configured shared first-party domain is required.
-    document.cookie = `${COOKIE}=; Path=/; Max-Age=0; SameSite=Lax${suffix}${window.location.protocol === "https:" ? "; Secure" : ""}`;
+    document.cookie = `${cookieName()}=; Path=/; Max-Age=0; SameSite=Lax${suffix}${window.location.protocol === "https:" ? "; Secure" : ""}`;
   } catch {
     /* Storage restrictions never block account actions. */
   }
@@ -183,7 +192,7 @@ export function recordBlogSourceTouch(touch: BlogSourceTouch): boolean {
   );
   try {
     // biome-ignore lint/suspicious/noDocumentCookie: Cookie Store API is not available in every supported browser; the configured shared first-party domain is required.
-    document.cookie = `${COOKIE}=${encodeURIComponent(JSON.stringify(value))}; Path=/; Domain=${options.domain}; Max-Age=${remaining}; SameSite=Lax${window.location.protocol === "https:" ? "; Secure" : ""}`;
+    document.cookie = `${cookieName()}=${encodeURIComponent(JSON.stringify(value))}; Path=/; Domain=${options.domain}; Max-Age=${remaining}; SameSite=Lax${window.location.protocol === "https:" ? "; Secure" : ""}`;
   } catch {
     return false;
   }
