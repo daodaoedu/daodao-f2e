@@ -35,6 +35,8 @@ class DevelopmentPublicationNginx(unittest.TestCase):
             for path, body in {
                 "zh-TW.html": "home-" + version,
                 "en.html": "english-home-" + version,
+                "zh-TW/dev/mock-preview/lighthouse": "燈塔預覽-" + version,
+                "en/dev/mock-preview/lighthouse": "Lighthouse preview-" + version,
                 "zh-TW/blog.html": "list-" + version,
                 "zh-TW/blog/weekly.html": "article-" + version,
                 "en/blog/weekly.html": "english-article-" + version,
@@ -160,6 +162,38 @@ class DevelopmentPublicationNginx(unittest.TestCase):
                     )
                 if body is not None:
                     self.assertEqual(response.stdout, body)
+
+    def test_lighthouse_export_is_html_in_both_locales(self):
+        for route, body in (
+            ("/dev/mock-preview/lighthouse", "燈塔預覽-a"),
+            ("/zh-TW/dev/mock-preview/lighthouse", "燈塔預覽-a"),
+            ("/en/dev/mock-preview/lighthouse", "Lighthouse preview-a"),
+        ):
+            with self.subTest(route=route):
+                response = self.request(route)
+                self.assertIn("200 OK", response.stderr)
+                self.assertEqual(response.stdout, body)
+                self.assertIn(
+                    "content-type: text/html; charset=utf-8", response.stderr.lower()
+                )
+                self.assertIn(
+                    "x-robots-tag: noindex, nofollow", response.stderr.lower()
+                )
+                self.assertIn(
+                    "cache-control: no-store, no-transform", response.stderr.lower()
+                )
+
+    def test_absent_lighthouse_export_never_falls_back_to_homepage(self):
+        target = self.store / "releases/a/site/en/dev/mock-preview/lighthouse"
+        original = target.read_bytes()
+        try:
+            target.unlink()
+            response = self.request("/en/dev/mock-preview/lighthouse")
+            self.assertIn("404 Not Found", response.stderr)
+            self.assertEqual(response.stdout, "missing-a")
+        finally:
+            target.write_bytes(original)
+            target.chmod(0o644)
 
     def test_physical_html_and_rsc_files_without_directory_redirects(self):
         for route, body in (

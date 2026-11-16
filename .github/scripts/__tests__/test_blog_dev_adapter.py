@@ -3,8 +3,10 @@ import importlib.util
 import json
 import os
 import stat
+import subprocess
 import tempfile
 import unittest
+from contextlib import ExitStack
 from pathlib import Path
 from unittest.mock import patch
 
@@ -286,6 +288,237 @@ class DevAdapterTests(unittest.TestCase):
             ):
                 ADAPTER.apply_overlay(snapshot, digest, b"invalid new config")
             self.assertEqual(previous_config.read_bytes(), b"previous healthy config")
+
+
+class ManagedConfigurationTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.image = "sha256:" + "a" * 64
+        self.current = {
+            "id": "old-container",
+            "image": self.image,
+            "managedMounts": True,
+            "registryNamespace": "fixture",
+        }
+        self.stack = ExitStack()
+        self.addCleanup(self.stack.close)
+        for name, value in [
+            ("OPERATOR", self.root),
+            ("NGINX", self.root / "nginx.conf"),
+            ("OVERLAY", self.root / "compose.json"),
+            ("BASE_COMPOSE", self.root / "base-compose.yaml"),
+        ]:
+            self.stack.enter_context(patch.object(ADAPTER, name, value))
+        self.stack.enter_context(patch.object(ADAPTER, "establish_operator"))
+        self.stack.enter_context(patch.object(ADAPTER, "establish_store"))
+        self.stack.enter_context(
+            patch.object(
+                ADAPTER, "read_owned_file", side_effect=lambda p: p.read_bytes()
+            )
+        )
+        self.stack.enter_context(
+            patch.object(
+                ADAPTER,
+                "atomic_owned_write",
+                side_effect=lambda p, data, mode=0o600: p.write_bytes(data),
+            )
+        )
+        self.stack.enter_context(
+            patch.object(
+                ADAPTER,
+                "inspect_container",
+                side_effect=lambda **kw: dict(self.current),
+            )
+        )
+        ADAPTER.BASE_COMPOSE.write_bytes(b"reviewed compose")
+        self.digest = hashlib.sha256(b"reviewed compose").hexdigest()
+        ADAPTER.NGINX.write_bytes(b"previous healthy config")
+        ADAPTER.OVERLAY.write_text(json.dumps(ADAPTER.overlay_payload(self.image)))
+        self.previous_overlay = ADAPTER.OVERLAY.read_bytes()
+        self.calls = []
+        self.fail_syntax = False
+
+    def execute(self, command, **kwargs):
+        self.calls.append(command)
+        if command[:2] == ["docker", "run"]:
+            if self.fail_syntax:
+                raise subprocess.CalledProcessError(1, command)
+        elif "config" in command:
+            return subprocess.CompletedProcess(
+                command,
+                0,
+                stdout=json.dumps({"services": {"dev_website": {"image": self.image}}}),
+            )
+        else:
+            self.assertEqual(command[-1], "dev_website")
+            self.assertIn("--force-recreate", command)
+            self.current["id"] = "owned-recreated-container"
+            self.current["configurationToken"] = (
+                json.loads(ADAPTER.OVERLAY.read_text())["services"]["dev_website"]
+                .get("labels", {})
+                .get(ADAPTER.CONFIGURATION_LABEL)
+            )
+        return subprocess.CompletedProcess(command, 0)
+
+    def prepare(self):
+        snapshot = dict(self.current)
+        return ADAPTER.prepare_configuration(snapshot, b"new healthy config")
+
+    def test_valid_upgrade_preserves_preimage_and_recreates_only_dev(self):
+        snapshot = self.prepare()
+        ADAPTER.apply_overlay(
+            snapshot, self.digest, b"new healthy config", run=self.execute
+        )
+        self.assertEqual(ADAPTER.NGINX.read_bytes(), b"new healthy config")
+        self.assertEqual(len(self.calls), 3)
+        syntax = self.calls[0]
+        self.assertIn("--network=none", syntax)
+        self.assertIn("--cap-drop=ALL", syntax)
+        self.assertIn(self.image, syntax)
+        self.assertIn("no-new-privileges", syntax)
+        ADAPTER.restore_previous(snapshot, self.digest, run=self.execute)
+        self.assertEqual(ADAPTER.NGINX.read_bytes(), b"previous healthy config")
+        self.assertEqual(ADAPTER.OVERLAY.read_bytes(), self.previous_overlay)
+
+    def test_invalid_syntax_does_not_change_serving_files_or_container(self):
+        snapshot = self.prepare()
+        self.fail_syntax = True
+        with self.assertRaises(subprocess.CalledProcessError):
+            ADAPTER.apply_overlay(
+                snapshot, self.digest, b"new healthy config", run=self.execute
+            )
+        self.assertEqual(ADAPTER.NGINX.read_bytes(), b"previous healthy config")
+        self.assertEqual(self.current["id"], "old-container")
+        self.assertEqual(ADAPTER.OVERLAY.read_bytes(), self.previous_overlay)
+
+    def test_same_configuration_is_idempotent(self):
+        snapshot = ADAPTER.prepare_configuration(
+            dict(self.current), b"previous healthy config"
+        )
+        ADAPTER.apply_overlay(
+            snapshot, self.digest, b"previous healthy config", run=self.execute
+        )
+        self.assertEqual(self.calls, [])
+
+    def test_current_and_owned_base_compose_mismatch_never_changes_serving(self):
+        snapshot = self.prepare()
+        current_base = self.root / "current-base.yaml"
+        current_base.write_bytes(b"new reviewed compose")
+        digest = hashlib.sha256(current_base.read_bytes()).hexdigest()
+        with (
+            patch.object(ADAPTER, "BASE_COMPOSE", current_base),
+            self.assertRaisesRegex(ValueError, "Saved reviewed compose"),
+        ):
+            ADAPTER.apply_overlay(
+                snapshot, digest, b"new healthy config", run=self.execute
+            )
+        self.assertEqual(self.calls, [])
+        self.assertEqual(ADAPTER.NGINX.read_bytes(), b"previous healthy config")
+        self.assertEqual(ADAPTER.OVERLAY.read_bytes(), self.previous_overlay)
+
+    def test_changed_preimage_is_rejected_before_syntax_or_serving_mutation(self):
+        snapshot = self.prepare()
+        ADAPTER.NGINX.write_bytes(b"externally updated config")
+        with self.assertRaises(ValueError):
+            ADAPTER.apply_overlay(
+                snapshot, self.digest, b"new healthy config", run=self.execute
+            )
+        self.assertEqual(self.calls, [])
+        self.assertEqual(ADAPTER.NGINX.read_bytes(), b"externally updated config")
+
+    def test_external_write_of_target_bytes_is_not_mistaken_for_idempotent_run(self):
+        snapshot = self.prepare()
+        ADAPTER.NGINX.write_bytes(b"new healthy config")
+        with self.assertRaisesRegex(ValueError, "transition input changed"):
+            ADAPTER.apply_overlay(
+                snapshot, self.digest, b"new healthy config", run=self.execute
+            )
+        self.assertEqual(self.calls, [])
+        self.assertEqual(ADAPTER.OVERLAY.read_bytes(), self.previous_overlay)
+
+    def test_stopped_operation_container_uses_persistent_preimage_for_restore(self):
+        snapshot = self.prepare()
+        ADAPTER.apply_overlay(
+            snapshot, self.digest, b"new healthy config", run=self.execute
+        )
+        # Recover from a freshly decoded snapshot, not references retained by apply.
+        recovered_snapshot = json.loads(json.dumps(snapshot))
+        probes = []
+
+        def inspect(**kwargs):
+            probes.append(kwargs)
+            if not kwargs.get("allow_stopped") and len(probes) == 1:
+                raise ValueError("operation container is stopped")
+            return dict(self.current)
+
+        with patch.object(ADAPTER, "inspect_container", side_effect=inspect):
+            ADAPTER.restore_previous(recovered_snapshot, self.digest, run=self.execute)
+        self.assertTrue(probes[0]["allow_stopped"])
+        self.assertEqual(ADAPTER.NGINX.read_bytes(), b"previous healthy config")
+        self.assertEqual(ADAPTER.OVERLAY.read_bytes(), self.previous_overlay)
+
+    def test_recreate_failure_after_owned_container_creation_restores_old_config(self):
+        snapshot = self.prepare()
+
+        def broken(command, **kwargs):
+            result = self.execute(command, **kwargs)
+            if "up" in command:
+                raise subprocess.CalledProcessError(1, command)
+            return result
+
+        with self.assertRaises(subprocess.CalledProcessError):
+            ADAPTER.apply_overlay(
+                snapshot, self.digest, b"new healthy config", run=broken
+            )
+        self.assertEqual(
+            self.current["configurationToken"], snapshot["configurationTransition"]
+        )
+        ADAPTER.restore_previous(snapshot, self.digest, run=self.execute)
+        self.assertEqual(ADAPTER.NGINX.read_bytes(), b"previous healthy config")
+        self.assertEqual(ADAPTER.OVERLAY.read_bytes(), self.previous_overlay)
+
+    def test_managed_digest_image_does_not_require_historical_registry_namespace(self):
+        self.current["registryNamespace"] = None
+        snapshot = self.prepare()
+        self.assertEqual(
+            ADAPTER.compose_environment(snapshot)["DOCKER_HUB_USERNAME"],
+            "managed-dev-unused",
+        )
+        ADAPTER.apply_overlay(
+            snapshot, self.digest, b"new healthy config", run=self.execute
+        )
+        self.assertEqual(ADAPTER.NGINX.read_bytes(), b"new healthy config")
+
+    def test_foreign_container_or_changed_config_is_never_restored(self):
+        for kind in ("container", "nginx", "overlay"):
+            with self.subTest(kind=kind):
+                snapshot = self.prepare()
+                ADAPTER.apply_overlay(
+                    snapshot, self.digest, b"new healthy config", run=self.execute
+                )
+                if kind == "container":
+                    self.current["configurationToken"] = "f" * 32
+                elif kind == "nginx":
+                    ADAPTER.NGINX.write_bytes(b"foreign config")
+                else:
+                    ADAPTER.OVERLAY.write_bytes(b"foreign overlay")
+                before = ADAPTER.NGINX.read_bytes(), ADAPTER.OVERLAY.read_bytes()
+                with self.assertRaises(ValueError):
+                    ADAPTER.restore_previous(snapshot, self.digest, run=self.execute)
+                self.assertEqual(
+                    (ADAPTER.NGINX.read_bytes(), ADAPTER.OVERLAY.read_bytes()), before
+                )
+                # Restore the isolated fixture without calling production recovery.
+                self.current = {
+                    "id": "old-container",
+                    "image": self.image,
+                    "managedMounts": True,
+                    "registryNamespace": "fixture",
+                }
+                ADAPTER.NGINX.write_bytes(b"previous healthy config")
+                ADAPTER.OVERLAY.write_bytes(self.previous_overlay)
 
 
 if __name__ == "__main__":
