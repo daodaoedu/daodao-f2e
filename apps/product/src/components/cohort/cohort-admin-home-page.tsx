@@ -151,6 +151,10 @@ export function CohortAdminHomePage({
     setSortField(field);
     setSortDirection("desc");
   };
+  const sortableColumns = [
+    { field: "checkins", label: t("checkin_count_label") },
+    { field: "activity", label: t("participant_latest_activity") },
+  ] as const;
   const isLoading =
     cohortQuery.isLoading ||
     enrollmentQuery.isLoading ||
@@ -264,46 +268,28 @@ export function CohortAdminHomePage({
                     {lighthouseT("col_participant")}
                   </span>
                   <span className="col-span-7 whitespace-nowrap sm:col-span-1">{lighthouseT("col_email")}</span>
-                  <span className="col-span-6 whitespace-nowrap sm:col-span-1">
-                    <button
-                      type="button"
-                      className="inline-flex items-center gap-1 rounded-sm hover:text-text-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-logo-cyan"
-                      onClick={() => toggleSort("checkins")}
-                      aria-label={`Sort by ${t("checkin_count_label")}`}
-                      aria-pressed={sortField === "checkins"}
-                    >
-                      {t("checkin_count_label")}
-                      {sortField === "checkins" ? (
-                        sortDirection === "asc" ? (
-                          <ArrowUp aria-hidden="true" className="size-3" />
+                  {sortableColumns.map(({ field, label }) => (
+                    <span key={field} className="col-span-6 whitespace-nowrap sm:col-span-1">
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-1 rounded-sm hover:text-text-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-logo-cyan"
+                        onClick={() => toggleSort(field)}
+                        aria-label={`Sort by ${label}`}
+                        aria-pressed={sortField === field}
+                      >
+                        {label}
+                        {sortField === field ? (
+                          sortDirection === "asc" ? (
+                            <ArrowUp aria-hidden="true" className="size-3" />
+                          ) : (
+                            <ArrowDown aria-hidden="true" className="size-3" />
+                          )
                         ) : (
-                          <ArrowDown aria-hidden="true" className="size-3" />
-                        )
-                      ) : (
-                        <ArrowUpDown aria-hidden="true" className="size-3 opacity-60" />
-                      )}
-                    </button>
-                  </span>
-                  <span className="col-span-6 whitespace-nowrap sm:col-span-1">
-                    <button
-                      type="button"
-                      className="inline-flex items-center gap-1 rounded-sm hover:text-text-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-logo-cyan"
-                      onClick={() => toggleSort("activity")}
-                      aria-label={`Sort by ${t("participant_latest_activity")}`}
-                      aria-pressed={sortField === "activity"}
-                    >
-                      {t("participant_latest_activity")}
-                      {sortField === "activity" ? (
-                        sortDirection === "asc" ? (
-                          <ArrowUp aria-hidden="true" className="size-3" />
-                        ) : (
-                          <ArrowDown aria-hidden="true" className="size-3" />
-                        )
-                      ) : (
-                        <ArrowUpDown aria-hidden="true" className="size-3 opacity-60" />
-                      )}
-                    </button>
-                  </span>
+                          <ArrowUpDown aria-hidden="true" className="size-3 opacity-60" />
+                        )}
+                      </button>
+                    </span>
+                  ))}
                 </div>
                 <ul className="grid gap-3">
                   {participantCards.map((participant) => (

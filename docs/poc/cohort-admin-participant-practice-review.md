@@ -24,4 +24,19 @@ Organization admins can view all cohorts belonging to their organization. Cohort
 - The sample cohort and participant IDs depend on the configured local/dev dataset and may not exist in other environments.
 - `pnpm run typecheck` passed. The cohort API test passed (13 tests), and the check-in stack test passed (5 tests).
 - Focused lint passed for `apps/product`, `packages/api`, and `packages/i18n`. Repository-wide `pnpm run lint` still fails in unchanged `packages/blog-content` files on formatter/CRLF checks.
-- Browser smoke testing was not rerun in this isolated worktree. This handoff is a code review preview, not acceptance or deployment evidence.
+- Local browser smoke test on 2026-11-16 at `/en/cohorts/28?programId=15`: roster showed 7 members; searching `no-such-participant@example.test` displayed “No participants match your filters.”; clearing the search and opening 周品妍 showed the admin review URL, `1 / 7`, the Check-ins tab selected, `Check-ins (6)`, and six check-in entries.
+- SonarCloud initially reported 40 duplicated lines in the two sort-header blocks in `cohort-admin-home-page.tsx`; those blocks now share one mapped renderer. The updated Sonar result is pending a new PR analysis.
+- This handoff is a code review preview, not acceptance or deployment evidence.
+
+## 驗證證據
+
+讀取權限驗證：不適用：本 PR 僅調整前端顯示和導覽，未新增或變更 API、資料庫或伺服器端授權；存取仍由既有組織與燈塔權限控制。
+
+### 核心旅程矩陣
+
+| ID | 旅程 | 類型 | 輸入 | 預期結果 | 實際 |
+| --- | --- | --- | --- | --- | --- |
+| J-01 | Cohort 參與者搜尋並檢視實踐 | 正常 | `/en/cohorts/28?programId=15`，選擇周品妍 | 開啟參與者的打卡檢視 | ✅ UI：名冊顯示 7 位成員；開啟後顯示周品妍 `1 / 7`、`Check-ins (6)`，並列出 6 筆打卡 |
+| J-01 | Cohort 參與者搜尋並檢視實踐 | 錯誤路徑 | 搜尋 `no-such-participant@example.test` | 無符合成員時顯示空狀態 | ✅ UI 訊息：`No participants match your filters.`；清除搜尋後可返回 7 位成員名冊 |
+
+證據報告：[Cohort admin participant practice review handoff](https://github.com/daodaoedu/daodao-f2e/blob/feat/cohort-admin-participant-practice-review/docs/poc/cohort-admin-participant-practice-review.md)。
