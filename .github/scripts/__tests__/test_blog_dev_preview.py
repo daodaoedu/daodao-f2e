@@ -229,6 +229,81 @@ class BlogDevPreviewTests(unittest.TestCase):
                 self.assertFalse(self.env_file.exists())
                 self.assertEqual(list(self.runner_temp.iterdir()), [])
 
+    APPROVALS = (
+        '[{"id":"guide","digest":"' + "a" * 64 + '",'
+        '"reviewer":"pm","evidence":"https://github.com/daodaoedu/daodao/issues/539"}]'
+    )
+
+    def prod_env(self, **extra):
+        return {
+            "BRANCH_NAME": "prod",
+            "BLOG_DEV_PREVIEW_CONTENT_SHA": "",
+            "BLOG_PROD_CONTENT_SHA": self.sha,
+            "BLOG_PROD_APPROVALS": self.APPROVALS,
+            **extra,
+        }
+
+    def test_prod_pin_is_built_in_publish_mode_with_private_approvals(self):
+        selected = self.run_helper("select", **self.prod_env())
+        self.assertEqual(selected.returncode, 0, selected.stderr)
+        self.assertEqual(
+            self.output_file.read_text(), f"enabled=true\ncontent-sha={self.sha}\n"
+        )
+        prepared = self.run_helper("prepare", **self.prod_env())
+        self.assertEqual(prepared.returncode, 0, prepared.stderr)
+        values = self.read_env()
+        snapshot = Path(values["BLOG_CONTENT_DIR"])
+        approvals = Path(values["BLOG_APPROVALS_FILE"])
+        evidence = Path(values["BLOG_EVIDENCE_ROOT"])
+        self.assertEqual(values["BLOG_CONTENT_MODE"], "publish")
+        self.assertEqual(
+            (snapshot / "articles/guide.md").read_text(), "draft article\n"
+        )
+        # Approval evidence must stay outside the content tree and the Docker context.
+        self.assertTrue(approvals.is_relative_to(evidence))
+        self.assertFalse(approvals.is_relative_to(snapshot))
+        self.assertFalse(approvals.is_relative_to(self.workspace))
+        self.assertEqual(
+            yaml.safe_load(approvals.read_text()), yaml.safe_load(self.APPROVALS)
+        )
+        # Production keeps its own ENV_PROD website origin.
+        self.assertNotIn("NEXT_PUBLIC_WEBSITE_URL", values)
+        self.assertEqual(values["BLOG_PUBLISHED_BASELINE_FILE"], "")
+
+    def test_prod_rejects_missing_or_malformed_approvals_before_staging(self):
+        digest = "a" * 64
+        for approvals in (
+            "",
+            "{}",
+            "[]",
+            "not json",
+            '[{"id":"guide","digest":"' + digest + '"}]',
+            '[{"id":"guide","digest":"short","reviewer":"pm","evidence":"x"}]',
+            '[{"id":"guide","digest":"'
+            + digest
+            + '","reviewer":"pm","evidence":"x","extra":1}]',
+        ):
+            with self.subTest(approvals=approvals):
+                result = self.run_helper(
+                    "prepare", **self.prod_env(BLOG_PROD_APPROVALS=approvals)
+                )
+                self.assertNotEqual(result.returncode, 0)
+                self.assertFalse(self.env_file.exists())
+                self.assertEqual(list(self.runner_temp.iterdir()), [])
+
+    def test_prod_pin_is_ignored_outside_prod_and_invalid_prod_pin_fails(self):
+        for branch in ("dev", "main", "feat/demo"):
+            with self.subTest(branch=branch):
+                self.output_file.unlink(missing_ok=True)
+                result = self.run_helper(
+                    "select",
+                    **self.prod_env(BRANCH_NAME=branch, BLOG_PROD_CONTENT_SHA="0" * 40),
+                )
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(self.output_file.read_text(), "enabled=false\n")
+        bad = self.run_helper("select", **self.prod_env(BLOG_PROD_CONTENT_SHA="prod"))
+        self.assertNotEqual(bad.returncode, 0)
+
     def test_checkout_revision_mismatch_is_rejected_before_staging(self):
         result = self.run_helper("prepare", BLOG_DEV_PREVIEW_CONTENT_SHA="0" * 40)
         self.assertNotEqual(result.returncode, 0)
@@ -304,7 +379,11 @@ class BlogDevPreviewTests(unittest.TestCase):
         def enabled(expression, branch, pin):
             return workflow_condition(
                 expression,
-                {"env.BRANCH_NAME": branch, "vars.BLOG_DEV_PREVIEW_CONTENT_SHA": pin},
+                {
+                    "env.BRANCH_NAME": branch,
+                    "vars.BLOG_DEV_PREVIEW_CONTENT_SHA": pin,
+                    "vars.BLOG_PROD_CONTENT_SHA": "",
+                },
             )
 
         for index, (branch, pin, helper, success, expected) in enumerate(
@@ -354,6 +433,27 @@ class BlogDevPreviewTests(unittest.TestCase):
                     self.assertFalse(output.exists())
                 else:
                     self.assertEqual(output.read_text(), expected)
+
+    def test_prod_content_pin_selects_only_on_prod_branch(self):
+        workflow = yaml.safe_load(WORKFLOW.read_text())
+        step = next(
+            s
+            for s in workflow["jobs"]["build-website"]["steps"]
+            if s.get("id") == "blog-preview"
+        )
+        for branch, expected in (("prod", True), ("dev", False), ("main", False)):
+            with self.subTest(branch=branch):
+                self.assertEqual(
+                    workflow_condition(
+                        step.get("if"),
+                        {
+                            "env.BRANCH_NAME": branch,
+                            "vars.BLOG_DEV_PREVIEW_CONTENT_SHA": "",
+                            "vars.BLOG_PROD_CONTENT_SHA": self.sha,
+                        },
+                    ),
+                    expected,
+                )
 
     def test_preview_wiring_changes_trigger_a_normal_website_build(self):
         workflow = yaml.safe_load(WORKFLOW.read_text())

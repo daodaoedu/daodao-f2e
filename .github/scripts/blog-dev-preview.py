@@ -1,5 +1,12 @@
-"""Stage an explicit dev-only draft snapshot for the normal website build."""
+"""Stage a pinned Blog content snapshot for the normal website build.
 
+dev: BLOG_DEV_PREVIEW_CONTENT_SHA, draft mode (noindex preview, no approval).
+prod: BLOG_PROD_CONTENT_SHA, publish mode; BLOG_PROD_APPROVALS (repository
+variable, editable only by maintainers) is written outside the content tree so
+authors cannot approve their own articles by committing evidence.
+"""
+
+import json
 import os
 import re
 import shutil
@@ -18,17 +25,41 @@ PUBLIC_ROOTS = (
 )
 
 
+PIN_VARIABLES = {"dev": "BLOG_DEV_PREVIEW_CONTENT_SHA", "prod": "BLOG_PROD_CONTENT_SHA"}
+APPROVAL_KEYS = {"id", "digest", "reviewer", "evidence"}
+
+
 def selected_pin(environment):
-    if environment.get("BRANCH_NAME") != "dev":
+    variable = PIN_VARIABLES.get(environment.get("BRANCH_NAME", ""))
+    if variable is None:
         return None
-    pin = environment.get("BLOG_DEV_PREVIEW_CONTENT_SHA", "")
+    pin = environment.get(variable, "")
     if not pin:
         return None
     if not re.fullmatch(r"[0-9a-f]{40}", pin):
-        raise ValueError(
-            "BLOG_DEV_PREVIEW_CONTENT_SHA must be a full lowercase commit SHA"
-        )
+        raise ValueError(f"{variable} must be a full lowercase commit SHA")
     return pin
+
+
+def production_approvals(environment):
+    """Shape check only; the shared validator matches ids and bilingual digests."""
+    try:
+        approvals = json.loads(environment.get("BLOG_PROD_APPROVALS", ""))
+    except json.JSONDecodeError:
+        raise ValueError("BLOG_PROD_APPROVALS must be JSON") from None
+    if not isinstance(approvals, list) or not approvals:
+        raise ValueError("BLOG_PROD_APPROVALS must list at least one approval")
+    for approval in approvals:
+        if (
+            not isinstance(approval, dict)
+            or set(approval) != APPROVAL_KEYS
+            or not all(isinstance(value, str) and value for value in approval.values())
+            or not re.fullmatch(r"[a-f0-9]{64}", approval["digest"])
+        ):
+            raise ValueError(
+                "Each approval needs exactly id, digest, reviewer, evidence"
+            )
+    return approvals
 
 
 def directory(environment, name):
@@ -120,10 +151,31 @@ def write_draft_environment(environment, snapshot, pin):
     print(f"Dev draft preview content: {pin}")
 
 
+def write_publish_environment(environment, snapshot, temporary, approvals, pin):
+    evidence = Path(tempfile.mkdtemp(prefix="daodao-blog-evidence-", dir=temporary))
+    approvals_file = evidence / "approvals.json"
+    approvals_file.write_text(json.dumps(approvals))
+    values = {
+        "BLOG_CONTENT_DIR": str(snapshot),
+        "BLOG_CONTENT_MODE": "publish",
+        "BLOG_APPROVALS_FILE": str(approvals_file),
+        "BLOG_PUBLISHED_BASELINE_FILE": "",
+        "BLOG_EVIDENCE_ROOT": str(evidence),
+    }
+    with Path(environment["GITHUB_ENV"]).open("a") as output:
+        output.writelines(f"{key}={value}\n" for key, value in values.items())
+    print(f"Production Blog content: {pin}")
+
+
 def prepare(environment, pin):
+    production = environment.get("BRANCH_NAME") == "prod"
+    approvals = production_approvals(environment) if production else None
     source, temporary = checked_checkout(environment, pin)
     snapshot = snapshot_public_content(source, temporary)
-    write_draft_environment(environment, snapshot, pin)
+    if production:
+        write_publish_environment(environment, snapshot, temporary, approvals, pin)
+    else:
+        write_draft_environment(environment, snapshot, pin)
 
 
 def main():
