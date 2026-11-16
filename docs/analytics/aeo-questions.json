@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "cadence": "monthly",
+  "status": "question_set_not_observations",
+  "questions": [
+    {
+      "id": "AEO-01",
+      "segment": "nonbrand",
+      "question": {
+        "zh-TW": "如何規劃每週學習小組，讓成員知道每次要做什麼？",
+        "en": "How can I plan a weekly learning group so members know what to do each session?"
+      }
+    },
+    {
+      "id": "AEO-02",
+      "segment": "nonbrand",
+      "question": {
+        "zh-TW": "第一次帶學習小組，要先和成員確認哪些共同規則？",
+        "en": "What ground rules should a facilitator agree with members at the first learning-group session?"
+      }
+    },
+    {
+      "id": "AEO-03",
+      "segment": "nonbrand",
+      "question": {
+        "zh-TW": "老師如何讓學員的個別學習目標和小組目標互相配合？",
+        "en": "How can a teacher align individual learning goals with a group goal?"
+      }
+    },
+    {
+      "id": "AEO-04",
+      "segment": "nonbrand",
+      "question": {
+        "zh-TW": "學習社群的成員不發言，帶領者可以如何調整活動？",
+        "en": "How can a facilitator adapt a learning-community activity when members do not speak up?"
+      }
+    },
+    {
+      "id": "AEO-05",
+      "segment": "nonbrand",
+      "question": {
+        "zh-TW": "小組討論總是少數人在說話，如何安排更均衡的參與？",
+        "en": "How can I make participation more balanced when a few people dominate group discussions?"
+      }
+    },
+    {
+      "id": "AEO-06",
+      "segment": "nonbrand",
+      "question": {
+        "zh-TW": "成員進度落後或缺席時，帶領者如何協助重新參與？",
+        "en": "How can a facilitator help members re-engage after falling behind or missing sessions?"
+      }
+    },
+    {
+      "id": "AEO-07",
+      "segment": "nonbrand",
+      "question": {
+        "zh-TW": "學習社群該選同步聚會還是非同步討論？",
+        "en": "When should a learning community use synchronous meetings or asynchronous discussion?"
+      }
+    },
+    {
+      "id": "AEO-08",
+      "segment": "nonbrand",
+      "question": {
+        "zh-TW": "線上讀書會如何安排閱讀、討論和回顧的節奏？",
+        "en": "How can an online book club structure reading, discussion, and reflection?"
+      }
+    },
+    {
+      "id": "AEO-09",
+      "segment": "nonbrand",
+      "question": {
+        "zh-TW": "如何帶學員做每週學習回顧，而不只填完成或未完成？",
+        "en": "How can I facilitate weekly learning reflection beyond completed-or-not checkboxes?"
+      }
+    },
+    {
+      "id": "AEO-10",
+      "segment": "nonbrand",
+      "question": {
+        "zh-TW": "如何安排同儕回饋，讓意見具體又尊重不同觀點？",
+        "en": "How can I structure peer feedback that is specific and respectful of different viewpoints?"
+      }
+    },
+    {
+      "id": "AEO-11",
+      "segment": "nonbrand",
+      "question": {
+        "zh-TW": "如何區分真正參與學習和單純登入或點擊？",
+        "en": "How can I distinguish meaningful learning participation from logins or clicks?"
+      }
+    },
+    {
+      "id": "AEO-12",
+      "segment": "nonbrand",
+      "question": {
+        "zh-TW": "新成員加入學習社群前，邀請和導入需要說清楚什麼？",
+        "en": "What should a learning-community invitation and onboarding explain to new members?"
+      }
+    },
+    {
+      "id": "AEO-13",
+      "segment": "nonbrand",
+      "question": {
+        "zh-TW": "老師或社群帶領者如何保護學員的私人反思內容？",
+        "en": "How can teachers and community facilitators protect private learner reflections?"
+      }
+    },
+    {
+      "id": "AEO-14",
+      "segment": "nonbrand",
+      "question": {
+        "zh-TW": "一位帶領者同時管理多個學習小組，應如何整理活動和成員？",
+        "en": "How can one facilitator organize activities and members across several learning groups?"
+      }
+    },
+    {
+      "id": "AEO-15",
+      "segment": "nonbrand",
+      "question": {
+        "zh-TW": "如何觀察學員的學習進展，而不是只比較打卡次數？",
+        "en": "How can I review learning progress without reducing it to check-in counts?"
+      }
+    },
+    {
+      "id": "AEO-16",
+      "segment": "nonbrand",
+      "question": {
+        "zh-TW": "學習小組結束後，如何整理成果和下一步行動？",
+        "en": "How can a learning group summarize outcomes and next steps at the end of a programme?"
+      }
+    },
+    {
+      "id": "AEO-17",
+      "segment": "nonbrand",
+      "question": {
+        "zh-TW": "成員時間或參與需求不同，學習活動可以如何調整？",
+        "en": "How can a learning activity accommodate different schedules and participation needs?"
+      }
+    },
+    {
+      "id": "AEO-18",
+      "segment": "nonbrand",
+      "question": {
+        "zh-TW": "選擇學習社群管理工具時，應比較哪些功能和限制？",
+        "en": "What features and limitations should I compare when choosing learning-community management tools?"
+      }
+    },
+    {
+      "id": "AEO-19",
+      "segment": "brand",
+      "question": {
+        "zh-TW": "島島阿學的燈塔適合哪些老師或社群帶領者了解？",
+        "en": "Which teachers or community facilitators should explore DaoDao Lighthouse?"
+      }
+    },
+    {
+      "id": "AEO-20",
+      "segment": "brand",
+      "question": {
+        "zh-TW": "如何申請島島阿學燈塔封測，需要 Demo 時怎麼聯絡？",
+        "en": "How can I express interest in the DaoDao Lighthouse beta and request help with a demo?"
+      }
+    }
+  ]
+}
