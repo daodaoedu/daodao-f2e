@@ -246,9 +246,10 @@ jobs:
 
       - name: Select dev Blog draft preview
         id: blog-preview
-        if: env.BRANCH_NAME == 'dev' && vars.BLOG_DEV_PREVIEW_CONTENT_SHA != ''
+        if: (env.BRANCH_NAME == 'dev' && vars.BLOG_DEV_PREVIEW_CONTENT_SHA != '') || (env.BRANCH_NAME == 'prod' && vars.BLOG_PROD_CONTENT_SHA != '')
         env:
           BLOG_DEV_PREVIEW_CONTENT_SHA: ${{ vars.BLOG_DEV_PREVIEW_CONTENT_SHA }}
+          BLOG_PROD_CONTENT_SHA: ${{ vars.BLOG_PROD_CONTENT_SHA }}
         run: |
           helper=.github/scripts/blog-dev-preview.py
           if [ -f "$helper" ] && [ ! -L "$helper" ]; then
@@ -270,7 +271,9 @@ jobs:
       - name: Stage dev Blog draft snapshot
         if: steps.blog-preview.outputs.enabled == 'true'
         env:
-          BLOG_DEV_PREVIEW_CONTENT_SHA: ${{ steps.blog-preview.outputs.content-sha }}
+          BLOG_DEV_PREVIEW_CONTENT_SHA: ${{ env.BRANCH_NAME == 'dev' && steps.blog-preview.outputs.content-sha || '' }}
+          BLOG_PROD_CONTENT_SHA: ${{ env.BRANCH_NAME == 'prod' && steps.blog-preview.outputs.content-sha || '' }}
+          BLOG_PROD_APPROVALS: ${{ vars.BLOG_PROD_APPROVALS }}
         run: python3 .github/scripts/blog-dev-preview.py prepare
 
       - name: Install dependencies and build
