@@ -6,6 +6,8 @@ import { useSafeRouter } from "@daodao/ui/hooks/use-safe-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback } from "react";
 
+import { useCohortViewQuery } from "@/lib/cohort-view-query";
+
 interface ISameDayCheckInNavProps {
   /** 同一天所有打卡的 ID 陣列（按 createdAt 排序） */
   sameDayCheckInIds: string[];
@@ -21,6 +23,8 @@ export const SameDayCheckInNav = ({
 }: ISameDayCheckInNavProps) => {
   const t = useTranslations("check_in");
   const router = useSafeRouter();
+
+  const cohortViewQuery = useCohortViewQuery();
   const total = sameDayCheckInIds.length;
 
   if (total <= 1) return null;
@@ -30,15 +34,19 @@ export const SameDayCheckInNav = ({
 
   const handlePrev = useCallback(() => {
     if (hasPrev) {
-      router.push(`/practices/${practiceId}/check-ins/${sameDayCheckInIds[currentIndex - 1]}`);
+      router.push(
+        `/practices/${practiceId}/check-ins/${sameDayCheckInIds[currentIndex - 1]}${cohortViewQuery}`
+      );
     }
-  }, [hasPrev, router, practiceId, sameDayCheckInIds, currentIndex]);
+  }, [hasPrev, router, practiceId, sameDayCheckInIds, currentIndex, cohortViewQuery]);
 
   const handleNext = useCallback(() => {
     if (hasNext) {
-      router.push(`/practices/${practiceId}/check-ins/${sameDayCheckInIds[currentIndex + 1]}`);
+      router.push(
+        `/practices/${practiceId}/check-ins/${sameDayCheckInIds[currentIndex + 1]}${cohortViewQuery}`
+      );
     }
-  }, [hasNext, router, practiceId, sameDayCheckInIds, currentIndex]);
+  }, [hasNext, router, practiceId, sameDayCheckInIds, currentIndex, cohortViewQuery]);
 
   return (
     <div className="relative flex items-center justify-between mb-6 pb-5">

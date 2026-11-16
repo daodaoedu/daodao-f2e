@@ -23,6 +23,8 @@ import type { ICheckInDisplayData, ICheckInFormData } from "@/components/check-i
 import { PageHeader } from "@/components/layout";
 import { mapApiMoodToMoodType, mapMoodTypeToApiMood } from "@/constants/mood";
 
+import { useCohortViewQuery } from "@/lib/cohort-view-query";
+
 /**
  * 將 API 的 checkinDate 格式轉換為顯示格式
  * 從 "2024-01-20" 轉換為 "2024.01.20"
@@ -79,7 +81,8 @@ export default function CheckInDetailPage() {
   const params = useParams();
   const practiceId = params.id as string;
   const checkInId = params.checkInId as string;
-  const practiceDetailPath = `/practices/${practiceId}`;
+  const cohortViewQuery = useCohortViewQuery();
+  const practiceDetailPath = `/practices/${practiceId}${cohortViewQuery}`;
 
   // 獲取 practice 資料
   const { data: practiceData, isLoading: isLoadingPractice } = usePracticeById(practiceId);

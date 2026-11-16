@@ -74,7 +74,6 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
   if (isLoading) {
     return (
       <div>
-        <h3 className="font-medium text-text-dark mb-3">{t("record_title")}</h3>
         <div className="bg-white rounded-lg px-4 py-2">
           <div className="text-xs text-text-dark font-medium text-center py-4">{t("loading")}</div>
         </div>
@@ -84,7 +83,6 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
 
   return (
     <div>
-      <h3 className="font-medium text-text-dark mb-3">{t("record_title")}</h3>
       <div className="bg-white rounded-lg px-4 py-2">
         <div className="flex items-center justify-between mb-3">
           <div className="text-xs text-text-dark font-medium">{t("mood_ranking")}</div>
