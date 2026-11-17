@@ -3613,6 +3613,1027 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/surveys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 搜尋及篩選問卷 */
+        get: {
+            parameters: {
+                query?: {
+                    status?: "draft" | "active" | "closed" | "archived";
+                    q?: string;
+                    limit?: number;
+                    offset?: number | null;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 操作成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: true;
+                            data: components["schemas"]["AdminSurveyListItemWire"][];
+                            /** Format: date-time */
+                            timestamp: string;
+                            meta?: {
+                                [key: string]: unknown;
+                            };
+                            pagination: {
+                                total: number;
+                                limit: number;
+                                offset: number;
+                                hasMore: boolean;
+                            };
+                        };
+                    };
+                };
+                /** @description 欄位或題目設定無效 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要登入 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要管理員權限；場次匿名回饋必須由獨立入口查看 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 問卷或回應不存在 */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 已有歷史回應的題目/匿名設定不可更改；封存為終態 */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        /** 建立正式問卷草稿 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ManagedSurveyCreate"];
+                };
+            };
+            responses: {
+                /** @description 草稿建立成功（managed_version=1） */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: true;
+                            data: components["schemas"]["ManagedSurveyResponse"];
+                            /** Format: date-time */
+                            timestamp: string;
+                            meta?: {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                /** @description 欄位或題目設定無效 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要登入 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要管理員權限；場次匿名回饋必須由獨立入口查看 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 問卷或回應不存在 */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 已有歷史回應的題目/匿名設定不可更改；封存為終態 */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/surveys/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 讀取問卷詳情（managed_version可為null，保留舊問卷） */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 操作成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: true;
+                            data: components["schemas"]["AdminSurveyDetailWire"];
+                            /** Format: date-time */
+                            timestamp: string;
+                            meta?: {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                /** @description 欄位或題目設定無效 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要登入 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要管理員權限；場次匿名回饋必須由獨立入口查看 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 問卷或回應不存在 */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 已有歷史回應的題目/匿名設定不可更改；封存為終態 */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        /** 儲存問卷（舊問卷保留舊欄位契約） */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ManagedSurveyUpdate"];
+                };
+            };
+            responses: {
+                /** @description 操作成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: true;
+                            data: components["schemas"]["ManagedSurveyResponse"];
+                            /** Format: date-time */
+                            timestamp: string;
+                            meta?: {
+                                [key: string]: unknown;
+                            };
+                        } | {
+                            /** @enum {boolean} */
+                            success: true;
+                            data: {
+                                id: number;
+                                /** @enum {boolean} */
+                                updated: true;
+                            };
+                            /** Format: date-time */
+                            timestamp: string;
+                            meta?: {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                /** @description 欄位或題目設定無效 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要登入 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要管理員權限；場次匿名回饋必須由獨立入口查看 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 問卷或回應不存在 */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 已有歷史回應的題目/匿名設定不可更改；封存為終態 */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        post?: never;
+        /** 刪除問卷/回應或移除庫項（不刪引用圖片） */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 刪除成功，無回應內容 */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 欄位或題目設定無效 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要登入 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要管理員權限；場次匿名回饋必須由獨立入口查看 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 問卷或回應不存在 */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 已有歷史回應的題目/匿名設定不可更改；封存為終態 */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/surveys/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** 發布、關閉、重開或封存問卷 */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ManagedSurveyStatus"];
+                };
+            };
+            responses: {
+                /** @description 操作成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: true;
+                            data: components["schemas"]["ManagedSurveyResponse"];
+                            /** Format: date-time */
+                            timestamp: string;
+                            meta?: {
+                                [key: string]: unknown;
+                            };
+                        } | {
+                            /** @enum {boolean} */
+                            success: true;
+                            data: {
+                                id: number;
+                                /** @enum {string} */
+                                status: "draft" | "active" | "closed" | "archived";
+                                /** Format: date-time */
+                                updated_at: string;
+                            };
+                            /** Format: date-time */
+                            timestamp: string;
+                            meta?: {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                /** @description 欄位或題目設定無效 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要登入 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要管理員權限；場次匿名回饋必須由獨立入口查看 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 問卷或回應不存在 */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 已有歷史回應的題目/匿名設定不可更改；封存為終態 */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/admin/surveys/{id}/responses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 讀取分頁回應者列表（匿名不回傳會員資料） */
+        get: {
+            parameters: {
+                query?: {
+                    limit?: number;
+                    offset?: number | null;
+                };
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 操作成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: true;
+                            data: components["schemas"]["AdminSurveyResponseListItemWire"][];
+                            /** Format: date-time */
+                            timestamp: string;
+                            meta?: {
+                                [key: string]: unknown;
+                            };
+                            pagination: {
+                                total: number;
+                                limit: number;
+                                offset: number;
+                                hasMore: boolean;
+                            };
+                        };
+                    };
+                };
+                /** @description 欄位或題目設定無效 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要登入 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要管理員權限；場次匿名回饋必須由獨立入口查看 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 問卷或回應不存在 */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 已有歷史回應的題目/匿名設定不可更改；封存為終態 */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/surveys/{id}/responses/{responseId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 讀取逐題回應 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                    responseId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 操作成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: true;
+                            data: components["schemas"]["AdminSurveyResponseDetailWire"];
+                            /** Format: date-time */
+                            timestamp: string;
+                            meta?: {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                /** @description 欄位或題目設定無效 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要登入 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要管理員權限；場次匿名回饋必須由獨立入口查看 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 問卷或回應不存在 */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 已有歷史回應的題目/匿名設定不可更改；封存為終態 */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        /** 刪除問卷/回應或移除庫項（不刪引用圖片） */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                    responseId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 刪除成功，無回應內容 */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 欄位或題目設定無效 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要登入 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要管理員權限；場次匿名回饋必須由獨立入口查看 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 問卷或回應不存在 */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 已有歷史回應的題目/匿名設定不可更改；封存為終態 */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/surveys/{id}/analytics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 從有效保存答案重算題目分析 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 操作成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: true;
+                            data: components["schemas"]["AdminSurveyAnalyticsWire"];
+                            /** Format: date-time */
+                            timestamp: string;
+                            meta?: {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                /** @description 欄位或題目設定無效 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要登入 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要管理員權限；場次匿名回饋必須由獨立入口查看 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 問卷或回應不存在 */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 已有歷史回應的題目/匿名設定不可更改；封存為終態 */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/surveys/images": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 讀取目前管理員的三張圖片庫 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 操作成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: true;
+                            data: components["schemas"]["AdminSurveyImageWire"][];
+                            /** Format: date-time */
+                            timestamp: string;
+                            meta?: {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                /** @description 欄位或題目設定無效 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要登入 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要管理員權限；場次匿名回饋必須由獨立入口查看 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 問卷或回應不存在 */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 已有歷史回應的題目/匿名設定不可更改；封存為終態 */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        /** 上傳8MiB以內PNG/JPEG/WebP圖片 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description 操作成功 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: true;
+                            data: components["schemas"]["AdminSurveyImageWire"];
+                            /** Format: date-time */
+                            timestamp: string;
+                            meta?: {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                /** @description 欄位或題目設定無效 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要登入 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要管理員權限；場次匿名回饋必須由獨立入口查看 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 問卷或回應不存在 */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 已有歷史回應的題目/匿名設定不可更改；封存為終態 */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 圖片操作過於頻繁 */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/surveys/images/{imageId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** 刪除問卷/回應或移除庫項（不刪引用圖片） */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    imageId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 刪除成功，無回應內容 */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 欄位或題目設定無效 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要登入 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 需要管理員權限；場次匿名回饋必須由獨立入口查看 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 問卷或回應不存在 */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 已有歷史回應的題目/匿名設定不可更改；封存為終態 */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/roles": {
         parameters: {
             query?: never;
@@ -5779,6 +6800,25 @@ export interface paths {
                 };
                 400: components["responses"]["BadRequestError"];
                 401: components["responses"]["UnauthorizedError"];
+                /** @description 同一 IP 的認證請求超過 10 次／15 分鐘（登入與註冊共用額度） */
+                429: {
+                    headers: {
+                        /** @description 重試前需等待的秒數 */
+                        "Retry-After"?: number;
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: false;
+                            message: string;
+                            /** @enum {string} */
+                            error: "AUTH_RATE_LIMIT_EXCEEDED";
+                            /** @enum {number} */
+                            retryAfter: 900;
+                        };
+                    };
+                };
                 500: components["responses"]["InternalServerError"];
             };
         };
@@ -5837,6 +6877,25 @@ export interface paths {
                                 code: string;
                                 message: string;
                             };
+                        };
+                    };
+                };
+                /** @description 同一 IP 的認證請求超過 10 次／15 分鐘（登入與註冊共用額度） */
+                429: {
+                    headers: {
+                        /** @description 重試前需等待的秒數 */
+                        "Retry-After"?: number;
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: false;
+                            message: string;
+                            /** @enum {string} */
+                            error: "AUTH_RATE_LIMIT_EXCEEDED";
+                            /** @enum {number} */
+                            retryAfter: 900;
                         };
                     };
                 };
@@ -6553,6 +7612,25 @@ export interface paths {
                 };
                 400: components["responses"]["BadRequestError"];
                 401: components["responses"]["UnauthorizedError"];
+                /** @description 同一 IP 的授權碼交換超過 60 次／1 分鐘（獨立於登入、註冊及 Apple 登入額度） */
+                429: {
+                    headers: {
+                        /** @description 重試前需等待的秒數 */
+                        "Retry-After"?: number;
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: false;
+                            message: string;
+                            /** @enum {string} */
+                            error: "AUTH_RATE_LIMIT_EXCEEDED";
+                            /** @enum {number} */
+                            retryAfter: 60;
+                        };
+                    };
+                };
                 500: components["responses"]["InternalServerError"];
             };
         };
@@ -11495,7 +12573,7 @@ export interface paths {
         };
         /**
          * 取得資料庫資訊
-         * @description 取得 PostgreSQL 和 Redis 的詳細資訊，包括欄位、索引、約束等
+         * @description 僅管理員可取得 PostgreSQL 和 Redis 的詳細資訊，包括欄位、索引、約束等
          */
         get: {
             parameters: {
@@ -11536,6 +12614,8 @@ export interface paths {
                         };
                     };
                 };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
                 500: components["responses"]["InternalServerError"];
             };
         };
@@ -11704,8 +12784,9 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 發送密碼重設郵件
-         * @description 發送密碼重設連結給用戶。支援可選身份驗證（允許未登入用戶重設密碼）。
+         * 密碼重設郵件入口已停用
+         * @deprecated
+         * @description 此遺留入口已停用，回應「密碼重設功能暫時不可用」，不處理輸入資料或寄送郵件。
          */
         post: {
             parameters: {
@@ -11714,21 +12795,8 @@ export interface paths {
                 path?: never;
                 cookie?: never;
             };
-            requestBody?: {
-                content: {
-                    "application/json": components["schemas"]["PasswordResetEmailRequest"];
-                };
-            };
+            requestBody?: never;
             responses: {
-                /** @description 密碼重設郵件發送成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["EmailSuccessResponse"];
-                    };
-                };
                 400: components["responses"]["BadRequestError"];
                 500: components["responses"]["InternalServerError"];
             };
@@ -12140,6 +13208,45 @@ export interface paths {
                     };
                     content?: never;
                 };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/feedback/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 列出登入者自己送出的錯誤回報與團隊回覆（新到舊，最多 100 筆） */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["MyBugReportListApiResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                500: components["responses"]["InternalServerError"];
             };
         };
         put?: never;
@@ -12828,7 +13935,7 @@ export interface paths {
         post?: never;
         /**
          * 刪除圖片
-         * @description 從雲端儲存中刪除指定的圖片檔案。需要身份驗證。
+         * @description 刪除登入使用者自己上傳的圖片。僅允許擁有者紀錄可驗證的圖片；未記錄擁有者的舊圖片保留且回傳 403。
          */
         delete: {
             parameters: {
@@ -12853,6 +13960,7 @@ export interface paths {
                 };
                 400: components["responses"]["BadRequestError"];
                 401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
                 404: components["responses"]["NotFoundError"];
                 /** @description 請求過於頻繁 */
                 429: {
@@ -12921,6 +14029,7 @@ export interface paths {
                 };
                 400: components["responses"]["BadRequestError"];
                 401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
                 /** @description 檔案過大 */
                 413: {
                     headers: {
@@ -13002,6 +14111,7 @@ export interface paths {
                 };
                 400: components["responses"]["BadRequestError"];
                 401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
                 /** @description 檔案過大或總數過多 */
                 413: {
                     headers: {
@@ -15300,8 +16410,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 取得系統監控資訊
-         * @description 取得系統資源使用情況，包括 CPU、記憶體、磁碟和 PostgreSQL 狀態
+         * 取得系統健康統計
+         * @description 僅管理員可讀取 CPU 負載、記憶體、磁碟用量及 PostgreSQL 連線統計，不包含主機或資料庫識別資訊。
          */
         get: {
             parameters: {
@@ -15312,7 +16422,7 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description 成功獲取系統監控資訊 */
+                /** @description 系統健康統計；資料庫不可用時保留其他健康資訊 */
                 200: {
                     headers: {
                         [name: string]: unknown;
@@ -15320,52 +16430,36 @@ export interface paths {
                     content: {
                         "application/json": {
                             system: {
-                                hostname: string;
-                                platform: string;
-                                arch: string;
                                 uptime: number;
                                 loadAverage: number[];
                                 totalMemory: number;
                                 freeMemory: number;
-                                release: string;
-                                type: string;
-                                userInfo?: unknown;
-                                cpus: unknown[];
-                                networkInterfaces?: unknown;
-                                processMemory?: unknown;
-                                processId: number;
-                                processTitle: string;
-                                processArgs: string[];
+                                processMemory: {
+                                    rss: number;
+                                    heapTotal: number;
+                                    heapUsed: number;
+                                    external: number;
+                                    arrayBuffers: number;
+                                };
                             };
                             postgres: {
-                                version?: string;
-                                current_connections?: number;
-                                max_connections?: number;
-                                database_size?: string;
-                                start_time?: string;
-                                config?: {
-                                    [key: string]: string;
-                                };
-                                tables?: {
-                                    table_name: string;
-                                    size: string;
-                                    row_count: number;
-                                }[];
-                                error?: string;
-                                details?: string;
+                                current_connections: number;
+                                max_connections: number;
+                            } | {
+                                /** @enum {string} */
+                                error: "PostgreSQL 連線不可用";
                             };
                             disk: {
-                                filesystem: string;
-                                type: string;
                                 size: number;
                                 used: number;
                                 available: number;
                                 use: number;
-                                mount: string;
                             }[];
                         };
                     };
                 };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
                 500: components["responses"]["InternalServerError"];
             };
         };
@@ -19911,7 +21005,6 @@ export interface paths {
                         frequencyMinDays?: number | null;
                         frequencyMaxDays?: number | null;
                         sessionDurationMinutes?: number | null;
-                        /** @default [] */
                         practiceTimePeriods?: ("morning" | "afternoon" | "evening" | "night" | "commute")[];
                         /** @description 自訂執行時段（practice_templates.other_context） */
                         timingOther?: string | null;
@@ -19924,7 +21017,6 @@ export interface paths {
                         }[];
                         /**
                          * @description draft：儲存草稿；ready：完成新增／更新
-                         * @default ready
                          * @enum {string}
                          */
                         status?: "draft" | "ready";
@@ -22136,6 +23228,11 @@ export interface paths {
                                 };
                                 practice: {
                                     id: number;
+                                    /**
+                                     * Format: uuid
+                                     * @description 實踐公開識別碼（UUID），用於連到參與者打卡頁
+                                     */
+                                    externalId: string | null;
                                     title: string;
                                     /** Format: date-time */
                                     startDate: string | null;
@@ -23021,6 +24118,8 @@ export interface paths {
                                     checkinCount: number;
                                     /** @description 這位參與者打卡收到的留言與回應數 */
                                     responseCount: number;
+                                    /** @description 這位參與者在本場次其他成員打卡下發佈的留言數（以人計，同一人各實踐列相同） */
+                                    publishedCommentCount: number;
                                     /**
                                      * Format: date-time
                                      * @description 最後一次打卡或收到回應的時間
@@ -32719,7 +33818,7 @@ export interface paths {
         };
         /**
          * 更新便利貼
-         * @description 更新指定便利貼的資料
+         * @description 僅便利貼擁有者可更新指定便利貼的資料
          */
         put: {
             parameters: {
@@ -32866,6 +33965,7 @@ export interface paths {
                 };
                 400: components["responses"]["BadRequestError"];
                 401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
                 404: components["responses"]["NotFoundError"];
                 500: components["responses"]["InternalServerError"];
             };
@@ -32873,7 +33973,7 @@ export interface paths {
         post?: never;
         /**
          * 刪除便利貼
-         * @description 刪除指定的便利貼
+         * @description 僅便利貼擁有者可刪除指定的便利貼
          */
         delete: {
             parameters: {
@@ -32951,6 +34051,7 @@ export interface paths {
                     };
                 };
                 401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
                 404: components["responses"]["NotFoundError"];
                 500: components["responses"]["InternalServerError"];
             };
@@ -39173,7 +40274,7 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description 問卷資料及新期末問卷填答資格 */
+                /** @description 問卷內容與填答資格；managed_version=1包含完整題型設定及品牌 */
                 200: {
                     headers: {
                         [name: string]: unknown;
@@ -39185,7 +40286,8 @@ export interface paths {
                              * @enum {boolean}
                              */
                             success: true;
-                            data: components["schemas"]["SurveyResponse"] & unknown;
+                            /** @description The main response data */
+                            data: components["schemas"]["SurveyResponse"] | components["schemas"]["ManagedSurveyResponse"];
                             /**
                              * Format: date-time
                              * @description ISO 8601 timestamp of the response
@@ -39241,7 +40343,15 @@ export interface paths {
                         };
                     };
                 };
+                401: components["responses"]["UnauthorizedError"];
                 404: components["responses"]["NotFoundError"];
+                /** @description 問卷已關閉、封存或額滿 */
+                410: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
             };
         };
         put?: never;
@@ -39274,7 +40384,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SubmitSurveyResponseRequest"];
+                    "application/json": components["schemas"]["ManagedSurveySubmission"] | components["schemas"]["SubmitSurveyResponseRequest"];
                 };
             };
             responses: {
@@ -39356,6 +40466,13 @@ export interface paths {
                 403: components["responses"]["ForbiddenError"];
                 404: components["responses"]["NotFoundError"];
                 409: components["responses"]["ConflictError"];
+                /** @description 問卷已關閉或封存 */
+                410: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
             };
         };
         delete?: never;
@@ -47902,32 +49019,6 @@ export interface components {
              */
             userId?: number;
         };
-        /** @description 寄送密碼重設郵件的請求資料 */
-        PasswordResetEmailRequest: {
-            /**
-             * Format: email
-             * @description 需要重設密碼的用戶郵件
-             * @example user@example.com
-             * @example user@example.com
-             * @example john.doe@company.com
-             * @example student@university.edu
-             */
-            email: string;
-            /**
-             * Format: uri
-             * @description 用戶點擊重設密碼的安全連結
-             * @example https://example.com/reset-password?token=xyz789
-             */
-            resetLink: string;
-            /**
-             * @description 用戶的顯示姓名
-             * @example 王小明
-             * @example 王小明
-             * @example John Doe
-             * @example 李雅韻
-             */
-            name?: string;
-        };
         /** @description 寄送馬拉松活動相關郵件的請求資料 */
         MarathonEmailRequest: {
             /**
@@ -48329,6 +49420,154 @@ export interface components {
              * @example 2024-01-15T10:30:00.000Z
              */
             timestamp: string;
+        };
+        /**
+         * @description Standard success response format
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        MyBugReportListApiResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description The main response data */
+            data: {
+                items: components["schemas"]["MyBugReport"][];
+            };
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        MyBugReport: {
+            /**
+             * @description 回報 id
+             * @example 8
+             */
+            id: number;
+            /**
+             * @description 回報描述
+             * @example 按下送出後畫面沒有反應
+             */
+            content: string;
+            /**
+             * @description 問題區域（ui／performance／auth／data／other）
+             * @example ui
+             */
+            area: string | null;
+            /**
+             * @description 相關連結
+             * @example https://app.daodao.so/settings
+             */
+            link: string | null;
+            /**
+             * @description 截圖網址
+             * @example []
+             */
+            screenshots: string[];
+            /**
+             * @description 處理狀態
+             * @example replied
+             * @enum {string}
+             */
+            status: "pending" | "replied" | "closed";
+            /**
+             * @description 回報時間（ISO 8601）
+             * @example 2026-11-08T02:00:00.000Z
+             */
+            createdAt: string;
+            /** @description 團隊回覆，由舊到新 */
+            replies: components["schemas"]["MyBugReportReply"][];
+        };
+        MyBugReportReply: {
+            /**
+             * @description 回覆 id
+             * @example 12
+             */
+            id: number;
+            /**
+             * @description 團隊回覆內容
+             * @example 已修正，謝謝回報！
+             */
+            content: string;
+            /**
+             * @description 回覆時間（ISO 8601）
+             * @example 2026-11-08T03:00:00.000Z
+             */
+            createdAt: string;
         };
         FollowTargetBody: {
             /**
@@ -50038,6 +51277,50 @@ export interface components {
         };
         /** @description 增強安全性的多個圖片檔案批量驗證 */
         EnhancedImageFiles: components["schemas"]["EnhancedImageFile"][];
+        ManagedSurveyCreate: {
+            title: string;
+            description?: string | null;
+            /** @default true */
+            is_public: boolean;
+            /** @default true */
+            is_anonymous: boolean;
+            max_responses?: number | null;
+            /** @default [] */
+            tags: string[];
+            /** Format: uri */
+            cover_url?: string | null;
+            /** Format: uri */
+            logo_url?: string | null;
+            thank_you_message?: string | null;
+            /** @default [] */
+            questions: components["schemas"]["ManagedSurveyQuestion"][];
+        };
+        ManagedSurveyQuestion: {
+            id?: number;
+            question_text: string;
+            /** @enum {string} */
+            question_type: "multiple_choice" | "single_choice" | "rating" | "text" | "yesno" | "scale" | "ranking";
+            /**
+             * @default text
+             * @enum {string}
+             */
+            input_type: "text" | "email" | "url" | "textarea";
+            /** @default false */
+            is_required: boolean;
+            /** @default 0 */
+            position: number;
+            scale_min?: number | null;
+            scale_max?: number | null;
+            scale_min_label?: string | null;
+            scale_max_label?: string | null;
+            /** @default [] */
+            options: {
+                id?: number;
+                option_text: string;
+                /** @default 0 */
+                position: number;
+            }[];
+        };
         /** @description 指定導師參與特定馬拉松活動的請求資料 */
         AssignMentorToMarathonRequest: {
             /**
@@ -54327,6 +55610,184 @@ export interface components {
              */
             limit: number;
         };
+        ManagedSurveyResponse: {
+            id: number;
+            external_id: string;
+            /** @enum {number} */
+            managed_version: 1;
+            title: string;
+            description: string | null;
+            /** @enum {string} */
+            status: "draft" | "active" | "closed" | "archived";
+            is_public: boolean;
+            is_anonymous: boolean;
+            logo_url: string | null;
+            cover_url: string | null;
+            thank_you_message: string | null;
+            max_responses: number | null;
+            has_responded?: boolean;
+            questions: {
+                id: number;
+                question_text: string;
+                /** @enum {string} */
+                question_type: "multiple_choice" | "single_choice" | "rating" | "text" | "yesno" | "scale" | "ranking";
+                /**
+                 * @default text
+                 * @enum {string}
+                 */
+                input_type: "text" | "email" | "url" | "textarea";
+                /** @default false */
+                is_required: boolean;
+                /** @default 0 */
+                position: number;
+                scale_min?: number | null;
+                scale_max?: number | null;
+                scale_min_label?: string | null;
+                scale_max_label?: string | null;
+                options: {
+                    id: number;
+                    option_text: string;
+                    position: number;
+                }[];
+            }[];
+        };
+        ManagedSurveyUpdate: {
+            title?: string;
+            description?: string | null;
+            max_responses?: number | null;
+            /** Format: uri */
+            cover_url?: string | null;
+            /** Format: uri */
+            logo_url?: string | null;
+            thank_you_message?: string | null;
+            is_public?: boolean;
+            is_anonymous?: boolean;
+            tags?: string[];
+            questions?: components["schemas"]["ManagedSurveyQuestion"][];
+        };
+        ManagedSurveyStatus: {
+            /** @enum {string} */
+            status: "draft" | "active" | "closed" | "archived";
+        };
+        AdminSurveyListItemWire: {
+            id: number;
+            external_id: string;
+            title: string;
+            /** @enum {string} */
+            status: "draft" | "active" | "closed" | "archived";
+            is_public: boolean;
+            is_anonymous: boolean;
+            managed_version: number | null;
+            tags: string[];
+            view_count: number;
+            /** Format: date-time */
+            created_at: string;
+            response_count: number;
+            max_responses: number | null;
+            structure_locked: boolean;
+            creator: {
+                id: number | null;
+                email: string | null;
+                nickname: string | null;
+            };
+        };
+        AdminSurveyDetailWire: components["schemas"]["AdminSurveyListItemWire"] & {
+            description: string | null;
+            cover_url: string | null;
+            logo_url: string | null;
+            thank_you_message: string | null;
+            /** Format: date-time */
+            updated_at: string;
+            questions: components["schemas"]["AdminSurveyQuestionWire"][];
+        };
+        AdminSurveyQuestionWire: {
+            id: number;
+            question_text: string;
+            /** @enum {string} */
+            question_type: "multiple_choice" | "single_choice" | "rating" | "text" | "yesno" | "scale" | "ranking";
+            is_required: boolean;
+            position: number;
+            /** @enum {string} */
+            input_type: "text" | "email" | "url" | "textarea";
+            scale_min: number | null;
+            scale_max: number | null;
+            scale_min_label: string | null;
+            scale_max_label: string | null;
+            options: {
+                id: number;
+                option_text: string;
+                position: number;
+            }[];
+        };
+        AdminSurveyResponseListItemWire: {
+            id: number;
+            user_id: number | null;
+            respondent_name: string | null;
+            /** Format: date-time */
+            completed_at: string;
+            answer_count: number;
+        };
+        AdminSurveyResponseDetailWire: components["schemas"]["AdminSurveyResponseListItemWire"] & {
+            answers: {
+                question_id: number;
+                question_text: string;
+                question_type: string;
+                answer_text: string | null;
+                selected_option_ids: number[];
+                selected_options: string[];
+                rating_value: number | null;
+                boolean_value: boolean | null;
+            }[];
+        };
+        AdminSurveyAnalyticsWire: {
+            survey_id: number;
+            response_count: number;
+            view_count: number;
+            avg_duration_seconds: number | null;
+            drop_off: {
+                last_position: number;
+                count: number;
+            }[];
+            per_question: {
+                question_id: number;
+                question_text: string;
+                question_type: string;
+                input_type?: string;
+                answer_count: number;
+                stats: {
+                    avg?: number | null;
+                    min?: number | null;
+                    max?: number | null;
+                    distribution?: {
+                        value: number;
+                        count: number;
+                    }[];
+                    option_counts?: {
+                        option_id: number;
+                        option_text: string;
+                        count: number;
+                        percentage?: number;
+                    }[];
+                    rank_counts?: {
+                        option_id: number;
+                        option_text: string;
+                        counts: number[];
+                        average_rank: number | null;
+                    }[];
+                    sample_answers?: (string | null)[];
+                    true?: number;
+                    false?: number;
+                };
+            }[];
+        };
+        AdminSurveyImageWire: {
+            id: number;
+            /** Format: uri */
+            url: string;
+            created_by: number;
+            /** Format: date-time */
+            created_at: string;
+        };
         /**
          * @description Paginated response format for page-based pagination
          * @example {
@@ -56943,6 +58404,15 @@ export interface components {
              * @example 2026-09-01T08:00:00.000Z
              */
             scheduledAt?: string;
+        };
+        ManagedSurveySubmission: {
+            answers: {
+                question_id: number;
+                answer_text?: string;
+                selected_option_ids?: number[];
+                rating_value?: number;
+                boolean_value?: boolean;
+            }[];
         };
         /**
          * @description Standard success response format
