@@ -151,7 +151,7 @@ interface CohortPreviewSource {
   programName: string;
   programDescription: string | null;
   organization: ActivityDetailType["organization"];
-  organizationOwners: { userId: number; nickname: string | null; createdAt: string }[];
+  organizationId: number;
 }
 
 type CohortErrorTranslator = (
@@ -396,6 +396,9 @@ function CohortSetupPanel({
     programId,
     activityPreviewOpen ? cohort?.id : undefined
   );
+  const previewOwnersQuery = useLighthouseOrganizationMembers(
+    activityPreviewOpen ? previewSource.organizationId : undefined
+  );
   const activityPreview = activityPreviewForm
     ? buildActivityPreview(
         activityPreviewForm,
@@ -406,7 +409,7 @@ function CohortSetupPanel({
           organization: previewSource.organization,
           host: resolvePreviewHost(
             previewEnrollmentsQuery.data?.data ?? [],
-            previewSource.organizationOwners,
+            previewOwnersQuery.data?.data ?? [],
             previewSource.organization.name
           ),
           untitledName: t("cohort_preview_untitled"),
@@ -2259,7 +2262,6 @@ interface ProgramPanelProps {
 function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
   const t = useTranslations("lighthouse");
   const { organization } = useLighthouseOrganization();
-  const ownersQuery = useLighthouseOrganizationMembers(program.organizationId);
   const currentOrganization = organization?.id === program.organizationId ? organization : null;
   const previewSource: CohortPreviewSource = {
     programName: program.name,
@@ -2269,7 +2271,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
       bio: currentOrganization?.bio ?? null,
       externalLink: currentOrganization?.externalLink ?? null,
     },
-    organizationOwners: ownersQuery.data?.data ?? [],
+    organizationId: program.organizationId,
   };
   const apiErrorMessage = useLighthouseErrorMessage();
   const { errorMessage: serverErrorMessage } = useServerErrorMessage();

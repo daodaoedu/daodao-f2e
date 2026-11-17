@@ -634,7 +634,7 @@
   "cohort_show_invite_message_on_signup": "Email 或連結邀請顯示訊息",
   "cohort_privacy_title": "隱私設定",
   "cohort_is_private": "私密活動",
-  "cohort_is_private_hint": "開啟後所有參與成員留言和打卡可被非參與者看見",
+  "cohort_is_private_hint": "開啟後參與成員的留言和打卡不會被非參與者看見",
   "cohort_checkin_default_private": "參與者打卡預設私密",
   "cohort_checkin_default_private_hint": "開啟後參與者的打卡預設只有自己和教練可見（將於打卡隱私功能上線後生效）",
   "cohort_host_comment_default_private": "教練留言預設私密",

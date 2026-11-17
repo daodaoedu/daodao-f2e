@@ -611,7 +611,7 @@
   "cohort_show_invite_message_on_signup": "Show a message to people invited by email or link",
   "cohort_privacy_title": "Privacy",
   "cohort_is_private": "Private cohort",
-  "cohort_is_private_hint": "When enabled, participant comments and check-ins are visible to non-participants",
+  "cohort_is_private_hint": "When enabled, participant comments and check-ins are hidden from non-participants",
   "cohort_checkin_default_private": "Default check-ins to private",
   "cohort_checkin_default_private_hint": "Learner check-ins are visible only to themselves and coaches (takes effect once check-in privacy launches)",
   "cohort_host_comment_default_private": "Default coach comments to private",
