@@ -1,6 +1,6 @@
 "use client";
 
-import { isApiError } from "@daodao/api";
+import { isApiError, recordManagedSurveyView } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
@@ -38,6 +38,7 @@ export function SurveyResponsePage() {
   const startedAtRef = useRef<string | null>(null);
   const sessionKeyRef = useRef<string | null>(null);
   const lastTrackedPositionRef = useRef<number | null>(null);
+  const countedManagedShareIdRef = useRef<string | null>(null);
 
   // Record start time + session key once survey is loaded
   useEffect(() => {
@@ -48,8 +49,15 @@ export function SurveyResponsePage() {
 
   // Track page view once survey is loaded
   useEffect(() => {
-    if (shareId && survey && !survey.cohortFeedback && survey.managedVersion !== 1)
-      void trackView(shareId);
+    if (!shareId || !survey || survey.cohortFeedback) return;
+    if (survey.managedVersion === 1) {
+      if (countedManagedShareIdRef.current !== shareId) {
+        countedManagedShareIdRef.current = shareId;
+        void recordManagedSurveyView(shareId);
+      }
+      return;
+    }
+    void trackView(shareId);
   }, [shareId, survey]);
   const [answers, setAnswers] = useState<Record<string, Answer>>({});
   const [submitted, setSubmitted] = useState(false);
