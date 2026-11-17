@@ -223,6 +223,7 @@ function CohortMemberContent({ cohortId }: { cohortId: number }) {
                   theme={practice.themeColor || DEFAULT_PRACTICE_THEME}
                   status={mapPracticeStatusToTaskStatus(practice.status)}
                   presentation="cohort"
+                  cohortId={cohortId}
                   lastCheckInDate={practice.lastCheckinAt ?? null}
                   startDate={practice.startDate ?? null}
                   endDate={practice.endDate ?? null}

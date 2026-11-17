@@ -5779,6 +5779,25 @@ export interface paths {
                 };
                 400: components["responses"]["BadRequestError"];
                 401: components["responses"]["UnauthorizedError"];
+                /** @description 同一 IP 的認證請求超過 10 次／15 分鐘（登入與註冊共用額度） */
+                429: {
+                    headers: {
+                        /** @description 重試前需等待的秒數 */
+                        "Retry-After"?: number;
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: false;
+                            message: string;
+                            /** @enum {string} */
+                            error: "AUTH_RATE_LIMIT_EXCEEDED";
+                            /** @enum {number} */
+                            retryAfter: 900;
+                        };
+                    };
+                };
                 500: components["responses"]["InternalServerError"];
             };
         };
@@ -5837,6 +5856,25 @@ export interface paths {
                                 code: string;
                                 message: string;
                             };
+                        };
+                    };
+                };
+                /** @description 同一 IP 的認證請求超過 10 次／15 分鐘（登入與註冊共用額度） */
+                429: {
+                    headers: {
+                        /** @description 重試前需等待的秒數 */
+                        "Retry-After"?: number;
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: false;
+                            message: string;
+                            /** @enum {string} */
+                            error: "AUTH_RATE_LIMIT_EXCEEDED";
+                            /** @enum {number} */
+                            retryAfter: 900;
                         };
                     };
                 };
@@ -6553,6 +6591,25 @@ export interface paths {
                 };
                 400: components["responses"]["BadRequestError"];
                 401: components["responses"]["UnauthorizedError"];
+                /** @description 同一 IP 的授權碼交換超過 60 次／1 分鐘（獨立於登入、註冊及 Apple 登入額度） */
+                429: {
+                    headers: {
+                        /** @description 重試前需等待的秒數 */
+                        "Retry-After"?: number;
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            success: false;
+                            message: string;
+                            /** @enum {string} */
+                            error: "AUTH_RATE_LIMIT_EXCEEDED";
+                            /** @enum {number} */
+                            retryAfter: 60;
+                        };
+                    };
+                };
                 500: components["responses"]["InternalServerError"];
             };
         };
@@ -11495,7 +11552,7 @@ export interface paths {
         };
         /**
          * 取得資料庫資訊
-         * @description 取得 PostgreSQL 和 Redis 的詳細資訊，包括欄位、索引、約束等
+         * @description 僅管理員可取得 PostgreSQL 和 Redis 的詳細資訊，包括欄位、索引、約束等
          */
         get: {
             parameters: {
@@ -11536,6 +11593,8 @@ export interface paths {
                         };
                     };
                 };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
                 500: components["responses"]["InternalServerError"];
             };
         };
@@ -11704,8 +11763,9 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 發送密碼重設郵件
-         * @description 發送密碼重設連結給用戶。支援可選身份驗證（允許未登入用戶重設密碼）。
+         * 密碼重設郵件入口已停用
+         * @deprecated
+         * @description 此遺留入口已停用，回應「密碼重設功能暫時不可用」，不處理輸入資料或寄送郵件。
          */
         post: {
             parameters: {
@@ -11714,21 +11774,8 @@ export interface paths {
                 path?: never;
                 cookie?: never;
             };
-            requestBody?: {
-                content: {
-                    "application/json": components["schemas"]["PasswordResetEmailRequest"];
-                };
-            };
+            requestBody?: never;
             responses: {
-                /** @description 密碼重設郵件發送成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["EmailSuccessResponse"];
-                    };
-                };
                 400: components["responses"]["BadRequestError"];
                 500: components["responses"]["InternalServerError"];
             };
@@ -12140,6 +12187,45 @@ export interface paths {
                     };
                     content?: never;
                 };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/feedback/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 列出登入者自己送出的錯誤回報與團隊回覆（新到舊，最多 100 筆） */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["MyBugReportListApiResponse"];
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                500: components["responses"]["InternalServerError"];
             };
         };
         put?: never;
@@ -12828,7 +12914,7 @@ export interface paths {
         post?: never;
         /**
          * 刪除圖片
-         * @description 從雲端儲存中刪除指定的圖片檔案。需要身份驗證。
+         * @description 刪除登入使用者自己上傳的圖片。僅允許擁有者紀錄可驗證的圖片；未記錄擁有者的舊圖片保留且回傳 403。
          */
         delete: {
             parameters: {
@@ -12853,6 +12939,7 @@ export interface paths {
                 };
                 400: components["responses"]["BadRequestError"];
                 401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
                 404: components["responses"]["NotFoundError"];
                 /** @description 請求過於頻繁 */
                 429: {
@@ -12921,6 +13008,7 @@ export interface paths {
                 };
                 400: components["responses"]["BadRequestError"];
                 401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
                 /** @description 檔案過大 */
                 413: {
                     headers: {
@@ -13002,6 +13090,7 @@ export interface paths {
                 };
                 400: components["responses"]["BadRequestError"];
                 401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
                 /** @description 檔案過大或總數過多 */
                 413: {
                     headers: {
@@ -15300,8 +15389,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 取得系統監控資訊
-         * @description 取得系統資源使用情況，包括 CPU、記憶體、磁碟和 PostgreSQL 狀態
+         * 取得系統健康統計
+         * @description 僅管理員可讀取 CPU 負載、記憶體、磁碟用量及 PostgreSQL 連線統計，不包含主機或資料庫識別資訊。
          */
         get: {
             parameters: {
@@ -15312,7 +15401,7 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description 成功獲取系統監控資訊 */
+                /** @description 系統健康統計；資料庫不可用時保留其他健康資訊 */
                 200: {
                     headers: {
                         [name: string]: unknown;
@@ -15320,52 +15409,36 @@ export interface paths {
                     content: {
                         "application/json": {
                             system: {
-                                hostname: string;
-                                platform: string;
-                                arch: string;
                                 uptime: number;
                                 loadAverage: number[];
                                 totalMemory: number;
                                 freeMemory: number;
-                                release: string;
-                                type: string;
-                                userInfo?: unknown;
-                                cpus: unknown[];
-                                networkInterfaces?: unknown;
-                                processMemory?: unknown;
-                                processId: number;
-                                processTitle: string;
-                                processArgs: string[];
+                                processMemory: {
+                                    rss: number;
+                                    heapTotal: number;
+                                    heapUsed: number;
+                                    external: number;
+                                    arrayBuffers: number;
+                                };
                             };
                             postgres: {
-                                version?: string;
-                                current_connections?: number;
-                                max_connections?: number;
-                                database_size?: string;
-                                start_time?: string;
-                                config?: {
-                                    [key: string]: string;
-                                };
-                                tables?: {
-                                    table_name: string;
-                                    size: string;
-                                    row_count: number;
-                                }[];
-                                error?: string;
-                                details?: string;
+                                current_connections: number;
+                                max_connections: number;
+                            } | {
+                                /** @enum {string} */
+                                error: "PostgreSQL 連線不可用";
                             };
                             disk: {
-                                filesystem: string;
-                                type: string;
                                 size: number;
                                 used: number;
                                 available: number;
                                 use: number;
-                                mount: string;
                             }[];
                         };
                     };
                 };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
                 500: components["responses"]["InternalServerError"];
             };
         };
@@ -19911,7 +19984,6 @@ export interface paths {
                         frequencyMinDays?: number | null;
                         frequencyMaxDays?: number | null;
                         sessionDurationMinutes?: number | null;
-                        /** @default [] */
                         practiceTimePeriods?: ("morning" | "afternoon" | "evening" | "night" | "commute")[];
                         /** @description 自訂執行時段（practice_templates.other_context） */
                         timingOther?: string | null;
@@ -19924,7 +19996,6 @@ export interface paths {
                         }[];
                         /**
                          * @description draft：儲存草稿；ready：完成新增／更新
-                         * @default ready
                          * @enum {string}
                          */
                         status?: "draft" | "ready";
@@ -22136,6 +22207,11 @@ export interface paths {
                                 };
                                 practice: {
                                     id: number;
+                                    /**
+                                     * Format: uuid
+                                     * @description 實踐公開識別碼（UUID），用於連到參與者打卡頁
+                                     */
+                                    externalId: string | null;
                                     title: string;
                                     /** Format: date-time */
                                     startDate: string | null;
@@ -23021,6 +23097,8 @@ export interface paths {
                                     checkinCount: number;
                                     /** @description 這位參與者打卡收到的留言與回應數 */
                                     responseCount: number;
+                                    /** @description 這位參與者在本場次其他成員打卡下發佈的留言數（以人計，同一人各實踐列相同） */
+                                    publishedCommentCount: number;
                                     /**
                                      * Format: date-time
                                      * @description 最後一次打卡或收到回應的時間
@@ -32719,7 +32797,7 @@ export interface paths {
         };
         /**
          * 更新便利貼
-         * @description 更新指定便利貼的資料
+         * @description 僅便利貼擁有者可更新指定便利貼的資料
          */
         put: {
             parameters: {
@@ -32866,6 +32944,7 @@ export interface paths {
                 };
                 400: components["responses"]["BadRequestError"];
                 401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
                 404: components["responses"]["NotFoundError"];
                 500: components["responses"]["InternalServerError"];
             };
@@ -32873,7 +32952,7 @@ export interface paths {
         post?: never;
         /**
          * 刪除便利貼
-         * @description 刪除指定的便利貼
+         * @description 僅便利貼擁有者可刪除指定的便利貼
          */
         delete: {
             parameters: {
@@ -32951,6 +33030,7 @@ export interface paths {
                     };
                 };
                 401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
                 404: components["responses"]["NotFoundError"];
                 500: components["responses"]["InternalServerError"];
             };
@@ -44171,6 +44251,11 @@ export interface components {
              */
             isCohortPractice?: boolean;
             /**
+             * @description 是否禁止複製（仍屬於場次或由場次模板建立，包含已解除關聯者；只在詳情回傳）
+             * @example false
+             */
+            isCopyRestricted?: boolean;
+            /**
              * @description 是否為燈塔場次實踐（隱私由場次統一設定，學員不可修改；只在詳情回傳）
              * @example false
              */
@@ -47902,32 +47987,6 @@ export interface components {
              */
             userId?: number;
         };
-        /** @description 寄送密碼重設郵件的請求資料 */
-        PasswordResetEmailRequest: {
-            /**
-             * Format: email
-             * @description 需要重設密碼的用戶郵件
-             * @example user@example.com
-             * @example user@example.com
-             * @example john.doe@company.com
-             * @example student@university.edu
-             */
-            email: string;
-            /**
-             * Format: uri
-             * @description 用戶點擊重設密碼的安全連結
-             * @example https://example.com/reset-password?token=xyz789
-             */
-            resetLink: string;
-            /**
-             * @description 用戶的顯示姓名
-             * @example 王小明
-             * @example 王小明
-             * @example John Doe
-             * @example 李雅韻
-             */
-            name?: string;
-        };
         /** @description 寄送馬拉松活動相關郵件的請求資料 */
         MarathonEmailRequest: {
             /**
@@ -48329,6 +48388,154 @@ export interface components {
              * @example 2024-01-15T10:30:00.000Z
              */
             timestamp: string;
+        };
+        /**
+         * @description Standard success response format
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "id": 123,
+         *         "_id": "550e8400-e29b-41d4-a716-446655440000",
+         *         "name": "JavaScript 基礎教程",
+         *         "description": "從零開始學習 JavaScript 程式設計",
+         *         "status": "published"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z"
+         *     }
+         * @example {
+         *       "success": true,
+         *       "data": {
+         *         "userId": 456,
+         *         "username": "john_doe",
+         *         "email": "john@example.com",
+         *         "role": "student"
+         *       },
+         *       "timestamp": "2024-01-15T10:30:00.000Z",
+         *       "meta": {
+         *         "cacheHit": true,
+         *         "processingTime": 23.1
+         *       }
+         *     }
+         */
+        MyBugReportListApiResponse: {
+            /**
+             * @description Indicates successful API response
+             * @enum {boolean}
+             */
+            success: true;
+            /** @description The main response data */
+            data: {
+                items: components["schemas"]["MyBugReport"][];
+            };
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp of the response
+             */
+            timestamp: string;
+            /**
+             * @description Optional metadata about the response
+             * @example {
+             *       "searchQuery": "JavaScript教程",
+             *       "searchTime": 45,
+             *       "cacheHit": false,
+             *       "processingTime": 123.5,
+             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+             *     }
+             * @example {
+             *       "categoryCounts": {
+             *         "前端開發": 25,
+             *         "後端開發": 18,
+             *         "資料科學": 12
+             *       },
+             *       "filters": {
+             *         "difficulty": "intermediate",
+             *         "language": "zh-TW"
+             *       }
+             *     }
+             */
+            meta?: {
+                /** @description Search query used for filtering results */
+                searchQuery?: string;
+                /** @description Time taken to execute the search query in milliseconds */
+                searchTime?: number;
+                /** @description Applied filters for the request */
+                filters?: {
+                    [key: string]: unknown;
+                };
+                /** @description Count of items per category */
+                categoryCounts?: {
+                    [key: string]: number;
+                };
+                /** @description Aggregated statistical data */
+                aggregateData?: {
+                    [key: string]: unknown;
+                };
+                /** @description Unique identifier for request tracking */
+                requestId?: string;
+                /** @description Whether the response was served from cache */
+                cacheHit?: boolean;
+                /** @description Total processing time in milliseconds */
+                processingTime?: number;
+            } & {
+                [key: string]: unknown;
+            };
+        };
+        MyBugReport: {
+            /**
+             * @description 回報 id
+             * @example 8
+             */
+            id: number;
+            /**
+             * @description 回報描述
+             * @example 按下送出後畫面沒有反應
+             */
+            content: string;
+            /**
+             * @description 問題區域（ui／performance／auth／data／other）
+             * @example ui
+             */
+            area: string | null;
+            /**
+             * @description 相關連結
+             * @example https://app.daodao.so/settings
+             */
+            link: string | null;
+            /**
+             * @description 截圖網址
+             * @example []
+             */
+            screenshots: string[];
+            /**
+             * @description 處理狀態
+             * @example replied
+             * @enum {string}
+             */
+            status: "pending" | "replied" | "closed";
+            /**
+             * @description 回報時間（ISO 8601）
+             * @example 2026-11-08T02:00:00.000Z
+             */
+            createdAt: string;
+            /** @description 團隊回覆，由舊到新 */
+            replies: components["schemas"]["MyBugReportReply"][];
+        };
+        MyBugReportReply: {
+            /**
+             * @description 回覆 id
+             * @example 12
+             */
+            id: number;
+            /**
+             * @description 團隊回覆內容
+             * @example 已修正，謝謝回報！
+             */
+            content: string;
+            /**
+             * @description 回覆時間（ISO 8601）
+             * @example 2026-11-08T03:00:00.000Z
+             */
+            createdAt: string;
         };
         FollowTargetBody: {
             /**

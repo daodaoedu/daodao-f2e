@@ -5,12 +5,13 @@ import {
   createComment,
   deleteComment,
   updateComment,
+  useAllPracticeCheckIns,
   useArchivePractice,
   useComments,
   useCurrentUser,
   useDeletePractice,
+  useLighthouseParticipantCheckins,
   useMentionCandidates,
-  useMyPractices,
   usePracticeById,
   usePracticeCheckIns,
   useReactionsList,
@@ -20,7 +21,7 @@ import {
 } from "@daodao/api";
 import type { MentionCandidate } from "@daodao/features-mention";
 import { useLocale, useTranslations } from "@daodao/i18n";
-import { useParams, useRouter } from "@daodao/i18n/navigation";
+import { useParams, useRouter, useSearchParams } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
 import { format, isValid, parseISO } from "date-fns";
 import { X } from "lucide-react";
@@ -33,9 +34,9 @@ import {
   isApiCommentNode,
   mapComment,
 } from "@/components/check-in/display/check-in-detail";
-import type { IComment } from "@/components/check-in/reactions";
 import { BackgroundAnimation } from "@/components/layout";
 import { PracticeDetailShell } from "@/components/practice";
+import { CohortParticipantNav } from "@/components/practice/detail/cohort-participant-nav";
 import { PRACTICE_DETAIL_CLOSE_PATH } from "@/constants/home-navigation";
 import {
   type ExecutionTiming,
@@ -47,8 +48,11 @@ import {
   useArchivePracticeDialog,
 } from "@/hooks/use-archive-practice-dialog";
 import { DeletePracticeResult, useDeletePracticeDialog } from "@/hooks/use-delete-practice-dialog";
+import { parseCohortParticipantRefs } from "@/lib/cohort-participant-context";
+import { isPracticeCopyRestricted } from "@/lib/practice-copy-policy";
 import { runDeletePracticeFlow } from "@/lib/practice-delete/run-delete-practice-flow";
 import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
+import { countTotalComments } from "@/utils/count-comments";
 import { formatFrequencyRange } from "@/utils/practice-edit-schedule";
 import { resolvePracticeDurationDays } from "@/utils/practice-period";
 
@@ -119,19 +123,94 @@ export default function PracticeDetailPage() {
   );
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const practiceId = params.id as string;
+  const requestedCohortAdminView = searchParams.get("view") === "cohort-admin";
+  const isCohortMemberView = searchParams.get("view") === "cohort-member";
+  const cohortProgramId = Number(searchParams.get("programId"));
+  const cohortId = Number(searchParams.get("cohortId"));
+  const cohortParticipantRefs = parseCohortParticipantRefs(searchParams.get("members"));
+  const cohortMemberIndex = Number(searchParams.get("memberIndex"));
+  const hasValidCohortParticipantContext =
+    requestedCohortAdminView &&
+    searchParams.has("memberIndex") &&
+    Number.isSafeInteger(cohortProgramId) &&
+    cohortProgramId > 0 &&
+    Number.isSafeInteger(cohortId) &&
+    cohortId > 0 &&
+    Number.isSafeInteger(cohortMemberIndex) &&
+    cohortMemberIndex >= 0 &&
+    cohortMemberIndex < cohortParticipantRefs.length;
+  const currentParticipant = hasValidCohortParticipantContext
+    ? cohortParticipantRefs[cohortMemberIndex]
+    : undefined;
+  // The URL is navigation state. This server-authorized object lookup proves the
+  // current organization/cohort/participant/practice before showing manager UI.
+  const currentParticipantCheckins = useLighthouseParticipantCheckins(
+    hasValidCohortParticipantContext ? cohortProgramId : undefined,
+    hasValidCohortParticipantContext ? cohortId : undefined,
+    currentParticipant?.userId,
+    currentParticipant?.practiceId
+  );
+  const isCheckingCohortAdminAccess =
+    hasValidCohortParticipantContext &&
+    !currentParticipantCheckins.data &&
+    !currentParticipantCheckins.error &&
+    !currentParticipantCheckins.validationError;
+  const isReadOnlyCohortView =
+    !currentParticipantCheckins.error &&
+    !currentParticipantCheckins.validationError &&
+    currentParticipantCheckins.data?.data.practice.externalId === practiceId;
+  const hasCohortParticipantContext = hasValidCohortParticipantContext && isReadOnlyCohortView;
+  const nextCohortParticipant = hasCohortParticipantContext
+    ? cohortParticipantRefs[cohortMemberIndex + 1]
+    : undefined;
+  const previousCohortParticipant = hasCohortParticipantContext
+    ? cohortParticipantRefs[cohortMemberIndex - 1]
+    : undefined;
+  const nextParticipantCheckins = useLighthouseParticipantCheckins(
+    hasCohortParticipantContext ? cohortProgramId : undefined,
+    hasCohortParticipantContext ? cohortId : undefined,
+    nextCohortParticipant?.userId,
+    nextCohortParticipant?.practiceId
+  );
+  const previousParticipantCheckins = useLighthouseParticipantCheckins(
+    hasCohortParticipantContext ? cohortProgramId : undefined,
+    hasCohortParticipantContext ? cohortId : undefined,
+    previousCohortParticipant?.userId,
+    previousCohortParticipant?.practiceId
+  );
+  const nextCohortPracticeExternalId = nextParticipantCheckins.data?.data.practice.externalId;
+  const previousCohortPracticeExternalId =
+    previousParticipantCheckins.data?.data.practice.externalId;
+  let cohortListingHref: string | undefined;
+  if (isReadOnlyCohortView && cohortProgramId > 0 && cohortId > 0) {
+    cohortListingHref = `/cohorts/${cohortId}?programId=${cohortProgramId}`;
+  } else if (isCohortMemberView && cohortId > 0) {
+    cohortListingHref = `/cohorts/${cohortId}`;
+  }
+  const handleClose = () => {
+    if (cohortListingHref) {
+      router.push(cohortListingHref);
+      return;
+    }
+    router.replace(PRACTICE_DETAIL_CLOSE_PATH);
+  };
   const {
     data: practiceData,
     isLoading,
     error,
     mutate: mutatePractice,
   } = usePracticeById(practiceId);
-  const { data: checkInsData, isLoading: isLoadingCheckIns } = usePracticeCheckIns(practiceId, {
-    limit: 30,
-  });
+  const standardCheckIns = usePracticeCheckIns(practiceId, { limit: 30 }, !isReadOnlyCohortView);
+  const allCheckIns = useAllPracticeCheckIns(practiceId, isReadOnlyCohortView);
+  const checkInsQuery = isReadOnlyCohortView ? allCheckIns : standardCheckIns;
+  const checkInsData = checkInsQuery.data;
+  const isLoadingCheckIns = checkInsQuery.isLoading;
   const {
     data: commentsData,
     isLoading: isLoadingComments,
+    error: commentsError,
     mutate: mutateComments,
   } = useComments({
     targetType: "practice",
@@ -142,7 +221,6 @@ export default function PracticeDetailPage() {
     targetId: practiceId,
     limit: 50,
   });
-  const { data: practicesListData } = useMyPractices({ limit: 100 });
   const { data: currentUserData } = useCurrentUser();
   const { data: reactionsListData } = useReactionsList({
     targetType: "practice",
@@ -247,28 +325,29 @@ export default function PracticeDetailPage() {
     }));
   }, [mentionCandidatesData]);
 
-  const { previousPracticeId, nextPracticeId, hasPrevious, hasNext } = useMemo(() => {
-    const practices = practicesListData?.data || [];
-    const currentIndex = practices.findIndex((p) => String(p.id) === practiceId);
-    if (currentIndex === -1) {
-      return { previousPracticeId: null, nextPracticeId: null, hasPrevious: false, hasNext: false };
-    }
-    const previousPractice = currentIndex > 0 ? practices[currentIndex - 1] : null;
-    const nextPractice = currentIndex < practices.length - 1 ? practices[currentIndex + 1] : null;
-    return {
-      previousPracticeId: previousPractice ? String(previousPractice.id) : null,
-      nextPracticeId: nextPractice ? String(nextPractice.id) : null,
-      hasPrevious: previousPractice !== null,
-      hasNext: nextPractice !== null,
-    };
-  }, [practicesListData, practiceId]);
-
-  const handlePrevious = () => {
-    if (previousPracticeId) router.push(`/practices/${previousPracticeId}`);
+  const getCohortParticipantPracticeHref = (externalId: string, memberIndex: number) => {
+    const nextParams = new URLSearchParams({
+      view: "cohort-admin",
+      programId: String(cohortProgramId),
+      cohortId: String(cohortId),
+      members: cohortParticipantRefs
+        .map(({ userId, practiceId: lighthousePracticeId }) => `${userId}:${lighthousePracticeId}`)
+        .join(","),
+      memberIndex: String(memberIndex),
+    });
+    return `/practices/${externalId}?${nextParams.toString()}`;
   };
-
-  const handleNext = () => {
-    if (nextPracticeId) router.push(`/practices/${nextPracticeId}`);
+  const handleNextCohortParticipant = () => {
+    if (!nextCohortPracticeExternalId) return;
+    router.push(
+      getCohortParticipantPracticeHref(nextCohortPracticeExternalId, cohortMemberIndex + 1)
+    );
+  };
+  const handlePreviousCohortParticipant = () => {
+    if (!previousCohortPracticeExternalId) return;
+    router.push(
+      getCohortParticipantPracticeHref(previousCohortPracticeExternalId, cohortMemberIndex - 1)
+    );
   };
 
   const handleEdit = () => {
@@ -340,7 +419,7 @@ export default function PracticeDetailPage() {
       toast.success(t("comment_success"));
       await Promise.all([mutateComments(), mutatePractice()]);
     },
-    [mutateComments, mutatePractice, practiceId, serverErrorMessage]
+    [mutateComments, mutatePractice, practiceId, serverErrorMessage, t]
   );
 
   const handleCommentEdit = useCallback(
@@ -368,7 +447,7 @@ export default function PracticeDetailPage() {
       await mutateComments();
       return true;
     },
-    [mutateComments, serverErrorMessage]
+    [mutateComments, serverErrorMessage, t]
   );
 
   const handleCommentDelete = useCallback(
@@ -393,16 +472,16 @@ export default function PracticeDetailPage() {
       await mutateComments();
       return true;
     },
-    [mutateComments, serverErrorMessage]
+    [mutateComments, serverErrorMessage, t]
   );
 
-  if (isLoading) {
+  if (isLoading || isCheckingCohortAdminAccess) {
     return (
       <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
         <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
           <button
             type="button"
-            onClick={() => router.replace(PRACTICE_DETAIL_CLOSE_PATH)}
+            onClick={handleClose}
             className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
             aria-label={t("close")}
           >
@@ -423,7 +502,7 @@ export default function PracticeDetailPage() {
         <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
           <button
             type="button"
-            onClick={() => router.replace(PRACTICE_DETAIL_CLOSE_PATH)}
+            onClick={handleClose}
             className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
             aria-label={t("close")}
           >
@@ -450,24 +529,48 @@ export default function PracticeDetailPage() {
 
   return (
     <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
-      <div className="sticky top-0 z-50 max-w-[448px] mx-auto w-full">
-        <button
-          type="button"
-          onClick={() => router.replace(PRACTICE_DETAIL_CLOSE_PATH)}
-          className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
-          aria-label={t("close")}
-        >
-          <X className="size-6" />
-        </button>
-      </div>
+      {hasCohortParticipantContext && cohortListingHref ? (
+        <CohortParticipantNav
+          backHref={cohortListingHref}
+          backLabel={t("back_to_cohort")}
+          navLabel={t("participant_navigation")}
+          participantName={practiceData?.data?.user?.name}
+          current={cohortMemberIndex + 1}
+          total={cohortParticipantRefs.length}
+          onPrevious={handlePreviousCohortParticipant}
+          onNext={handleNextCohortParticipant}
+          previousDisabled={!previousCohortPracticeExternalId}
+          nextDisabled={!nextCohortPracticeExternalId}
+          previousLabel={t("previous_participant_practice")}
+          nextLabel={t("next_participant_practice")}
+        />
+      ) : (
+        <div className="sticky top-0 z-50 mx-auto w-full max-w-[1440px] px-2 md:px-8">
+          <button
+            type="button"
+            onClick={handleClose}
+            className="absolute top-2 right-2 flex items-center justify-center size-10 rounded-full text-light-gray bg-very-light-gray/50 hover:text-logo-cyan"
+            aria-label={t("close")}
+          >
+            <X className="size-6" />
+          </button>
+        </div>
+      )}
       <BackgroundAnimation />
 
       <PracticeDetailShell
+        hasTopBar={hasCohortParticipantContext && Boolean(cohortListingHref)}
         practice={{
           id: practiceId,
           title: practice.title,
           isChallenge: practiceData?.data?.isChallenge === true,
-          isCohortPractice: practiceData?.data?.isCohortPractice === true,
+          isCopyRestricted: practiceData?.data
+            ? isPracticeCopyRestricted(practiceData.data)
+            : false,
+          isCohortPractice:
+            practiceData?.data?.isCohortPractice === true ||
+            isReadOnlyCohortView ||
+            isCohortMemberView,
           status: practiceData?.data?.status,
           actionDescription: practice.actionDescription,
           frequency: practice.frequency,
@@ -493,19 +596,28 @@ export default function PracticeDetailPage() {
         }}
         practiceId={practiceId}
         isOwner={isOwner}
+        readOnly={isReadOnlyCohortView}
         checkInsData={checkInsData}
         isLoadingCheckIns={isLoadingCheckIns}
+        checkInsError={isReadOnlyCohortView && Boolean(allCheckIns.error)}
+        onRetryCheckIns={() => {
+          void allCheckIns.mutate();
+        }}
         isLoadingComments={isLoadingComments}
+        commentsError={Boolean(commentsError)}
+        onRetryComments={() => {
+          void mutateComments();
+        }}
         comments={comments}
         currentUserName={currentUserData?.data?.name || undefined}
         currentUserId={currentUserData?.data?.id || undefined}
         currentUserPhotoURL={getCurrentUserPhotoURL(currentUserData?.data)}
         mentionCandidates={mentionCandidates}
-        commentCount={practiceData?.data?.stats?.commentCount}
-        hasPrevious={hasPrevious}
-        hasNext={hasNext}
-        onPrevious={handlePrevious}
-        onNext={handleNext}
+        commentCount={
+          Array.isArray(commentsData?.data)
+            ? countTotalComments(commentsData.data.filter(isApiCommentNode))
+            : practiceData?.data?.stats?.commentCount
+        }
         onEditPractice={handleEdit}
         onArchivePractice={() => {
           void handleArchive();
