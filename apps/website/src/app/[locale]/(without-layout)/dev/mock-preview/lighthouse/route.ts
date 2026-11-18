@@ -61,7 +61,7 @@ html.dark-nav .btn-cta{background:var(--primary-lighter);color:var(--bg-dark)}
 .nav-right{display:flex;align-items:center;gap:14px}
 @media (min-width:480px){.nav-links{display:flex}}
 .hero{position:relative;overflow:visible;min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding-block:clamp(48px,7vw,96px) clamp(56px,7vw,104px);background:linear-gradient(145deg,var(--page) 0%,#E8F7F5 60%,#D4F0F5 100%)}
-@media(min-width:600px){.hero{min-height:700px}}
+@media(min-width:600px){.hero{min-height:100svh}}
 .hero .wrap{position:relative;z-index:1;display:grid;gap:48px;align-items:center}
 @media (min-width:980px){.hero .wrap{grid-template-columns:1.4fr 1fr}}
 .hero-copy{position:relative}
@@ -587,7 +587,7 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
               <li>已加入、已開始、本週持續行動中的人數</li>
               <li>打卡熱度圖、近兩週走勢、偏好的打卡時段</li>
               <li>打卡標籤與情緒分佈</li>
-              <li>參與者明細：打卡、留言、瀏覽、迴響</li>
+              <li>參與者明細：打卡次數、收到留言、收到迴響</li>
             </ul>
           </div>
           <div class="mock" aria-hidden="true">
@@ -595,10 +595,10 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
               <div class="card-lite">
                 <h4>情緒分佈</h4><small>打卡時情緒分佈</small>
                 <div class="mood">
-                  <div><span>平靜</span><span>24</span><span class="bar"><i style="width:78%"></i></span></div>
-                  <div><span>有點累</span><span>17</span><span class="bar"><i style="width:55%"></i></span></div>
+                  <div><span>不錯</span><span>24</span><span class="bar"><i style="width:78%"></i></span></div>
+                  <div><span>普通</span><span>17</span><span class="bar"><i style="width:55%"></i></span></div>
                   <div><span>開心</span><span>14</span><span class="bar"><i style="width:45%"></i></span></div>
-                  <div><span>焦慮</span><span>9</span><span class="bar"><i style="width:29%"></i></span></div>
+                  <div><span>受挫</span><span>9</span><span class="bar"><i style="width:29%"></i></span></div>
                 </div>
               </div>
               <div class="card-lite">
@@ -609,15 +609,16 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
               </div>
             </div>
             <div style="margin-top:16px">
-              <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:4px">打卡時段　偏好在哪些時段打卡（24 小時制）</div>
-              <div class="hours">
-                <div><i style="height:26%"></i><span>06–09</span></div>
-                <div><i style="height:39%"></i><span>09–12</span></div>
-                <div><i style="height:30%"></i><span>12–15</span></div>
-                <div><i style="height:22%"></i><span>15–18</span></div>
-                <div><i style="height:61%"></i><span>18–21</span></div>
-                <div><i style="height:100%"></i><span>21–24</span></div>
-              </div>
+              <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:4px">打卡時段（Asia/Taipei）　偏好在哪些時段打卡（24 小時制）</div>
+              <svg viewBox="0 0 400 130" width="100%" role="img" aria-label="打卡時段折線圖" style="display:block;margin-top:8px">
+                <path d="M25 77.5L75 65.8L125 71.7L175 83.3L225 54.2L275 42.5L325 25L375 60V100H25Z" fill="var(--primary-palest)"/>
+                <polyline points="25,77.5 75,65.8 125,71.7 175,83.3 225,54.2 275,42.5 325,25 375,60" fill="none" stroke="var(--primary-base)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <g fill="var(--primary-base)"><circle cx="25" cy="77.5" r="3.5"/><circle cx="75" cy="65.8" r="3.5"/><circle cx="125" cy="71.7" r="3.5"/><circle cx="175" cy="83.3" r="3.5"/><circle cx="225" cy="54.2" r="3.5"/><circle cx="275" cy="42.5" r="3.5"/><circle cx="325" cy="25" r="3.5"/><circle cx="375" cy="60" r="3.5"/></g>
+                <g font-size="11" fill="var(--text-muted)" text-anchor="middle" font-family="var(--f-body)">
+                  <text x="25" y="66">3</text><text x="75" y="54">5</text><text x="125" y="60">4</text><text x="175" y="72">2</text><text x="225" y="43">7</text><text x="275" y="31">9</text><text x="325" y="14">12</text><text x="375" y="49">6</text>
+                  <text x="25" y="120">07</text><text x="75" y="120">09</text><text x="125" y="120">12</text><text x="175" y="120">15</text><text x="225" y="120">18</text><text x="275" y="120">20</text><text x="325" y="120">21</text><text x="375" y="120">22</text>
+                </g>
+              </svg>
             </div>
           </div>
         </div>
@@ -628,16 +629,16 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
             <h3>群組聊天：每個活動課程都有自己的聊天室</h3>
             <p>建立活動課程時，聊天室就自動開好；參與者加入課程後自動進來，不用另外拉群。重要的事情置頂，大家都看得到。</p>
             <ul class="ticks">
-              <li>發起人訊息有專屬標記，可以置頂、整理訊息</li>
+              <li>發起人名字旁有盾牌標記，可以置頂重要訊息</li>
               <li>回覆引用、按讚，看見彼此的回應</li>
-              <li>搜尋過去的對話，重要內容不會被沖掉</li>
-              <li>課程結束後，聊天室仍可繼續交流</li>
+              <li>聊天室內搜尋過去的對話，重要內容不會被沖掉</li>
             </ul>
           </div>
           <div class="mock" aria-hidden="true" style="padding:0;overflow:hidden">
             <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--bg-gray)">
               <div style="width:32px;height:32px;border-radius:8px;background:var(--primary-palest);display:grid;place-items:center;font:700 .75rem var(--f-body);color:var(--primary-darker)">信</div>
               <div style="flex:1;min-width:0"><div style="font-size:.85rem;font-weight:700;color:var(--bg-dark)">信念改寫陪跑營・第 3 梯</div></div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
               <div style="display:flex;gap:-4px"><span style="width:22px;height:22px;border-radius:50%;background:var(--primary-palest);border:2px solid white;font-size:.6rem;display:grid;place-items:center;color:var(--primary-darker);font-weight:700">安</span><span style="width:22px;height:22px;border-radius:50%;background:#FFF3E0;border:2px solid white;font-size:.6rem;display:grid;place-items:center;color:#E65100;font-weight:700;margin-left:-6px">涵</span><span style="width:22px;height:22px;border-radius:50%;background:#E8F5E9;border:2px solid white;font-size:.6rem;display:grid;place-items:center;color:#2E7D32;font-weight:700;margin-left:-6px">宇</span><span style="width:22px;height:22px;border-radius:50%;background:#EDE7F6;border:2px solid white;font-size:.6rem;display:grid;place-items:center;color:#4527A0;font-weight:700;margin-left:-6px">18</span></div>
             </div>
             <div style="padding:12px 14px;background:#F9F5E8;border-bottom:1px solid var(--bg-gray);display:flex;align-items:center;gap:8px"><span style="color:#E65100;font-size:.75rem">📌</span><span style="font-size:.75rem;color:var(--bg-dark)"><b>依婷</b>　週四晚上 8 點直播，主題是「說不的練習」</span></div>
@@ -653,7 +654,7 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
                 <div style="background:#16B9B3;border-radius:12px 12px 4px 12px;padding:9px 12px;font-size:.8rem;color:white;max-width:88%"><div style="font-size:.7rem;opacity:.8;margin-bottom:3px">小安：今天主管問我意見…</div>這一步很不容易！記得那時身體的感覺嗎？</div>
               </div>
             </div>
-            <div style="padding:10px 14px;border-top:1px solid var(--bg-gray);display:flex;align-items:center;gap:8px"><span style="flex:1;font-size:.8rem;color:var(--text-muted)">說點什麼，參與者都在</span><div style="width:30px;height:30px;border-radius:50%;background:var(--primary-palest);display:grid;place-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke="#16B9B3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+            <div style="padding:10px 14px;border-top:1px solid var(--bg-gray);display:flex;align-items:center;gap:8px"><span style="flex:1;font-size:.8rem;color:var(--text-muted)">說點什麼，島民都在</span><div style="width:30px;height:30px;border-radius:50%;background:var(--primary-palest);display:grid;place-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke="#16B9B3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
           </div>
         </div>
         <!-- 名單 -->
@@ -674,6 +675,7 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
                 <h4>邀請成員</h4>
                 <div style="background:var(--page);border:1px solid var(--bg-gray);border-radius:10px;padding:10px;font-size:.72rem;color:var(--text-muted);margin-bottom:10px;line-height:1.9">an.chen@example.com<br>yuting.w@example.com<br>sya.lin@example.com</div>
                 <div style="font-size:.7rem;color:var(--text-muted);margin-bottom:8px">上傳名單前請確認已取得當事人同意，邀請信只用於本場次。</div>
+                <div style="margin-bottom:10px"><span class="mini-btn solid">預覽名單</span></div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border:1px solid var(--bg-gray);border-radius:8px;margin-bottom:6px"><span style="font-size:.78rem;color:var(--bg-dark)">小安・10/02 加入</span><span style="font-size:.7rem;font-weight:600;color:var(--primary-darker);background:var(--primary-palest);padding:2px 8px;border-radius:999px">已加入</span></div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border:1px solid var(--bg-gray);border-radius:8px"><span style="font-size:.78rem;color:var(--bg-dark)">yuting.w@…</span><span style="font-size:.7rem;font-weight:600;color:#E65100;background:#FFF3E0;padding:2px 8px;border-radius:999px">待確認</span></div>
               </div>
@@ -684,7 +686,7 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
                   <span style="font-size:.7rem;color:#6aacaa;font-weight:500">QR Code</span>
                 </div>
                 <button type="button" style="width:100%;padding:8px;border:2px solid var(--primary-base);border-radius:999px;background:transparent;color:var(--primary-darker);font:600 .78rem var(--f-body);cursor:pointer">複製連結</button>
-                <div style="text-align:center;margin-top:8px;font-size:.7rem;color:var(--text-muted)">暫停加入・重置加入連結</div>
+                <div style="display:flex;justify-content:center;gap:8px;margin-top:10px"><span class="mini-btn">重置加入連結</span><span style="font:600 .72rem var(--f-body);padding:5px 8px;color:var(--text-muted)">暫停加入</span></div>
               </div>
             </div>
           </div>
@@ -697,10 +699,10 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
             <p>想公開招生的場次，可以列在島島的「探索活動課程」頁面。這裡是參與者自己發起的活動與課程目錄，訪客不用登入就能瀏覽，先認識你，再決定要不要報名。</p>
           </div>
           <div class="mock" aria-hidden="true" style="padding:0;overflow:hidden">
-            <div style="padding:14px 16px;border-bottom:1px solid var(--bg-gray);display:flex;align-items:center;justify-content:space-between"><span style="font-size:.85rem;font-weight:700;color:var(--bg-dark)">探索活動課程</span><span style="font-size:.72rem;color:var(--text-muted)">訪客也能瀏覽</span></div>
+            <div style="padding:14px 16px;border-bottom:1px solid var(--bg-gray);display:flex;align-items:center;justify-content:space-between"><span style="font-size:.85rem;font-weight:700;color:var(--bg-dark)">探索活動課程</span><span style="font-size:.72rem;color:var(--text-muted)">島民自己發起的活動與課程</span></div>
             <div style="padding:12px 14px">
               <div style="display:flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid var(--bg-gray);border-radius:999px;margin-bottom:10px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="#A0AEC0" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="#A0AEC0" stroke-width="2" stroke-linecap="round"/></svg><span style="font-size:.78rem;color:var(--text-muted)">搜尋活動名稱、介紹或發起人</span></div>
-              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"><span style="padding:4px 12px;border-radius:999px;background:var(--primary-base);color:white;font-size:.72rem;font-weight:600">全部</span><span style="padding:4px 12px;border-radius:999px;background:var(--bg-gray);color:var(--text-muted);font-size:.72rem">開放報名</span><span style="padding:4px 12px;border-radius:999px;background:var(--bg-gray);color:var(--text-muted);font-size:.72rem">進行中</span><span style="padding:4px 12px;border-radius:999px;background:var(--bg-gray);color:var(--text-muted);font-size:.72rem">免費</span></div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"><span style="padding:4px 12px;border-radius:999px;background:var(--primary-base);color:white;font-size:.72rem;font-weight:600">全部</span><span style="padding:4px 12px;border-radius:999px;background:var(--bg-gray);color:var(--text-muted);font-size:.72rem">開放報名</span><span style="padding:4px 12px;border-radius:999px;background:var(--bg-gray);color:var(--text-muted);font-size:.72rem">進行中</span><span style="padding:4px 12px;border-radius:999px;background:var(--bg-gray);color:var(--text-muted);font-size:.72rem">已結束</span><span style="padding:4px 12px;border-radius:999px;background:var(--bg-gray);color:var(--text-muted);font-size:.72rem">免費</span><span style="padding:4px 12px;border-radius:999px;background:var(--bg-gray);color:var(--text-muted);font-size:.72rem">付費</span></div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
                 <div style="border:1px solid var(--bg-gray);border-radius:12px;overflow:hidden">
                   <div style="background:repeating-linear-gradient(45deg,#E0F5F4,#E0F5F4 4px,#C5EBE9 4px,#C5EBE9 8px);padding:8px 10px;display:flex;align-items:center;justify-content:space-between"><span style="font-size:.66rem;font-weight:700;color:var(--primary-darker);background:white;padding:2px 7px;border-radius:999px">開放報名</span><span style="font-size:.66rem;color:var(--primary-darker)">3 個主題實踐</span></div>
@@ -708,7 +710,7 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
                 </div>
                 <div style="border:1px solid var(--bg-gray);border-radius:12px;overflow:hidden">
                   <div style="background:repeating-linear-gradient(45deg,#FFF9E0,#FFF9E0 4px,#FFF0B3 4px,#FFF0B3 8px);padding:8px 10px;display:flex;align-items:center;justify-content:space-between"><span style="font-size:.66rem;font-weight:700;color:#92680A;background:white;padding:2px 7px;border-radius:999px">進行中</span><span style="font-size:.66rem;color:#92680A">1 個主題實踐</span></div>
-                  <div style="padding:10px"><div style="font-size:.8rem;font-weight:700;color:var(--bg-dark);margin-bottom:3px">7 日自我覺察打卡</div><div style="font-size:.7rem;color:var(--text-muted);margin-bottom:6px">每天花五分鐘，寫下一個讓你停下來的瞬間。</div><div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:.7rem;color:var(--text-muted)">家睿・24 位參與者</span><span style="font-size:.75rem;font-weight:600;color:var(--primary-darker)">免費</span></div></div>
+                  <div style="padding:10px"><div style="font-size:.8rem;font-weight:700;color:var(--bg-dark);margin-bottom:3px">7 日自我覺察打卡</div><div style="font-size:.7rem;color:var(--text-muted);margin-bottom:6px">每天花五分鐘，寫下一個讓你停下來的瞬間。</div><div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:.7rem;color:var(--text-muted)">家睿・24 位島民</span><span style="font-size:.75rem;font-weight:600;color:var(--primary-darker)">免費</span></div></div>
                 </div>
               </div>
             </div>
