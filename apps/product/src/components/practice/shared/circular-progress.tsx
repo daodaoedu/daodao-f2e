@@ -10,6 +10,8 @@ interface CircularProgressProps {
   className?: string;
   showText?: boolean;
   textClassName?: string;
+  caption?: string;
+  ariaLabel?: string;
 }
 
 export const CircularProgress = ({
@@ -19,6 +21,8 @@ export const CircularProgress = ({
   className,
   showText = true,
   textClassName,
+  caption,
+  ariaLabel,
 }: CircularProgressProps) => {
   const t = useTranslations("practice");
   const radius = (size - strokeWidth) / 2;
@@ -33,7 +37,7 @@ export const CircularProgress = ({
         height={size}
         className="transform -rotate-90"
         role="img"
-        aria-label={t("progress_aria", { value: Math.round(value) })}
+        aria-label={ariaLabel ?? t("progress_aria", { value: Math.round(value) })}
       >
         {/* Background circle */}
         <circle
@@ -62,11 +66,16 @@ export const CircularProgress = ({
       {showText && (
         <div
           className={cn(
-            "absolute inset-0 flex items-center justify-center text-lg font-semibold text-logo-cyan",
+            "absolute inset-0 flex flex-col items-center justify-center font-semibold text-logo-cyan",
             textClassName
           )}
         >
-          {Math.round(value)}%
+          {caption && (
+            <span className="text-[9px] font-medium leading-tight text-text-dark/70">
+              {caption}
+            </span>
+          )}
+          <span className={caption ? "text-sm leading-tight" : "text-lg"}>{Math.round(value)}%</span>
         </div>
       )}
     </div>

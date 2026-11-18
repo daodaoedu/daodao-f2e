@@ -3,8 +3,9 @@
 import { type PracticeCheckInsResponse, useComments } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Link } from "@daodao/i18n/navigation";
+import { Button } from "@daodao/ui/components/button";
 import { format, isValid, parse } from "date-fns";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { isApiCommentNode } from "@/components/check-in/display/api-comment-node";
 import { CheckInCommentSheetContent } from "@/components/check-in/display/check-in-detail";
 import { MOOD_OPTIONS, MoodType, mapApiMoodToMoodType } from "@/constants/mood";
@@ -22,6 +23,7 @@ interface ICurrentUserProps {
 interface ICheckInCommentGroupProps extends ICurrentUserProps {
   practiceId: string;
   checkIn: PracticeCheckIn;
+  isHidden?: boolean;
   onCountChange: (checkInId: string, count: number) => void;
 }
 
@@ -34,6 +36,7 @@ const formatCheckInDate = (checkinDate: string): string => {
 function CheckInCommentGroup({
   practiceId,
   checkIn,
+  isHidden = false,
   onCountChange,
   ...currentUser
 }: ICheckInCommentGroupProps) {
@@ -59,7 +62,7 @@ function CheckInCommentGroup({
   const Emoji = MOOD_OPTIONS.find((option) => option.id === mood)?.emoji;
 
   return (
-    <li className="overflow-hidden rounded-xl bg-white shadow-sm">
+    <li className={`${isHidden ? "hidden " : ""}overflow-hidden rounded-xl bg-white shadow-sm`}>
       <Link
         href={`/practices/${practiceId}/check-ins/${checkInId}${cohortViewQuery}`}
         className="flex items-start gap-3 border-b border-[#E4EAE9] bg-[#F0F9F8] px-4 py-3 transition-colors hover:bg-[#E7FAF7]"
@@ -104,6 +107,8 @@ export function CheckInCommentGroups({
   onCountChange,
   ...currentUser
 }: ICheckInCommentGroupsProps) {
+  const t = useTranslations("check_in");
+  const [expanded, setExpanded] = useState(false);
   const checkIns = checkInsData?.data ?? [];
 
   if (checkIns.length === 0) {
@@ -116,16 +121,27 @@ export function CheckInCommentGroups({
         <h2 className="mb-2 px-1 text-xs font-medium text-[#6B8789]">{heading}</h2>
       )}
       <ol className="flex flex-col gap-3">
-        {checkIns.map((checkIn) => (
+        {checkIns.map((checkIn, index) => (
           <CheckInCommentGroup
             key={checkIn.id}
             practiceId={practiceId}
             checkIn={checkIn}
+            isHidden={!expanded && index >= 2}
             onCountChange={onCountChange}
             {...currentUser}
           />
         ))}
       </ol>
+      {totalCount > 0 && checkIns.length > 2 && (
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => setExpanded((value) => !value)}
+          className="mt-2 h-auto w-full py-2 text-sm text-[#6B8789] hover:text-text-dark"
+        >
+          {expanded ? t("checkins_show_less") : t("checkins_show_more")}
+        </Button>
+      )}
     </section>
   );
 }

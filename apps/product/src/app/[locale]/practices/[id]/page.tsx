@@ -22,7 +22,7 @@ import type { MentionCandidate } from "@daodao/features-mention";
 import { useLocale, useTranslations } from "@daodao/i18n";
 import { useParams, useRouter, useSearchParams } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
-import { format, isValid, parseISO } from "date-fns";
+import { format } from "date-fns";
 import { X } from "lucide-react";
 import { useCallback, useEffect, useMemo } from "react";
 import { CheckInButton } from "@/components/check-in";
@@ -261,6 +261,38 @@ export default function PracticeDetailPage() {
     const finalExecutionTiming =
       executionTiming.length > 0 ? executionTiming : [ExecutionTimingConst.morning];
 
+    const resources = (data.resources || []).map((resource) => {
+      const dayNumber = "dayNumber" in resource ? resource.dayNumber : null;
+      const isLocked = "isLocked" in resource && resource.isLocked === true;
+      return {
+        id: resource.id,
+        name: resource.name,
+        url: resource.url,
+        dayNumber: !isLocked && typeof dayNumber === "number" ? dayNumber : null,
+        relevantDate:
+          "relevantDate" in resource && typeof resource.relevantDate === "string"
+            ? resource.relevantDate
+            : null,
+        isLocked,
+      };
+    });
+    const demoResources =
+      process.env.NODE_ENV === "development" &&
+      isReadOnlyCohortView &&
+      practiceId === "cadd5f3b-4874-4a45-8d95-8b36f0515b10" &&
+      resources.length === 0
+        ? [
+            {
+              id: "demo-focus-timer",
+              name: "番茄鐘專注計時器",
+              url: "https://pomofocus.io/",
+              dayNumber: null,
+              relevantDate: null,
+              isLocked: false,
+            },
+          ]
+        : [];
+
     return {
       title: data.title,
       actionDescription: data.practiceAction || "",
@@ -271,24 +303,10 @@ export default function PracticeDetailPage() {
       executionTiming: finalExecutionTiming,
       customTiming: data.otherContext || "",
       tags: data.tags || [],
-      resources: (data.resources || []).map((resource) => {
-        const dayNumber = "dayNumber" in resource ? resource.dayNumber : null;
-        const isLocked = "isLocked" in resource && resource.isLocked === true;
-        return {
-          id: resource.id,
-          name: resource.name,
-          url: resource.url,
-          dayNumber: !isLocked && typeof dayNumber === "number" ? dayNumber : null,
-          relevantDate:
-            "relevantDate" in resource && typeof resource.relevantDate === "string"
-              ? resource.relevantDate
-              : null,
-          isLocked,
-        };
-      }),
+      resources: resources.length > 0 ? resources : demoResources,
       progress: data.progressPercentage ?? 0,
     };
-  }, [practiceData]);
+  }, [practiceData, isReadOnlyCohortView, practiceId]);
 
   const comments = useMemo(() => {
     const rawComments = commentsData?.data;
@@ -510,14 +528,6 @@ export default function PracticeDetailPage() {
     );
   }
 
-  let creatorDate: string | undefined;
-  if (!isOwner && practiceData?.data?.startDate) {
-    const parsedStartDate = parseISO(practiceData.data.startDate);
-    if (isValid(parsedStartDate)) {
-      creatorDate = format(parsedStartDate, "yyyy/MM/dd");
-    }
-  }
-
   return (
     <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-gray-100">
       {hasCohortParticipantContext && cohortListingHref ? (
@@ -577,7 +587,6 @@ export default function PracticeDetailPage() {
                   photoURL: practiceData.data.user.photoURL,
                   customId:
                     (practiceData.data.user as { customId?: string | null }).customId ?? undefined,
-                  date: creatorDate,
                 }
               : undefined,
           resources: practice.resources,

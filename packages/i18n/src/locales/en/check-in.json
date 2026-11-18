@@ -1,4 +1,6 @@
 {
+  "checkins_show_more": "See more",
+  "checkins_show_less": "Show less",
   "just_now": "just now",
   "anonymous_user": "Anonymous User",
   "comment_failed": "Failed to post comment, please try again",
@@ -103,6 +105,7 @@
   "check_in_failed": "Check-in failed, please try again later",
   "record_title": "Check-in Records",
   "loading": "Loading...",
+  "mood": "Mood",
   "mood_ranking": "Mood Ranking",
   "collapse": "Collapse",
   "expand": "Expand",
