@@ -39,12 +39,19 @@ describe("public survey feedback mapping", () => {
   it("preserves server eligibility and privacy metadata so the page cannot use generic tracking", async () => {
     getPublicSurvey.mockResolvedValueOnce({
       ...rawSurvey,
-      cohort_feedback: { state: "login_required", privacy_notice: "僅記錄完成狀態" },
+      cohort_feedback: {
+        state: "login_required",
+        privacy_notice: "僅記錄完成狀態",
+        organization_name: "島島測試組織",
+        cohort_name: "春季測試班",
+      },
     });
     const result = await getSurveyByShareId("feedback-survey");
     expect(result.cohortFeedback).toEqual({
       state: "login_required",
       privacyNotice: "僅記錄完成狀態",
+      organizationName: "島島測試組織",
+      cohortName: "春季測試班",
     });
     expect(result.questions[0]).toMatchObject({
       id: "55",
