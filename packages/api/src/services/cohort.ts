@@ -38,7 +38,15 @@ type AddOrganizationMemberBody = NonNullable<
 
 export type LighthouseOrganizationType = OrganizationListResponse["data"][number];
 export type LighthouseProgramType = ProgramListResponse["data"][number];
-export type LighthouseCohortType = CohortListResponse["data"][number];
+type ApiLighthouseCohortType = CohortListResponse["data"][number];
+export type LighthouseCohortType = Omit<
+  ApiLighthouseCohortType,
+  "organizationId" | "organizationName"
+> &
+  Partial<Pick<ApiLighthouseCohortType, "organizationId" | "organizationName">>;
+type LighthouseCohortListResponse = Omit<CohortListResponse, "data"> & {
+  data: LighthouseCohortType[];
+};
 
 const nullableDateTimeSchema = z.string().datetime().nullable();
 const responseMetaSchema = z.record(z.string(), z.unknown()).optional();
@@ -97,8 +105,8 @@ const cohortSessionShape = {
 const lighthouseCohortShape = {
   id: z.number().int().positive(),
   programId: z.number().int().positive(),
-  organizationId: z.number().int().positive(),
-  organizationName: z.string(),
+  organizationId: z.number().int().positive().optional(),
+  organizationName: z.string().optional(),
   slug: z.string(),
   displayName: z.string(),
   tagline: z.string().nullable(),
@@ -140,7 +148,7 @@ export const lighthouseProgramListResponseSchema: z.ZodType<ProgramListResponse>
 );
 
 export const lighthouseCohortListResponseSchema: z.ZodType<
-  CohortListResponse,
+  LighthouseCohortListResponse,
   z.ZodTypeDef,
   unknown
 > = apiSuccessSchema(z.array(lighthouseCohortSchema));

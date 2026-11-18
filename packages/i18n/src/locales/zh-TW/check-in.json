@@ -1,4 +1,6 @@
 {
+  "checkins_show_more": "看更多",
+  "checkins_show_less": "收起",
   "just_now": "剛剛",
   "anonymous_user": "匿名使用者",
   "comment_failed": "留言失敗，請稍後再試",
@@ -103,6 +105,7 @@
   "check_in_failed": "打卡失敗，請稍後再試",
   "record_title": "打卡紀錄",
   "loading": "載入中...",
+  "mood": "心情",
   "mood_ranking": "心情排行",
   "collapse": "收合",
   "expand": "展開",

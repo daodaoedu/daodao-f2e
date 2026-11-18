@@ -28,35 +28,38 @@ import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import {
   Archive,
+  BookOpen,
+  CalendarCheck,
   ChevronDown,
   ChevronUp,
   Copy,
+  List,
   LockIcon,
+  MessageCircle,
   MoreHorizontal,
   Pencil,
+  Shapes,
   Trash2,
 } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { CheckInRecordCard, CheckInStack } from "@/components/check-in";
+import { CheckInList } from "@/components/check-in/display";
 import {
   CommentSection,
   type IComment,
   ReactionPickerButton,
 } from "@/components/check-in/reactions";
 import { LottieEmoji } from "@/components/check-in/reactions/lottie-emoji";
-import {
-  ExecutionDurationCard,
-  ExecutionTimingCard,
-  PracticeOverviewCard,
-} from "@/components/practice";
+import { PracticeOverviewCard } from "@/components/practice";
+import { CheckInCommentGroups } from "@/components/practice/detail/check-in-comment-groups";
 import { PracticeDetailTitle } from "@/components/practice/detail/practice-detail-title";
 import {
   BrowseActivityContent,
   type IBrowseActivityFollower,
 } from "@/components/practice/shared/browse-activity-content";
 import type { ExecutionTiming } from "@/constants/practice-form";
-import type { PracticeStatus } from "@/constants/practice-status";
+import { PracticeStatus } from "@/constants/practice-status";
 import {
   PICKER_REACTIONS,
   REACTION_CONFIG,
@@ -108,6 +111,17 @@ interface IPracticeDetailViewModel {
 
 type TabType = "comments" | "checkins" | "resources";
 
+const CheckInView = {
+  list: "list",
+  bubbles: "bubbles",
+} as const;
+type CheckInViewType = (typeof CheckInView)[keyof typeof CheckInView];
+
+const CHECK_IN_VIEWS = [
+  { id: CheckInView.list, labelKey: "checkin_view_list", Icon: List },
+  { id: CheckInView.bubbles, labelKey: "checkin_view_bubbles", Icon: Shapes },
+] as const;
+
 interface IBrowseActivityData {
   viewCount?: number;
   followers?: IBrowseActivityFollower[];
@@ -117,6 +131,9 @@ interface IPracticeDetailShellProps {
   practice: IPracticeDetailViewModel;
   practiceId: string;
   isOwner: boolean;
+  readOnly?: boolean;
+  /** 頁面頂端已有 sticky 導覽列（高 56px）：分頁列黏在它下方，手機版不再預留關閉鈕空間 */
+  hasTopBar?: boolean;
   checkInsData: React.ComponentProps<typeof CheckInRecordCard>["checkInsData"];
   isLoadingCheckIns: boolean;
   isLoadingComments?: boolean;
@@ -130,6 +147,10 @@ interface IPracticeDetailShellProps {
   hasNext?: boolean;
   onPrevious?: () => void;
   onNext?: () => void;
+  previousDisabled?: boolean;
+  nextDisabled?: boolean;
+  previousLabel?: string;
+  nextLabel?: string;
   onEditPractice: () => void;
   onArchivePractice: () => void;
   onDeletePractice: () => void;
@@ -145,11 +166,11 @@ interface IPracticeDetailShellProps {
   browseActivity?: IBrowseActivityData;
 }
 
-const TABS: { id: TabType; labelKey: "tab_comments" | "tab_checkins" | "tab_resources" }[] = [
-  { id: "comments", labelKey: "tab_comments" },
-  { id: "checkins", labelKey: "tab_checkins" },
-  { id: "resources", labelKey: "tab_resources" },
-];
+const TABS = [
+  { id: "comments", labelKey: "tab_comments", Icon: DialogOutlineSvg },
+  { id: "checkins", labelKey: "tab_checkins", Icon: CalendarCheck },
+  { id: "resources", labelKey: "tab_resources", Icon: BookOpen },
+] as const;
 
 interface IPracticeResourceListCardProps {
   startDate?: string;
@@ -246,6 +267,8 @@ export function PracticeDetailShell({
   practice,
   practiceId,
   isOwner,
+  readOnly = false,
+  hasTopBar = false,
   checkInsData,
   isLoadingCheckIns,
   isLoadingComments = false,
@@ -261,6 +284,10 @@ export function PracticeDetailShell({
   hasNext = false,
   onPrevious,
   onNext,
+  previousDisabled = false,
+  nextDisabled = false,
+  previousLabel,
+  nextLabel,
   onDeletePractice,
   onSubmitComment,
   onEditComment,
@@ -274,12 +301,34 @@ export function PracticeDetailShell({
   const searchParams = useSearchParams();
   const { copyPractice } = useCopyPractice();
   const [isCopying, setIsCopying] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabType>("comments");
-  const [infoExpanded, setInfoExpanded] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabType>("checkins");
+  const [checkInView, setCheckInView] = useState<CheckInViewType>(
+    readOnly ? CheckInView.list : CheckInView.bubbles
+  );
+  // 各打卡的留言數（由 CheckInCommentGroups 回報），用於留言分頁的總數
+  const [checkInCommentCounts, setCheckInCommentCounts] = useState<Record<string, number>>({});
+  const handleCheckInCommentCount = useCallback((checkInId: string, count: number) => {
+    setCheckInCommentCounts((prev) =>
+      prev[checkInId] === count ? prev : { ...prev, [checkInId]: count }
+    );
+  }, []);
+  const checkInCommentTotal = (checkInsData?.data ?? []).reduce(
+    (sum, checkIn) => sum + (checkInCommentCounts[String(checkIn.id)] ?? 0),
+    0
+  );
+  const practiceCommentCount = commentCount ?? comments.length;
+  // 進行中的實踐：手機版先看到打卡，實踐資訊卡預設收合（桌機版兩欄並排，不受影響）
+  const isOverviewCollapsible = practice.status === PracticeStatus.active;
+  const [overviewOpenOnMobile, setOverviewOpenOnMobile] = useState(false);
   const [practiceMenuOpen, setPracticeMenuOpen] = useState(false);
   const [isFollowingPractice, setIsFollowingPractice] = useState(false);
   const commentsRef = useRef<HTMLDivElement>(null);
+  const practiceCommentsRef = useRef<HTMLDivElement>(null);
   const practiceMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setActiveTab("checkins");
+  }, [practice.id, practice.isCohortPractice, readOnly]);
 
   useEffect(() => {
     if (!practiceMenuOpen) return;
@@ -312,11 +361,16 @@ export function PracticeDetailShell({
       return false;
     }
 
-    return TABS.some((item) => item.id === tab);
-  }, []);
+    return TABS.some((item) => item.id === tab) && (tab !== "comments" || readOnly);
+  }, [readOnly]);
 
   useEffect(() => {
     if (!isValidTab(tabParam)) {
+      if (tabParam === "comments" && !readOnly) {
+        requestAnimationFrame(() => {
+          practiceCommentsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
       return;
     }
 
@@ -334,6 +388,26 @@ export function PracticeDetailShell({
     null) as ReactionTypeType | null;
   const effectiveReaction = pendingReaction !== undefined ? pendingReaction : currentUserReaction;
   const headerReactions: ReactionTypeType[] = effectiveReaction ? [effectiveReaction] : [];
+  const reactionFollowers = browseActivity?.followers ?? [];
+  const activeReactions = (reactionsData?.data?.reactions ?? [])
+    .filter((reaction) => reaction.count > 0)
+    .slice(0, PICKER_REACTIONS.length);
+  const totalReactionCount = (reactionsData?.data?.reactions ?? []).reduce(
+    (sum, reaction) => sum + reaction.count,
+    0
+  );
+  const serverActiveReactionTypes = activeReactions.map(
+    (reaction) => reaction.type as ReactionTypeType
+  );
+  const displayReactions =
+    reactionFollowers.length > 0
+      ? ([...new Set(reactionFollowers.map((follower) => follower.reaction))].slice(
+          0,
+          PICKER_REACTIONS.length
+        ) as ReactionTypeType[])
+      : effectiveReaction && !serverActiveReactionTypes.includes(effectiveReaction)
+        ? [effectiveReaction, ...serverActiveReactionTypes].slice(0, PICKER_REACTIONS.length)
+        : serverActiveReactionTypes;
 
   const handleHeaderReactionToggle = useCallback(
     (type: ReactionTypeType) => {
@@ -417,47 +491,244 @@ export function PracticeDetailShell({
   };
 
   return (
-    <div className="flex-1 max-w-[448px] mx-auto w-full pb-24">
-      <div className="px-4 pt-[60px]">
-        <div className="flex items-center justify-between mb-2">
-          {statusInfo ? (
-            <Badge variant={statusInfo.variant} size="sm">
-              {t(statusInfo.label)}
-            </Badge>
-          ) : (
-            <div />
+    <div className="flex-1 w-full max-w-[1600px] mx-auto px-4 md:px-8 lg:px-[72px] pb-24">
+      <div className="grid grid-cols-1 lg:mx-auto lg:w-full lg:max-w-5xl lg:grid-cols-[minmax(300px,400px)_minmax(0,1fr)] lg:items-start lg:gap-6">
+        <section className={cn("md:pt-4", hasTopBar ? "pt-4" : "pt-[60px]")}>
+          <div className="flex items-center justify-between mb-2">
+            {statusInfo ? (
+              <Badge variant={statusInfo.variant} size="sm">
+                {t(statusInfo.label)}
+              </Badge>
+            ) : (
+              <div />
+            )}
+
+            <div ref={practiceMenuRef} className="relative">
+              {!readOnly && (
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => setPracticeMenuOpen((value) => !value)}
+                  className={cn(
+                    "h-8 w-8",
+                    practiceMenuOpen ? "bg-[#E4EAE9]" : "hover:bg-[#E4EAE9]"
+                  )}
+                >
+                  <MoreHorizontal className="size-5" />
+                </Button>
+              )}
+
+              {practiceMenuOpen && isOwner && (
+                <div className="absolute right-0 top-full mt-1 bg-white rounded-2xl shadow-lg border border-[#E4EAE9] py-2 z-20 min-w-[140px]">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => {
+                      setPracticeMenuOpen(false);
+                      onEditPractice();
+                    }}
+                    className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
+                  >
+                    <Pencil className="size-[18px] shrink-0" />
+                    <span>{t("action_edit")}</span>
+                  </Button>
+                  {!practice.isCohortPractice && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={async () => {
+                        setPracticeMenuOpen(false);
+                        try {
+                          setIsCopying(true);
+                          const { id } = await copyPractice(practiceId);
+                          router.push(`/practices/copy-success?practiceId=${id}`);
+                        } catch {
+                          toast.error(t("copy_failed"));
+                        } finally {
+                          setIsCopying(false);
+                        }
+                      }}
+                      disabled={isCopying}
+                      className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
+                    >
+                      <Copy className="size-[18px] shrink-0" />
+                      <span>{t("action_copy")}</span>
+                    </Button>
+                  )}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => {
+                      setPracticeMenuOpen(false);
+                      onArchivePractice();
+                    }}
+                    className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
+                  >
+                    <Archive className="size-[18px] shrink-0" />
+                    <span>{t("action_archive")}</span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={openBrowseActivity}
+                    className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
+                  >
+                    <ChartColumnIncreasingSvg className="size-[18px] shrink-0" />
+                    <span>{t("action_browse_activity")}</span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => {
+                      setPracticeMenuOpen(false);
+                      // 確認框由 onDeletePractice（頁面的 useDeletePracticeDialog）負責，這裡不再自帶一層（daodao#369）
+                      onDeletePractice();
+                    }}
+                    className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                  >
+                    <Trash2 className="size-[18px] shrink-0" />
+                    <span>{t("action_delete")}</span>
+                  </Button>
+                </div>
+              )}
+
+              {practiceMenuOpen && !isOwner && (
+                <div className="absolute right-0 top-full mt-1 bg-white rounded-2xl shadow-lg border border-[#E4EAE9] py-2 z-20 min-w-[140px]">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => {
+                      setPracticeMenuOpen(false);
+                      window.open("https://tally.so/r/BzGQy4", "_blank");
+                    }}
+                    className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
+                  >
+                    <FlagOutlineSvg className="size-5 shrink-0" />
+                    <span>{t("action_report")}</span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => {
+                      setPracticeMenuOpen(false);
+                      void handleToggleFollowPractice();
+                    }}
+                    className={cn(
+                      "w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm transition-colors cursor-pointer",
+                      isFollowingPractice
+                        ? "text-logo-cyan hover:bg-[#E8FAF9]"
+                        : "text-[#295E5C] hover:bg-[#F0F9F8]"
+                    )}
+                  >
+                    <TelescopeSvg className="size-5 shrink-0" />
+                    <span>{isFollowingPractice ? t("action_unfollow") : t("action_follow")}</span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={openBrowseActivity}
+                    className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
+                  >
+                    <ChartColumnIncreasingSvg className="size-5 shrink-0" />
+                    <span>{t("action_browse_activity")}</span>
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <PracticeDetailTitle
+            title={practice.title}
+            status={practice.status}
+            hasPrevious={hasPrevious}
+            hasNext={hasNext}
+            onPrevious={onPrevious ?? (() => {})}
+            onNext={onNext ?? (() => {})}
+            previousDisabled={previousDisabled}
+            nextDisabled={nextDisabled}
+            previousLabel={previousLabel}
+            nextLabel={nextLabel}
+          />
+
+          {isOverviewCollapsible && (
+            <div className="-mt-3 mb-3 flex w-full items-center gap-2 rounded-lg bg-white px-4 py-3 shadow-sm md:hidden">
+              <Button
+                type="button"
+                variant="ghost"
+                aria-expanded={overviewOpenOnMobile}
+                aria-controls="practice-overview-card"
+                onClick={() => setOverviewOpenOnMobile((value) => !value)}
+                className="flex h-auto min-w-0 flex-1 items-center justify-between gap-3 rounded-lg p-0 text-left cursor-pointer hover:bg-white"
+              >
+                <span className="min-w-0 flex-1">
+                  <span className="block text-xs font-medium text-[#6B8789]">
+                    {overviewOpenOnMobile
+                      ? t("hide_practice_details")
+                      : (practice.creator?.name ?? t("show_practice_details"))}
+                  </span>
+                  {!overviewOpenOnMobile && practice.actionDescription && (
+                    <span className="mt-0.5 block truncate text-sm font-normal text-text-dark">
+                      {practice.actionDescription}
+                    </span>
+                  )}
+                </span>
+                {overviewOpenOnMobile ? (
+                  <ChevronUp aria-hidden="true" className="size-4 shrink-0 text-[#9FB5B8]" />
+                ) : (
+                  <ChevronDown aria-hidden="true" className="size-4 shrink-0 text-[#9FB5B8]" />
+                )}
+              </Button>
+              {!overviewOpenOnMobile && (
+                <div className="w-28 shrink-0">
+                  <ReactionPickerButton
+                    selectedReactions={headerReactions}
+                    onToggle={handleHeaderReactionToggle}
+                    variant="card"
+                    alignment="end"
+                    displayReactions={displayReactions.slice(0, 3)}
+                    totalCount={totalReactionCount}
+                    openOnClick
+                    stackOverlapClassName="ml-1"
+                  />
+                </div>
+              )}
+            </div>
           )}
 
-          <div ref={practiceMenuRef} className="relative">
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              onClick={() => setPracticeMenuOpen((value) => !value)}
-              className={cn("h-8 w-8", practiceMenuOpen ? "bg-[#E4EAE9]" : "hover:bg-[#E4EAE9]")}
-            >
-              <MoreHorizontal className="size-5" />
-            </Button>
+          <div
+            id="practice-overview-card"
+            className={cn(
+              "bg-white rounded-lg shadow-sm mb-4",
+              isOverviewCollapsible && !overviewOpenOnMobile && "hidden md:block"
+            )}
+          >
+            <PracticeOverviewCard
+              actionDescription={practice.actionDescription}
+              frequency={practice.frequency}
+              durationMinutes={practice.durationMinutes}
+              tags={practice.tags}
+              executionTiming={practice.executionTiming}
+              customTiming={practice.customTiming}
+              durationDays={practice.durationDays}
+              startDate={practice.startDate ?? null}
+              progress={practice.progress}
+              showProgress
+              creator={practice.creator}
+            />
 
-            {practiceMenuOpen && isOwner && (
-              <div className="absolute right-0 top-full mt-1 bg-white rounded-2xl shadow-lg border border-[#E4EAE9] py-2 z-20 min-w-[140px]">
+            <div className="px-4">
+              {!readOnly && !isOwner && !practice.isChallenge && !practice.isCohortPractice && (
                 <Button
                   type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    setPracticeMenuOpen(false);
-                    onEditPractice();
-                  }}
-                  className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
-                >
-                  <Pencil className="size-[18px] shrink-0" />
-                  <span>{t("action_edit")}</span>
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
+                  variant="outline"
+                  className="w-full mb-3 gap-2 rounded-full"
+                  disabled={isCopying}
                   onClick={async () => {
-                    setPracticeMenuOpen(false);
+                    if (!currentUserId) {
+                      router.push(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
+                      return;
+                    }
                     try {
                       setIsCopying(true);
                       const { id } = await copyPractice(practiceId);
@@ -468,396 +739,290 @@ export function PracticeDetailShell({
                       setIsCopying(false);
                     }
                   }}
-                  disabled={isCopying}
-                  className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
                 >
-                  <Copy className="size-[18px] shrink-0" />
-                  <span>{t("action_copy")}</span>
+                  <Copy className="size-4" />
+                  {isCopying ? t("action_copying") : t("action_also_practice")}
                 </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    setPracticeMenuOpen(false);
-                    onArchivePractice();
-                  }}
-                  className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
-                >
-                  <Archive className="size-[18px] shrink-0" />
-                  <span>{t("action_archive")}</span>
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={openBrowseActivity}
-                  className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
-                >
-                  <ChartColumnIncreasingSvg className="size-[18px] shrink-0" />
-                  <span>{t("action_browse_activity")}</span>
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    setPracticeMenuOpen(false);
-                    // 確認框由 onDeletePractice（頁面的 useDeletePracticeDialog）負責，這裡不再自帶一層（daodao#369）
-                    onDeletePractice();
-                  }}
-                  className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
-                >
-                  <Trash2 className="size-[18px] shrink-0" />
-                  <span>{t("action_delete")}</span>
-                </Button>
-              </div>
-            )}
-
-            {practiceMenuOpen && !isOwner && (
-              <div className="absolute right-0 top-full mt-1 bg-white rounded-2xl shadow-lg border border-[#E4EAE9] py-2 z-20 min-w-[140px]">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    setPracticeMenuOpen(false);
-                    window.open("https://tally.so/r/BzGQy4", "_blank");
-                  }}
-                  className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
-                >
-                  <FlagOutlineSvg className="size-5 shrink-0" />
-                  <span>{t("action_report")}</span>
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    setPracticeMenuOpen(false);
-                    void handleToggleFollowPractice();
-                  }}
-                  className={cn(
-                    "w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm transition-colors cursor-pointer",
-                    isFollowingPractice
-                      ? "text-logo-cyan hover:bg-[#E8FAF9]"
-                      : "text-[#295E5C] hover:bg-[#F0F9F8]"
-                  )}
-                >
-                  <TelescopeSvg className="size-5 shrink-0" />
-                  <span>{isFollowingPractice ? t("action_unfollow") : t("action_follow")}</span>
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={openBrowseActivity}
-                  className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
-                >
-                  <ChartColumnIncreasingSvg className="size-5 shrink-0" />
-                  <span>{t("action_browse_activity")}</span>
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <PracticeDetailTitle
-          title={practice.title}
-          status={practice.status}
-          hasPrevious={hasPrevious}
-          hasNext={hasNext}
-          onPrevious={onPrevious ?? (() => {})}
-          onNext={onNext ?? (() => {})}
-        />
-
-        <div className="bg-white rounded-lg shadow-sm mb-4 overflow-hidden">
-          <PracticeOverviewCard
-            actionDescription={practice.actionDescription}
-            frequency={practice.frequency}
-            durationMinutes={practice.durationMinutes}
-            tags={practice.tags}
-            progress={practice.progress}
-            showProgress
-            creator={practice.creator}
-          />
-
-          <div className="px-4">
-            <div className="border-t border-[#E4EAE9] mb-3" />
-            {!isOwner && !practice.isChallenge && (
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full mb-3 gap-2 rounded-full"
-                disabled={isCopying}
-                onClick={async () => {
-                  if (!currentUserId) {
-                    router.push(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
-                    return;
-                  }
-                  try {
-                    setIsCopying(true);
-                    const { id } = await copyPractice(practiceId);
-                    router.push(`/practices/copy-success?practiceId=${id}`);
-                  } catch {
-                    toast.error(t("copy_failed"));
-                  } finally {
-                    setIsCopying(false);
-                  }
-                }}
-              >
-                <Copy className="size-4" />
-                {isCopying ? t("action_copying") : t("action_also_practice")}
-              </Button>
-            )}
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setInfoExpanded((value) => !value)}
-              className="w-full h-auto justify-between px-0 text-sm text-[#9FB5B8] py-1 mb-2 cursor-pointer hover:bg-transparent"
-            >
-              {t("more_info")}
-              {infoExpanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
-            </Button>
-
-            <div
-              className={cn(
-                "grid transition-all duration-300 ease-in-out",
-                infoExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
               )}
-            >
-              <div className="overflow-hidden">
-                <div className="grid grid-cols-2 gap-3 pb-3">
-                  <ExecutionTimingCard
-                    executionTiming={practice.executionTiming}
-                    customTiming={practice.customTiming}
-                  />
-                  {practice.durationDays !== null && (
-                    <ExecutionDurationCard
-                      durationDays={practice.durationDays}
-                      startDate={practice.startDate || ""}
-                      showRemaining
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex w-fit rounded-xl py-1 transition-colors hover:bg-gray-100">
+                    <ReactionPickerButton
+                      selectedReactions={headerReactions}
+                      onToggle={handleHeaderReactionToggle}
+                      variant="card"
+                      alignment="start"
                     />
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {(() => {
-              const followers = browseActivity?.followers ?? [];
-              // 從 reactions API 取出有人按的類型（所有人共享的 aggregate）
-              const activeReactions = (reactionsData?.data?.reactions ?? [])
-                .filter((r) => r.count > 0)
-                .slice(0, PICKER_REACTIONS.length);
-              const totalReactionCount = (reactionsData?.data?.reactions ?? []).reduce(
-                (sum, r) => sum + r.count,
-                0
-              );
-              const latestActorName =
-                (reactionsData?.data?.reactions ?? []).find((r) => r.count > 0)?.latestActorName ??
-                null;
-              // 優先用 API followers；沒有時用 aggregate reactions（所有人共享）
-              // 當 followers 為空時，加入 effectiveReaction 做樂觀更新
-              const serverActiveTypes = activeReactions.map((r) => r.type as ReactionTypeType);
-              const displayReactions =
-                followers.length > 0
-                  ? ([...new Set(followers.map((f) => f.reaction))].slice(
-                      0,
-                      PICKER_REACTIONS.length
-                    ) as ReactionTypeType[])
-                  : effectiveReaction && !serverActiveTypes.includes(effectiveReaction)
-                    ? [effectiveReaction, ...serverActiveTypes].slice(0, PICKER_REACTIONS.length)
-                    : serverActiveTypes;
-              const firstName = followers[0]?.name;
-              const text =
-                followers.length > 1
-                  ? t("followers_with_others", {
-                      firstName: firstName ?? "",
-                      count: String(followers.length - 1),
-                    })
-                  : followers.length === 1
-                    ? firstName
-                    : effectiveReaction
-                      ? totalReactionCount > 1
-                        ? t("you_with_others", { count: String(totalReactionCount - 1) })
-                        : t("you")
-                      : totalReactionCount > 0
-                        ? latestActorName
-                          ? totalReactionCount > 1
-                            ? t("others_with_count", {
-                                name: latestActorName,
-                                count: String(totalReactionCount - 1),
-                              })
-                            : latestActorName
-                          : t("count_people", { count: String(totalReactionCount) })
-                        : undefined;
-              if (displayReactions.length === 0 && !text) return null;
-              return (
-                <button
-                  type="button"
-                  onClick={openBrowseActivity}
-                  className="flex items-center gap-2 pb-3 hover:opacity-70 transition-opacity cursor-pointer"
-                >
-                  {displayReactions.length > 0 && (
-                    <div className="flex">
-                      {displayReactions.map((reaction, i) => (
-                        <div
-                          key={reaction}
-                          className={cn(
-                            "size-7 rounded-full bg-[#E8FAF9] flex items-center justify-center ring-2 ring-white",
-                            i > 0 && "-ml-1.5"
-                          )}
-                        >
-                          <LottieEmoji
-                            url={REACTION_CONFIG[reaction].lottieUrl}
-                            fallback={REACTION_CONFIG[reaction].emoji}
-                            size={20}
-                            play={false}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  <span className="text-sm text-text-dark">{text}</span>
-                </button>
-              );
-            })()}
-          </div>
-
-          <div className="flex items-center border-t border-[#E4EAE9] py-4 px-4">
-            <div className="flex-1 flex justify-center rounded-xl hover:bg-gray-100 transition-colors py-1">
-              <ReactionPickerButton
-                selectedReactions={headerReactions}
-                onToggle={handleHeaderReactionToggle}
-                variant="card"
-              />
-            </div>
-
-            <div className="w-px h-5 bg-[#E4EAE9]" />
-
-            <div className="flex-1 flex justify-center rounded-xl hover:bg-gray-100 transition-colors py-1">
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveTab("comments");
-                  setTimeout(() => {
-                    commentsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-                  }, 0);
-                }}
-                className="flex items-center gap-1.5 p-1.5 text-text-dark cursor-pointer"
-              >
-                <DialogOutlineSvg className="size-[22px]" />
-                <span className="text-sm font-medium">{commentCount ?? comments.length}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div ref={commentsRef} className="flex border-b border-[#E4EAE9] mx-4">
-        {(() => {
-          const countMap: Record<TabType, number> = {
-            comments: commentCount ?? comments?.length ?? 0,
-            checkins: checkInsData?.data?.length ?? 0,
-            resources: practice?.resources?.length ?? 0,
-          };
-          return TABS.map(({ id, labelKey }) => {
-            const count = countMap[id];
-            const label = t(labelKey);
-            const displayLabel = count > 0 ? `${label}(${count})` : label;
-            return (
-              <div
-                key={id}
-                className={cn(
-                  "flex flex-1 items-center justify-center",
-                  activeTab === id && "border-b-2 border-logo-cyan -mb-px"
-                )}
-              >
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => setActiveTab(id)}
-                  className={cn(
-                    "h-auto rounded-none px-1 py-3 text-sm font-medium transition-colors cursor-pointer",
-                    activeTab === id ? "text-logo-cyan" : "text-[#9FB5B8] hover:text-text-dark/60"
-                  )}
-                >
-                  {displayLabel}
-                </Button>
-                {id === "resources" && isOwner && (
+                  </div>
                   <Button
                     type="button"
                     variant="ghost"
-                    size="icon"
-                    aria-label={t("edit_resources")}
-                    title={t("edit_resources")}
-                    onClick={() => router.push(`/practices/${practiceId}/edit#practice-resources`)}
-                    className="shrink-0 size-6 text-logo-cyan"
+                    aria-label={`${t("practice_comments_heading")} (${practiceCommentCount})`}
+                    title={t("practice_comments_heading")}
+                    onClick={() =>
+                      practiceCommentsRef.current?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                      })
+                    }
+                    className="h-8 shrink-0 gap-1.5 px-2 text-xs text-[#6B8789] hover:text-logo-cyan"
                   >
-                    <Pencil className="size-3" aria-hidden="true" />
+                    <MessageCircle aria-hidden="true" className="size-4" />
+                    <span className="tabular-nums">{practiceCommentCount}</span>
                   </Button>
-                )}
+                </div>
+                {(() => {
+                  const followers = reactionFollowers;
+                  const latestActorName =
+                    (reactionsData?.data?.reactions ?? []).find((r) => r.count > 0)
+                      ?.latestActorName ?? null;
+                  const firstName = followers[0]?.name;
+                  const text =
+                    followers.length > 1
+                      ? t("followers_with_others", {
+                          firstName: firstName ?? "",
+                          count: String(followers.length - 1),
+                        })
+                      : followers.length === 1
+                        ? firstName
+                        : effectiveReaction
+                          ? totalReactionCount > 1
+                            ? t("you_with_others", { count: String(totalReactionCount - 1) })
+                            : t("you")
+                          : totalReactionCount > 0
+                            ? latestActorName
+                              ? totalReactionCount > 1
+                                ? t("others_with_count", {
+                                    name: latestActorName,
+                                    count: String(totalReactionCount - 1),
+                                  })
+                                : latestActorName
+                              : t("count_people", { count: String(totalReactionCount) })
+                            : undefined;
+                  if (displayReactions.length === 0 && !text) return null;
+                  return (
+                    <button
+                      type="button"
+                      onClick={openBrowseActivity}
+                      className="flex w-fit items-center justify-end gap-2 text-right hover:opacity-70 transition-opacity cursor-pointer"
+                    >
+                      {displayReactions.length > 0 && (
+                        <div className="flex">
+                          {displayReactions.map((reaction, i) => (
+                            <div
+                              key={reaction}
+                              className={cn(
+                                "size-7 rounded-full bg-[#E8FAF9] flex items-center justify-center ring-2 ring-white",
+                                i > 0 && "-ml-1.5"
+                              )}
+                            >
+                              <LottieEmoji
+                                url={REACTION_CONFIG[reaction].lottieUrl}
+                                fallback={REACTION_CONFIG[reaction].emoji}
+                                size={20}
+                                play={false}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <span className="text-sm text-text-dark">{text}</span>
+                    </button>
+                  );
+                })()}
               </div>
-            );
-          });
-        })()}
-      </div>
-
-      {activeTab === "comments" && (
-        <div className="mx-4 mt-4 mb-4 bg-white rounded-xl shadow-sm">
-          {isLoadingComments ? (
-            <div className="px-4 py-6 text-xs text-[#9FB5B8] text-center">
-              {t("comments_loading")}
             </div>
-          ) : (
-            <CommentSection
-              comments={comments}
-              selectedReactions={[]}
-              onSubmit={(content, _reactions, parentId, mentionedUserIds) =>
-                onSubmitComment(content, parentId, mentionedUserIds)
-              }
-              hasMoreComments
-              currentUserName={currentUserName}
-              currentUserId={currentUserId}
-              currentUserPhotoURL={currentUserPhotoURL}
-              mentionCandidates={mentionCandidates}
-              onEditComment={onEditComment}
-              onDeleteComment={onDeleteComment}
-            />
+
+          </div>
+
+          <div
+            ref={practiceCommentsRef}
+            className="mb-4 overflow-hidden rounded-xl bg-white shadow-sm"
+          >
+            <div className="flex items-center justify-between px-4 pt-4 pb-2">
+              <h2 className="text-xs font-semibold text-[#6B8789]">
+                {t("practice_comments_heading")}
+              </h2>
+            </div>
+            {isLoadingComments ? (
+              <div className="px-4 py-6 text-xs text-[#9FB5B8] text-center">
+                {t("comments_loading")}
+              </div>
+            ) : (
+              <CommentSection
+                comments={comments}
+                selectedReactions={[]}
+                onSubmit={(content, _reactions, parentId, mentionedUserIds) =>
+                  onSubmitComment(content, parentId, mentionedUserIds)
+                }
+                hasMoreComments
+                previewCount={5}
+                currentUserName={currentUserName}
+                currentUserId={currentUserId}
+                currentUserPhotoURL={currentUserPhotoURL}
+                mentionCandidates={mentionCandidates}
+                onEditComment={onEditComment}
+                onDeleteComment={onDeleteComment}
+              />
+            )}
+          </div>
+        </section>
+
+        <main className="min-w-0 lg:pt-12">
+          <div
+            ref={commentsRef}
+            className={cn(
+              "sticky z-20 flex bg-gray-100 lg:ml-12 lg:mr-0",
+              hasTopBar ? "top-14 scroll-mt-14" : "top-0"
+            )}
+          >
+            {(() => {
+              const countMap: Record<TabType, number> = {
+                comments: checkInCommentTotal,
+                checkins: checkInsData?.data?.length ?? 0,
+                resources: practice?.resources?.length ?? 0,
+              };
+              const visibleTabs = readOnly ? TABS : TABS.filter(({ id }) => id !== "comments");
+              return visibleTabs.map(({ id, labelKey, Icon }) => {
+                const count = countMap[id];
+                const label =
+                  id === "comments" ? t("checkin_comments_heading") : t(labelKey);
+                const accessibleLabel = label;
+                return (
+                  <div key={id} className="flex flex-1 items-center justify-center">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => setActiveTab(id)}
+                      aria-label={`${accessibleLabel}${count > 0 ? ` (${count})` : ""}`}
+                      title={label}
+                      className={cn(
+                        "h-auto gap-1.5 rounded-none border-b-2 border-transparent px-1 py-3 text-xs font-medium transition-colors cursor-pointer",
+                        activeTab === id
+                          ? "border-logo-cyan text-logo-cyan"
+                          : "text-[#9FB5B8] hover:text-text-dark/60"
+                      )}
+                    >
+                      <Icon aria-hidden="true" className="size-5" />
+                      <span>{label}</span>
+                      {count > 0 && <span className="text-xs">{count}</span>}
+                    </Button>
+                    {id === "resources" && isOwner && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        aria-label={t("edit_resources")}
+                        title={t("edit_resources")}
+                        onClick={() =>
+                          router.push(`/practices/${practiceId}/edit#practice-resources`)
+                        }
+                        className="shrink-0 size-6 text-logo-cyan"
+                      >
+                        <Pencil className="size-3" aria-hidden="true" />
+                      </Button>
+                    )}
+                  </div>
+                );
+              });
+            })()}
+          </div>
+
+          {/* 保持掛載（分頁非留言時隱藏），留言分頁的總數才能在一進頁面就包含打卡留言 */}
+          {readOnly && (
+            <div className={cn(activeTab !== "comments" && "hidden")}>
+              <CheckInCommentGroups
+                practiceId={practiceId}
+                checkInsData={checkInsData}
+                heading={t("checkin_comments_heading")}
+                totalCount={checkInCommentTotal}
+                onCountChange={handleCheckInCommentCount}
+                currentUserName={currentUserName}
+                currentUserId={currentUserId}
+                currentUserPhotoURL={currentUserPhotoURL}
+              />
+            </div>
           )}
-        </div>
-      )}
 
-      {activeTab === "checkins" && (
-        <div className="pt-4">
-          <div className="px-4">
-            <CheckInRecordCard checkInsData={checkInsData} isLoading={isLoadingCheckIns} />
-          </div>
-          <div className="pt-10 overflow-x-hidden">
-            <CheckInStack practiceId={practiceId} checkInsData={checkInsData} />
-          </div>
-        </div>
-      )}
+          {activeTab === "checkins" && (
+            <div className="pt-4 md:pt-1">
+              <div className="lg:pl-12 lg:pr-0">
+                <CheckInRecordCard checkInsData={checkInsData} isLoading={isLoadingCheckIns} />
+              </div>
+              {readOnly && (checkInsData?.data?.length ?? 0) > 0 && (
+                <fieldset className="mx-4 mt-4 hidden justify-end md:flex">
+                  <legend className="sr-only">{t("checkin_view_label")}</legend>
+                  <div className="flex rounded-full bg-[#E4EAE9] p-0.5">
+                    {CHECK_IN_VIEWS.map(({ id, labelKey, Icon }) => (
+                      <Button
+                        key={id}
+                        type="button"
+                        variant="ghost"
+                        aria-pressed={checkInView === id}
+                        onClick={() => setCheckInView(id)}
+                        className={cn(
+                          "h-8 gap-1.5 rounded-full px-3 text-xs font-medium cursor-pointer",
+                          checkInView === id
+                            ? "bg-white text-[#0D7773] shadow-sm hover:bg-white"
+                            : "text-[#6B8789] hover:bg-transparent hover:text-text-dark"
+                        )}
+                      >
+                        <Icon aria-hidden="true" className="size-3.5" />
+                        {t(labelKey)}
+                      </Button>
+                    ))}
+                  </div>
+                </fieldset>
+              )}
+              {checkInView === CheckInView.list ? (
+                <div className="pt-3 pb-4 lg:pl-12 lg:pr-0">
+                  <CheckInList practiceId={practiceId} checkInsData={checkInsData} />
+                </div>
+              ) : (
+                <>
+                  <div className="hidden overflow-x-clip pt-10 md:flex md:justify-center lg:pl-12">
+                    <CheckInStack practiceId={practiceId} checkInsData={checkInsData} />
+                  </div>
+                  <div className="pt-3 pb-4 md:hidden">
+                    <CheckInList practiceId={practiceId} checkInsData={checkInsData} />
+                  </div>
+                </>
+              )}
+            </div>
+          )}
 
-      {activeTab === "resources" && (
-        <div className="px-4 pt-4 flex flex-col gap-3 pb-4">
-          {practice.resources.length > 0 ? (
-            // 有指定使用日的資源依天數排前面，沒指定的（整段期間皆可用）排最後
-            [...practice.resources]
-              .sort((a, b) =>
-                practice.isCohortPractice
-                  ? 0
-                  : (a.dayNumber ?? Number.MAX_SAFE_INTEGER) -
-                    (b.dayNumber ?? Number.MAX_SAFE_INTEGER)
-              )
-              .map((resource) => (
+          {activeTab === "resources" && (
+            <div className="pt-4 flex flex-col gap-3 pb-4 lg:pl-12 lg:pr-0">
+              {practice.resources.length > 0 ? (
+                // 有指定使用日的資源依天數排前面，沒指定的（整段期間皆可用）排最後
+                [...practice.resources]
+                  .sort((a, b) =>
+                    practice.isCohortPractice
+                      ? 0
+                      : (a.dayNumber ?? Number.MAX_SAFE_INTEGER) -
+                        (b.dayNumber ?? Number.MAX_SAFE_INTEGER)
+                  )
+                  .map((resource) => (
+                    <PracticeResourceListCard
+                      key={resource.id}
+                      resource={resource}
+                      startDate={practice.startDate}
+                    />
+                  ))
+              ) : readOnly ? (
                 <PracticeResourceListCard
-                  key={resource.id}
-                  resource={resource}
+                  resource={{ id: "demo-resource", name: t("demo_resource_title") }}
                   startDate={practice.startDate}
                 />
-              ))
-          ) : (
-            <div className="text-sm text-[#9FB5B8] py-4">{t("no_resources")}</div>
+              ) : (
+                <div className="pl-14 py-4 text-sm text-[#9FB5B8] lg:pl-0">{t("no_resources")}</div>
+              )}
+            </div>
           )}
-        </div>
-      )}
 
-      {footer}
+          {footer}
+        </main>
+      </div>
     </div>
   );
 }

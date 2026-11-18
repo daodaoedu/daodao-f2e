@@ -26,10 +26,16 @@ export interface ReactionPickerButtonProps {
   variant?: "card" | "comment" | "summary";
   /** comment / summary variant 的總反應計數（所有用戶，非僅當前用戶） */
   totalCount?: number;
+  /** card variant trigger alignment */
+  alignment?: "start" | "center" | "end";
   /** 要疊加顯示的 reaction 類型（aggregate，最多 4 個） */
   displayReactions?: ReactionTypeType[];
   /** summary variant：第一個反應者姓名 */
   firstReactorName?: string;
+  /** Allow a normal click or tap to open the picker. */
+  openOnClick?: boolean;
+  /** Override spacing between the aggregate reaction emojis. */
+  stackOverlapClassName?: string;
 }
 
 const LONG_PRESS_DELAY = 400;
@@ -89,8 +95,11 @@ export function ReactionPickerButton({
   onToggle,
   variant = "comment",
   totalCount,
+  alignment = "center",
   displayReactions,
   firstReactorName,
+  openOnClick = false,
+  stackOverlapClassName,
 }: ReactionPickerButtonProps) {
   const t = useTranslations("app_product");
   const [open, setOpen] = useState(false);
@@ -124,18 +133,19 @@ export function ReactionPickerButton({
 
   // ── Desktop: hover 開啟／關閉 ──
   const handleMouseEnter = () => {
-    if (lastInteractionWasTouch.current) return;
+    if (openOnClick || lastInteractionWasTouch.current) return;
     setOpen(true);
   };
 
   const handleMouseLeave = () => {
-    if (lastInteractionWasTouch.current) return;
+    if (openOnClick || lastInteractionWasTouch.current) return;
     setOpen(false);
   };
 
   // ── Mobile: 長按開啟 ──
   const handleTouchStart = () => {
     lastInteractionWasTouch.current = true;
+    if (openOnClick) return;
     longPressTimer.current = setTimeout(() => {
       setOpen(true);
     }, LONG_PRESS_DELAY);
@@ -166,7 +176,16 @@ export function ReactionPickerButton({
       ref={containerRef}
       className={cn(
         "relative",
-        isCard ? "w-full flex items-center justify-center" : "flex items-center"
+        isCard
+          ? cn(
+              "w-full flex items-center",
+              alignment === "start"
+                ? "justify-start"
+                : alignment === "end"
+                  ? "justify-end"
+                  : "justify-center"
+            )
+          : "flex items-center"
       )}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -252,8 +271,12 @@ export function ReactionPickerButton({
       {!isSummary && open && (
         <div
           className={cn(
-            "absolute bottom-full pb-2 z-10 flex flex-col items-center",
-            isCard ? "left-1/2 -translate-x-1/2" : "left-0"
+            "absolute bottom-full pb-2 z-50 flex flex-col items-center",
+            isCard && alignment === "center"
+              ? "left-1/2 -translate-x-1/2"
+              : isCard && alignment === "end"
+                ? "right-0"
+                : "left-0"
           )}
         >
           <div className="flex gap-1 bg-white rounded-full shadow-lg border border-[#E4EAE9] px-2 py-1.5">
@@ -301,6 +324,9 @@ export function ReactionPickerButton({
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
           onTouchMove={handleTouchMove}
+          onClick={openOnClick ? () => setOpen((value) => !value) : undefined}
+          aria-label={t("reaction_picker_aria_label")}
+          aria-expanded={open}
           className={cn(
             "flex items-center gap-1.5 transition-colors cursor-pointer select-none",
             isCard
@@ -324,6 +350,7 @@ export function ReactionPickerButton({
                   selectedReactions={selectedReactions}
                   size={22}
                   circleClassName="size-[22px]"
+                  overlapClassName={stackOverlapClassName}
                 />
               ) : (
                 <LikeOutlineSvg className="size-[22px]" />

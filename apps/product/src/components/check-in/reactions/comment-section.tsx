@@ -26,7 +26,7 @@ import { tokenizeMentionContent } from "./comment-mentions";
 import { extractCommentSegments } from "./comment-url-segments";
 import { ReactionPickerButton } from "./reaction-picker-button";
 
-const PREVIEW_COUNT = 2;
+const PREVIEW_COUNT = 5;
 
 // ============================================================================
 // Types
@@ -475,6 +475,8 @@ interface CommentSectionProps {
   ) => void;
   /** 是否顯示「更多留言」摺疊按鈕 */
   hasMoreComments?: boolean;
+  /** Number of comments to show before expanding */
+  previewCount?: number;
   /** 當前登入用戶的名稱（顯示用） */
   currentUserName?: string;
   /** 當前登入用戶的 ID，用於判斷是否為自己的留言 */
@@ -496,6 +498,7 @@ export function CommentSection({
   inputRef: externalRef,
   onSubmit,
   hasMoreComments = false,
+  previewCount = PREVIEW_COUNT,
   currentUserName,
   currentUserId,
   currentUserPhotoURL,
@@ -524,8 +527,8 @@ export function CommentSection({
     {}
   );
   const [expanded, setExpanded] = useState(false);
-  const previewComments = hasMoreComments ? comments.slice(0, PREVIEW_COUNT) : comments;
-  const hiddenComments = hasMoreComments ? comments.slice(PREVIEW_COUNT) : [];
+  const previewComments = hasMoreComments ? comments.slice(0, previewCount) : comments;
+  const hiddenComments = hasMoreComments ? comments.slice(previewCount) : [];
   const hiddenCount = hiddenComments.length;
   const internalRef = useRef<HTMLTextAreaElement>(null);
   const ref = externalRef ?? internalRef;

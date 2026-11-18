@@ -18,6 +18,7 @@ import {
   type MoodType as MoodTypeType,
   mapApiMoodToMoodType,
 } from "@/constants/mood";
+import { useCohortViewQuery } from "@/lib/cohort-view-query";
 import type { IBodyPosition, ICheckInItem, ISvgGeometry } from "../types";
 import { computeBodyDisplayLeft } from "./check-in-stack-utils";
 
@@ -136,7 +137,7 @@ const CONTAINER_WIDTH = 448;
 const MIN_CONTAINER_HEIGHT = 300;
 const WALL_THICKNESS = 20;
 const WALL_OFFSET = 10;
-const LAYER_SPACING = 1.2;
+const LAYER_SPACING = 1.5;
 const PATH_SAMPLES = 50;
 const VERTEX_DISTANCE_THRESHOLD = 0.1;
 
@@ -279,6 +280,7 @@ interface ICheckInStackProps {
 
 export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const cohortViewQuery = useCohortViewQuery();
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const svgRefsRef = useRef<(SVGSVGElement | null)[]>([]);
   const bodiesRef = useRef<Matter.Body[]>([]);
@@ -566,15 +568,19 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
   };
 
   return (
-    <div ref={handleWrapperRef} style={{ width: "100%", height: containerHeight * scale }}>
+    <div
+      ref={handleWrapperRef}
+      className="flex w-full justify-center"
+      style={{ height: containerHeight * scale }}
+    >
       <div
         ref={containerRef}
-        className="relative"
+        className="relative shrink-0"
         style={{
           width: CONTAINER_WIDTH,
           height: containerHeight,
           transform: `scale(${scale})`,
-          transformOrigin: "top left",
+          transformOrigin: "top center",
         }}
       >
         {/* 隱藏的 SVG 區域，用於提取幾何數據 */}
@@ -637,7 +643,7 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
           return (
             <Link
               key={id}
-              href={`/practices/${practiceId}/check-ins/${item.id}`}
+              href={`/practices/${practiceId}/check-ins/${item.id}${cohortViewQuery}`}
               className="absolute cursor-pointer hover:shadow-2xl"
               style={{
                 width: w,

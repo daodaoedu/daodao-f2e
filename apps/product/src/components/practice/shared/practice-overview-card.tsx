@@ -6,15 +6,15 @@ import { Link } from "@daodao/i18n/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Badge } from "@daodao/ui/components/badge";
 import { ReactionSection } from "@/components/social";
-import type { ManualPracticeFormValues } from "../create/manual/schema";
+import { EXECUTION_TIMING_OPTIONS, type ManualPracticeFormValues } from "../create/manual/schema";
 import { CircularProgress } from "./circular-progress";
+import { PracticeScheduleCard } from "./practice-schedule-card";
 
 interface CreatorInfo {
   id: string;
   name: string;
   photoURL?: string | null;
   customId?: string | null;
-  date?: string;
 }
 
 interface PracticeOverviewCardProps {
@@ -22,6 +22,10 @@ interface PracticeOverviewCardProps {
   frequency: ManualPracticeFormValues["frequency"];
   durationMinutes: ManualPracticeFormValues["durationMinutes"];
   tags?: ManualPracticeFormValues["tags"];
+  executionTiming?: ManualPracticeFormValues["executionTiming"];
+  customTiming?: ManualPracticeFormValues["customTiming"];
+  durationDays?: number | null;
+  startDate?: string | null;
   // 詳情頁專用屬性
   progress?: number;
   showProgress?: boolean;
@@ -36,12 +40,23 @@ export const PracticeOverviewCard = ({
   frequency,
   durationMinutes,
   tags,
+  executionTiming,
+  customTiming,
+  durationDays,
+  startDate,
   progress,
   showProgress = false,
   creator,
   practiceId,
 }: PracticeOverviewCardProps) => {
   const t = useTranslations("practice");
+  const executionTimingLabels = [
+    ...(executionTiming ?? []).flatMap((timing) => {
+      const option = EXECUTION_TIMING_OPTIONS.find((item) => item.value === timing);
+      return option ? [t(option.labelKey)] : [];
+    }),
+    ...(customTiming ? [customTiming] : []),
+  ];
   return (
     <div className="relative bg-white pt-4 px-4 pb-4 mb-4 rounded-xl">
       {/* 建立者資訊 - 僅在公開頁面顯示 */}
@@ -61,16 +76,30 @@ export const PracticeOverviewCard = ({
           >
             {creator.name}
           </Link>
-          {creator.date && <span className="text-sm text-text-dark/60">{creator.date}</span>}
         </div>
       )}
-      <div className="relative flex items-start gap-4">
-        {/* Overview Text */}
-        <div className="flex-1">
-          <p className="font-medium text-text-dark mb-3 pr-[88px]">{actionDescription}</p>
+      <div>
+        <div className="mb-3 flex items-start gap-3">
+          <p className="min-w-0 flex-1 font-medium text-text-dark">{actionDescription}</p>
+          {/* Circular Progress - 僅在詳情頁顯示 */}
+          {showProgress && typeof progress === "number" && (
+            <CircularProgress
+              value={progress}
+              className="shrink-0"
+              ariaLabel={t("completion_rate_aria", { value: Math.round(progress) })}
+            />
+          )}
+        </div>
 
+        {durationDays !== undefined && durationDays !== null && (
+          <div className="mb-3 pt-2">
+            <PracticeScheduleCard durationDays={durationDays} startDate={startDate ?? null} />
+          </div>
+        )}
+
+        <div>
           {/* Time Commitments */}
-          <div className="flex pb-3 mb-3 border-b border-bg-gray">
+          <div className="flex gap-3 pb-3 mb-3 border-b border-bg-gray pl-2">
             <div className="w-20">
               <div className="text-xs text-text-dark">{t("overview_per_week")}</div>
               <div className="flex items-baseline gap-0.5">
@@ -85,6 +114,19 @@ export const PracticeOverviewCard = ({
                 <div className="text-xs text-text-dark">{t("overview_minutes_unit")}</div>
               </div>
             </div>
+            {executionTimingLabels.length > 0 && (
+              <div className="min-w-0 flex-1">
+                <div className="text-xs text-text-dark">{t("form_execution_timing")}</div>
+                <div className="flex flex-wrap items-baseline gap-x-1 text-lg font-medium leading-7 text-logo-cyan">
+                  {executionTimingLabels.map((label, index) => (
+                    <span key={`${label}-${index}`}>
+                      {index > 0 && <span aria-hidden="true">、</span>}
+                      {label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Related Topics */}
@@ -104,13 +146,6 @@ export const PracticeOverviewCard = ({
             </div>
           )}
         </div>
-
-        {/* Circular Progress - 僅在詳情頁顯示 */}
-        {showProgress && typeof progress === "number" && (
-          <div className="absolute right-0 top-0">
-            <CircularProgress value={progress} />
-          </div>
-        )}
       </div>
 
       {/* 反應列 */}

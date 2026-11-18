@@ -37,6 +37,7 @@ interface InProgressTaskCardProps {
   draftActionLabel?: string;
   /** Compact card actions and inset progress bar used on the Personal Space page. */
   presentation?: "default" | "personal-space" | "cohort";
+  cohortId?: number;
   onBeforeCheckIn?: () => Promise<boolean>;
 }
 
@@ -56,6 +57,7 @@ export const InProgressTaskCard = ({
   onEdit,
   draftActionLabel,
   presentation = "default",
+  cohortId,
   onBeforeCheckIn,
 }: InProgressTaskCardProps) => {
   const t = useTranslations("dashboard");
@@ -82,7 +84,11 @@ export const InProgressTaskCard = ({
 
   return (
     <CustomLink
-      href={`/practices/${id}`}
+      href={
+        isCohort
+          ? `/practices/${id}?view=cohort-member${cohortId ? `&cohortId=${cohortId}` : ""}`
+          : `/practices/${id}`
+      }
       className="relative block w-[294px] h-[239px] md:w-full rounded-[12px] overflow-hidden cursor-pointer text-left hover:scale-[1.02] hover:shadow-md transition-all duration-200"
     >
       <Theme
