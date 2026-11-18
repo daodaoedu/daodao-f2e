@@ -17,10 +17,10 @@ describe("spaceHref", () => {
     expect(spaceHref(eventCourse)).toBe("/cohorts/64");
   });
 
-  // #201：組織成員沒有 enrollment，學員頁會把他導回 /mine，所以改連管理端場次頁
-  it("sends an organization member to the lighthouse cohort dashboard", () => {
+  // Organization members use the cohort page's manager view to review joined participants.
+  it("sends an organization member to the cohort manager view", () => {
     expect(spaceHref({ ...eventCourse, canManage: true })).toBe(
-      "/lighthouse/programs/7/cohorts/64/dashboard"
+      "/cohorts/64?programId=7"
     );
   });
 
