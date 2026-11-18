@@ -35,6 +35,11 @@ function isDateInRange(
 }
 
 interface DatePickerProps {
+  "aria-label"?: string;
+  /** 滑鼠停留時的提示（例如可選日期的限制） */
+  title?: string;
+  /** 是否在輸入框右側顯示日曆圖示；燈塔場次頁不顯示（daodao#524），其他頁面維持預設 */
+  showCalendarIcon?: boolean;
   value: Date | undefined;
   invalid?: boolean;
   placeholder?: string;
@@ -51,6 +56,9 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
   (
     {
       value,
+      "aria-label": ariaLabel,
+      title,
+      showCalendarIcon = true,
       invalid,
       placeholder = "請選擇日期",
       className,
@@ -92,15 +100,18 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
     return (
       <Popover open={disabled ? false : open} onOpenChange={disabled ? undefined : setOpen}>
         <PopoverTrigger asChild>
-          <div className="relative flex gap-2">
+          <div className={cn("relative", showCalendarIcon && "flex gap-2")}>
             <Input
               ref={ref}
+              aria-label={ariaLabel}
+              title={title}
               value={inputValue}
               placeholder={placeholder}
               disabled={disabled}
               readOnly
               className={cn(
-                "pr-10 cursor-pointer",
+                "cursor-pointer",
+                showCalendarIcon && "pr-10",
                 className,
                 (invalid || isRangeError) && "border-red"
               )}
@@ -113,16 +124,18 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
                 }
               }}
             />
-            <Button
-              id="date-picker"
-              variant="ghost"
-              disabled={disabled}
-              type="button"
-              className="absolute top-1/2 right-2 size-6 -translate-y-1/2 pointer-events-none"
-            >
-              <CalendarIcon className="size-3.5" />
-              <span className="sr-only">Select date</span>
-            </Button>
+            {showCalendarIcon && (
+              <Button
+                id="date-picker"
+                variant="ghost"
+                disabled={disabled}
+                type="button"
+                className="absolute top-1/2 right-2 size-6 -translate-y-1/2 pointer-events-none"
+              >
+                <CalendarIcon className="size-3.5" />
+                <span className="sr-only">Select date</span>
+              </Button>
+            )}
           </div>
         </PopoverTrigger>
         <PopoverContent

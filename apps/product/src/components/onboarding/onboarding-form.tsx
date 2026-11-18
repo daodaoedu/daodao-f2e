@@ -8,7 +8,12 @@ import {
 } from "@daodao/api";
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
-import { getStorage, StorageEnum } from "@daodao/shared";
+import {
+  clearBlogSourceContext,
+  getStorage,
+  readBlogSourceHeader,
+  StorageEnum,
+} from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { toast } from "@daodao/ui/components/sonner";
@@ -223,7 +228,13 @@ export const OnboardingForm = ({ initialEmail }: OnboardingFormProps) => {
         const storedFlow = registrationFlowStorage.get();
         const registrationFlow =
           storedFlow === "quiz" || storedFlow === "action_maker" ? storedFlow : "landing_page";
-        await createCurrentUserWithFormData({ ...updateData, registrationFlow });
+        const sourceContext = readBlogSourceHeader();
+        await createCurrentUserWithFormData(
+          { ...updateData, registrationFlow },
+          undefined,
+          sourceContext ? { "X-Daodao-Blog-Context": sourceContext } : undefined
+        );
+        clearBlogSourceContext({ authenticated: true });
         registrationFlowStorage.remove();
         await refreshToken();
       } else {

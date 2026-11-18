@@ -1,29 +1,15 @@
 "use client";
 
-import {
-  type LighthouseDashboardQuery,
-  useLighthouseCohort,
-  useLighthouseDashboard,
-} from "@daodao/api";
+import { type LighthouseDashboardQuery, useLighthouseDashboard } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
-import { CustomLink } from "@daodao/ui/components/custom-link";
-import { Input } from "@daodao/ui/components/input";
+import { DatePicker } from "@daodao/ui/components/date-picker";
+import { Popover, PopoverContent, PopoverTrigger } from "@daodao/ui/components/popover";
 import { cn } from "@daodao/ui/lib/utils";
-import { format, parseISO } from "date-fns";
-import {
-  Activity,
-  CalendarDays,
-  ExternalLink,
-  Flame,
-  Globe,
-  Lock,
-  MapPin,
-  Rocket,
-  Users,
-  Video,
-} from "lucide-react";
+import { addDays, differenceInCalendarWeeks, format, parseISO, startOfWeek } from "date-fns";
+import { Activity, Flame, Info, Rocket, Users } from "lucide-react";
 import { useState } from "react";
+import { DEFAULT_ACTIVITY_TIMEZONE } from "./cohort-activity-badge";
 import { CohortErrorState } from "./cohort-error-state";
 import { CohortParticipantsTable } from "./cohort-participants-table";
 
@@ -32,19 +18,21 @@ interface CohortDashboardProps {
   cohortId: number;
 }
 
-const HEAT_CELL = 32;
-const monthDay = (value: string): string => format(parseISO(value), "M/d");
+const monthDay = (value: string): string => format(parseISO(value), "yyyy/MM/dd");
+const heatColor = (count: number, max: number): string =>
+  `color-mix(in srgb, #16B9B3 ${(count / max) * 85}%, #EDF8F6)`;
 
 /** FRD 3.3 儀表板：實踐 chip × 日期範圍驅動所有區塊；只呈現絕對數字（TP-AG-04） */
 export function CohortDashboard({ programId, cohortId }: CohortDashboardProps) {
   const t = useTranslations("lighthouse");
   const [practiceTitle, setPracticeTitle] = useState<string | undefined>(undefined);
   const [range, setRange] = useState<{ from?: string; to?: string }>({});
+  const [selectedHeatDate, setSelectedHeatDate] = useState<string | undefined>();
+  const isAllTime = !range.from && !range.to;
+
   const filter: LighthouseDashboardQuery = { practiceTitle, ...range };
   const query = useLighthouseDashboard(programId, cohortId, filter);
   const data = query.data?.data;
-  const cohortQuery = useLighthouseCohort(programId, cohortId);
-  const cohort = cohortQuery.data?.data;
 
   if (query.isLoading && !data)
     return <p className="px-10 py-12 text-sm text-[#5A7B79]">{t("loading")}</p>;
@@ -65,36 +53,31 @@ export function CohortDashboard({ programId, cohortId }: CohortDashboardProps) {
       </div>
     );
 
-  const maxHeat = Math.max(1, ...Object.values(data.heatmap));
+  const maxHeatCount = Math.max(0, ...Object.values(data.heatmap));
+  const maxHeat = Math.max(1, maxHeatCount);
   const maxHour = Math.max(1, ...Object.values(data.hourHistogram));
   const maxMood = Math.max(1, ...data.moodDistribution.map((item) => item.count));
-  const showOverview = data.practiceTitle === null;
+  const heatRangeStart = parseISO(data.range.from);
+  const heatRangeEnd = parseISO(data.range.to);
+  const firstHeatWeek = startOfWeek(heatRangeStart, { weekStartsOn: 1 });
+  const lastHeatWeek = startOfWeek(heatRangeEnd, { weekStartsOn: 1 });
+  const heatWeekCount =
+    differenceInCalendarWeeks(lastHeatWeek, firstHeatWeek, { weekStartsOn: 1 }) + 1;
+  const heatWeeks = Array.from({ length: heatWeekCount }, (_, weekIndex) => {
+    const weekStart = addDays(firstHeatWeek, weekIndex * 7);
+    const days = Array.from({ length: 7 }, (_, dayIndex) => {
+      const dateKey = format(addDays(weekStart, dayIndex), "yyyy-MM-dd");
+      const inRange = dateKey >= data.range.from && dateKey <= data.range.to;
+      return { dateKey, inRange, count: data.heatmap[dateKey] ?? 0 };
+    });
+    return { dateLabel: days.find((day) => day.inRange)?.dateKey, days };
+  });
+  const overviewRows = practiceTitle
+    ? data.practiceOverview.filter((row) => row.title === practiceTitle)
+    : data.practiceOverview;
 
   return (
     <div className="mx-auto w-full max-w-6xl px-5 py-8 md:px-10">
-      {/* 場次資訊摘要 */}
-      {cohort && <CohortInfoPanel cohort={cohort} />}
-
-      {/* FR-DB-01 實踐篩選器 */}
-      <fieldset
-        className="flex flex-wrap gap-2"
-        aria-label={t("dashboard_practice_filter")}
-        data-testid="practice-filter"
-      >
-        <Chip active={!practiceTitle} onClick={() => setPracticeTitle(undefined)}>
-          {t("dashboard_all_practices")}
-        </Chip>
-        {data.practices.map((practice) => (
-          <Chip
-            key={practice.title}
-            active={practiceTitle === practice.title}
-            onClick={() => setPracticeTitle(practice.title)}
-          >
-            {practice.title}
-          </Chip>
-        ))}
-      </fieldset>
-
       {/* FR-DB-02 KPI 摘要卡 */}
       <div className="mt-5 grid gap-4 sm:grid-cols-3">
         <Metric
@@ -105,85 +88,126 @@ export function CohortDashboard({ programId, cohortId }: CohortDashboardProps) {
         <Metric
           icon={<Rocket className="size-5 text-[#0D7773]" aria-hidden="true" />}
           label={t("dashboard_activated")}
+          hint={t("dashboard_activated_hint")}
           value={data.kpi.activated}
         />
         <Metric
           icon={<Flame className="size-5 text-[#0D7773]" aria-hidden="true" />}
           label={t("dashboard_active_members")}
+          hint={t("dashboard_active_members_hint")}
           value={data.kpi.activeThisWeek}
         />
       </div>
 
-      {/* FR-DB-03 實踐總覽表（僅全部實踐） */}
-      {showOverview && (
-        <section
-          className="mt-5 rounded-3xl border border-[#CDEBE8] bg-white p-6"
-          aria-labelledby="dashboard-overview-title"
-        >
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <h2 id="dashboard-overview-title" className="text-lg font-semibold">
-                {t("dashboard_practice_overview")}
-              </h2>
-              <p className="mt-1 text-xs text-[#78928F]">
+      {/* FR-DB-03 實踐篩選與總覽 */}
+      <section
+        className="mt-5 rounded-3xl border border-[#CDEBE8] bg-white p-6"
+        aria-labelledby="dashboard-overview-title"
+      >
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <h2 id="dashboard-overview-title" className="text-lg font-semibold">
+            {t("dashboard_practice_overview")}
+          </h2>
+        </div>
+        {/* FR-DB-01 實踐與日期篩選器 */}
+        <div className="mt-4 rounded-2xl bg-[#F0FBF9] p-4" data-testid="dashboard-filters">
+          <div className="flex flex-col gap-4">
+            <fieldset
+              className="flex flex-wrap gap-2"
+              aria-label={t("dashboard_practice_filter")}
+              data-testid="practice-filter"
+            >
+              <Chip
+                active={!practiceTitle}
+                onClick={() => {
+                  setSelectedHeatDate(undefined);
+                  setPracticeTitle(undefined);
+                }}
+              >
+                {t("dashboard_all_practices")}
+              </Chip>
+              {data.practices.map((practice) => (
+                <Chip
+                  key={practice.title}
+                  active={practiceTitle === practice.title}
+                  onClick={() => {
+                    setSelectedHeatDate(undefined);
+                    setPracticeTitle(practice.title);
+                  }}
+                >
+                  {practice.title}
+                </Chip>
+              ))}
+            </fieldset>
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <DatePicker
+                showCalendarIcon={false}
+                aria-label={t("dashboard_range_from")}
+                value={parseISO(range.from ?? data.range.from)}
+                maxDate={parseISO(range.to ?? data.range.to)}
+                onChange={(date) => {
+                  setSelectedHeatDate(undefined);
+                  setRange((r) => ({ ...r, from: date ? format(date, "yyyy-MM-dd") : undefined }));
+                }}
+                className="h-9 w-[150px] text-xs"
+              />
+              <DatePicker
+                showCalendarIcon={false}
+                aria-label={t("dashboard_range_to")}
+                value={parseISO(range.to ?? data.range.to)}
+                minDate={parseISO(range.from ?? data.range.from)}
+                onChange={(date) => {
+                  setSelectedHeatDate(undefined);
+                  setRange((r) => ({ ...r, to: date ? format(date, "yyyy-MM-dd") : undefined }));
+                }}
+                className="h-9 w-[150px] text-xs"
+              />
+              <p className="text-xs text-[#78928F]" aria-live="polite">
                 {t("dashboard_range_summary", {
                   from: data.range.from.replaceAll("-", "/"),
                   to: data.range.to.replaceAll("-", "/"),
                 })}
               </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2 text-xs">
-              <Input
-                type="date"
-                aria-label={t("dashboard_range_from")}
-                value={range.from ?? data.range.from}
-                max={range.to ?? data.range.to}
-                onChange={(event) => setRange((r) => ({ ...r, from: event.target.value }))}
-                className="h-9 w-[150px] text-xs"
-              />
-              <span aria-hidden="true">–</span>
-              <Input
-                type="date"
-                aria-label={t("dashboard_range_to")}
-                value={range.to ?? data.range.to}
-                min={range.from ?? data.range.from}
-                onChange={(event) => setRange((r) => ({ ...r, to: event.target.value }))}
-                className="h-9 w-[150px] text-xs"
-              />
               <Button
                 type="button"
-                variant="outline"
+                variant={isAllTime ? "default" : "outline"}
                 size="sm"
                 className="border-[#CDEBE8]"
-                onClick={() => setRange({})}
+                aria-pressed={isAllTime}
+                onClick={() => {
+                  setSelectedHeatDate(undefined);
+                  setRange({});
+                }}
               >
                 {t("dashboard_range_all")}
               </Button>
             </div>
           </div>
-          <ul className="mt-4 grid gap-2">
-            {data.practiceOverview.map((row) => (
-              <li
-                key={row.title}
-                className="grid gap-3 rounded-2xl border border-[#DDEFED] px-4 py-3 md:grid-cols-[1.6fr_repeat(4,1fr)] md:items-center"
-              >
-                <div>
-                  <p className="font-semibold">{row.title}</p>
-                  <p className="mt-0.5 text-xs text-[#78928F]">
-                    {row.startDate ? row.startDate.slice(0, 10).replaceAll("-", "/") : "—"} –{" "}
-                    {row.endDate ? row.endDate.slice(0, 10).replaceAll("-", "/") : "—"}
-                  </p>
-                </div>
-                <Stat label={t("dashboard_started_count")} value={row.startedCount} />
-                <Stat label={t("dashboard_checkin_count")} value={row.checkinCount} />
-                <Stat label={t("dashboard_avg_people")} value={row.avgCheckinPeople} />
-                <Stat label={t("dashboard_avg_length")} value={row.avgCheckinLength} />
-              </li>
-            ))}
-            {!data.practiceOverview.length && <Empty />}
-          </ul>
-        </section>
-      )}
+        </div>
+        <ul className="mt-4 grid gap-2">
+          {overviewRows.map((row) => (
+            <li
+              key={row.title}
+              className="grid gap-3 rounded-2xl border border-[#DDEFED] px-4 py-3 md:grid-cols-[1.6fr_repeat(4,1fr)] md:items-center"
+            >
+              <div>
+                <p className="font-semibold">{row.title}</p>
+                <p className="mt-0.5 text-xs text-[#78928F]">
+                  {t("dashboard_practice_period", {
+                    from: row.startDate ? row.startDate.slice(0, 10).replaceAll("-", "/") : "—",
+                    to: row.endDate ? row.endDate.slice(0, 10).replaceAll("-", "/") : "—",
+                  })}
+                </p>
+              </div>
+              <Stat label={t("dashboard_started_count")} value={row.startedCount} />
+              <Stat label={t("dashboard_checkin_count")} value={row.checkinCount} />
+              <Stat label={t("dashboard_avg_people")} value={row.avgCheckinPeople} />
+              <Stat label={t("dashboard_avg_length")} value={row.avgCheckinLength} />
+            </li>
+          ))}
+          {!overviewRows.length && <Empty />}
+        </ul>
+      </section>
 
       <div className="mt-5 grid gap-5 lg:grid-cols-2">
         {/* FR-DB-04 打卡熱度圖 */}
@@ -191,32 +215,71 @@ export function CohortDashboard({ programId, cohortId }: CohortDashboardProps) {
           title={t("dashboard_rhythm_heatmap")}
           description={t("dashboard_rhythm_heatmap_desc")}
         >
-          <div
-            className="mt-4 grid w-full gap-1.5"
-            style={{ gridTemplateColumns: `repeat(auto-fill, ${HEAT_CELL}px)` }}
-          >
-            {Object.entries(data.heatmap).map(([day, count]) => (
-              <div key={day} className="group relative" data-heat>
-                <div
-                  className="rounded-md border border-[#DDEFED]"
-                  style={{
-                    width: HEAT_CELL,
-                    height: HEAT_CELL,
-                    backgroundColor: `color-mix(in srgb, #16B9B3 ${(count / maxHeat) * 85}%, #EDF8F6)`,
-                  }}
-                  role="img"
-                  aria-label={t("dashboard_heat_tooltip", { date: monthDay(day), count })}
-                />
-                <span
-                  role="tooltip"
-                  className="pointer-events-none absolute -top-9 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-[#0D3036] px-2 py-1 text-[11px] text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
-                >
-                  {t("dashboard_heat_tooltip", { date: monthDay(day), count })}
+          <div className="mt-4 grid w-full gap-x-2 gap-y-2 overflow-x-auto">
+            {heatWeeks.map((week, weekIndex) => (
+              <div
+                key={week.dateLabel ?? weekIndex}
+                className="grid w-max grid-cols-[70px_repeat(7,24px)] items-center gap-x-1 sm:grid-cols-[76px_repeat(7,28px)] sm:gap-x-1.5"
+              >
+                <span className="text-[9px] text-[#78928F] sm:text-[10px]">
+                  {week.dateLabel ? monthDay(week.dateLabel) : ""}
                 </span>
+                {week.days.map((day) => {
+                  if (!day.inRange) return <span key={day.dateKey} className="size-6 sm:size-7" />;
+                  const tooltip = t("dashboard_heat_tooltip", {
+                    date: monthDay(day.dateKey),
+                    count: day.count,
+                  });
+                  return (
+                    <div key={day.dateKey} className="group relative" data-heat>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        animation="none"
+                        aria-label={tooltip}
+                        aria-pressed={selectedHeatDate === day.dateKey}
+                        onClick={() => setSelectedHeatDate(day.dateKey)}
+                        className={cn(
+                          "size-6 rounded-md border border-[#DDEFED] p-0 hover:bg-transparent sm:size-7",
+                          selectedHeatDate === day.dateKey && "ring-2 ring-[#0D7773]"
+                        )}
+                        style={{ backgroundColor: heatColor(day.count, maxHeat) }}
+                      />
+                      <span
+                        role="tooltip"
+                        className="pointer-events-none absolute -top-9 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-[#0D3036] px-2 py-1 text-[11px] text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+                      >
+                        {tooltip}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             ))}
           </div>
+          {selectedHeatDate && (
+            <p className="mt-2 text-xs text-[#456B68]" aria-live="polite">
+              {t("dashboard_heat_tooltip", {
+                date: monthDay(selectedHeatDate),
+                count: data.heatmap[selectedHeatDate] ?? 0,
+              })}
+            </p>
+          )}
           {!Object.keys(data.heatmap).length && <Empty />}
+          <div className="mt-4 flex items-center gap-2 text-[10px] text-[#78928F]">
+            <span>{t("dashboard_heat_legend_title")}</span>
+            <span>{t("dashboard_heat_legend_min")}</span>
+            <span
+              aria-label={t("dashboard_heat_legend_description", { max: maxHeatCount })}
+              className="h-2 w-20 rounded-full"
+              role="img"
+              style={{
+                background: `linear-gradient(to right, #EDF8F6, ${heatColor(maxHeat, maxHeat)})`,
+              }}
+            />
+            <span>{t("dashboard_heat_legend_max", { count: maxHeatCount })}</span>
+          </div>
         </Card>
 
         {/* FR-DB-05 打卡標籤分佈 */}
@@ -259,9 +322,12 @@ export function CohortDashboard({ programId, cohortId }: CohortDashboardProps) {
           className="min-w-0 rounded-3xl border border-[#CDEBE8] bg-white p-6 lg:col-span-2"
           aria-labelledby="dashboard-hours-title"
         >
-          <h2 id="dashboard-hours-title" className="text-lg font-semibold">
-            {t("dashboard_time_rhythm")}
-          </h2>
+          <div className="flex flex-wrap items-baseline gap-x-2">
+            <h2 id="dashboard-hours-title" className="text-lg font-semibold">
+              {t("dashboard_time_rhythm")}
+            </h2>
+            <span className="text-xs text-[#456B68]">({DEFAULT_ACTIVITY_TIMEZONE})</span>
+          </div>
           <p className="mt-1 text-xs text-[#78928F]">{t("dashboard_time_rhythm_desc")}</p>
           <div className="mt-5 flex h-44 items-end gap-2 overflow-x-auto">
             {Object.entries(data.hourHistogram).map(([hour, count]) => (
@@ -337,13 +403,48 @@ function Card({
   );
 }
 
-function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
+function Metric({
+  icon,
+  label,
+  hint,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  hint?: string;
+  value: number;
+}) {
   return (
     <div className="flex items-center gap-4 rounded-3xl border border-[#CDEBE8] bg-[#F0FBF9] px-5 py-4">
       {icon}
       <div>
         <strong className="block text-xl text-[#0D3036]">{value}</strong>
-        <span className="block text-xs text-[#5A7B79]">{label}</span>
+        <span className="flex items-center gap-1 text-xs text-[#5A7B79]">
+          {label}
+          {hint && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="size-7 shrink-0 rounded-full text-[#0D7773] hover:bg-[#EAF7F5]"
+                  aria-label={hint}
+                >
+                  <Info className="size-3.5" aria-hidden="true" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                side="top"
+                align="start"
+                sideOffset={6}
+                className="w-72 max-w-[calc(100vw-2rem)] rounded-lg border-[#CDEBE8] bg-[#0D3036] px-3 py-2 text-xs leading-relaxed text-white shadow-md"
+              >
+                {hint}
+              </PopoverContent>
+            </Popover>
+          )}
+        </span>
       </div>
     </div>
   );
@@ -351,7 +452,7 @@ function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; 
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div>
+    <div className="flex items-baseline gap-2 md:block">
       <p className="text-[11px] text-[#78928F]">{label}</p>
       <p className="text-base font-semibold text-[#0D3036]">{value}</p>
     </div>
@@ -401,13 +502,30 @@ function TrendChart({
   const area = `${padding},${height - padding} ${line} ${points.at(-1)?.x ?? padding},${height - padding}`;
   const last = points.at(-1);
   const deltaLabel = `${trend.delta >= 0 ? "+" : ""}${trend.delta}`;
+  const thisWeekDays = trend.days.slice(-7);
+  const thisWeekStart = thisWeekDays[0]?.date;
+  const thisWeekEnd = thisWeekDays.at(-1)?.date;
+  const dateTickIndices = [
+    0,
+    Math.round((trend.days.length - 1) / 3),
+    Math.round(((trend.days.length - 1) * 2) / 3),
+    trend.days.length - 1,
+  ].filter((index, position, indices) => indices.indexOf(index) === position);
 
   return (
     <div className="mt-4">
       <div className="flex items-center justify-between gap-3">
-        <p>
+        <p className="flex flex-wrap items-baseline gap-x-2">
           <strong className="text-3xl font-semibold text-[#0D3036]">{trend.thisWeek}</strong>
-          <span className="ml-2 text-xs text-[#78928F]">{t("dashboard_trend_unit")}</span>
+          <span className="text-xs text-[#78928F]">{t("dashboard_trend_unit")}</span>
+          {thisWeekStart && thisWeekEnd && (
+            <span className="text-xs text-[#78928F]">
+              {t("dashboard_trend_date_range", {
+                from: monthDay(thisWeekStart),
+                to: monthDay(thisWeekEnd),
+              })}
+            </span>
+          )}
         </p>
         <span className="rounded-full bg-[#E7FAF7] px-3 py-1 text-xs font-semibold text-[#0D5B59]">
           {t("dashboard_trend_delta", { delta: deltaLabel })}
@@ -440,198 +558,21 @@ function TrendChart({
           </g>
         ))}
       </svg>
-      <div className="flex justify-between text-[10px] text-[#78928F]">
-        <span>{t("dashboard_trend_last_week")}</span>
-        <span>{t("dashboard_trend_this_week")}</span>
+      <div className="mt-1 flex justify-between gap-1 text-[9px] text-[#78928F] sm:text-[10px]">
+        {dateTickIndices.map((index, tickIndex) => (
+          <span
+            key={trend.days[index]?.date ?? index}
+            className={cn(
+              "whitespace-nowrap",
+              tickIndex === 0 && "text-left",
+              tickIndex === dateTickIndices.length - 1 && "text-right"
+            )}
+          >
+            {trend.days[index] ? monthDay(trend.days[index].date) : ""}
+          </span>
+        ))}
       </div>
     </div>
-  );
-}
-
-/** 場次資訊摘要面板：顯示互動方式、地點、費用、聚會時段、報名方式、隱私設定 */
-function CohortInfoPanel({
-  cohort,
-}: {
-  cohort: {
-    tagline: string | null;
-    interactionModes: string[];
-    meetingUrl: string | null;
-    location: string | null;
-    sessions: {
-      id: number;
-      sessionDate: string;
-      startTime: string | null;
-      endTime: string | null;
-    }[];
-    feeType: string;
-    feeAmount: number | null;
-    signupMethod: string;
-    externalSignupUrl: string | null;
-    isPrivate: boolean;
-    checkinDefaultPrivate: boolean;
-    hostCommentDefaultPrivate: boolean;
-  };
-}) {
-  const t = useTranslations("lighthouse");
-  const modeLabels: Record<string, string> = {
-    sync: t("cohort_interaction_mode_sync"),
-    async: t("cohort_interaction_mode_async"),
-    physical: t("cohort_interaction_mode_physical"),
-  };
-
-  const hasInfo =
-    cohort.tagline ||
-    cohort.interactionModes.length > 0 ||
-    cohort.location ||
-    cohort.meetingUrl ||
-    cohort.sessions.length > 0 ||
-    cohort.feeType === "paid";
-
-  if (!hasInfo) return null;
-
-  return (
-    <section className="mb-5 rounded-3xl border border-[#CDEBE8] bg-white p-6">
-      {cohort.tagline && <p className="mb-4 text-sm italic text-[#456B68]">{cohort.tagline}</p>}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {/* 互動方式 */}
-        {cohort.interactionModes.length > 0 && (
-          <div className="flex items-start gap-3">
-            <Globe className="mt-0.5 size-4 shrink-0 text-[#0D7773]" aria-hidden="true" />
-            <div>
-              <p className="text-xs font-medium text-[#78928F]">
-                {t("cohort_info_interaction_modes")}
-              </p>
-              <div className="mt-1 flex flex-wrap gap-1.5">
-                {cohort.interactionModes.map((mode) => (
-                  <span
-                    key={mode}
-                    className="rounded-full bg-[#E7FAF7] px-2.5 py-1 text-xs font-medium text-[#0D5B59]"
-                  >
-                    {modeLabels[mode] ?? mode}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 地點 */}
-        {cohort.location && (
-          <div className="flex items-start gap-3">
-            <MapPin className="mt-0.5 size-4 shrink-0 text-[#0D7773]" aria-hidden="true" />
-            <div>
-              <p className="text-xs font-medium text-[#78928F]">{t("cohort_info_location")}</p>
-              <p className="mt-0.5 text-sm text-[#0D3036]">{cohort.location}</p>
-            </div>
-          </div>
-        )}
-
-        {/* 會議連結 */}
-        {cohort.meetingUrl && (
-          <div className="flex items-start gap-3">
-            <Video className="mt-0.5 size-4 shrink-0 text-[#0D7773]" aria-hidden="true" />
-            <div>
-              <p className="text-xs font-medium text-[#78928F]">{t("cohort_info_meeting_url")}</p>
-              <CustomLink
-                href={cohort.meetingUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-0.5 inline-flex items-center gap-1 text-sm text-[#0D7773] hover:underline"
-              >
-                {(() => {
-                  try {
-                    return new URL(cohort.meetingUrl).hostname;
-                  } catch {
-                    return cohort.meetingUrl;
-                  }
-                })()}
-                <ExternalLink className="size-3" aria-hidden="true" />
-              </CustomLink>
-            </div>
-          </div>
-        )}
-
-        {/* 費用 */}
-        <div className="flex items-start gap-3">
-          <span className="mt-0.5 text-sm font-medium text-[#0D7773]" aria-hidden="true">
-            $
-          </span>
-          <div>
-            <p className="text-xs font-medium text-[#78928F]">{t("cohort_info_fee")}</p>
-            <p className="mt-0.5 text-sm text-[#0D3036]">
-              {cohort.feeType === "paid"
-                ? t("cohort_info_fee_paid", { amount: cohort.feeAmount ?? 0 })
-                : t("cohort_info_fee_free")}
-            </p>
-          </div>
-        </div>
-
-        {/* 報名方式 */}
-        <div className="flex items-start gap-3">
-          <ExternalLink className="mt-0.5 size-4 shrink-0 text-[#0D7773]" aria-hidden="true" />
-          <div>
-            <p className="text-xs font-medium text-[#78928F]">{t("cohort_info_signup_method")}</p>
-            <p className="mt-0.5 text-sm text-[#0D3036]">
-              {cohort.signupMethod === "external"
-                ? t("cohort_info_signup_external")
-                : t("cohort_info_signup_island_form")}
-            </p>
-            {cohort.signupMethod === "external" && cohort.externalSignupUrl && (
-              <CustomLink
-                href={cohort.externalSignupUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-0.5 inline-flex items-center gap-1 text-xs text-[#0D7773] hover:underline"
-              >
-                {cohort.externalSignupUrl}
-              </CustomLink>
-            )}
-          </div>
-        </div>
-
-        {/* 隱私 */}
-        <div className="flex items-start gap-3">
-          {cohort.isPrivate ? (
-            <Lock className="mt-0.5 size-4 shrink-0 text-[#0D7773]" aria-hidden="true" />
-          ) : (
-            <Globe className="mt-0.5 size-4 shrink-0 text-[#0D7773]" aria-hidden="true" />
-          )}
-          <div>
-            <p className="text-xs font-medium text-[#78928F]">{t("cohort_info_privacy")}</p>
-            <p className="mt-0.5 text-sm text-[#0D3036]">
-              {cohort.isPrivate ? t("cohort_info_private") : t("cohort_info_public_activity")}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* 聚會時段 */}
-      {cohort.sessions.length > 0 && (
-        <div className="mt-4 border-t border-[#DDEFED] pt-4">
-          <div className="flex items-center gap-2">
-            <CalendarDays className="size-4 text-[#0D7773]" aria-hidden="true" />
-            <p className="text-xs font-medium text-[#78928F]">{t("cohort_info_sessions")}</p>
-          </div>
-          <ul className="mt-2 grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
-            {cohort.sessions.map((session) => (
-              <li
-                key={session.id}
-                className="rounded-xl border border-[#DDEFED] px-3 py-2 text-sm text-[#0D3036]"
-              >
-                {session.sessionDate.slice(0, 10)}
-                {(session.startTime || session.endTime) && (
-                  <span className="ml-2 text-[#78928F]">
-                    {session.startTime ?? ""}
-                    {session.startTime && session.endTime ? "–" : ""}
-                    {session.endTime ?? ""}
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </section>
   );
 }
 

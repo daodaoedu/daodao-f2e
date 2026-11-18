@@ -11,7 +11,15 @@ import { useState } from "react";
 
 type SubscribeStatus = "idle" | "loading" | "success" | "error";
 
-export const Footer = () => {
+export const Footer = ({
+  showLanguageSwitcher = true,
+  logoLocale,
+  newsletterLink,
+}: {
+  showLanguageSwitcher?: boolean;
+  logoLocale?: "zh-TW" | "en";
+  newsletterLink?: { description: string; label: string };
+}) => {
   const t = useTranslations("common");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -53,8 +61,12 @@ export const Footer = () => {
         <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-start">
           <div>
             <Image
-              src="/assets/landing-page/logo-simple-white.svg"
-              alt="島島阿學 Logo"
+              src={
+                logoLocale
+                  ? `/assets/blog/${logoLocale === "en" ? "en" : "zh"}-dark.svg`
+                  : "/assets/landing-page/logo-simple-white.svg"
+              }
+              alt={logoLocale === "en" ? "DaoDao" : "島島阿學"}
               width={142}
               height={24}
               className="mb-2"
@@ -63,9 +75,7 @@ export const Footer = () => {
           </div>
 
           {/* 語言切換元件 */}
-          <div className="mt-2 md:mt-0">
-            <LanguageSwitcher />
-          </div>
+          <div className="mt-2 md:mt-0">{showLanguageSwitcher && <LanguageSwitcher />}</div>
         </div>
         <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-3">
           <div className="space-y-4">
@@ -152,103 +162,129 @@ export const Footer = () => {
           </div>
           <div className="space-y-4">
             <p className="text-lg text-primary-lighter">{t("footer_newsletter_title")}</p>
-            <form className="space-y-3" onSubmit={handleSubscribe}>
-              <input
-                className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-white placeholder:text-white/50 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-base disabled:opacity-50"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder={t("footer_name_placeholder")}
-                disabled={status === "loading" || status === "success"}
-              />
-              <input
-                className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-white placeholder:text-white/50 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-base disabled:opacity-50"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={t("footer_email_placeholder")}
-                disabled={status === "loading" || status === "success"}
-                required
-              />
-              <Button
-                type="submit"
-                variant="ctaPrimary"
-                size="huge"
-                className="w-full"
-                disabled={status === "loading" || status === "success" || !email}
-              >
-                {status === "loading" && t("footer_subscribing")}
+            {newsletterLink ? (
+              <div className="space-y-3 text-white/80">
+                <p>{newsletterLink.description}</p>
+                <CustomLink href="/" className="underline underline-offset-4">
+                  {newsletterLink.label}
+                </CustomLink>
+              </div>
+            ) : (
+              <form className="space-y-3" onSubmit={handleSubscribe}>
+                <input
+                  className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-white placeholder:text-white/50 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-base disabled:opacity-50"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder={t("footer_name_placeholder")}
+                  disabled={status === "loading" || status === "success"}
+                />
+                <input
+                  className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-white placeholder:text-white/50 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-base disabled:opacity-50"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={t("footer_email_placeholder")}
+                  disabled={status === "loading" || status === "success"}
+                  required
+                />
+                <Button
+                  type="submit"
+                  variant="ctaPrimary"
+                  size="huge"
+                  className="w-full"
+                  disabled={status === "loading" || status === "success" || !email}
+                >
+                  {status === "loading" && t("footer_subscribing")}
+                  {status === "success" && (
+                    <>
+                      {t("footer_subscribed")}
+                      <Check className="ml-2 size-5" />
+                    </>
+                  )}
+                  {(status === "idle" || status === "error") && (
+                    <>
+                      {t("footer_subscribe_button")}
+                      <ChevronRight className="ml-2 size-5" />
+                    </>
+                  )}
+                </Button>
                 {status === "success" && (
-                  <>
-                    {t("footer_subscribed")}
-                    <Check className="ml-2 size-5" />
-                  </>
+                  <p className="text-sm text-primary-lighter">
+                    {t("footer_subscribe_confirm_hint")}
+                  </p>
                 )}
-                {(status === "idle" || status === "error") && (
-                  <>
-                    {t("footer_subscribe_button")}
-                    <ChevronRight className="ml-2 size-5" />
-                  </>
+                {status === "error" && (
+                  <p className="text-sm text-red-400">{t("footer_subscribe_error")}</p>
                 )}
-              </Button>
-              {status === "success" && (
-                <p className="text-sm text-primary-lighter">{t("footer_subscribe_confirm_hint")}</p>
-              )}
-              {status === "error" && (
-                <p className="text-sm text-red-400">{t("footer_subscribe_error")}</p>
-              )}
-            </form>
+              </form>
+            )}
           </div>
         </div>
-        <div className="mb-8 space-y-4">
-          <div className="flex gap-4">
-            <CustomLink
-              href={SOCIAL_LINKS.INSTAGRAM}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-opacity hover:opacity-80"
-            >
-              <Image
-                src="/assets/landing-page/icon-Instagram.svg"
-                alt={t("footer_instagram_alt")}
-                width={36}
-                height={35}
-              />
+        {newsletterLink ? (
+          <div className="mb-8 flex flex-wrap gap-4 text-white/80">
+            <CustomLink href={SOCIAL_LINKS.INSTAGRAM} target="_blank" rel="noopener noreferrer">
+              Instagram
             </CustomLink>
-            <CustomLink
-              href={SOCIAL_LINKS.FACEBOOK}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-opacity hover:opacity-80"
-            >
-              <Image
-                src="/assets/landing-page/icon-Facebook.svg"
-                alt={t("footer_facebook_alt")}
-                width={36}
-                height={35}
-              />
+            <CustomLink href={SOCIAL_LINKS.FACEBOOK} target="_blank" rel="noopener noreferrer">
+              Facebook
             </CustomLink>
-            <CustomLink
-              href={SOCIAL_LINKS.DISCORD}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-opacity hover:opacity-80"
-            >
-              <Image
-                src="/assets/landing-page/icon-Discord.svg"
-                alt={t("footer_discord_alt")}
-                width={36}
-                height={35}
-              />
+            <CustomLink href={SOCIAL_LINKS.DISCORD} target="_blank" rel="noopener noreferrer">
+              Discord
             </CustomLink>
+            <a href={`mailto:${SOCIAL_LINKS.EMAIL}`}>{SOCIAL_LINKS.EMAIL}</a>
           </div>
-          <a
-            href={`mailto:${SOCIAL_LINKS.EMAIL}`}
-            className="block w-fit text-white/70 transition-colors hover:text-primary-base"
-          >
-            {SOCIAL_LINKS.EMAIL}
-          </a>
-        </div>
+        ) : (
+          <div className="mb-8 space-y-4">
+            <div className="flex gap-4">
+              <CustomLink
+                href={SOCIAL_LINKS.INSTAGRAM}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-opacity hover:opacity-80"
+              >
+                <Image
+                  src="/assets/landing-page/icon-Instagram.svg"
+                  alt={t("footer_instagram_alt")}
+                  width={36}
+                  height={35}
+                />
+              </CustomLink>
+              <CustomLink
+                href={SOCIAL_LINKS.FACEBOOK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-opacity hover:opacity-80"
+              >
+                <Image
+                  src="/assets/landing-page/icon-Facebook.svg"
+                  alt={t("footer_facebook_alt")}
+                  width={36}
+                  height={35}
+                />
+              </CustomLink>
+              <CustomLink
+                href={SOCIAL_LINKS.DISCORD}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-opacity hover:opacity-80"
+              >
+                <Image
+                  src="/assets/landing-page/icon-Discord.svg"
+                  alt={t("footer_discord_alt")}
+                  width={36}
+                  height={35}
+                />
+              </CustomLink>
+            </div>
+            <a
+              href={`mailto:${SOCIAL_LINKS.EMAIL}`}
+              className="block w-fit text-white/70 transition-colors hover:text-primary-base"
+            >
+              {SOCIAL_LINKS.EMAIL}
+            </a>
+          </div>
+        )}
         <p className="text-center text-basic-300">
           {t("footer_copyright", {
             year: new Date().getFullYear(),

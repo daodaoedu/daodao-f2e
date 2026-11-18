@@ -3,9 +3,12 @@
 import { useLighthouseCohort } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { usePathname } from "@daodao/i18n/navigation";
+import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { cn } from "@daodao/ui/lib/utils";
-import { ChevronLeft, Pencil } from "lucide-react";
+import { ChevronDown, ChevronLeft, Pencil } from "lucide-react";
+import { useState } from "react";
+import { CohortInfoPanel } from "./cohort-info-panel";
 import { useLighthouseOrganization } from "./lighthouse-organization-context";
 
 interface CohortShellProps {
@@ -22,13 +25,15 @@ export function CohortShell({ programId, cohortId, children }: CohortShellProps)
   const t = useTranslations("lighthouse");
   const pathname = usePathname();
   const base = `/lighthouse/programs/${programId}/cohorts/${cohortId}`;
+  const isDashboard = pathname.startsWith(`${base}/dashboard`);
   const cohort = useLighthouseCohort(programId, cohortId);
   const cohortName = cohort.data?.data.displayName;
   const isArchived = cohort.data?.data.status === "archived";
+  const [showCohortInfo, setShowCohortInfo] = useState(false);
 
   return (
     <div>
-      <div className="sticky top-0 z-30 border-b border-[#CDEBE8] bg-white px-5 md:px-10">
+      <div className="sticky top-28 z-30 border-b border-[#CDEBE8] bg-white px-5 md:top-0 md:px-10">
         <nav
           className="mx-auto flex max-w-6xl gap-1 overflow-x-auto py-3"
           aria-label={t("cohort_navigation")}
@@ -39,7 +44,7 @@ export function CohortShell({ programId, cohortId, children }: CohortShellProps)
             return (
               <CustomLink
                 key={section}
-                href={href(`${base}/${section}`, cohort.data?.data.organizationId)}
+                href={href(sectionHref, cohort.data?.data.organizationId)}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-logo-cyan",
@@ -78,7 +83,27 @@ export function CohortShell({ programId, cohortId, children }: CohortShellProps)
               <Pencil className="size-3.5" aria-hidden="true" />
             </CustomLink>
           )}
+          {isDashboard && cohort.data?.data && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              aria-expanded={showCohortInfo}
+              aria-controls="cohort-information"
+              onClick={() => setShowCohortInfo((open) => !open)}
+              className="h-auto gap-1.5 rounded-full border-[#CDEBE8] bg-white px-3 py-1.5 text-xs font-semibold text-[#0D3036] hover:bg-logo-cyan hover:text-white"
+            >
+              {t("cohort_info_title")}
+              <ChevronDown
+                className={cn("size-3.5 transition-transform", showCohortInfo && "rotate-180")}
+                aria-hidden="true"
+              />
+            </Button>
+          )}
         </div>
+        {isDashboard && showCohortInfo && cohort.data?.data && (
+          <CohortInfoPanel cohort={cohort.data.data} />
+        )}
       </header>
 
       {children}

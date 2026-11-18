@@ -6,6 +6,8 @@ import { useLocale, useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import { FileText } from "lucide-react";
+import { type ComponentProps, useState } from "react";
+import { CohortCheckinDrawer } from "./cohort-checkin-drawer";
 import { CohortErrorState } from "./cohort-error-state";
 import { CohortFeedback } from "./cohort-feedback";
 import { CohortOutcomeSummary } from "./cohort-outcome-summary";
@@ -39,6 +41,8 @@ export function CohortOutcome({ programId, cohortId }: CohortOutcomeProps) {
   const feedbackEnabled = getEnv("NEXT_PUBLIC_COHORT_FEEDBACK_ENABLED") === "true";
   const query = useLighthouseOutcome(programId, cohortId);
   const outcome = query.data?.data;
+  const [checkinPerson, setCheckinPerson] =
+    useState<ComponentProps<typeof CohortCheckinDrawer>["person"]>(null);
 
   if (query.isLoading && !outcome)
     return <p className="px-10 py-12 text-sm text-[#5A7B79]">{t("loading")}</p>;
@@ -76,7 +80,23 @@ export function CohortOutcome({ programId, cohortId }: CohortOutcomeProps) {
         refresh={() => query.mutate()}
       />
 
-      <CohortOutcomeTables outcome={outcome} />
+      <CohortOutcomeTables
+        outcome={outcome}
+        onOpenCheckins={(row) =>
+          setCheckinPerson({
+            userId: row.userId,
+            nickname: row.nickname,
+            practiceId: row.practiceId,
+            practiceTitle: row.practiceTitle,
+          })
+        }
+      />
+      <CohortCheckinDrawer
+        programId={programId}
+        cohortId={cohortId}
+        person={checkinPerson}
+        onClose={() => setCheckinPerson(null)}
+      />
 
       {feedbackEnabled && (
         <CohortFeedback

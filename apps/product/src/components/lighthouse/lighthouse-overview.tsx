@@ -27,7 +27,7 @@ function CohortCard({ cohort }: { cohort: LighthouseOrganizationCohortType }) {
 
   return (
     <article
-      className="group relative min-w-0 rounded-3xl border border-[#CDEBE8] bg-white p-6 transition-transform hover:-translate-y-0.5 focus-within:-translate-y-0.5"
+      className="group relative min-w-0 rounded-3xl border border-[#CDEBE8] bg-white p-4 transition-transform hover:-translate-y-0.5 focus-within:-translate-y-0.5 sm:p-6"
       aria-labelledby={`cohort-card-${cohort.id}-title`}
     >
       <CustomLink
@@ -46,7 +46,7 @@ function CohortCard({ cohort }: { cohort: LighthouseOrganizationCohortType }) {
           <div className="mt-2 flex items-center gap-2">
             <h2
               id={`cohort-card-${cohort.id}-title`}
-              className="truncate text-xl font-semibold tracking-[-0.02em]"
+              className="truncate text-lg font-semibold tracking-[-0.02em] sm:text-xl"
             >
               {cohort.displayName}
             </h2>
@@ -55,7 +55,7 @@ function CohortCard({ cohort }: { cohort: LighthouseOrganizationCohortType }) {
                 asChild
                 variant="outline"
                 size="icon"
-                className="pointer-events-auto relative z-10 size-7 shrink-0 rounded-full border-[#CDEBE8] text-[#0D7773]"
+                className="pointer-events-auto relative z-10 size-7 rounded-full border-[#CDEBE8] text-[#0D7773]"
               >
                 <CustomLink href={editHref} aria-label={t("cohort_edit")} title={t("cohort_edit")}>
                   <Pencil className="size-3.5" aria-hidden="true" />
@@ -63,13 +63,13 @@ function CohortCard({ cohort }: { cohort: LighthouseOrganizationCohortType }) {
               </Button>
             )}
           </div>
-          <p className="mt-1 text-xs text-[#78928F]">
-            {cohort.startDate.slice(0, 10)} — {cohort.endDate.slice(0, 10)}
+          <p className="mt-1 break-words text-[11px] text-[#78928F] sm:text-xs">
+            {formatOverviewDate(cohort.startDate)} — {formatOverviewDate(cohort.endDate)}
           </p>
         </div>
         <CustomLink
           href={manageHref}
-          className="pointer-events-auto relative z-10 grid size-8 shrink-0 place-items-center rounded-full text-[#0D7773] hover:bg-[#EDF8F6]"
+          className="pointer-events-auto relative z-10 grid size-8 place-items-center rounded-full text-[#0D7773] hover:bg-[#EDF8F6]"
           aria-label={t("manage_cohort")}
           title={t("manage_cohort")}
         >
@@ -77,13 +77,17 @@ function CohortCard({ cohort }: { cohort: LighthouseOrganizationCohortType }) {
         </CustomLink>
       </div>
 
-      <div className="pointer-events-none relative mt-4 grid grid-cols-2 gap-3">
-        <div className="rounded-xl bg-[#EDF8F6] p-4">
-          <span className="text-2xl font-semibold text-[#0D7773]">{cohort.celebrateCount}</span>
+      <div className="pointer-events-none relative mt-4 grid grid-cols-2 gap-2 sm:gap-3">
+        <div className="rounded-xl bg-[#EDF8F6] p-3 sm:p-4">
+          <span className="text-xl font-semibold text-[#0D7773] sm:text-2xl">
+            {cohort.celebrateCount}
+          </span>
           <span className="mt-1 block text-xs text-[#456B68]">{t("overview_stat_celebrate")}</span>
         </div>
-        <div className="rounded-xl bg-[#FFF4E5] p-4">
-          <span className="text-2xl font-semibold text-[#A95D00]">{cohort.encourageCount}</span>
+        <div className="rounded-xl bg-[#FFF4E5] p-3 sm:p-4">
+          <span className="text-xl font-semibold text-[#A95D00] sm:text-2xl">
+            {cohort.encourageCount}
+          </span>
           <span className="mt-1 block text-xs text-[#456B68]">{t("overview_stat_encourage")}</span>
         </div>
       </div>
@@ -91,17 +95,20 @@ function CohortCard({ cohort }: { cohort: LighthouseOrganizationCohortType }) {
   );
 }
 
+function formatOverviewDate(value: string): string {
+  return value.slice(0, 10).replaceAll("-", "/");
+}
+
 export function LighthouseOverview() {
-  const { href } = useLighthouseOrganization();
+  const { href, organization } = useLighthouseOrganization();
   const t = useTranslations("lighthouse");
-  const { organization } = useLighthouseOrganization();
   const organizationId = organization?.id;
   const { cohorts: allCohorts, isLoading } = useLighthouseOrganizationCohorts(organizationId);
   // 封存中的場次改由「封存」頁列出（FR-ARC-04 主要列表需排除封存項目）
   const cohorts = allCohorts?.filter((cohort) => cohort.status !== "archived");
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-5 py-10 md:px-10 md:py-14">
+    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-5 sm:py-10 md:px-10 md:py-14">
       <header>
         <h1 className="text-2xl font-semibold leading-[1.08] tracking-[-0.045em] md:text-4xl">
           {t("overview_title")}
@@ -109,7 +116,7 @@ export function LighthouseOverview() {
         <div className="mt-3 text-right">
           <CustomLink
             href={href("/lighthouse/programs")}
-            className="text-sm font-semibold text-[#0D7773] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-logo-cyan"
+            className="inline-flex min-h-11 items-center rounded-full px-3 text-sm font-semibold text-[#0D7773] hover:bg-[#EDF8F6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-logo-cyan"
           >
             {t("nav_programs")}
           </CustomLink>
