@@ -12,6 +12,7 @@ import {
 } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
+import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Input } from "@daodao/ui/components/input";
 import { toast } from "@daodao/ui/components/sonner";
 import { Textarea } from "@daodao/ui/components/textarea";
@@ -466,6 +467,11 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
           <h2 id="roster-list-title" className="text-xl font-semibold">
             {t("roster_title")}
           </h2>
+          <Button asChild variant="outline" size="sm" className="shrink-0">
+            <CustomLink href={`/cohorts/${cohortId}?programId=${programId}`}>
+              {t("review_participant_practices")}
+            </CustomLink>
+          </Button>
           <p className="text-xs text-[#78928F]">
             {pendingCount > 0
               ? t("roster_summary", { count: memberCount, pending: pendingCount })
