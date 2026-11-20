@@ -421,7 +421,7 @@
   "enrollment_status_removed": "已移除",
   "resend": "重寄",
   "remove": "移除",
-  "member_remove_confirm": "移除後，此參與者的實踐會轉回個人實踐，確定繼續嗎？",
+  "member_remove_confirm": "移除後，此參與者的本期實踐會從個人空間移除，確定繼續嗎？",
   "member_remove_failed": "無法移除參與者",
   "member_removed": "參與者已移除",
   "overview_active_cohorts": "所有場次",
