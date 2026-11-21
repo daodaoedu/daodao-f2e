@@ -26,6 +26,8 @@ export interface MentionInputProps {
   value: string;
   onChange: (value: string) => void;
   onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  onCompositionStart?: React.CompositionEventHandler<HTMLTextAreaElement>;
+  onCompositionEnd?: React.CompositionEventHandler<HTMLTextAreaElement>;
   placeholder?: string;
   rows?: number;
   className?: string;
@@ -48,6 +50,8 @@ export function MentionInput({
   value,
   onChange,
   onKeyDown,
+  onCompositionStart,
+  onCompositionEnd,
   placeholder,
   rows = 1,
   className,
@@ -130,6 +134,8 @@ export function MentionInput({
         value={value}
         onChange={handleChange}
         onKeyDown={onKeyDown}
+        onCompositionStart={onCompositionStart}
+        onCompositionEnd={onCompositionEnd}
         placeholder={placeholder}
         rows={rows}
         className={className}
