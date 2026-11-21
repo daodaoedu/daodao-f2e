@@ -160,7 +160,7 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
                     />
                   </View>
                   {/* Mood illustration (對齊 product 用 @daodao/assets 心情插畫) */}
-                  <MoodIcon width={28} height={28} />
+                  {MoodIcon ? <MoodIcon width={28} height={28} /> : null}
                   {/* Count */}
                   <Text
                     fontSize={12}
