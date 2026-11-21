@@ -1,6 +1,7 @@
 "use client";
 
 import type { ChatMessageType } from "@daodao/api";
+import type { MentionCandidate } from "@daodao/features-mention";
 import { useLocale, useTranslations } from "@daodao/i18n";
 import { Spinner } from "@daodao/ui/components/spinner";
 import { useEffect, useRef } from "react";
@@ -13,6 +14,7 @@ interface ChatMessageListProps {
   isLoading: boolean;
   isHost: boolean;
   viewerUserId: number | null;
+  mentionCandidates: MentionCandidate[];
   onReply?: (message: ChatMessageType) => void;
   onEdit?: (message: ChatMessageType) => void;
   onDelete?: (message: ChatMessageType) => void;
@@ -24,6 +26,7 @@ export function ChatMessageList({
   isLoading,
   isHost,
   viewerUserId,
+  mentionCandidates,
   onReply,
   onEdit,
   onDelete,
@@ -84,6 +87,7 @@ export function ChatMessageList({
             isGroupEnd={item.isGroupEnd}
             isHost={isHost}
             viewerUserId={viewerUserId}
+            mentionCandidates={mentionCandidates}
             onReply={onReply}
             onEdit={onEdit}
             onDelete={onDelete}

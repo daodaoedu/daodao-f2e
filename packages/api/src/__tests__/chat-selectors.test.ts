@@ -77,6 +77,7 @@ describe("chat response selectors (wire envelope)", () => {
   it("room detail: returns the room inside data", () => {
     const detail = {
       ...room,
+      firstUnreadMessageId: 123,
       viewerRole: "host" as const,
       viewerUserId: 2,
       pinnedCount: 0,

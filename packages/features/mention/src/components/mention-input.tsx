@@ -31,6 +31,7 @@ export interface MentionInputProps {
   className?: string;
   inputRef?: React.RefObject<HTMLTextAreaElement | null>;
   participants: MentionCandidate[];
+  suggestionPosition?: "above" | "below";
   autoFocus?: boolean;
   onMentionSelect?: (candidate: MentionCandidate) => void;
   disabled?: boolean;
@@ -52,6 +53,7 @@ export function MentionInput({
   className,
   inputRef,
   participants,
+  suggestionPosition = "below",
   autoFocus,
   onMentionSelect,
   disabled,
@@ -138,7 +140,10 @@ export function MentionInput({
       {mentionQuery !== null && filtered.length > 0 && (
         // biome-ignore lint/a11y/noStaticElementInteractions: prevent textarea blur when clicking anywhere in dropdown
         <div
-          className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border border-[#E4EAE9] py-1 z-20 min-w-[160px] max-h-44 overflow-y-auto"
+          className={cn(
+            "absolute left-0 bg-white rounded-xl shadow-lg border border-[#E4EAE9] py-1 z-20 min-w-[160px] max-h-44 overflow-y-auto",
+            suggestionPosition === "above" ? "bottom-full mb-1" : "top-full mt-1"
+          )}
           onMouseDown={(e) => e.preventDefault()}
         >
           {filtered.map((p) => (
