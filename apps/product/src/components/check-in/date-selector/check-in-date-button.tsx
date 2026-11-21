@@ -3,11 +3,11 @@
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
+import { format, parseISO } from "date-fns";
 import type { ICheckInDate, ICheckInDisplayData } from "../types";
 
 interface ICheckInDateButtonProps {
   item: ICheckInDate;
-  index: number;
   checkIns: Record<string, ICheckInDisplayData>;
   activeCheckInId: string;
   /** 目前打卡的日期（yyyy-MM-dd），用於同日多筆打卡時正確高亮 */
@@ -27,7 +27,6 @@ const getCheckInOpacity = (checkInCount: number): number => {
 
 export const CheckInDateButton = ({
   item,
-  index,
   checkIns,
   activeCheckInId,
   activeDate,
@@ -42,6 +41,7 @@ export const CheckInDateButton = ({
   // 計算打卡次數對應的透明度
   const checkInCount = item.checkInCount ?? (hasCheckIn ? 1 : 0);
   const fillOpacity = getCheckInOpacity(checkInCount);
+  const date = parseISO(item.date);
 
   return (
     <Button
@@ -77,7 +77,7 @@ export const CheckInDateButton = ({
           : t("date_no_record", { date: item.date })
       }
     >
-      <span className="relative z-10">{index + 1}</span>
+      <span className="relative z-10 text-base font-semibold">{format(date, "d")}</span>
     </Button>
   );
 };

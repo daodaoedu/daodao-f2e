@@ -4,7 +4,7 @@ import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { useSafeRouter } from "@daodao/ui/hooks/use-safe-router";
 import { cn } from "@daodao/ui/lib/utils";
-import { X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CheckInDateButton } from "./check-in-date-button";
 import type { ICheckInDateSelectorProps } from "./types";
@@ -135,6 +135,12 @@ export const MobileCheckInDateSelector = ({
     }
   };
 
+  const scrollDates = (direction: -1 | 1) => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    container.scrollBy({ left: direction * container.clientWidth * 0.75, behavior: "smooth" });
+  };
+
   // 處理關閉按鈕點擊
   const handleClose = () => {
     if (closeActionTo) {
@@ -159,34 +165,53 @@ export const MobileCheckInDateSelector = ({
       onClickCapture={handleClickCapture}
     >
       {/* 標題列 */}
-      <div className="flex items-center justify-between px-5 pt-4">
-        {/* 左側佔位 */}
-        <div className="w-10" />
-
-        {/* 中間標題 */}
-        {title && <h1 className="text-lg font-medium text-bg-dark">{title}</h1>}
-
-        {/* 右側關閉按鈕 */}
+      <div className="relative px-5 pt-2">
+        {checkInDates.length > 7 && (
+          <div className="flex justify-center gap-4">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-label={t("date_scroll_left")}
+              onClick={() => scrollDates(-1)}
+              animation="none"
+              className="size-7 text-bg-dark/60 hover:bg-bg-dark/5"
+            >
+              <ChevronLeft className="size-4" aria-hidden="true" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-label={t("date_scroll_right")}
+              onClick={() => scrollDates(1)}
+              animation="none"
+              className="size-7 text-bg-dark/60 hover:bg-bg-dark/5"
+            >
+              <ChevronRight className="size-4" aria-hidden="true" />
+            </Button>
+          </div>
+        )}
+        {title && <h1 className="text-center text-lg font-medium text-bg-dark">{title}</h1>}
         <Button
           variant="ghost"
           size="icon"
           onClick={handleClose}
           aria-label={t("close")}
           animation="none"
-          className="text-light-gray bg-very-light-gray/50"
+          className="absolute right-3 top-3 text-light-gray bg-very-light-gray/50"
         >
-          <X className="size-6" />
+          <X className="size-6" aria-hidden="true" />
         </Button>
       </div>
 
       {/* 日期選擇器 */}
       <div ref={scrollContainerRef} className="overflow-x-auto scrollbar-hide px-10">
         <div className="flex items-center justify-center gap-4 w-fit mx-auto pb-5 pt-4">
-          {checkInDates.map((item, index) => (
+          {checkInDates.map((item) => (
             <CheckInDateButton
               key={item.id}
               item={item}
-              index={index}
               checkIns={checkIns}
               activeCheckInId={activeCheckInId}
               activeDate={activeDate}

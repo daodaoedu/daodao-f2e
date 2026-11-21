@@ -433,6 +433,7 @@ export const CheckInDetail = ({
       <div className="flex-1 flex justify-center rounded-xl hover:bg-gray-100 transition-colors py-1">
         <button
           type="button"
+          aria-label={t("open_comments")}
           onClick={() =>
             openSheet({
               title: t("sheet_comment"),
@@ -467,6 +468,7 @@ export const CheckInDetail = ({
             <Button
               variant="ghost"
               size="icon"
+              aria-label={t("more_options")}
               className="size-9 rounded-full bg-primary-darker/60 text-white hover:bg-primary-darker/80 hover:text-white"
             >
               <Ellipsis className="size-5" />

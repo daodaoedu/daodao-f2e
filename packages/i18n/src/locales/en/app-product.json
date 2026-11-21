@@ -465,6 +465,7 @@
   "count_people": "{count} people",
   "reaction_aggregate_with_others": "{name} and {count} others reacted: {label}",
   "reaction_aggregate_count": "{count} people reacted: {label}",
+  "reaction_button_label": "Add or change reaction",
   "option_high": "High",
   "option_associate": "Associate",
   "option_university": "University",

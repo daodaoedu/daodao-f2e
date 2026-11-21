@@ -465,6 +465,7 @@
   "count_people": "{count} 人",
   "reaction_aggregate_with_others": "{name} 與其他 {count} 人{label}",
   "reaction_aggregate_count": "{count} 人{label}",
+  "reaction_button_label": "加入或變更反應",
   "option_high": "高中/職",
   "option_associate": "專科",
   "option_university": "大學",

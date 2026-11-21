@@ -95,6 +95,25 @@ export const CheckInCard = ({
 
         {/* 可滾動內容區 + 底部漸層遮罩 */}
         <div className="relative">
+          <header className="flex h-20 items-center justify-between px-5 pt-1">
+            {MoodEmoji ? (
+              <div className="flex min-w-0 items-center gap-2 text-xs text-text-dark">
+                <MoodEmoji className="size-5 shrink-0" aria-hidden="true" />
+                <span className={cn(MOOD_LABEL_CLASSNAME, "truncate")}>
+                  {t("mood_label", { label: moodLabel || moodOption?.label || "" })}
+                </span>
+              </div>
+            ) : (
+              <div />
+            )}
+            <div className="relative size-20 shrink-0">
+              <StampSvg width={80} height={81} aria-hidden="true" />
+              <div className="absolute top-1/2 left-1/2 flex size-8 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center text-center text-[10px] font-bold text-logo-gray rotate-15">
+                <div>{dateYear}</div>
+                <div>{dateMonthDay}</div>
+              </div>
+            </div>
+          </header>
           <main
             ref={mainRef}
             onScroll={handleScroll}
@@ -111,30 +130,10 @@ export const CheckInCard = ({
                 backgroundSize: "280px 39px",
                 backgroundRepeat: "repeat-y",
                 backgroundPositionX: "15px",
-                backgroundPositionY: "24px",
+                backgroundPositionY: "-10px",
               }}
             >
-              <div className="absolute top-0 left-0 w-full h-12 bg-white" />
               <div className="relative space-y-4">
-                {/* 時間戳/印章 */}
-                <div className="relative float-right anonymous-pro translate-x-2 translate-y-3 animate-stamp pointer-events-none z-30">
-                  <StampSvg width={100} height={100} />
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-xs font-bold text-logo-gray rotate-15 size-10 flex flex-col items-center justify-center">
-                    <div>{dateYear}</div>
-                    <div>{dateMonthDay}</div>
-                  </div>
-                </div>
-
-                {/* 心情狀態 */}
-                {MoodEmoji && (
-                  <div className="flex items-center gap-2">
-                    <MoodEmoji className="size-6" />
-                    <span className={MOOD_LABEL_CLASSNAME}>
-                      {t("mood_label", { label: moodLabel || moodOption?.label || "" })}
-                    </span>
-                  </div>
-                )}
-
                 {/* 文字內容 */}
                 {isBlankContent(content) && showEmptyHint ? (
                   <p className="text-light-gray text-sm italic">{t("empty_content_hint")}</p>

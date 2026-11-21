@@ -187,6 +187,7 @@ export function ReactionPickerButton({
                       </div>
                       <button
                         type="button"
+                        aria-label={t(config.label)}
                         onClick={() => {
                           onToggle(type);
                           setOpen(false);
@@ -268,6 +269,7 @@ export function ReactionPickerButton({
                   </div>
                   <button
                     type="button"
+                    aria-label={t(config.label)}
                     onClick={() => {
                       onToggle(type);
                       setOpen(false);
@@ -296,6 +298,7 @@ export function ReactionPickerButton({
       {!isSummary && (
         <button
           type="button"
+          aria-label={t("reaction_button_label")}
           // 防止瀏覽器長按跳出系統選單
           onContextMenu={(e) => e.preventDefault()}
           onTouchStart={handleTouchStart}
