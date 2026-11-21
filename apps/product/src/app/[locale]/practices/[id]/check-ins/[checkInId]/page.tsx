@@ -103,9 +103,15 @@ export default function CheckInDetailPage() {
 
   // 獲取 practice 資料
   const { data: practiceData, isLoading: isLoadingPractice } = usePracticeById(practiceId);
-  const practiceCohortMetadata = practiceData?.data as
-    | (typeof practiceData.data & { cohortName?: string; organizationName?: string })
-    | undefined;
+  const practice = practiceData?.data;
+  const practiceCohortName =
+    practice && "cohortName" in practice && typeof practice.cohortName === "string"
+      ? practice.cohortName
+      : undefined;
+  const practiceOrganizationName =
+    practice && "organizationName" in practice && typeof practice.organizationName === "string"
+      ? practice.organizationName
+      : undefined;
   const isSampleCohortPractice = practiceId === SAMPLE_COHORT_PRACTICE_ID;
   let cohortNameFromView: string | undefined;
   let organizationNameFromView: string | undefined;
@@ -359,12 +365,12 @@ export default function CheckInDetailPage() {
             checkInData={checkInData}
             cohortName={
               cohortNameFromView ??
-              practiceCohortMetadata?.cohortName ??
+              practiceCohortName ??
               (isSampleCohortPractice ? "秋季共學班" : undefined)
             }
             organizationName={
               organizationNameFromView ??
-              practiceCohortMetadata?.organizationName ??
+              practiceOrganizationName ??
               (isSampleCohortPractice ? "島島教育" : undefined)
             }
             onEditComplete={isOwner ? handleEditComplete : undefined}
