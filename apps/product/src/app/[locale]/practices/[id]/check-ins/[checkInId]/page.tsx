@@ -139,8 +139,9 @@ export default function CheckInDetailPage() {
   // 將 API 的 check-ins 轉換為 ICheckInDisplayData 格式
   const checkInsMap = useMemo(() => {
     const map = new Map<string, ICheckInDisplayData>();
+    const practice = practiceData?.data;
 
-    if (!checkInsData?.data || !practiceData?.data) {
+    if (!checkInsData?.data || !practice) {
       return map;
     }
 
@@ -152,8 +153,8 @@ export default function CheckInDetailPage() {
         content: checkIn.note || "",
         tags: checkIn.tags || [],
         images: checkIn.imageUrls || [],
-        practiceTitle: practiceData.data.title,
-        authorName: practiceData.data.user?.name ?? undefined,
+        practiceTitle: practice.title,
+        authorName: practice.user?.name ?? undefined,
         // viewCount 尚未同步進 generated types（server dev branch 合併後才有）
         viewCount: (checkIn as { viewCount?: number }).viewCount ?? 0,
       };
@@ -270,7 +271,7 @@ export default function CheckInDetailPage() {
         <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
           <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
           <PageHeader
-          title={t("checkin_title")}
+            title={t("checkin_title")}
             variant="light"
             disableLightOn="mobile"
             rightActionTo={practiceDetailPath}
@@ -347,7 +348,11 @@ export default function CheckInDetailPage() {
         />
         {/* Desktop 版本的標題列 */}
         <div className="hidden md:block">
-          <PageHeader title={t("checkin_title")} variant="light" rightActionTo={practiceDetailPath} />
+          <PageHeader
+            title={t("checkin_title")}
+            variant="light"
+            rightActionTo={practiceDetailPath}
+          />
         </div>
         <main className="max-w-[448px] mx-auto pt-[150px] md:pt-10 px-5 pb-52">
           <CheckInDetail

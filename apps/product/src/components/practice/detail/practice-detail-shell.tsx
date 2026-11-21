@@ -356,13 +356,16 @@ export function PracticeDetailShell({
   );
   const tabParam = searchParams.get("tab");
 
-  const isValidTab = useCallback((tab: string | null): tab is TabType => {
-    if (!tab) {
-      return false;
-    }
+  const isValidTab = useCallback(
+    (tab: string | null): tab is TabType => {
+      if (!tab) {
+        return false;
+      }
 
-    return TABS.some((item) => item.id === tab) && (tab !== "comments" || readOnly);
-  }, [readOnly]);
+      return TABS.some((item) => item.id === tab) && (tab !== "comments" || readOnly);
+    },
+    [readOnly]
+  );
 
   useEffect(() => {
     if (!isValidTab(tabParam)) {
@@ -708,10 +711,6 @@ export function PracticeDetailShell({
               frequency={practice.frequency}
               durationMinutes={practice.durationMinutes}
               tags={practice.tags}
-              executionTiming={practice.executionTiming}
-              customTiming={practice.customTiming}
-              durationDays={practice.durationDays}
-              startDate={practice.startDate ?? null}
               progress={practice.progress}
               showProgress
               creator={practice.creator}
@@ -832,7 +831,6 @@ export function PracticeDetailShell({
                 })()}
               </div>
             </div>
-
           </div>
 
           <div
@@ -885,8 +883,7 @@ export function PracticeDetailShell({
               const visibleTabs = readOnly ? TABS : TABS.filter(({ id }) => id !== "comments");
               return visibleTabs.map(({ id, labelKey, Icon }) => {
                 const count = countMap[id];
-                const label =
-                  id === "comments" ? t("checkin_comments_heading") : t(labelKey);
+                const label = id === "comments" ? t("checkin_comments_heading") : t(labelKey);
                 const accessibleLabel = label;
                 return (
                   <div key={id} className="flex flex-1 items-center justify-center">

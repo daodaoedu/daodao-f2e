@@ -13,6 +13,7 @@ interface IUseShareCheckInSheetOptions {
   checkInData: CheckInData & {
     date: string;
     images?: string[];
+    authorName?: string;
     cohortName?: string;
     organizationName?: string;
   };
