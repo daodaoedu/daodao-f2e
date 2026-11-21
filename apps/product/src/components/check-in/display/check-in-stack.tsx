@@ -18,7 +18,9 @@ import {
   type MoodType as MoodTypeType,
   mapApiMoodToMoodType,
 } from "@/constants/mood";
+import { useCohortViewQuery } from "@/lib/cohort-view-query";
 import type { IBodyPosition, ICheckInItem, ISvgGeometry } from "../types";
+import { CheckInDescriptionText } from "./check-in-description-text";
 import { computeBodyDisplayLeft } from "./check-in-stack-utils";
 
 const { Engine, World, Bodies, Vertices, Runner, Body } = Matter;
@@ -136,7 +138,7 @@ const CONTAINER_WIDTH = 448;
 const MIN_CONTAINER_HEIGHT = 300;
 const WALL_THICKNESS = 20;
 const WALL_OFFSET = 10;
-const LAYER_SPACING = 1.2;
+const LAYER_SPACING = 1.5;
 const PATH_SAMPLES = 50;
 const VERTEX_DISTANCE_THRESHOLD = 0.1;
 
@@ -258,7 +260,7 @@ const createPathBody = (x: number, y: number, pathElement: SVGPathElement): Matt
 
 const MOOD_MAP = Object.fromEntries(
   MOOD_OPTIONS.map((option) => [option.id, option.emoji])
-) as Record<MoodTypeType, React.FC<React.SVGProps<SVGSVGElement>>>;
+) as Partial<Record<MoodTypeType, React.FC<React.SVGProps<SVGSVGElement>>>>;
 
 /**
  * 將 API 的 checkinDate 格式轉換為顯示格式
@@ -279,6 +281,7 @@ interface ICheckInStackProps {
 
 export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const cohortViewQuery = useCohortViewQuery();
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const svgRefsRef = useRef<(SVGSVGElement | null)[]>([]);
   const bodiesRef = useRef<Matter.Body[]>([]);
@@ -566,15 +569,19 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
   };
 
   return (
-    <div ref={handleWrapperRef} style={{ width: "100%", height: containerHeight * scale }}>
+    <div
+      ref={handleWrapperRef}
+      className="flex w-full justify-center"
+      style={{ height: containerHeight * scale }}
+    >
       <div
         ref={containerRef}
-        className="relative"
+        className="relative shrink-0"
         style={{
           width: CONTAINER_WIDTH,
           height: containerHeight,
           transform: `scale(${scale})`,
-          transformOrigin: "top left",
+          transformOrigin: "top center",
         }}
       >
         {/* 隱藏的 SVG 區域，用於提取幾何數據 */}
@@ -630,14 +637,12 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
           if (!item) return null;
 
           const { mood, date, content } = item;
-          const Emoji = (MOOD_MAP[mood as MoodTypeType] ?? MOOD_OPTIONS[0]?.emoji) as React.FC<
-            React.SVGProps<SVGSVGElement>
-          >;
+          const Emoji = MOOD_MAP[mood as MoodTypeType];
 
           return (
             <Link
               key={id}
-              href={`/practices/${practiceId}/check-ins/${item.id}`}
+              href={`/practices/${practiceId}/check-ins/${item.id}${cohortViewQuery}`}
               className="absolute cursor-pointer hover:shadow-2xl"
               style={{
                 width: w,
@@ -657,9 +662,11 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
                   i % 5 === 3 && "pb-11"
                 )}
               >
-                <Emoji className="size-6" />
+                {Emoji && <Emoji className="size-6" />}
                 <div className="text-xs text-bg-dark">{date}</div>
-                <div className="max-w-40 text-bg-dark line-clamp-2">{content}</div>
+                <div className="max-w-40 text-bg-dark line-clamp-2">
+                  <CheckInDescriptionText content={content} />
+                </div>
               </div>
             </Link>
           );

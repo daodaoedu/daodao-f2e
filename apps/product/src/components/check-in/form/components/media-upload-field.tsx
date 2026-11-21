@@ -125,7 +125,7 @@ export const MediaUploadField = ({
       control={form.control}
       name="media"
       render={({ field }) => (
-        <FormItem className="mb-16 md:mb-8">
+        <FormItem className="mt-4 mb-16 md:mb-8">
           <div className="mb-3 flex items-center justify-between gap-2">
             <FormLabel className="block text-base font-medium text-text-dark">
               {t("upload_photo")}
@@ -174,6 +174,9 @@ export const MediaUploadField = ({
               multiple
               maxFiles={3 - keptImages.length}
               disabled={isCompressing}
+              uploadLabel={t("upload_file")}
+              uploadHint={t("upload_hint")}
+              removeLabel={t("remove_media")}
             />
           </FormControl>
           <FormMessage />

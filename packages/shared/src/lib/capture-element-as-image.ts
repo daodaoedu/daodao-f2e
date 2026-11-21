@@ -123,14 +123,17 @@ export function getElementCaptureDimensions(element: {
 
 export const captureElementAsImage = async (
   element: HTMLElement,
-  cropOptions?: CropOptions
+  cropOptions?: CropOptions,
+  /** Minimum render scale; device pixel ratio can still request a higher scale. */
+  minScale = 1
 ): Promise<CapturedImageData | null> => {
   try {
     const { domToPng } = await import("modern-screenshot");
     const devicePixelRatio = window.devicePixelRatio || 1;
+    const pixelRatio = Math.max(devicePixelRatio, Math.min(minScale, 4));
     const { width, height } = getElementCaptureDimensions(element);
     const dataUrl = await domToPng(element, {
-      scale: devicePixelRatio,
+      scale: pixelRatio,
       width,
       height,
       fetch: {
@@ -145,7 +148,7 @@ export const captureElementAsImage = async (
     };
 
     if (cropOptions) {
-      const croppedData = await cropImage(dataUrl, cropOptions, devicePixelRatio);
+      const croppedData = await cropImage(dataUrl, cropOptions, pixelRatio);
       return croppedData;
     }
 

@@ -17,12 +17,12 @@ interface ICheckInDateButtonProps {
 }
 
 /**
- * 根據打卡次數計算橘色填充的透明度
- * 1 次 = 10%, 2 次 = 20%, ..., 10 次以上 = 100%
+ * 根據打卡次數計算橘色填充的透明度，讓單次打卡也能清楚辨識
+ * 1 次 = 28%，每多一次增加 8%，最多 100%
  */
 const getCheckInOpacity = (checkInCount: number): number => {
   if (checkInCount <= 0) return 0;
-  return Math.min(checkInCount * 0.1, 1);
+  return Math.min(0.28 + (checkInCount - 1) * 0.08, 1);
 };
 
 export const CheckInDateButton = ({
@@ -77,7 +77,9 @@ export const CheckInDateButton = ({
           : t("date_no_record", { date: item.date })
       }
     >
-      <span className="relative z-10 text-base font-semibold">{format(date, "d")}</span>
+      <span className="relative z-10 text-base font-semibold">
+        {format(date, "d")}
+      </span>
     </Button>
   );
 };

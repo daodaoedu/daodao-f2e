@@ -13,6 +13,8 @@ interface IUseShareCheckInSheetOptions {
   checkInData: CheckInData & {
     date: string;
     images?: string[];
+    cohortName?: string;
+    organizationName?: string;
   };
   /** 關閉時的回調 */
   onClose?: () => void;
@@ -45,7 +47,15 @@ export function useShareCheckInSheet({
     open({
       title: t("share_sheet_title"),
       description: t("share_sheet_description"),
-      content: <ShareCheckInSheetContent taskTitle={taskTitle} checkInData={checkInData} />,
+      content: (
+        <ShareCheckInSheetContent
+          taskTitle={taskTitle}
+          authorName={checkInData.authorName}
+          cohortName={checkInData.cohortName}
+          organizationName={checkInData.organizationName}
+          checkInData={checkInData}
+        />
+      ),
       dismissible: true,
       closeOnEscape: true,
       showCloseButton: true,

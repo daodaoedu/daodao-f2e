@@ -54,6 +54,7 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
 
     // 統計每個心情的出現次數
     checkInsData.data.forEach((checkIn) => {
+      if (checkIn.mood === "bored") return;
       const moodType = mapApiMoodToMoodType(checkIn.mood);
       if (moodType) {
         const currentCount = moodCountMap.get(moodType) ?? 0;

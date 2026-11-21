@@ -1,7 +1,8 @@
-import { useCreatePracticeCheckIn } from "@daodao/api";
+import { useCreatePracticeCheckIn, useUpdatePracticeCheckIn } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { toast } from "@daodao/ui/components/sonner";
-import { mapMoodTypeToApiMood } from "@/constants/mood";
+import { useRef } from "react";
+import { mapMoodTypeToApiMood, MoodType, type MoodType as MoodTypeValue } from "@/constants/mood";
 import { useCheckInSuccessDialog } from "@/hooks/use-check-in-success-dialog";
 import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import type { ICheckInFormData } from "../../types";
@@ -9,7 +10,6 @@ import { runCheckInCreate } from "../check-in-submit-flow";
 
 interface UseCheckInSubmitOptions {
   practiceId: string;
-  taskTitle: string;
   progressPercentage?: number;
   onComplete?: (data: ICheckInFormData) => void;
 }
@@ -19,16 +19,15 @@ interface UseCheckInSubmitOptions {
  */
 export const useCheckInSubmit = ({
   practiceId,
-  taskTitle,
   progressPercentage = 0,
   onComplete,
 }: UseCheckInSubmitOptions) => {
   const t = useTranslations("check_in");
   const { errorMessage } = useServerErrorMessage();
   const { createCheckIn } = useCreatePracticeCheckIn(practiceId);
-  const { openSuccessDialog } = useCheckInSuccessDialog({
-    title: taskTitle,
-  });
+  const { updateCheckIn } = useUpdatePracticeCheckIn(practiceId);
+  const selectedMoodRef = useRef<MoodTypeValue>(MoodType.neutral);
+  const { openSuccessDialog } = useCheckInSuccessDialog({});
 
   /**
    * @param options.onCreated 打卡建立成功、顯示成功對話框之前呼叫（用來關閉打卡 sheet）。
@@ -37,13 +36,15 @@ export const useCheckInSubmit = ({
   const submitCheckIn = async (data: ICheckInFormData, options?: { onCreated?: () => void }) => {
     // 顯示 loading toast
     const loadingToast = toast.loading(t("checking_in"));
+    const initialMood = data.mood ?? MoodType.neutral;
+    selectedMoodRef.current = initialMood;
 
     await runCheckInCreate({
       // 使用封裝好的函數創建打卡記錄（自動處理圖片上傳和 cache 刷新）
       create: () =>
         createCheckIn({
           // 將前端的 MoodType 映射到 API 的 ApiMoodType
-          mood: mapMoodTypeToApiMood(data.mood),
+          mood: mapMoodTypeToApiMood(initialMood),
           tags: data.tags,
           description: data.description,
           media: data.media,
@@ -76,9 +77,33 @@ export const useCheckInSubmit = ({
             : undefined;
 
         // 顯示成功對話框
-        await openSuccessDialog(progressPercentage, newProgressPercentage, encouragement);
+        const successResult = await openSuccessDialog(
+          progressPercentage,
+          newProgressPercentage,
+          encouragement,
+          initialMood,
+          (mood) => {
+            selectedMoodRef.current = mood;
+          }
+        );
+        let savedMood = initialMood;
+        if (successResult.value === "complete") {
+          const selectedMood = selectedMoodRef.current;
+          if (selectedMood !== initialMood) {
+            try {
+              await updateCheckIn(
+                { mood: mapMoodTypeToApiMood(selectedMood) },
+                String(response.data.id)
+              );
+              savedMood = selectedMood;
+            } catch (error) {
+              console.error("Check-in mood update failed:", error);
+              toast.error(t("mood_update_failed"));
+            }
+          }
+        }
 
-        onComplete?.(data);
+        onComplete?.({ ...data, mood: savedMood });
       },
     });
   };

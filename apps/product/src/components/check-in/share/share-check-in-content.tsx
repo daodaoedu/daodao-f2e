@@ -5,6 +5,7 @@ import LineSvg from "@daodao/assets/images/social-icons/line-filled.svg";
 import LinkedInSvg from "@daodao/assets/images/social-icons/linkedin-filled.svg";
 import ThreadsSvg from "@daodao/assets/images/social-icons/threads-filled.svg";
 import XSvg from "@daodao/assets/images/social-icons/x-filled.svg";
+import { HorizontalFullSvg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
 import { captureElementAsImage, dataUrlToFile, getShareAPI } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
@@ -16,6 +17,9 @@ import type { ICheckInFormData } from "../types";
 
 interface IShareCheckInSheetContentProps {
   taskTitle: string;
+  authorName?: string;
+  cohortName?: string;
+  organizationName?: string;
   checkInData: ICheckInFormData & { date: string; images?: string[] };
 }
 
@@ -25,6 +29,9 @@ interface IShareCheckInSheetContentProps {
  */
 export const ShareCheckInSheetContent = ({
   taskTitle,
+  authorName,
+  cohortName,
+  organizationName,
   checkInData,
 }: IShareCheckInSheetContentProps) => {
   const t = useTranslations("app_product");
@@ -43,7 +50,7 @@ export const ShareCheckInSheetContent = ({
         return;
       }
       try {
-        const imageData = await captureElementAsImage(element);
+        const imageData = await captureElementAsImage(element, undefined, 4);
         if (imageData) {
           setCardImageUrl(imageData.src);
         }
@@ -130,8 +137,8 @@ export const ShareCheckInSheetContent = ({
   return (
     <>
       {/* Hidden card for screenshot capture */}
-      <div className="fixed -left-[9999px] -top-[9999px] opacity-0 pointer-events-none">
-        <div ref={captureRef} className="w-[350px]">
+      <div className="fixed left-0 top-0 -z-50 opacity-0 pointer-events-none">
+        <div ref={captureRef} className="w-[350px] bg-white pb-8">
           <CheckInCard
             taskTitle={taskTitle}
             titleClassName="hidden"
@@ -142,15 +149,31 @@ export const ShareCheckInSheetContent = ({
             images={images}
             showTape={false}
             isCapture
+            paperFooterContent={
+              <div className="flex w-full min-w-0 items-end justify-between gap-4">
+                <div className="min-w-0 pl-[22px] text-left text-text-dark">
+                  <p className="truncate text-sm font-semibold">{taskTitle}</p>
+                  {authorName && (
+                    <p className="mt-0.5 truncate text-xs font-medium text-logo-gray">
+                      {authorName}
+                    </p>
+                  )}
+                  {(cohortName || organizationName) && (
+                    <p className="mt-0.5 truncate text-[10px] text-logo-gray/80">
+                      {[organizationName, cohortName].filter(Boolean).join(" · ")}
+                    </p>
+                  )}
+                </div>
+                <HorizontalFullSvg className="h-5 w-auto shrink-0" aria-hidden="true" />
+              </div>
+            }
           />
         </div>
       </div>
 
       <div className="px-6 flex flex-col min-h-screen">
         <div className="flex-1 flex flex-col gap-8">
-          <h2 className="text-xl font-medium text-bg-dark">{taskTitle}</h2>
-
-          <div className="relative overflow-hidden w-[350px] min-h-[192px]">
+          <div className="relative w-[350px] max-w-full">
             {isCapturing ? (
               <div className="flex items-center justify-center h-[192px] text-sm text-light-gray">
                 {t("share_generating_image")}
@@ -168,11 +191,7 @@ export const ShareCheckInSheetContent = ({
             )}
           </div>
 
-          {/* 分享到社群媒體 */}
           <div>
-            <h3 className="text-base font-medium mb-3 text-text-dark text-center">
-              {t("share_social_title")}
-            </h3>
             <div className="flex justify-center gap-4">
               <Button
                 type="button"
@@ -244,7 +263,7 @@ export const ShareCheckInSheetContent = ({
         </div>
 
         {/* 下載打卡圖片 */}
-        <div className="sticky bottom-0 left-0 right-0 border-t border-light-gray bg-white p-6 -mx-6 -mb-6">
+        <div className="sticky bottom-0 left-0 right-0 bg-white p-6 -mx-6 -mb-6">
           <Button
             type="button"
             variant="outline"

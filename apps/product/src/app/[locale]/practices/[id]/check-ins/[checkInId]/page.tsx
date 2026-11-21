@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  useCohortMemberHome,
   useCurrentUser,
+  useLighthouseCohort,
   usePracticeById,
   usePracticeCheckIns,
   useRecordView,
@@ -9,7 +11,7 @@ import {
 } from "@daodao/api";
 import { Deco4Svg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
-import { useParams } from "@daodao/i18n/navigation";
+import { useParams, useSearchParams } from "@daodao/i18n/navigation";
 import { toast } from "@daodao/ui/components/sonner";
 import { addDays, format, isValid, parse } from "date-fns";
 import { useEffect, useMemo } from "react";
@@ -20,8 +22,12 @@ import {
   SameDayCheckInNav,
 } from "@/components/check-in";
 import type { ICheckInDisplayData, ICheckInFormData } from "@/components/check-in/types";
-import { PageHeader } from "@/components/layout";
+import { PageHeader, WithLayoutFrame } from "@/components/layout";
 import { mapApiMoodToMoodType, mapMoodTypeToApiMood } from "@/constants/mood";
+
+import { useCohortViewQuery } from "@/lib/cohort-view-query";
+
+const SAMPLE_COHORT_PRACTICE_ID = "9a41499c-ab7b-4ddc-8473-f5fca0031043";
 
 /**
  * 將 API 的 checkinDate 格式轉換為顯示格式
@@ -77,12 +83,39 @@ const generateFullDateRange = (
 export default function CheckInDetailPage() {
   const t = useTranslations("practice");
   const params = useParams();
+  const searchParams = useSearchParams();
   const practiceId = params.id as string;
   const checkInId = params.checkInId as string;
-  const practiceDetailPath = `/practices/${practiceId}`;
+  const view = searchParams.get("view");
+  const cohortId = Number(searchParams.get("cohortId"));
+  const programId = Number(searchParams.get("programId"));
+  const validCohortId = Number.isInteger(cohortId) && cohortId > 0 ? cohortId : undefined;
+  const validProgramId = Number.isInteger(programId) && programId > 0 ? programId : undefined;
+  const cohortMemberHome = useCohortMemberHome(
+    view === "cohort-member" ? validCohortId : undefined
+  );
+  const lighthouseCohort = useLighthouseCohort(
+    view === "cohort-admin" ? validProgramId : undefined,
+    view === "cohort-admin" ? validCohortId : undefined
+  );
+  const cohortViewQuery = useCohortViewQuery();
+  const practiceDetailPath = `/practices/${practiceId}${cohortViewQuery}`;
 
   // 獲取 practice 資料
   const { data: practiceData, isLoading: isLoadingPractice } = usePracticeById(practiceId);
+  const practiceCohortMetadata = practiceData?.data as
+    | (typeof practiceData.data & { cohortName?: string; organizationName?: string })
+    | undefined;
+  const isSampleCohortPractice = practiceId === SAMPLE_COHORT_PRACTICE_ID;
+  let cohortNameFromView: string | undefined;
+  let organizationNameFromView: string | undefined;
+  if (view === "cohort-member") {
+    cohortNameFromView = cohortMemberHome.data?.data?.displayName;
+    organizationNameFromView = cohortMemberHome.data?.data?.organization.name;
+  } else if (view === "cohort-admin") {
+    cohortNameFromView = lighthouseCohort.data?.data?.displayName;
+    organizationNameFromView = lighthouseCohort.data?.data?.organizationName;
+  }
 
   const recordView = useRecordView();
 
@@ -101,6 +134,7 @@ export default function CheckInDetailPage() {
   const { data: checkInsData, isLoading: isLoadingCheckIns } = usePracticeCheckIns(practiceId, {
     limit: 30,
   });
+  const checkInRecordCount = checkInsData?.pagination?.totalItems ?? checkInsData?.data?.length;
 
   // 將 API 的 check-ins 轉換為 ICheckInDisplayData 格式
   const checkInsMap = useMemo(() => {
@@ -119,6 +153,7 @@ export default function CheckInDetailPage() {
         tags: checkIn.tags || [],
         images: checkIn.imageUrls || [],
         practiceTitle: practiceData.data.title,
+        authorName: practiceData.data.user?.name ?? undefined,
         // viewCount 尚未同步進 generated types（server dev branch 合併後才有）
         viewCount: (checkIn as { viewCount?: number }).viewCount ?? 0,
       };
@@ -231,36 +266,40 @@ export default function CheckInDetailPage() {
   // Loading 狀態
   if (isLoadingPractice || isLoadingCheckIns || isLoadingCurrentUser) {
     return (
-      <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
-        <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
-        <PageHeader
+      <WithLayoutFrame className="bg-logo-cyan">
+        <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
+          <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
+          <PageHeader
           title={t("checkin_title")}
-          variant="light"
-          disableLightOn="mobile"
-          rightActionTo={practiceDetailPath}
-        />
-        <main className="max-w-[448px] mx-auto pt-[88px] md:pt-[72px] px-5 pb-40">
-          <div className="text-center text-white">{t("checkin_loading")}</div>
-        </main>
-      </div>
+            variant="light"
+            disableLightOn="mobile"
+            rightActionTo={practiceDetailPath}
+          />
+          <main className="max-w-[448px] mx-auto pt-[88px] md:pt-[72px] px-5 pb-40">
+            <div className="text-center text-white">{t("checkin_loading")}</div>
+          </main>
+        </div>
+      </WithLayoutFrame>
     );
   }
 
   // Error 或找不到 check-in 的狀態
   if (!checkInData || !practiceData?.data) {
     return (
-      <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
-        <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
-        <PageHeader
-          title={t("checkin_title")}
-          variant="light"
-          disableLightOn="mobile"
-          rightActionTo={practiceDetailPath}
-        />
-        <main className="max-w-[448px] mx-auto pt-[88px] md:pt-[72px] px-5 pb-40">
-          <div className="text-center text-white">{t("checkin_not_found")}</div>
-        </main>
-      </div>
+      <WithLayoutFrame className="bg-logo-cyan">
+        <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
+          <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
+          <PageHeader
+            title={t("checkin_title")}
+            variant="light"
+            disableLightOn="mobile"
+            rightActionTo={practiceDetailPath}
+          />
+          <main className="max-w-[448px] mx-auto pt-[88px] md:pt-[72px] px-5 pb-40">
+            <div className="text-center text-white">{t("checkin_not_found")}</div>
+          </main>
+        </div>
+      </WithLayoutFrame>
     );
   }
 
@@ -292,57 +331,68 @@ export default function CheckInDetailPage() {
   };
 
   return (
-    <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
-      <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
-
-      {/* 日期選擇器（mobile 版本整合標題列） */}
-      <CheckInDateSelector
-        checkInDates={fullCheckInDates}
-        checkIns={checkInsRecord}
-        activeCheckInId={checkInId}
-        activeDate={activeCheckInDate}
-        practiceId={practiceId}
-        title={t("checkin_title")}
-        closeActionTo={practiceDetailPath}
-      />
-
-      {/* Desktop 版本的標題列 */}
-      <div className="hidden md:block">
-        <PageHeader title={t("checkin_title")} variant="light" rightActionTo={practiceDetailPath} />
-      </div>
-
-      <main className="max-w-[448px] mx-auto pt-[150px] md:pt-10 px-5 pb-52">
-        <CheckInDetail
-          checkInData={checkInData}
-          onEditComplete={isOwner ? handleEditComplete : undefined}
-          afterTitle={
-            <SameDayCheckInNav
-              sameDayCheckInIds={sameDayCheckInIds}
-              currentIndex={currentIndexInDay}
-              practiceId={practiceId}
-            />
-          }
-          parentPracticeHref={practiceDetailPath}
+    <WithLayoutFrame className="bg-logo-cyan">
+      <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
+        <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
+        {/* 日期選擇器（mobile 版本整合標題列） */}
+        <CheckInDateSelector
+          checkInDates={fullCheckInDates}
+          checkIns={checkInsRecord}
+          activeCheckInId={checkInId}
+          activeDate={activeCheckInDate}
+          practiceId={practiceId}
+          checkInCount={checkInRecordCount}
+          title={t("checkin_title")}
+          closeActionTo={practiceDetailPath}
         />
-      </main>
-
-      {isOwner && (
-        <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray z-20">
-          {/* 打卡按鈕 */}
-          <CheckInButton
-            variant="orange"
-            className="w-full sm:max-w-[288px]"
-            practiceId={practiceId}
-            practiceStatus={practiceData?.data?.status}
-            lastCheckInDate={checkInIdToDateMap.get(checkInId) || null}
-            startDate={practiceData?.data?.startDate || null}
-            endDate={practiceData?.data?.endDate || null}
-            taskTitle={checkInData.practiceTitle}
-            onComplete={handleCheckInComplete}
-            progressPercentage={practiceData?.data?.progressPercentage ?? 0}
+        {/* Desktop 版本的標題列 */}
+        <div className="hidden md:block">
+          <PageHeader title={t("checkin_title")} variant="light" rightActionTo={practiceDetailPath} />
+        </div>
+        <main className="max-w-[448px] mx-auto pt-[150px] md:pt-10 px-5 pb-52">
+          <CheckInDetail
+            checkInData={checkInData}
+            cohortName={
+              cohortNameFromView ??
+              practiceCohortMetadata?.cohortName ??
+              (isSampleCohortPractice ? "秋季共學班" : undefined)
+            }
+            organizationName={
+              organizationNameFromView ??
+              practiceCohortMetadata?.organizationName ??
+              (isSampleCohortPractice ? "島島教育" : undefined)
+            }
+            onEditComplete={isOwner ? handleEditComplete : undefined}
+            afterTitle={
+              <SameDayCheckInNav
+                sameDayCheckInIds={sameDayCheckInIds}
+                currentIndex={currentIndexInDay}
+                practiceId={practiceId}
+              />
+            }
+            parentPracticeHref={practiceDetailPath}
+            visitorView={!isOwner}
+            isOwner={isOwner}
           />
-        </footer>
-      )}
-    </div>
+        </main>
+        {isOwner && (
+          <footer className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-0 right-0 flex justify-center gap-6 border-t border-light-gray bg-very-light-gray p-6 z-20 md:bottom-0">
+            {/* 打卡按鈕 */}
+            <CheckInButton
+              variant="orange"
+              className="w-full sm:max-w-[288px] md:translate-x-[var(--sidebar-center-offset)]"
+              practiceId={practiceId}
+              practiceStatus={practiceData?.data?.status}
+              lastCheckInDate={checkInIdToDateMap.get(checkInId) || null}
+              startDate={practiceData?.data?.startDate || null}
+              endDate={practiceData?.data?.endDate || null}
+              taskTitle={checkInData.practiceTitle}
+              onComplete={handleCheckInComplete}
+              progressPercentage={practiceData?.data?.progressPercentage ?? 0}
+            />
+          </footer>
+        )}
+      </div>
+    </WithLayoutFrame>
   );
 }

@@ -1,11 +1,13 @@
 "use client";
 
-import { useTranslations } from "@daodao/i18n";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { useSafeRouter } from "@daodao/ui/hooks/use-safe-router";
 import { cn } from "@daodao/ui/lib/utils";
+import { parseISO } from "date-fns";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCohortViewQuery } from "@/lib/cohort-view-query";
 import { CheckInDateButton } from "./check-in-date-button";
 import type { ICheckInDateSelectorProps } from "./types";
 
@@ -15,12 +17,22 @@ export const MobileCheckInDateSelector = ({
   practiceId,
   activeCheckInId,
   activeDate,
+  checkInCount,
   title,
   closeActionTo,
 }: ICheckInDateSelectorProps) => {
   const t = useTranslations("check_in");
+  const locale = useLocale();
   const router = useSafeRouter();
+
+  const cohortViewQuery = useCohortViewQuery();
   const [isVisible, setIsVisible] = useState(true);
+  const [visibleMonthLabel, setVisibleMonthLabel] = useState(() => {
+    const date = checkInDates.find((item) => item.date === activeDate)?.date ?? checkInDates[0]?.date;
+    return date
+      ? new Intl.DateTimeFormat(locale, { month: "short", year: "numeric" }).format(parseISO(date))
+      : "";
+  });
   const lastScrollY = useRef(0);
   const navRef = useRef<HTMLElement>(null);
 
@@ -31,6 +43,33 @@ export const MobileCheckInDateSelector = ({
   const isDragging = useRef(false);
   const dragStartX = useRef(0);
   const dragScrollLeft = useRef(0);
+
+  const updateVisibleMonthLabel = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const dateItems = Array.from(
+      container.querySelectorAll<HTMLElement>("[data-check-in-date]")
+    );
+    if (dateItems.length === 0) return;
+    // Keep the month label in sync with the first date reaching the strip's
+    // visible left edge, rather than switching while that date is still off-screen.
+    const monthLabelAnchor = containerRect.left + 40;
+    const visibleItem =
+      dateItems.reduce<{ item: HTMLElement; center: number } | undefined>((closest, item) => {
+        const rect = item.getBoundingClientRect();
+        const center = rect.left + rect.width / 2;
+        if (center > monthLabelAnchor || (closest && center <= closest.center)) return closest;
+        return { item, center };
+      }, undefined)?.item ?? dateItems[0];
+    const dateValue = visibleItem?.dataset.checkInDate;
+    if (!dateValue) return;
+
+    setVisibleMonthLabel(
+      new Intl.DateTimeFormat(locale, { month: "short", year: "numeric" }).format(parseISO(dateValue))
+    );
+  }, [locale]);
 
   // 處理滾動時隱藏/顯示面板
   useEffect(() => {
@@ -80,7 +119,8 @@ export const MobileCheckInDateSelector = ({
     if (activeButton) {
       activeButton.scrollIntoView({ behavior: "instant", inline: "center", block: "nearest" });
     }
-  }, [activeDate, checkInDates]);
+    requestAnimationFrame(updateVisibleMonthLabel);
+  }, [activeDate, checkInDates, updateVisibleMonthLabel]);
 
   // 滑鼠拖曳：按下
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -128,17 +168,21 @@ export const MobileCheckInDateSelector = ({
     }
   }, []);
 
+  const scrollDates = useCallback((direction: -1 | 1) => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    container.scrollBy({
+      left: direction * Math.max(container.clientWidth * 0.75, 160),
+      behavior: "smooth",
+    });
+  }, []);
+
   // 處理日期選擇
   const handleDateSelect = (selectedCheckInId: string) => {
     if (selectedCheckInId !== activeCheckInId) {
-      router.push(`/practices/${practiceId}/check-ins/${selectedCheckInId}`);
+      router.push(`/practices/${practiceId}/check-ins/${selectedCheckInId}${cohortViewQuery}`);
     }
-  };
-
-  const scrollDates = (direction: -1 | 1) => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-    container.scrollBy({ left: direction * container.clientWidth * 0.75, behavior: "smooth" });
   };
 
   // 處理關閉按鈕點擊
@@ -155,7 +199,7 @@ export const MobileCheckInDateSelector = ({
     <nav
       ref={navRef}
       className={cn(
-        "fixed top-0 left-0 right-0 z-30 bg-[#E9FEFFB2]/70 border-b-2 border-[#E9FEFFB2] rounded-b-3xl backdrop-blur-lg transition-transform duration-300 ease-in-out md:left-1/2 md:right-auto md:w-[720px] md:max-w-[calc(100vw-40px)] md:-translate-x-1/2",
+        "fixed top-0 left-0 right-0 z-30 transition-[left,transform] duration-300 ease-in-out md:left-[calc(50%_+_var(--sidebar-center-offset))] md:right-auto md:w-[720px] md:max-w-[calc(100vw-40px)] md:-translate-x-1/2",
         !isVisible && "-translate-y-full"
       )}
       onMouseDown={handleMouseDown}
@@ -165,59 +209,100 @@ export const MobileCheckInDateSelector = ({
       onClickCapture={handleClickCapture}
     >
       {/* 標題列 */}
-      <div className="relative px-5 pt-2">
-        {checkInDates.length > 7 && (
-          <div className="flex justify-center gap-4">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              aria-label={t("date_scroll_left")}
-              onClick={() => scrollDates(-1)}
-              animation="none"
-              className="size-7 text-bg-dark/60 hover:bg-bg-dark/5"
+      <div className="relative flex h-11 items-center justify-center px-4">
+        {/* 中間標題，日期提示箭頭分置標題左右 */}
+        {title && (
+          <div className="flex items-center justify-center gap-2">
+            {checkInDates.length > 7 && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                aria-label={t("date_scroll_left")}
+                onClick={() => scrollDates(-1)}
+                animation="none"
+                className="size-7 text-bg-dark/60 hover:bg-bg-dark/5"
+              >
+                <ChevronLeft className="size-4" aria-hidden="true" />
+              </Button>
+            )}
+            <h1
+              className="text-lg font-medium text-bg-dark"
+              aria-describedby={checkInDates.length > 7 ? "date-scroll-hint" : undefined}
             >
-              <ChevronLeft className="size-4" aria-hidden="true" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              aria-label={t("date_scroll_right")}
-              onClick={() => scrollDates(1)}
-              animation="none"
-              className="size-7 text-bg-dark/60 hover:bg-bg-dark/5"
-            >
-              <ChevronRight className="size-4" aria-hidden="true" />
-            </Button>
+              {title}
+            </h1>
+            {checkInCount !== undefined && (
+              <span
+                className="rounded-md bg-white/45 px-1.5 py-0.5 text-[10px] font-semibold leading-3 text-bg-dark/75"
+              >
+                {checkInCount}
+              </span>
+            )}
+            {checkInDates.length > 7 && (
+              <>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  aria-label={t("date_scroll_right")}
+                  onClick={() => scrollDates(1)}
+                  animation="none"
+                  className="size-7 text-bg-dark/60 hover:bg-bg-dark/5"
+                >
+                  <ChevronRight className="size-4" aria-hidden="true" />
+                </Button>
+                <span id="date-scroll-hint" className="sr-only">
+                  {t("date_scroll_hint")}
+                </span>
+              </>
+            )}
           </div>
         )}
-        {title && <h1 className="text-center text-lg font-medium text-bg-dark">{title}</h1>}
+
+        {/* 右側關閉按鈕 */}
         <Button
           variant="ghost"
           size="icon"
           onClick={handleClose}
           aria-label={t("close")}
           animation="none"
-          className="absolute right-3 top-3 text-light-gray bg-very-light-gray/50"
+          className="absolute right-3 top-1/2 size-9 -translate-y-1/2 rounded-full bg-white/45 text-bg-dark/60 hover:bg-white/70"
         >
-          <X className="size-6" aria-hidden="true" />
+          <X className="size-5" />
         </Button>
       </div>
 
       {/* 日期選擇器 */}
-      <div ref={scrollContainerRef} className="overflow-x-auto scrollbar-hide px-10">
-        <div className="flex items-center justify-center gap-4 w-fit mx-auto pb-5 pt-4">
-          {checkInDates.map((item) => (
-            <CheckInDateButton
-              key={item.id}
-              item={item}
-              checkIns={checkIns}
-              activeCheckInId={activeCheckInId}
-              activeDate={activeDate}
-              onSelect={handleDateSelect}
-            />
-          ))}
+      <div className="relative mx-2 mt-1 rounded-3xl border border-white/50 bg-[#E9FEFFB2]/65 shadow-sm backdrop-blur-lg md:mx-0">
+        <p className="pointer-events-none absolute left-4 top-2 z-10 h-3 whitespace-nowrap text-[10px] font-medium text-bg-dark/75">
+          {visibleMonthLabel}
+        </p>
+        <div
+          ref={scrollContainerRef}
+          className="overflow-x-auto scrollbar-hide px-4"
+          onScroll={updateVisibleMonthLabel}
+        >
+          <ol className="mx-auto flex w-fit items-center justify-center gap-3 pb-3 pt-3 pr-48">
+            {checkInDates.map((item) => {
+              return (
+                <li
+                  key={item.id}
+                  data-check-in-date={item.date}
+                  className="flex shrink-0 flex-col items-center gap-1"
+                >
+                  <p className="h-3" aria-hidden="true" />
+                  <CheckInDateButton
+                    item={item}
+                    checkIns={checkIns}
+                    activeCheckInId={activeCheckInId}
+                    activeDate={activeDate}
+                    onSelect={handleDateSelect}
+                  />
+                </li>
+              );
+            })}
+          </ol>
         </div>
       </div>
     </nav>
