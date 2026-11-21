@@ -30,6 +30,7 @@ const room = {
   organizationName: "lighthouse test",
   memberCount: 3,
   unreadCount: 2,
+  firstUnreadMessageId: null,
   lastMessage: null,
   lastActivityAt: "2026-10-09T17:49:44.079Z",
 };

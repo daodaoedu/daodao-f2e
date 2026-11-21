@@ -1,12 +1,12 @@
 "use client";
 
-import { useTranslations } from "@daodao/i18n";
+import { useLocale, useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Button, type ButtonProps } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isBefore, startOfDay } from "date-fns";
-import { CalendarCheck, Check, Eye } from "lucide-react";
+import { CalendarCheck, Check, ChevronDown, Eye, History, Sparkles } from "lucide-react";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { CheckInStatus } from "@/constants/check-in-status";
@@ -16,8 +16,10 @@ import { parseLocalDate } from "@/utils/practice-period";
 import type { ICheckInFormData, ICheckInStatusOptions } from "../types";
 import { submitKeepingValuesOnError } from "./check-in-submit-flow";
 import { DescriptionField } from "./components/description-field";
+import { formatCheckInDescription, parseCheckInDescription } from "./description-answers";
 import { MediaUploadField } from "./components/media-upload-field";
 import { MoodSelector } from "./components/mood-selector";
+import { PreviousCheckIns } from "./components/previous-check-ins";
 import { ReflectionQuestion } from "./components/reflection-question";
 import { TagSelector } from "./components/tag-selector";
 import { useCheckInStatus } from "./hooks/use-check-in-status";
@@ -32,36 +34,46 @@ export type { CheckInStatusType as CheckInStatus } from "@/constants/check-in-st
  * 可用於 SheetManager 或直接使用 CheckInSheet
  */
 interface ICheckInSheetContentProps {
+  practiceId?: string;
   taskTitle: string;
   onComplete: (data: ICheckInFormData) => Promise<void> | void;
   /** 初始值（用於編輯模式） */
-  initialValues?: Partial<CheckInFormValuesType>;
+  initialValues?: Partial<ICheckInFormData>;
   /** 既有的圖片 URL（編輯模式時顯示） */
   existingImages?: string[];
   /** 提交按鈕文字 */
   submitButtonText?: string;
+  /** 心情在打卡送出前選擇，或送出後於成功對話框選擇 */
+  moodSelectionPosition?: "form" | "after";
 }
 
 export const CheckInSheetContent = ({
+  practiceId,
   taskTitle,
   onComplete,
   initialValues,
   existingImages,
   submitButtonText,
+  moodSelectionPosition = "form",
 }: ICheckInSheetContentProps) => {
   const t = useTranslations("check_in");
+  const locale = useLocale();
   const resolvedSubmitButtonText = submitButtonText ?? t("submit_check_in");
+  const initialDescriptionAnswers = parseCheckInDescription(initialValues?.description ?? "");
   const form = useForm<CheckInFormValuesType>({
-    resolver: zodResolver(createCheckInFormSchema(t)),
+    resolver: zodResolver(createCheckInFormSchema(t, locale)),
     defaultValues: {
-      mood: initialValues?.mood ?? null,
+      mood: initialValues?.mood ?? (moodSelectionPosition === "after" ? "neutral" : null),
       tags: initialValues?.tags ?? [],
-      description: initialValues?.description ?? "",
+      actionObservation: initialDescriptionAnswers.actionObservation,
+      nextStep: initialDescriptionAnswers.nextStep,
       media: initialValues?.media ?? [],
     },
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPreviousCheckIns, setShowPreviousCheckIns] = useState(false);
+  const [showWritingAids, setShowWritingAids] = useState(false);
   const [keptExistingImages, setKeptExistingImages] = useState<string[]>(existingImages ?? []);
 
   const onSubmit = async (values: CheckInFormValuesType) => {
@@ -73,7 +85,15 @@ export const CheckInSheetContent = ({
           onComplete({
             mood: values.mood,
             tags: values.tags,
-            description: values.description,
+            description: formatCheckInDescription(
+              {
+                actionObservation: values.actionObservation,
+                nextStep: values.nextStep,
+              },
+              {
+                nextStep: t("description_follow_up_next_step"),
+              }
+            ),
             media: values.media,
             existingImageUrls:
               keptExistingImages.length > 0 || existingImages?.length
@@ -91,18 +111,62 @@ export const CheckInSheetContent = ({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="px-6">
         {/* Activity Title */}
-        <h2 className="text-md leading-8 font-medium text-bg-dark wrap-break-word mb-8">
-          {taskTitle}
-        </h2>
+        <div className="mb-8 flex items-center justify-between gap-3">
+          <h2 className="min-w-0 text-md leading-8 font-medium text-bg-dark wrap-break-word">
+            {taskTitle}
+          </h2>
+          {practiceId && (
+            <Button
+              type="button"
+              variant="ghost"
+              aria-expanded={showPreviousCheckIns}
+              onClick={() => setShowPreviousCheckIns((visible) => !visible)}
+              className="h-8 shrink-0 gap-1.5 px-2 text-xs font-medium text-logo-cyan hover:bg-logo-cyan/10 hover:text-logo-cyan"
+            >
+              <History className="size-3.5" aria-hidden="true" />
+              {showPreviousCheckIns ? t("hide_checkin_history") : t("view_checkin_history")}
+            </Button>
+          )}
+        </div>
+        {showPreviousCheckIns && practiceId && (
+          <PreviousCheckIns
+            practiceId={practiceId}
+            isDemo={taskTitle.trimStart().toLocaleLowerCase().startsWith("demo")}
+          />
+        )}
 
-        {/* Mood Selection */}
-        <MoodSelector form={form} />
+        {moodSelectionPosition === "form" && <MoodSelector form={form} />}
 
         {/* Thought Sharing (tags, description, media) */}
         <div className="mb-8">
-          <h3 className="text-base font-medium mb-3 text-text-dark">{t("thought_sharing")}</h3>
+          <h3 className="mb-3 text-base font-medium text-text-dark">
+            {t("thought_sharing")}
+            <span aria-hidden="true" className="ml-1 text-red-500">
+              *
+            </span>
+            <span className="sr-only">{t("tags_required_hint")}</span>
+          </h3>
           <TagSelector form={form} />
-          <DescriptionField form={form} beforeTextarea={<ReflectionQuestion />} />
+          <Button
+            type="button"
+            variant="ghost"
+            aria-expanded={showWritingAids}
+            onClick={() => setShowWritingAids((visible) => !visible)}
+            className="mb-2 h-8 gap-1.5 px-2 text-sm font-medium text-logo-cyan hover:bg-logo-cyan/10 hover:text-logo-cyan"
+          >
+            <Sparkles className="size-4" aria-hidden="true" />
+            {t("writing_aids")}
+            <ChevronDown
+              className={`size-3.5 transition-transform ${showWritingAids ? "rotate-180" : ""}`}
+              aria-hidden="true"
+            />
+          </Button>
+          {showWritingAids && (
+            <div className="mb-3 rounded-xl bg-very-light-gray/60 p-3">
+              <ReflectionQuestion />
+            </div>
+          )}
+          <DescriptionField form={form} />
           <MediaUploadField
             form={form}
             existingImages={existingImages}
@@ -199,12 +263,12 @@ export const CheckInButton = ({
 
   const { submitCheckIn } = useCheckInSubmit({
     practiceId,
-    taskTitle,
     progressPercentage,
     onComplete,
   });
 
   const { openCheckInSheet } = useCheckInSheet({
+    practiceId,
     taskTitle,
     // 建立成功才關 sheet；失敗時錯誤（toast 已在 submitCheckIn 顯示）往上丟，sheet 與內容保留
     onComplete: (data, { closeSheet }) => submitCheckIn(data, { onCreated: closeSheet }),

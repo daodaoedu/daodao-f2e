@@ -9,7 +9,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@daodao/ui/components/radio-group";
 import { cn } from "@daodao/ui/lib/utils";
 import type { UseFormReturn } from "react-hook-form";
-import { MOOD_OPTIONS } from "@/constants/mood";
+import { CHECK_IN_MOOD_OPTIONS } from "@/constants/mood";
 import type { CheckInFormValuesType } from "../schema";
 
 interface IMoodSelectorProps {
@@ -38,7 +38,7 @@ export const MoodSelector = ({ form }: IMoodSelectorProps) => {
               onBlur={field.onBlur}
               className="flex justify-between"
             >
-              {MOOD_OPTIONS.map(({ id, label, emoji: Emoji }) => {
+              {CHECK_IN_MOOD_OPTIONS.map(({ id, label, emoji: Emoji }) => {
                 const translatedLabel = t(`moods.${id}`);
                 const isSelected = field.value === id;
                 const inputId = `mood-${id}`;

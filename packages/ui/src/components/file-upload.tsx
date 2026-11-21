@@ -50,6 +50,9 @@ export interface FileUploadProps {
   maxFiles?: number;
   className?: string;
   disabled?: boolean;
+  uploadLabel?: string;
+  uploadHint?: string;
+  removeLabel?: string;
 }
 
 const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
@@ -62,6 +65,9 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
       maxFiles,
       className,
       disabled = false,
+      uploadLabel = "上傳檔案",
+      uploadHint = "點擊開啟資料夾或直接拖曳",
+      removeLabel = "移除媒體",
       ...props
     },
     ref
@@ -140,7 +146,7 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
         <button
           type="button"
           disabled={disabled}
-          aria-label="上傳檔案"
+          aria-label={uploadLabel}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
@@ -165,7 +171,7 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
           />
           <div className="flex flex-col items-center gap-2.5">
             <GalleryAddSvg className="size-10 text-logo-cyan" />
-            <p className="text-light-gray">點擊開啟資料夾或直接拖曳</p>
+            <p className="text-light-gray">{uploadHint}</p>
           </div>
         </button>
 
@@ -183,7 +189,7 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
                     handleRemoveFile(index);
                   }}
                   className="absolute top-2 right-2 size-5 bg-[#295E5C66]/40 text-white rounded-full flex items-center justify-center"
-                  aria-label="移除媒體"
+                  aria-label={removeLabel}
                   disabled={disabled}
                 >
                   <X className="size-3" />

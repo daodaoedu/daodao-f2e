@@ -7646,6 +7646,8 @@ export interface paths {
                                 memberCount: number;
                                 /** @description 未讀數 */
                                 unreadCount: number;
+                                /** @description 第一則未讀訊息 ID；沒有未讀訊息時為 null */
+                                firstUnreadMessageId: number | null;
                                 /** @description 最後一則訊息 */
                                 lastMessage: {
                                     /** @description 訊息 ID */
@@ -8345,6 +8347,10 @@ export interface paths {
                          * @example 42
                          */
                         replyToMessageId?: number;
+                        /** @description 被 @mention 的聊天室成員 ID 列表 */
+                        mentionedUserIds?: number[];
+                        /** @description 是否 @all（僅聊天室管理員可用） */
+                        mentionAll?: boolean;
                     };
                 };
             };

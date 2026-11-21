@@ -2,12 +2,12 @@
 
 import { NotebookHoleSvg, StampSvg, TapeSvg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
-import { parseTextLinks } from "@daodao/shared/lib/parse-text-links";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid } from "date-fns";
 import * as React from "react";
 import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 import { isBlankContent } from "@/utils/check-in-content";
+import { CheckInDescriptionText } from "./check-in-description-text";
 import { MOOD_LABEL_CLASSNAME, TAG_CLASSNAME } from "./check-in-card-classnames";
 
 interface ICheckInCardProps {
@@ -17,7 +17,12 @@ interface ICheckInCardProps {
   content: string;
   tags: string[];
   images?: string[];
+  authorName?: string;
+  cohortName?: string;
+  organizationName?: string;
   titleClassName?: string;
+  titleMeta?: React.ReactNode;
+  paperFooterContent?: React.ReactNode;
   onImageClick?: (index: number) => void;
   showTape?: boolean;
   /** 標題下方插入的額外內容（例如同日打卡切換導航） */
@@ -41,7 +46,12 @@ export const CheckInCard = ({
   content,
   tags,
   images,
+  authorName,
+  cohortName,
+  organizationName,
   titleClassName = "text-white",
+  titleMeta,
+  paperFooterContent,
   onImageClick,
   showTape = true,
   afterTitle,
@@ -82,86 +92,92 @@ export const CheckInCard = ({
     <div className="max-w-[350px] mx-auto">
       {/* 實踐標題 */}
       <div className={`px-2 pb-5 text-center ${titleClassName}`}>
-        <h2 className="text-lg font-semibold line-clamp-2">{taskTitle}</h2>
+        <h2 className="text-lg font-semibold tracking-[0.04em] text-white line-clamp-2">
+          {taskTitle}
+        </h2>
+        {titleMeta}
+        {!paperFooterContent && authorName && (
+          <div className="mt-2 flex items-center justify-center gap-1.5 text-sm opacity-90">
+            <span className="max-w-[260px] truncate">{authorName}</span>
+          </div>
+        )}
+        {!paperFooterContent && (cohortName || organizationName) && (
+          <p className="mt-1 max-w-[280px] truncate text-center text-xs opacity-80">
+            {[organizationName, cohortName].filter(Boolean).join(" · ")}
+          </p>
+        )}
       </div>
 
       {/* 標題下方額外內容（如同日打卡切換） */}
       {afterTitle}
 
       {/* 筆記本風格內容區 */}
-      <div className={cn("relative bg-white mb-5 mt-5 rounded-b", bottomActions ? "" : "pb-9")}>
+      <div
+        className={cn(
+          "relative bg-white mb-5 mt-5 rounded-b",
+          !bottomActions && !paperFooterContent && "pb-9"
+        )}
+      >
         {/* 筆記本裝訂線（頂部） */}
         <NotebookHoleSvg className="absolute -top-7 left-0" />
 
         {/* 可滾動內容區 + 底部漸層遮罩 */}
         <div className="relative">
+          {/* 日期印章固定放在卡片標頭，與打卡文字分開 */}
+          <header className="flex h-20 items-center justify-between px-5 pt-1">
+            {MoodEmoji ? (
+              <div className="flex min-w-0 items-center gap-2 text-xs text-text-dark">
+                <MoodEmoji className="size-5 shrink-0" aria-hidden="true" />
+                <span className={cn(MOOD_LABEL_CLASSNAME, "truncate")}>
+                  {t("mood_label", { label: moodLabel || moodOption?.label || "" })}
+                </span>
+              </div>
+            ) : (
+              <div />
+            )}
+            <div className="relative size-20 shrink-0">
+              <StampSvg width={80} height={81} aria-hidden="true" />
+              <div className="absolute top-1/2 left-1/2 flex size-8 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center text-center text-[10px] font-bold text-logo-gray rotate-15">
+                <div>{dateYear}</div>
+                <div>{dateMonthDay}</div>
+              </div>
+            </div>
+          </header>
           <main
             ref={mainRef}
             onScroll={handleScroll}
             className={cn(
               "pt-4.5 bg-white scrollbar-hide px-5",
-              !isCapture && "max-h-[400px] overflow-y-auto"
+              !isCapture && "max-h-[320px] overflow-y-auto"
             )}
           >
             <div
-              className={images && images.filter(Boolean).length > 0 ? "pb-24" : "pb-8"}
+              className={cn(
+                "relative",
+                images && images.filter(Boolean).length > 0 ? "pb-24" : "pb-8"
+              )}
               style={{
                 backgroundImage:
                   "linear-gradient(to bottom, transparent 0px, transparent 38px, #99ECFF 38px, #99ECFF 39px)",
                 backgroundSize: "280px 39px",
                 backgroundRepeat: "repeat-y",
                 backgroundPositionX: "15px",
-                backgroundPositionY: "24px",
+                backgroundPositionY: "-10px",
               }}
             >
-              <div className="absolute top-0 left-0 w-full h-12 bg-white" />
-              <div className="relative space-y-4">
-                {/* 時間戳/印章 */}
-                <div className="relative float-right anonymous-pro translate-x-2 translate-y-3 animate-stamp pointer-events-none z-30">
-                  <StampSvg width={100} height={100} />
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-xs font-bold text-logo-gray rotate-15 size-10 flex flex-col items-center justify-center">
-                    <div>{dateYear}</div>
-                    <div>{dateMonthDay}</div>
-                  </div>
-                </div>
-
-                {/* 心情狀態 */}
-                {MoodEmoji && (
-                  <div className="flex items-center gap-2">
-                    <MoodEmoji className="size-6" />
-                    <span className={MOOD_LABEL_CLASSNAME}>
-                      {t("mood_label", { label: moodLabel || moodOption?.label || "" })}
-                    </span>
-                  </div>
-                )}
-
+              <div className="relative space-y-0 pl-[22px]">
                 {/* 文字內容 */}
                 {isBlankContent(content) && showEmptyHint ? (
                   <p className="text-light-gray text-sm italic">{t("empty_content_hint")}</p>
                 ) : (
-                  <p className="text-text-dark font-medium whitespace-pre-wrap wrap-break-word">
-                    {parseTextLinks(content).map((seg, i) =>
-                      seg.type === "url" &&
-                      (seg.value.startsWith("https://") || seg.value.startsWith("http://")) ? (
-                        <a
-                          key={`${i}-url`}
-                          href={seg.value}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-logo-cyan underline break-all"
-                        >
-                          {seg.value}
-                        </a>
-                      ) : (
-                        <React.Fragment key={`${i}-text`}>{seg.value}</React.Fragment>
-                      )
-                    )}
+                  <p className="text-text-dark font-medium leading-[39px] whitespace-pre-wrap wrap-break-word">
+                    <CheckInDescriptionText content={content} linkify />
                   </p>
                 )}
 
                 {/* 標籤 */}
                 {tags && tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2 text-logo-cyan text-sm">
+                  <div className="mt-[39px] flex min-h-[39px] flex-wrap items-center gap-2 text-logo-cyan text-sm">
                     {tags.map((tag) => (
                       <p key={tag} className={TAG_CLASSNAME}>
                         # {tag}
@@ -239,6 +255,12 @@ export const CheckInCard = ({
             <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-b from-white/0 to-white pointer-events-none z-10" />
           )}
         </div>
+
+        {paperFooterContent && (
+          <footer className="relative z-20 mt-3 flex min-h-12 items-end justify-between gap-4 px-5 pb-4">
+            {paperFooterContent}
+          </footer>
+        )}
 
         {bottomActions}
       </div>

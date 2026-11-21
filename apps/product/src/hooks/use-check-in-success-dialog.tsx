@@ -6,58 +6,20 @@ import {
   TooltipPanel,
   TooltipTrigger,
 } from "@daodao/ui/components/animate-ui/components/base/tooltip";
-import { SplitText } from "@daodao/ui/components/split-text";
 import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { cn } from "@daodao/ui/lib/utils";
+import { RadioGroup, RadioGroupItem } from "@daodao/ui/components/radio-group";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
+import {
+  CHECK_IN_MOOD_OPTIONS,
+  MoodType,
+  type MoodType as MoodTypeValue,
+} from "@/constants/mood";
 import { getProgressAnimationAction } from "./check-in-progress-animation";
 
 interface UseCheckInSuccessDialogOptions {
-  title: string;
   from?: number;
   to?: number;
-}
-
-interface DelayedSplitTextProps {
-  title: string;
-  onLetterAnimationComplete: () => void;
-}
-
-/**
- * 延遲啟用動畫的 SplitText 包裝組件
- */
-function DelayedSplitText({ title, onLetterAnimationComplete }: DelayedSplitTextProps) {
-  const [isAnimationEnabled, setIsAnimationEnabled] = useState(false);
-
-  useEffect(() => {
-    // 等待彈窗打開動畫完成後再啟用文字動畫（約 350ms）
-    const timer = setTimeout(() => {
-      setIsAnimationEnabled(true);
-    }, 300);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, []);
-
-  if (!isAnimationEnabled) return null;
-
-  return (
-    <SplitText
-      text={title}
-      className="text-xl font-semibold text-text-dark"
-      delay={100}
-      duration={0.3}
-      ease="power3.out"
-      splitType="chars"
-      from={{ opacity: 0, y: 6 }}
-      to={{ opacity: 1, y: 0 }}
-      threshold={0.1}
-      rootMargin="-100px"
-      textAlign="center"
-      onLetterAnimationComplete={onLetterAnimationComplete}
-    />
-  );
 }
 
 /**
@@ -147,7 +109,6 @@ interface AlwaysOpenTooltipProps {
   from: number;
   to: number;
   shouldStartAnimation?: boolean;
-  onAnimationComplete?: () => void;
 }
 
 /**
@@ -157,7 +118,6 @@ function AlwaysOpenTooltip({
   from,
   to,
   shouldStartAnimation = true,
-  onAnimationComplete,
 }: AlwaysOpenTooltipProps) {
   const [percentage, setPercentage] = useState(from);
   const [isAnimated, setIsAnimated] = useState(false);
@@ -178,7 +138,6 @@ function AlwaysOpenTooltip({
       setPercentage(to);
       setIsAnimated(true);
       setShowFireworks(true);
-      onAnimationComplete?.();
       return;
     }
 
@@ -199,11 +158,11 @@ function AlwaysOpenTooltip({
     );
 
     return () => clearInterval(interval);
-  }, [from, to, percentage, isAnimated, shouldStartAnimation, onAnimationComplete]);
+  }, [from, to, percentage, isAnimated, shouldStartAnimation]);
 
   return (
     <Tooltip alwaysOpen open>
-      <div className="absolute bottom-[167px] left-12 right-12 h-[12px] bg-very-light-gray rounded-full">
+      <div className="absolute inset-x-10 bottom-5 h-[12px] rounded-full bg-very-light-gray">
         <div
           className="w-full h-full bg-linear-90 from-blue to-logo-cyan rounded-full origin-left"
           style={{ transform: `scaleX(${Math.min(percentage, 100)}%)` }}
@@ -220,9 +179,9 @@ function AlwaysOpenTooltip({
         />
       </div>
       <TooltipPanel
-        sideOffset={20}
+        sideOffset={16}
         side="top"
-        className="bg-logo-cyan text-white font-bold text-3xl py-2 rounded-full [--arrow-size:14px]"
+        className="rounded-full bg-logo-cyan px-3 py-1 text-2xl font-bold text-white [--arrow-size:12px]"
       >
         {percentage}%
       </TooltipPanel>
@@ -231,54 +190,21 @@ function AlwaysOpenTooltip({
 }
 
 interface Step1AnimationProps {
-  title: string;
   from: number;
   to: number;
 }
 
-function Step1Animation({ title, from, to }: Step1AnimationProps) {
-  const [showProgress, setShowProgress] = useState(false);
+function Step1Animation({ from, to }: Step1AnimationProps) {
   const [shouldStartAnimation, setShouldStartAnimation] = useState(false);
-  const [isFinished, setIsFinished] = useState(false);
-  const [isHidden, setIsHidden] = useState(false);
 
   useEffect(() => {
-    if (showProgress && !isFinished) {
-      const timer = setTimeout(() => {
-        setShouldStartAnimation(true);
-      }, 300);
-
-      return () => {
-        clearTimeout(timer);
-      };
-    }
-    if (isFinished && !isHidden) {
-      const timer = setTimeout(() => {
-        setIsHidden(true);
-      }, 1500);
-
-      return () => clearTimeout(timer);
-    }
-  }, [showProgress, isFinished, isHidden]);
+    const timer = setTimeout(() => setShouldStartAnimation(true), 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <div
-      className={cn(
-        "absolute top-[72px] bottom-0 inset-x-0 bg-white rounded-3xl px-4 pb-4 z-10 transition-opacity",
-        isHidden && "opacity-0 pointer-events-none"
-      )}
-    >
-      <div className="mx-auto w-fit">
-        <DelayedSplitText title={title} onLetterAnimationComplete={() => setShowProgress(true)} />
-      </div>
-      {showProgress && !isHidden && (
-        <AlwaysOpenTooltip
-          from={from}
-          to={to}
-          shouldStartAnimation={shouldStartAnimation}
-          onAnimationComplete={() => setIsFinished(true)}
-        />
-      )}
+    <div className="relative mb-3 h-24 rounded-2xl bg-very-light-gray/60 px-4 pt-2">
+      <AlwaysOpenTooltip from={from} to={to} shouldStartAnimation={shouldStartAnimation} />
     </div>
   );
 }
@@ -293,23 +219,84 @@ function Step2Animation({ encouragement }: Step2AnimationProps) {
   return (
     <div className="space-y-1">
       <p>{encouragement || t("success_default_encouragement")}</p>
-      <p className="text-sm text-text-dark/60">{t("success_continue_hint")}</p>
     </div>
   );
 }
 
+function MoodFollowUp({
+  initialMood,
+  onMoodChange,
+}: {
+  initialMood: MoodTypeValue;
+  onMoodChange?: (mood: MoodTypeValue) => void;
+}) {
+  const t = useTranslations("check_in");
+  const [mood, setMood] = useState<MoodTypeValue>(initialMood);
+
+  return (
+    <section className="mt-3 rounded-2xl border border-logo-cyan/25 bg-logo-cyan/5 px-3 py-3 shadow-sm">
+      <p className="mb-2 text-base font-semibold text-text-dark">{t("mood_question")}</p>
+      <RadioGroup
+        value={mood}
+        onValueChange={(value) => {
+          const nextMood = value as MoodTypeValue;
+          setMood(nextMood);
+          onMoodChange?.(nextMood);
+        }}
+        className="grid grid-cols-5 gap-1.5"
+      >
+        {CHECK_IN_MOOD_OPTIONS.map(({ id, label, emoji: Emoji }) => {
+          const translatedLabel = t(`moods.${id}`);
+          const inputId = `post-checkin-mood-${id}`;
+          return (
+            <label
+              key={id}
+              htmlFor={inputId}
+              className={cn(
+                "flex min-w-0 cursor-pointer flex-col items-center gap-1 rounded-xl border border-transparent px-1 py-2 text-center transition-colors hover:bg-white focus-within:ring-2 focus-within:ring-logo-cyan/50",
+                mood === id
+                  ? "border-logo-cyan/40 bg-white shadow-sm"
+                  : "bg-white/55"
+              )}
+            >
+              <RadioGroupItem
+                value={id}
+                id={inputId}
+                className="sr-only"
+                aria-label={translatedLabel}
+              />
+              <Emoji className="size-8" aria-hidden="true" />
+              <span className={cn("text-[10px] leading-tight", mood === id ? "font-semibold text-text-dark" : "text-gray-600")}>
+                {translatedLabel || label}
+              </span>
+            </label>
+          );
+        })}
+      </RadioGroup>
+    </section>
+  );
+}
+
 interface CheckInSuccessContentProps {
-  title: string;
   from: number;
   to: number;
   encouragement?: string;
+  initialMood: MoodTypeValue;
+  onMoodChange?: (mood: MoodTypeValue) => void;
 }
 
-function CheckInSuccessContent({ title, from, to, encouragement }: CheckInSuccessContentProps) {
+function CheckInSuccessContent({
+  from,
+  to,
+  encouragement,
+  initialMood,
+  onMoodChange,
+}: CheckInSuccessContentProps) {
   return (
     <>
-      <Step1Animation title={title} from={from} to={to} />
+      <Step1Animation from={from} to={to} />
       <Step2Animation encouragement={encouragement} />
+      <MoodFollowUp initialMood={initialMood} onMoodChange={onMoodChange} />
     </>
   );
 }
@@ -329,32 +316,40 @@ function CheckInSuccessContent({ title, from, to, encouragement }: CheckInSucces
  * ```
  */
 export function useCheckInSuccessDialog({
-  title,
   from = 0,
   to = 100,
 }: UseCheckInSuccessDialogOptions) {
   const t = useTranslations("check_in");
-  const { openSuccessDialog: openDialog } = useDialog();
+  const { openSuccessDialog: openSuccess } = useDialog();
 
   const openSuccessDialog = useCallback(
-    (dynamicFrom?: number, dynamicTo?: number, encouragement?: string) => {
+    (
+      dynamicFrom?: number,
+      dynamicTo?: number,
+      encouragement?: string,
+      initialMood: MoodTypeValue = MoodType.neutral,
+      onMoodChange?: (mood: MoodTypeValue) => void
+    ) => {
       const finalFrom = dynamicFrom !== undefined ? dynamicFrom : from;
       const finalTo = dynamicTo !== undefined ? dynamicTo : to;
-      return openDialog({
+      return openSuccess({
         title: t("success_title"),
-        message: (
-          <CheckInSuccessContent
-            title={title}
-            from={finalFrom}
-            to={finalTo}
-            encouragement={encouragement}
-          />
+        content: (
+          <div className="p-4 text-text-dark">
+            <CheckInSuccessContent
+              from={finalFrom}
+              to={finalTo}
+              encouragement={encouragement}
+              initialMood={initialMood}
+              onMoodChange={onMoodChange}
+            />
+          </div>
         ),
         textAlign: "left",
         buttons: [{ label: t("success_complete"), value: "complete", variant: "orange" }],
       });
     },
-    [openDialog, title, from, to, t]
+    [openSuccess, from, to, t]
   );
 
   return { openSuccessDialog };

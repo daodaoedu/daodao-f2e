@@ -66,6 +66,10 @@ export interface PracticeSummary {
   practiceId: string;
   /** 實踐名稱（標題，最多 50 字） */
   practiceName: string;
+  /** 所屬場次名稱（若為 cohort 實踐） */
+  cohortName?: string;
+  /** 所屬組織名稱（若為 cohort 實踐） */
+  organizationName?: string;
   /** 實踐內容描述（最多 50 字） */
   practiceDescription?: string;
   /** 實踐開始日期 (YYYY-MM-DD) */
@@ -293,7 +297,7 @@ const CHECKINS_PAGE_SIZE = 100;
 /** 摘要分頁抓取的頁數上限（最多 1,000 筆），避免異常資料造成大量請求 */
 const MAX_CHECKIN_PAGES_FOR_SUMMARY = 10;
 
-type PracticeCheckIn = NonNullable<PracticeCheckInsResponse["data"]>[number];
+export type PracticeCheckIn = NonNullable<PracticeCheckInsResponse["data"]>[number];
 
 /**
  * 分頁取回實踐的全部打卡記錄（供摘要統計用）
@@ -463,6 +467,9 @@ export const getPracticeSummary = async (
       userPhotoURL: practice.user?.photoURL,
       practiceId: practice.id,
       practiceName: truncateText(practice.title, 50),
+      cohortName: (practice as typeof practice & { cohortName?: string }).cohortName,
+      organizationName: (practice as typeof practice & { organizationName?: string })
+        .organizationName,
       practiceDescription: truncateText(practice.practiceAction, 50),
       startDate: practice.startDate ?? "",
       endDate: practice.endDate ?? "",
@@ -477,6 +484,27 @@ export const getPracticeSummary = async (
   } catch (error) {
     const message = error instanceof Error ? error.message : "獲取摘要失敗";
     return { data: null, error: message };
+  }
+};
+
+/**
+ * 獲取實踐的完整打卡時間軸（供總結頁日曆／照片足跡使用）
+ * @description 分頁抓取全部打卡記錄，依日期排序由舊到新
+ * @param practiceId 實踐 ID
+ * @returns 打卡記錄列表或錯誤
+ */
+export const getPracticeCheckInTimeline = async (
+  practiceId: string
+): Promise<{ data: PracticeCheckIn[]; error: string | null }> => {
+  try {
+    const checkIns = await fetchAllCheckInsForSummary(practiceId);
+    const sorted = [...checkIns].sort(
+      (a, b) => new Date(a.checkinDate).getTime() - new Date(b.checkinDate).getTime()
+    );
+    return { data: sorted, error: null };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "獲取打卡時間軸失敗";
+    return { data: [], error: message };
   }
 };
 
