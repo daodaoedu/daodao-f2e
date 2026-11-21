@@ -29,11 +29,13 @@ export const useChatMembers = (roomId: number | null) =>
     { revalidateOnFocus: false }
   );
 
-/** 歷史訊息（初始載入，不帶 after/since） */
-export const useChatMessageHistory = (roomId: number | null) =>
+/** 歷史訊息（初始載入；有未讀訊息時載入至第一則未讀訊息） */
+export const useChatMessageHistory = (roomId: number | null, before?: number | null) =>
   useQuery(
     "/api/v1/chat-rooms/{roomId}/messages",
-    roomId ? { params: { path: { roomId } } } : null,
+    roomId && before !== null
+      ? { params: { path: { roomId }, ...(before !== undefined && { query: { before } }) } }
+      : null,
     { revalidateOnFocus: false }
   );
 

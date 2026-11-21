@@ -83,4 +83,6 @@ export interface NotificationApiItem {
   reactionType?: string;
   checkinId?: number;
   url?: string;
+  chatNotificationKind?: "mention" | "general";
+  chatRoomName?: string;
 }

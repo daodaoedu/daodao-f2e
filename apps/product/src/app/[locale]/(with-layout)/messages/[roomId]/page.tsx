@@ -8,14 +8,17 @@ import {
   markChatRoomRead,
   selectChatDelta,
   selectChatHistory,
+  selectChatMembers,
   selectChatPins,
   selectChatRoom,
   useChatMessageDelta,
   useChatMessageHistory,
+  useChatMembers,
   useChatPins,
   useChatRoom,
   useMyChatRooms,
 } from "@daodao/api";
+import type { MentionCandidate } from "@daodao/features-mention";
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -51,6 +54,21 @@ export default function ChatRoomPage() {
   const room = selectChatRoom(roomData);
   // 訊息 author.userId 是內部 users.id；/users/me 只給 UUID，所以用聊天室詳情的 viewerUserId 判斷本人訊息
   const viewerUserId = room?.viewerUserId ?? null;
+  const { data: membersData } = useChatMembers(roomId || null);
+  const isHost = room?.viewerRole === "host";
+  const mentionCandidates = useMemo<MentionCandidate[]>(() => {
+    const candidates = selectChatMembers(membersData)
+      .filter((member) => member.userId !== viewerUserId)
+      .map((member) => ({
+        userId: String(member.userId),
+        numericUserId: member.userId,
+        name: member.nickname ?? t("deleted_user"),
+        photoURL: member.avatar ?? undefined,
+      }));
+
+    candidates.unshift({ userId: "all", numericUserId: 0, name: "all", photoURL: undefined });
+    return candidates;
+  }, [membersData, viewerUserId, t]);
   const { mutate: mutateRooms } = useMyChatRooms();
   const { data: pinsData, mutate: mutatePins } = useChatPins(roomId || null);
 
@@ -58,7 +76,10 @@ export default function ChatRoomPage() {
     data: historyData,
     isLoading: historyLoading,
     mutate: mutateHistory,
-  } = useChatMessageHistory(roomId || null);
+  } = useChatMessageHistory(
+    room ? roomId || null : null,
+    room?.firstUnreadMessageId != null ? room.firstUnreadMessageId + 1 : undefined
+  );
 
   const historyMessages: ChatMessageType[] = useMemo(
     () => selectChatHistory(historyData),
@@ -88,7 +109,6 @@ export default function ChatRoomPage() {
   const [showMembers, setShowMembers] = useState(false);
   const [showPins, setShowPins] = useState(false);
 
-  const isHost = room?.viewerRole === "host";
   const pinnedCount = selectChatPins(pinsData).length;
 
   useEffect(() => {
@@ -222,6 +242,7 @@ export default function ChatRoomPage() {
                 isLoading={historyLoading}
                 isHost={isHost}
                 viewerUserId={viewerUserId}
+                mentionCandidates={mentionCandidates}
                 onReply={handleReply}
                 onEdit={handleEdit}
                 onDelete={setDeleteTarget}
@@ -243,6 +264,8 @@ export default function ChatRoomPage() {
           </div>
           <ChatInput
             roomId={roomId}
+            isHost={isHost}
+            mentionCandidates={mentionCandidates}
             replyTo={replyTo}
             editingMessage={editingMessage}
             onClearReply={() => setReplyTo(null)}

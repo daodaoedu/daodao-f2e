@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Group chat email notification preview</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #17383b;
+        background: #f2f8f8;
+      }
+
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; }
+      button { font: inherit; }
+
+      .preview-shell { width: min(100% - 32px, 760px); margin: 40px auto; }
+      .preview-heading { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 20px; }
+      .eyebrow { margin: 0 0 6px; color: #0a9998; font-size: 12px; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+      h1 { margin: 0; font-size: clamp(22px, 4vw, 30px); letter-spacing: -.035em; }
+      .subtitle { margin: 7px 0 0; color: #718d90; font-size: 14px; line-height: 1.5; }
+      .schedule-pill { flex: 0 0 auto; padding: 8px 12px; border: 1px solid #cfe4e3; border-radius: 999px; color: #527579; background: #fff; font-size: 12px; }
+
+      .toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+      .segmented { display: inline-flex; gap: 3px; padding: 4px; border: 1px solid #d8e8e7; border-radius: 12px; background: #e9f2f2; }
+      .segmented button { min-height: 36px; padding: 0 13px; border: 0; border-radius: 9px; color: #5d7c7e; background: transparent; cursor: pointer; font-size: 13px; font-weight: 650; }
+      .segmented button[aria-pressed="true"] { color: #17383b; background: #fff; box-shadow: 0 1px 3px #183c3e18; }
+
+      .mail-window { overflow: hidden; border: 1px solid #dce9e8; border-radius: 18px; background: #eaf2f2; box-shadow: 0 18px 48px #1d555412; }
+      .mail-chrome { display: flex; align-items: center; gap: 7px; height: 38px; padding: 0 14px; border-bottom: 1px solid #dce9e8; color: #759092; font-size: 11px; }
+      .dot { width: 8px; height: 8px; border-radius: 50%; background: #d4e5e4; }
+      .mail-chrome span:last-child { margin-left: 6px; }
+      .mail-paper { width: min(100%, 620px); margin: 22px auto; overflow: hidden; border: 1px solid #e5eded; border-radius: 12px; background: #fff; box-shadow: 0 5px 18px #183c3e0c; }
+      .brand-bar { height: 7px; background: linear-gradient(90deg, #12b8b5 0 76%, #ffa53a 76%); }
+      .mail-content { padding: 30px 34px 24px; }
+      .brand { display: flex; align-items: center; gap: 9px; margin-bottom: 25px; color: #17383b; font-size: 16px; font-weight: 800; letter-spacing: -.02em; }
+      .brand-mark { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 10px; color: #fff; background: #12b8b5; font-size: 15px; }
+      .mail-subject { margin: 0 0 7px; color: #789194; font-size: 12px; font-weight: 650; }
+      h2 { margin: 0; color: #17383b; font-size: 24px; letter-spacing: -.035em; line-height: 1.25; }
+      .intro { margin: 18px 0 22px; color: #48676a; font-size: 15px; line-height: 1.75; }
+      .event-card { padding: 18px 20px; border: 1px solid #d8eceb; border-left: 4px solid #13b8b5; border-radius: 10px; background: #f5fbfb; }
+      .event-kicker { margin: 0 0 8px; color: #118f8e; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+      .event-copy { margin: 0; color: #284c4f; font-size: 15px; line-height: 1.7; }
+      .event-copy strong { color: #17383b; }
+      .private-note { margin: 8px 0 0; color: #789194; font-size: 12px; }
+      .cta-wrap { margin: 25px 0 0; text-align: center; }
+      .cta { display: inline-block; padding: 12px 21px; border-radius: 9px; color: white; background: #11aaa8; font-size: 14px; font-weight: 750; text-decoration: none; }
+      .fine-print { margin: 25px 0 0; padding-top: 17px; border-top: 1px solid #e6eeee; color: #81999b; font-size: 11px; line-height: 1.7; text-align: center; }
+      .fine-print a { color: #527579; text-decoration: underline; text-underline-offset: 2px; }
+      .design-note { margin: 13px 3px 0; color: #7b9496; font-size: 12px; line-height: 1.6; }
+
+      @media (max-width: 560px) {
+        .preview-shell { width: min(100% - 22px, 760px); margin: 24px auto; }
+        .preview-heading { align-items: start; flex-direction: column; gap: 10px; }
+        .toolbar { align-items: stretch; flex-direction: column; }
+        .segmented { width: 100%; }
+        .segmented button { flex: 1; padding-inline: 8px; }
+        .mail-paper { margin: 10px auto; border-radius: 9px; }
+        .mail-content { padding: 24px 20px 20px; }
+        h2 { font-size: 21px; }
+        .event-card { padding: 15px 15px; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="preview-shell">
+      <header class="preview-heading">
+        <div>
+          <p class="eyebrow">Email template preview</p>
+          <h1>Group chat notifications</h1>
+          <p class="subtitle">A concise digest entry for a mention or a new message.</p>
+        </div>
+        <span class="schedule-pill">Sent with the existing 4-hour digest</span>
+      </header>
+
+      <div class="toolbar" aria-label="Preview controls">
+        <div class="segmented" role="group" aria-label="Notification type">
+          <button type="button" data-kind="mention" aria-pressed="true">Mention</button>
+          <button type="button" data-kind="general" aria-pressed="false">New message</button>
+        </div>
+        <div class="segmented" role="group" aria-label="Language">
+          <button type="button" data-locale="en" aria-pressed="true">English</button>
+          <button type="button" data-locale="zh-TW" aria-pressed="false">繁體中文</button>
+        </div>
+      </div>
+
+      <section class="mail-window" aria-label="Email preview">
+        <div class="mail-chrome"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span>Notification digest · preview</span></div>
+        <article class="mail-paper">
+          <div class="brand-bar"></div>
+          <div class="mail-content">
+            <div class="brand"><span class="brand-mark">島</span><span data-copy="brand">Dao Dao</span></div>
+            <p class="mail-subject" data-copy="subject">Group chat notification</p>
+            <h2 data-copy="heading">You were mentioned in a group chat</h2>
+            <p class="intro"><span data-copy="greeting">Hi Yuki,</span> <span data-copy="intro">there’s an update in your group chat.</span></p>
+            <div class="event-card">
+              <p class="event-kicker" data-copy="kicker">You were mentioned</p>
+              <p class="event-copy" data-copy="event"><strong>Pei</strong> mentioned you in the <strong>Test cohort</strong> group chat.</p>
+              <p class="private-note" data-copy="privateNote">Message content is kept out of this email.</p>
+            </div>
+            <p class="cta-wrap"><a class="cta" href="https://app-dev.daodao.so/en/messages/350298" data-copy="cta">Open chat</a></p>
+            <p class="fine-print"><span data-copy="schedule">Group chat notifications are included in the regular notification digest.</span><br /><a href="#" data-copy="settings">Manage email preferences</a> · <a href="#" data-copy="unsubscribe">Unsubscribe</a></p>
+          </div>
+        </article>
+      </section>
+      <p class="design-note">Preview data: Yuki · Pei · Test cohort. The message body is intentionally omitted for both notification types.</p>
+    </main>
+
+    <script>
+      const copy = {
+        en: {
+          brand: "Dao Dao",
+          subject: "Group chat notification",
+          mentionHeading: "You were mentioned in a group chat",
+          generalHeading: "There’s a new group chat message",
+          greeting: "Hi Yuki,",
+          intro: "there’s an update in your group chat.",
+          mentionKicker: "You were mentioned",
+          generalKicker: "New group message",
+          mentionEvent: "<strong>Pei</strong> mentioned you in the <strong>Test cohort</strong> group chat.",
+          generalEvent: "<strong>Pei</strong> sent a new message in the <strong>Test cohort</strong> group chat.",
+          privateNote: "Message content is kept out of this email.",
+          cta: "Open chat",
+          schedule: "Group chat notifications are included in the regular notification digest.",
+          settings: "Manage email preferences",
+          unsubscribe: "Unsubscribe",
+        },
+        "zh-TW": {
+          brand: "島島阿學",
+          subject: "群組聊天室通知",
+          mentionHeading: "有人在群組聊天室提及你",
+          generalHeading: "群組聊天室有新訊息",
+          greeting: "Yuki，你好：",
+          intro: "你的群組聊天室有新動態。",
+          mentionKicker: "有人提及你",
+          generalKicker: "群組新訊息",
+          mentionEvent: "<strong>Pei</strong> 在「<strong>Test cohort</strong>」群組聊天室提及了你。",
+          generalEvent: "<strong>Pei</strong> 在「<strong>Test cohort</strong>」群組聊天室傳送了新訊息。",
+          privateNote: "這封信不會顯示訊息內容。",
+          cta: "開啟聊天室",
+          schedule: "群組聊天室通知會併入定期寄送的通知摘要。",
+          settings: "管理電子郵件通知",
+          unsubscribe: "取消訂閱",
+        },
+      };
+
+      let kind = "mention";
+      let locale = "en";
+
+      function render() {
+        const words = copy[locale];
+        const values = {
+          brand: words.brand,
+          subject: words.subject,
+          heading: kind === "mention" ? words.mentionHeading : words.generalHeading,
+          greeting: words.greeting,
+          intro: words.intro,
+          kicker: kind === "mention" ? words.mentionKicker : words.generalKicker,
+          event: kind === "mention" ? words.mentionEvent : words.generalEvent,
+          privateNote: words.privateNote,
+          cta: words.cta,
+          schedule: words.schedule,
+          settings: words.settings,
+          unsubscribe: words.unsubscribe,
+        };
+        for (const [key, value] of Object.entries(values)) {
+          const element = document.querySelector(`[data-copy="${key}"]`);
+          if (element) element.innerHTML = value;
+        }
+        document.documentElement.lang = locale;
+        document.querySelector(".cta").href = locale === "en"
+          ? "https://app-dev.daodao.so/en/messages/350298"
+          : "https://app-dev.daodao.so/zh-TW/messages/350298";
+      }
+
+      document.querySelectorAll("[data-kind]").forEach((button) => {
+        button.addEventListener("click", () => {
+          kind = button.dataset.kind;
+          document.querySelectorAll("[data-kind]").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+          render();
+        });
+      });
+      document.querySelectorAll("[data-locale]").forEach((button) => {
+        button.addEventListener("click", () => {
+          locale = button.dataset.locale;
+          document.querySelectorAll("[data-locale]").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+          render();
+        });
+      });
+      render();
+    </script>
+  </body>
+</html>
