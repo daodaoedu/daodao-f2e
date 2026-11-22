@@ -3,10 +3,13 @@
 import type { PracticeCheckInsResponse } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Link } from "@daodao/i18n/navigation";
+import { Button } from "@daodao/ui/components/button";
 import { format, isValid, parse } from "date-fns";
 import { ChevronRight } from "lucide-react";
+import { useState } from "react";
 import { MOOD_OPTIONS, MoodType, mapApiMoodToMoodType } from "@/constants/mood";
 import { useCohortViewQuery } from "@/lib/cohort-view-query";
+import { CheckInDescriptionText } from "./check-in-description-text";
 
 interface ICheckInListProps {
   practiceId: string;
@@ -18,14 +21,25 @@ const formatCheckInDate = (checkinDate: string): string => {
   return isValid(date) ? format(date, "yyyy/MM/dd") : checkinDate;
 };
 
+const CHECK_IN_NOTE_PREVIEW_LENGTH = 25;
+
+const truncateCheckInNote = (note: string): string => {
+  const characters = Array.from(note);
+  return characters.length > CHECK_IN_NOTE_PREVIEW_LENGTH
+    ? `${characters.slice(0, CHECK_IN_NOTE_PREVIEW_LENGTH).join("")}...`
+    : note;
+};
+
 /**
  * Chronological, fully readable list of check-ins. The counterpart to
  * CheckInStack for people who need to scan every entry (e.g. cohort coaches).
  */
 export const CheckInList = ({ practiceId, checkInsData }: ICheckInListProps) => {
   const t = useTranslations("check_in");
+  const tAppProduct = useTranslations("app_product");
   const cohortViewQuery = useCohortViewQuery();
   const checkIns = checkInsData?.data ?? [];
+  const [visibleCount, setVisibleCount] = useState(3);
 
   if (checkIns.length === 0) {
     return null;
@@ -33,10 +47,11 @@ export const CheckInList = ({ practiceId, checkInsData }: ICheckInListProps) => 
 
   return (
     <ol className="flex flex-col gap-2">
-      {checkIns.map((checkIn) => {
+      {checkIns.slice(0, visibleCount).map((checkIn) => {
         const mood = mapApiMoodToMoodType(checkIn.mood) ?? MoodType.neutral;
-        const Emoji = MOOD_OPTIONS.find((option) => option.id === mood)?.emoji;
-        const moodLabel = t(`moods.${mood}`);
+        const moodOption = MOOD_OPTIONS.find((option) => option.id === mood);
+        const Emoji = moodOption?.emoji;
+        const moodLabel = moodOption ? t(`moods.${mood}`) : null;
 
         return (
           <li key={checkIn.id}>
@@ -50,11 +65,11 @@ export const CheckInList = ({ practiceId, checkInsData }: ICheckInListProps) => 
                   <time dateTime={checkIn.checkinDate} className="font-medium tabular-nums">
                     {formatCheckInDate(checkIn.checkinDate)}
                   </time>
-                  <span>{moodLabel}</span>
+                  {moodLabel && <span>{moodLabel}</span>}
                 </div>
                 {checkIn.note && (
                   <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-relaxed text-text-dark">
-                    {checkIn.note}
+                    <CheckInDescriptionText content={truncateCheckInNote(checkIn.note)} />
                   </p>
                 )}
               </div>
@@ -63,6 +78,18 @@ export const CheckInList = ({ practiceId, checkInsData }: ICheckInListProps) => 
           </li>
         );
       })}
+      {checkIns.length > visibleCount && (
+        <li>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setVisibleCount((count) => count + 3)}
+            className="w-full h-auto py-3 text-sm text-[#6B8789] hover:text-text-dark/60"
+          >
+            {tAppProduct("comments_show_more")}
+          </Button>
+        </li>
+      )}
     </ol>
   );
 };

@@ -11,6 +11,8 @@ import {
 } from "@/components/check-in/form/check-in-submit-flow";
 
 interface IUseCheckInSheetOptions {
+  /** 實踐 ID（用於顯示過往打卡紀錄） */
+  practiceId: string;
   /** 任務標題 */
   taskTitle: string;
   /**
@@ -40,7 +42,12 @@ interface IUseCheckInSheetOptions {
  * openCheckInSheet();
  * ```
  */
-export function useCheckInSheet({ taskTitle, onComplete, onClose }: IUseCheckInSheetOptions) {
+export function useCheckInSheet({
+  practiceId,
+  taskTitle,
+  onComplete,
+  onClose,
+}: IUseCheckInSheetOptions) {
   const t = useTranslations("check_in");
   const { open } = useSheetManager();
   const closeRef = useRef<(() => void) | null>(null);
@@ -51,7 +58,9 @@ export function useCheckInSheet({ taskTitle, onComplete, onClose }: IUseCheckInS
       description: t("sheet_description"),
       content: (
         <CheckInSheetContent
+          practiceId={practiceId}
           taskTitle={taskTitle}
+          moodSelectionPosition="after"
           // 不先關 sheet：由 onComplete 在建立成功後呼叫 closeSheet，失敗時 sheet 與內容保留（daodao#377）
           onComplete={createSheetCompleteHandler(onComplete, () => closeRef.current)}
         />
@@ -62,7 +71,7 @@ export function useCheckInSheet({ taskTitle, onComplete, onClose }: IUseCheckInS
       onClose: onClose,
     });
     closeRef.current = close;
-  }, [taskTitle, onComplete, onClose, open, t]);
+  }, [practiceId, taskTitle, onComplete, onClose, open, t]);
 
   return { openCheckInSheet };
 }

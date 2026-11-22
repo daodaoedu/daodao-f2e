@@ -1,5 +1,4 @@
 import {
-  BoredSvg,
   FineSvg,
   FrustratedSvg,
   HappySvg,
@@ -34,11 +33,13 @@ export interface MoodOption {
 export const MOOD_OPTIONS: MoodOption[] = [
   { id: MoodType.hopeless, label: "hopeless", emoji: HopelessSvg },
   { id: MoodType.frustrated, label: "frustrated", emoji: FrustratedSvg },
-  { id: MoodType.bored, label: "bored", emoji: BoredSvg },
   { id: MoodType.neutral, label: "neutral", emoji: NeutralSvg },
   { id: MoodType.fine, label: "fine", emoji: FineSvg },
   { id: MoodType.happy, label: "happy", emoji: HappySvg },
 ];
+
+/** 新增或修改打卡時可選擇的心情 */
+export const CHECK_IN_MOOD_OPTIONS = MOOD_OPTIONS;
 
 /**
  * API mood 值類型

@@ -19,7 +19,7 @@ export const mockCheckIns: Record<string, ICheckInDisplayData> = {
   "3": {
     id: "3",
     date: "2026.01.03",
-    mood: MoodType.bored,
+    mood: MoodType.neutral,
     content: "Today I mainly practiced Vibe coding.",
     tags: ["inspired"],
     practiceTitle: "Learning Vibe coding",

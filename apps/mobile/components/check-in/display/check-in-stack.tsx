@@ -119,7 +119,7 @@ export const CheckInStack = ({ checkInsData, onCheckInPress }: ICheckInStackProp
           >
             <ShapeComponent width={width} height={height} />
             <YStack style={[styles.itemContent, { paddingBottom: contentPaddingBottom }]}>
-              <MoodIcon width={30} height={30} />
+              {MoodIcon && <MoodIcon width={30} height={30} />}
               <Text fontSize={12} color={colors.text.dark} fontWeight="500">
                 {item.date}
               </Text>

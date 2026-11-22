@@ -23,9 +23,10 @@ import type {
   IGetPracticeTemplatesParams,
   IGetRandomPracticeTemplatesParams,
   IGetUserPracticesParams,
+  PracticeCheckIn,
   PracticeSummary,
 } from "./practice";
-import { copyPractice, getPracticeSummary } from "./practice";
+import { copyPractice, getPracticeCheckInTimeline, getPracticeSummary } from "./practice";
 import { mergeCheckInPages } from "./practice-check-in-pages";
 
 export type {
@@ -304,6 +305,51 @@ export const usePracticeSummary = (
   };
 };
 
+/**
+ * 獲取實踐完整打卡時間軸的 Hook
+ * @description 用於總結頁的日曆足跡與照片足跡，依日期由舊到新排序
+ * @param practiceId 實踐 ID
+ * @param options SWR 選項
+ * @returns 打卡記錄列表和狀態
+ */
+export const usePracticeCheckInTimeline = (
+  practiceId: string | null | undefined,
+  options?: {
+    /** 是否啟用查詢（預設 true） */
+    enabled?: boolean;
+  }
+) => {
+  const normalizedId = practiceId ? String(practiceId) : null;
+  const enabled = options?.enabled !== false && !!normalizedId;
+
+  const { data, error, isLoading } = useSWR<{
+    data: PracticeCheckIn[];
+    error: string | null;
+  }>(
+    enabled ? `/api/v1/practices/${normalizedId}/checkins/timeline` : null,
+    async () => {
+      if (!normalizedId) {
+        return { data: [], error: "缺少實踐 ID" };
+      }
+      return getPracticeCheckInTimeline(normalizedId);
+    },
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      shouldRetryOnError: false,
+    }
+  );
+
+  return {
+    /** 打卡時間軸（由舊到新） */
+    checkIns: data?.data ?? [],
+    /** 錯誤訊息 */
+    error: error?.message ?? data?.error ?? null,
+    /** 是否正在載入 */
+    isLoading,
+  };
+};
+
 // ============================================================================
 // Mutation Hooks
 // ============================================================================
@@ -559,11 +605,17 @@ export const useCreatePracticeCheckIn = (practiceId: string) => {
  * @param checkInId 打卡記錄 ID
  * @returns 更新打卡記錄的函數
  */
-export const useUpdatePracticeCheckIn = (practiceId: string, checkInId: string) => {
+export const useUpdatePracticeCheckIn = (practiceId: string, checkInId?: string) => {
   const mutate = useMutate();
 
-  const updateCheckIn = async (formData: Partial<ICheckInFormData>) => {
-    const response = await updatePracticeCheckInWithFormData(practiceId, checkInId, formData);
+  const updateCheckIn = async (
+    formData: Partial<ICheckInFormData>,
+    targetCheckInId: string | undefined = checkInId
+  ) => {
+    if (!targetCheckInId) {
+      throw new Error("A check-in ID is required to update a check-in");
+    }
+    const response = await updatePracticeCheckInWithFormData(practiceId, targetCheckInId, formData);
 
     // 刷新打卡列表的 cache（使用空 query 對象來匹配所有 query 參數組合）
     await mutate([

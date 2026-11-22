@@ -269,10 +269,10 @@ export const useCohortJoinInfo = (joinToken: string) => {
   return useValidatedResponse(query, cohortJoinInfoResponseSchema);
 };
 
-export const useCohortMemberHome = (cohortId: number) => {
+export const useCohortMemberHome = (cohortId?: number) => {
   const query = useQuery(
     "/api/v1/cohorts/{cohortId}",
-    { params: { path: { cohortId } } },
+    cohortId ? { params: { path: { cohortId } } } : null,
     { keepPreviousData: false, revalidateOnFocus: true }
   );
   return useValidatedResponse(query, cohortMemberHomeResponseSchema);
