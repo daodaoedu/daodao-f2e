@@ -1,0 +1,39 @@
+# Publish approved Blog content to production
+
+This manual entry updates Website only, after checking successful CI for the exact current `prod` frontend. It does not merge the held full-publisher PR1199 or content migration PR9, and does not enable cross-repository automatic publishing.
+
+## Install before first use
+
+1. Review and merge the implementation into `dev`, then prepare a narrow release into `prod` containing the publisher, shared ownership guard and coordination lock, matching tests and the existing content contract. Do not deploy unrelated dev product changes. A dev merge alone does not install the production entry.
+2. Verify both the repository's trusted default workflow source and `prod` contain the production ownership guard. Verify `production` environment permissions/reviewers and existing SSH/registry credentials with the operator. The checked-in SSH host key must match the production host; do not use `ssh-keyscan` or disable verification as a workaround.
+3. Set `BLOG_PROD_RELEASE_MANAGED=true` only as an explicitly authorized cutover. Legacy CD will stop updating prod Website while retaining Product deployment. Keep the entry disabled until this installation and cutover are reviewed; do not change the flag during an active publication.
+4. Drain all existing legacy production CD runs, including queued and waiting runs, without cancelling another session's work. The new entry also rejects any unfinished legacy production CD found through complete paginated inventory. Recheck after CI completes because it can trigger legacy CD.
+5. Run ordinary Linode CI on the installed exact current `prod` commit. Wait for success, then wait for any resulting legacy CD to finish. PR CI, a different branch/SHA, a failed or rerunning attempt, or an unrelated workflow does not authorize publication.
+
+## Prepare an article release
+
+Prepare an isolated content branch from the official content revision currently published. Keep every existing bilingual article and identity, then add/edit complete `zh-tw` and `en` pairs and supported images. Use the shared content schema and validator supplied by the target frontend. Obtain real human editorial approval for each new/changed bilingual digest; an unchanged exact digest may retain its valid approval. Infrastructure approval does not grant editorial approval.
+
+As a separately authorized operator step, update `BLOG_PROD_CONTENT_SHA` to the full official content commit and `BLOG_PROD_APPROVALS` to the complete approved set (`id`, `digest`, `reviewer`, `evidence`). Preserve the previous values privately for recovery. Repository variables are not secrets: use public approval references, never credentials or private source data; GitHub may display variable values in Actions step metadata. Actual snapshot files and validator evidence stay outside public output and Docker context. Keep settings unchanged until the run finishes.
+
+The workflow freezes the inputs once, checks a matching successful CI attempt, stages content with the existing shared publish validator, and builds `@daodao/website`. It records frontend/content identities and pretty-route byte hashes, then builds only the Docker `website` target with a release-specific tag and deploys the registry digest. Product is not built or recreated.
+
+## Invoke and verify
+
+After the above prerequisites and release authorization, invoke:
+
+```sh
+gh workflow run blog-prod-publish.yml --repo daodaoedu/daodao-f2e --ref prod -f ci_run_id=<successful-prod-Linode-CI-run-ID>
+```
+
+There is no force input. The supplied CI run is checked against the canonical workflow ID/path, official repository, exact current `prod` SHA, branch, event and latest completed successful attempt. A missing/mismatching source, approval digest or unfinished legacy CD fails before host access.
+
+The host holds the shared production deployment lock, checks current official prod HEAD again, preserves the previous Website image, and activates only `prod_website` using frozen Compose configuration. Public HTTPS verification checks the version marker, bilingual article/index routes and images against exact hashes and MIME. It rejects removal of existing published Blog HTML routes. Nginx uses `no-transform` to prevent edge email obfuscation from changing verified HTML.
+
+Verify the Actions run and host recovery report separately. Success requires exact public content and an unchanged Product container identity. Do not call a registry push or container start a successful publication. A new public marker at `/blog-release.json` identifies both source revisions; confirm the intended article and images as well.
+
+## Failure and recovery
+
+Known deployment, public verification and handled termination failures attempt to restore the captured previous image and compare previous public bytes. Recovery success does not change the failed operation into a successful publication. If recovery is not verified, preserve the rollback image holder and private host report/configuration; inspect the recorded previous image and frozen Compose before any authorized recovery attempt. Never run global Docker pruning, reset the shared Git checkout, remove Product, switch a migration PR or set `force_deploy=true` to get past a failure.
+
+The local tests and Docker checks accompanying this implementation do not prove installation or a production publication. Record first installed run, actual frontend/content identities, public readback, failure/recovery and cleanup evidence before declaring the entry operational.

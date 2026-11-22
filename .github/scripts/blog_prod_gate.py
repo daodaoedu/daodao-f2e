@@ -1,0 +1,279 @@
+"""Authorize exact production CI and freeze private Blog release inputs."""
+
+import argparse
+import hashlib
+import importlib.util
+import json
+import os
+import re
+import stat
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+REPOSITORY = "daodaoedu/daodao-f2e"
+PREFIX = f"repos/{REPOSITORY}"
+CI_PATH = ".github/workflows/linode-ci.yml"
+ROOT = Path(__file__).resolve().parents[2]
+MAX_SNAPSHOT_BYTES = 1024 * 1024
+
+
+def preview_helper():
+    spec = importlib.util.spec_from_file_location(
+        "blog_dev_preview", Path(__file__).with_name("blog-dev-preview.py")
+    )
+    helper = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(helper)
+    return helper
+
+
+def full_sha(value):
+    if not isinstance(value, str) or not re.fullmatch(r"[a-f0-9]{40}", value):
+        raise ValueError("A full lowercase commit SHA is required")
+    return value
+
+
+def positive_id(value):
+    if not isinstance(value, str) or not re.fullmatch(r"[1-9][0-9]*", value):
+        raise ValueError("CI run ID must be a positive decimal integer")
+    return int(value)
+
+
+def canonical(value):
+    return json.dumps(value, sort_keys=True, separators=(",", ":")).encode()
+
+
+def digest(value):
+    return hashlib.sha256(value).hexdigest()
+
+
+def context(environment):
+    required = {
+        "GITHUB_REPOSITORY": REPOSITORY,
+        "GITHUB_EVENT_NAME": "workflow_dispatch",
+        "GITHUB_REF": "refs/heads/prod",
+        "BLOG_PROD_RELEASE_MANAGED": "true",
+    }
+    if any(environment.get(key) != value for key, value in required.items()):
+        raise ValueError(
+            "Only the official managed production manual workflow is allowed"
+        )
+    return full_sha(environment.get("GITHUB_SHA")), full_sha(
+        environment.get("BLOG_PROD_CONTENT_SHA")
+    )
+
+
+def official_repository(value):
+    return (
+        isinstance(value, dict)
+        and value.get("full_name") == REPOSITORY
+        and value.get("fork") is False
+    )
+
+
+def require_idle_legacy_cd(api):
+    """Reject every unfinished production legacy deployment across all pages."""
+    for page in range(1, 1001):
+        endpoint = (
+            f"{PREFIX}/actions/workflows/linode-cd.yml/runs"
+            f"?branch=prod&per_page=100&page={page}"
+        )
+        result = api(endpoint)
+        runs = result.get("workflow_runs")
+        if not isinstance(runs, list) or len(runs) > 100:
+            raise ValueError("Cannot establish legacy deployment quiescence")
+        for run in runs:
+            if not isinstance(run, dict) or run.get("status") != "completed":
+                raise ValueError("A legacy production deployment has not completed")
+        if len(runs) < 100:
+            return
+    raise ValueError("Legacy deployment inventory exceeded its bounded scan")
+
+
+def authorize(environment, ci_run_id, checkout_sha, api):
+    """Return bound release data only after every current source/CI check passes."""
+    frontend, content = context(environment)
+    run_id = positive_id(ci_run_id)
+    approvals = preview_helper().production_approvals(environment)
+    if checkout_sha != frontend:
+        raise ValueError("Frontend checkout differs from the workflow revision")
+    current = api(f"{PREFIX}/git/ref/heads/prod")
+    if current.get("object", {}).get("sha") != frontend:
+        raise ValueError("Production source advanced; start a new release")
+    workflow = api(f"{PREFIX}/actions/workflows/linode-ci.yml")
+    workflow_id = workflow.get("id")
+    if (
+        type(workflow_id) is not int
+        or workflow_id <= 0
+        or workflow.get("path") != CI_PATH
+        or workflow.get("state") != "active"
+    ):
+        raise ValueError("Canonical production CI workflow is unavailable")
+    # Read the run itself, not a cached list or the workflow's display name.
+    run = api(f"{PREFIX}/actions/runs/{run_id}")
+    if (
+        run.get("id") != run_id
+        or run.get("workflow_id") != workflow_id
+        or run.get("path") != CI_PATH
+        or not official_repository(run.get("repository"))
+        or not official_repository(run.get("head_repository"))
+        or run.get("head_branch") != "prod"
+        or run.get("head_sha") != frontend
+        or run.get("event") not in ("push", "workflow_dispatch")
+        or run.get("status") != "completed"
+        or run.get("conclusion") != "success"
+        or type(run.get("run_attempt")) is not int
+        or run["run_attempt"] <= 0
+    ):
+        raise ValueError("The exact official production revision needs successful CI")
+    require_idle_legacy_cd(api)
+    approvals_digest = digest(canonical(approvals))
+    return {
+        "schema_version": 1,
+        "frontend_sha": frontend,
+        "content_sha": content,
+        "ci_run_id": run_id,
+        "ci_run_attempt": run["run_attempt"],
+        "approvals": approvals,
+        "approvals_sha256": approvals_digest,
+        "release_id": f"blog-{frontend}-{content}-{approvals_digest[:16]}",
+    }
+
+
+def check_snapshot(snapshot, environment, checkout_sha, api):
+    if not isinstance(snapshot, dict):
+        raise TypeError("Release snapshot must be an object")
+    current = authorize(
+        environment, str(snapshot.get("ci_run_id", "")), checkout_sha, api
+    )
+    if current != snapshot:
+        raise ValueError("Release inputs or CI attempt changed; start a new release")
+    return snapshot
+
+
+def private_runner_directory(environment):
+    helper = preview_helper()
+    workspace = helper.directory(environment, "GITHUB_WORKSPACE")
+    temporary = helper.directory(environment, "RUNNER_TEMP")
+    if temporary.is_relative_to(workspace):
+        raise ValueError("Release snapshot must remain outside the frontend workspace")
+    return temporary
+
+
+def write_snapshot(snapshot, environment):
+    temporary = private_runner_directory(environment)
+    directory = Path(tempfile.mkdtemp(prefix="blog-prod-release-", dir=temporary))
+    path = directory / "release.json"
+    with path.open("xb") as output:
+        os.chmod(path, 0o600)
+        output.write(canonical(snapshot))
+    return path
+
+
+def read_snapshot(path, environment, expected_sha256=None):
+    temporary = private_runner_directory(environment)
+    path = Path(path)
+    if (
+        not path.is_absolute()
+        or path.is_symlink()
+        or path.resolve(strict=True) != path
+        or not path.is_relative_to(temporary)
+        or not path.is_file()
+        or path.stat().st_uid != os.getuid()
+        or stat.S_IMODE(path.stat().st_mode) != 0o600
+        or stat.S_IMODE(path.parent.stat().st_mode) != 0o700
+        or path.stat().st_size > MAX_SNAPSHOT_BYTES
+    ):
+        raise ValueError("A private regular runner snapshot is required")
+    data = path.read_bytes()
+    if expected_sha256 is not None and (
+        not re.fullmatch(r"[a-f0-9]{64}", expected_sha256)
+        or digest(data) != expected_sha256
+    ):
+        raise ValueError("Release snapshot hash differs from the authorized input")
+    return json.loads(data)
+
+
+def public_outputs(snapshot, path):
+    values = {
+        "frontend-sha": snapshot["frontend_sha"],
+        "content-sha": snapshot["content_sha"],
+        "release-id": snapshot["release_id"],
+        "snapshot": str(path),
+        "snapshot-sha256": digest(path.read_bytes()),
+    }
+    if any("\n" in value or "\r" in value for value in values.values()):
+        raise ValueError("Invalid output value")
+    return "".join(f"{key}={value}\n" for key, value in values.items())
+
+
+def github_api(endpoint):
+    result = subprocess.run(
+        ["gh", "api", "--hostname", "github.com", endpoint],
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    return json.loads(result.stdout)
+
+
+def checkout_revision(environment):
+    root = preview_helper().directory(environment, "GITHUB_WORKSPACE")
+    result = subprocess.run(
+        ["git", "-c", "core.hooksPath=/dev/null", "rev-parse", "--verify", "HEAD"],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=10,
+    )
+    return full_sha(result.stdout.strip())
+
+
+def stage_snapshot(snapshot, environment):
+    """Use only the frozen approvals when invoking the existing shared staging helper."""
+    staged_environment = dict(environment)
+    staged_environment.update(
+        {
+            "BRANCH_NAME": "prod",
+            "BLOG_PROD_CONTENT_SHA": snapshot["content_sha"],
+            "BLOG_PROD_APPROVALS": canonical(snapshot["approvals"]).decode(),
+        }
+    )
+    preview_helper().prepare(staged_environment, snapshot["content_sha"])
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    operations = parser.add_subparsers(dest="operation", required=True)
+    prepare = operations.add_parser("prepare")
+    prepare.add_argument("--ci-run-id", required=True)
+    for operation in ("check", "stage"):
+        action = operations.add_parser(operation)
+        action.add_argument("--snapshot", required=True)
+        action.add_argument("--snapshot-sha256", required=True)
+    args = parser.parse_args()
+    environment = os.environ
+    checkout = checkout_revision(environment)
+    if args.operation == "prepare":
+        snapshot = authorize(environment, args.ci_run_id, checkout, github_api)
+        path = write_snapshot(snapshot, environment)
+        with Path(environment["GITHUB_OUTPUT"]).open("a") as output:
+            output.write(public_outputs(snapshot, path))
+    else:
+        snapshot = read_snapshot(args.snapshot, environment, args.snapshot_sha256)
+        check_snapshot(snapshot, environment, checkout, github_api)
+        if args.operation == "stage":
+            stage_snapshot(snapshot, environment)
+    print("Production release gate passed")
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except (TypeError, ValueError, OSError, subprocess.SubprocessError):
+        # Never echo approvals, request payloads or API response bodies to logs.
+        print("Production release gate rejected the request", file=sys.stderr)
+        sys.exit(1)

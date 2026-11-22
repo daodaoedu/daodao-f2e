@@ -138,16 +138,17 @@ jobs:
             echo "⏭️  Product skipped (no changes)"
           fi
 
-      - name: Select legacy dev website ownership
+      - name: Select legacy website ownership
         id: ownership
         env:
           BRANCH_NAME: ${{ env.BRANCH_NAME }}
           BLOG_DEV_RELEASE_MANAGED: ${{ vars.BLOG_DEV_RELEASE_MANAGED }}
+          BLOG_PROD_RELEASE_MANAGED: ${{ vars.BLOG_PROD_RELEASE_MANAGED }}
           REQUESTED: ${{ steps.changes.outputs.website }}
           TRUSTED_WORKFLOW_SHA: ${{ github.workflow_sha }}
         run: |
-          # Job vars are snapshots, not a live lease. Set true and drain old dev CD before cutover.
-          if [ "$BRANCH_NAME" = "dev" ]; then
+          # Job vars are snapshots, not a live lease. Set managed ownership and drain old CD before each channel cutover.
+          if [ "$BRANCH_NAME" = "dev" ] || [ "$BRANCH_NAME" = "prod" ]; then
             if ! [[ "$TRUSTED_WORKFLOW_SHA" =~ ^[a-f0-9]{40}$ ]]; then
               echo 'Invalid trusted workflow source SHA' >&2
               exit 1
@@ -160,7 +161,7 @@ jobs:
             GIT_NO_REPLACE_OBJECTS=1 git -c core.hooksPath=/dev/null -c core.fsmonitor=false show "$TRUSTED_WORKFLOW_SHA:.github/scripts/blog-cd-ownership.py" > "$trusted_helper"
             python3 "$trusted_helper" --branch "$BRANCH_NAME" --requested "$REQUESTED"
           else
-            # Old prod/feature source does not need the newly introduced helper.
+            # Other channels retain their legacy ownership decision.
             printf 'website=%s\ndev=false\nmanaged=false\n' "$REQUESTED" >> "$GITHUB_OUTPUT"
           fi
 
@@ -532,30 +533,32 @@ jobs:
     outputs:
       website: ${{ steps.ownership.outputs.website }}
       dev-branch: ${{ steps.ownership.outputs.dev }}
+      controlled-branch: ${{ steps.ownership.outputs.controlled }}
       product: ${{ needs.build-product.result == 'success' }}
     permissions:
       contents: write
     steps:
       - name: Checkout trusted workflow ownership helper
         id: ownership-source
-        if: env.BRANCH_NAME == 'dev'
+        if: env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'prod'
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: ${{ github.workflow_sha }}
           persist-credentials: false
 
-      - name: Select legacy dev website ownership
+      - name: Select legacy website ownership
         id: ownership
         env:
           BRANCH_NAME: ${{ env.BRANCH_NAME }}
           BLOG_DEV_RELEASE_MANAGED: ${{ vars.BLOG_DEV_RELEASE_MANAGED }}
+          BLOG_PROD_RELEASE_MANAGED: ${{ vars.BLOG_PROD_RELEASE_MANAGED }}
           REQUESTED: ${{ needs.build-website.result == 'success' }}
         run: |
-          # Job vars are snapshots, not a live lease. Set true and drain old dev CD before cutover.
-          if [ "$BRANCH_NAME" = "dev" ]; then
+          # Job vars are snapshots, not a live lease. Set managed ownership and drain old CD before each channel cutover.
+          if [ "$BRANCH_NAME" = "dev" ] || [ "$BRANCH_NAME" = "prod" ]; then
             python3 .github/scripts/blog-cd-ownership.py --branch "$BRANCH_NAME" --requested "$REQUESTED"
           else
-            # Old prod/feature source does not need the newly introduced helper.
+            # Other channels retain their legacy ownership decision.
             printf 'website=%s\ndev=false\nmanaged=false\n' "$REQUESTED" >> "$GITHUB_OUTPUT"
           fi
 
@@ -599,10 +602,10 @@ jobs:
           ssh -o StrictHostKeyChecking=no root@$LINODE_INSTANCE_IP "mkdir -p /root/daodao-f2e"
 
           # 創建 .env.prod
-          echo "$ENV_PROD" | ssh -o StrictHostKeyChecking=no root@$LINODE_INSTANCE_IP "cat > /root/daodao-f2e/.env.prod && chmod 600 /root/daodao-f2e/.env.prod"
+          echo "$ENV_PROD" | ssh -o StrictHostKeyChecking=no root@$LINODE_INSTANCE_IP "flock -w 600 /var/lock/daodao-production-deploy.lock sh -c 'umask 077; cat > /root/daodao-f2e/.env.prod && chmod 600 /root/daodao-f2e/.env.prod'"
 
           # 創建 .env.dev
-          echo "$ENV_DEV" | ssh -o StrictHostKeyChecking=no root@$LINODE_INSTANCE_IP "cat > /root/daodao-f2e/.env.dev && chmod 600 /root/daodao-f2e/.env.dev"
+          echo "$ENV_DEV" | ssh -o StrictHostKeyChecking=no root@$LINODE_INSTANCE_IP "flock -w 600 /var/lock/daodao-production-deploy.lock sh -c 'umask 077; cat > /root/daodao-f2e/.env.dev && chmod 600 /root/daodao-f2e/.env.dev'"
 
           echo "✅ Environment files created on Linode"
 
@@ -625,6 +628,11 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o ConnectTimeout=10 root@$LINODE_INSTANCE_IP << ENDSSH
             set -e
+            # Serialize production host mutations with the dedicated Blog publisher.
+            if [ "${APP_ENV}" = "prod" ]; then
+              exec 9>/var/lock/daodao-production-deploy.lock
+              flock -w 600 9
+            fi
             export APP_DIR=/root/daodao-f2e
             export COMPOSE_FILE=docker-compose.yaml
             export APP_ENV=${APP_ENV}
@@ -784,7 +792,7 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     needs: [deploy, build-website, build-product]
-    if: ${{ always() && needs.deploy.result == 'success' && ((needs.deploy.outputs.dev-branch == 'true' && (needs.deploy.outputs.website == 'true' || needs.build-product.result == 'success')) || (needs.deploy.outputs.dev-branch != 'true' && needs.build-website.result == 'success' && needs.build-product.result == 'success')) }}
+    if: ${{ always() && needs.deploy.result == 'success' && ((needs.deploy.outputs.controlled-branch == 'true' && (needs.deploy.outputs.website == 'true' || needs.build-product.result == 'success')) || (needs.deploy.outputs.controlled-branch != 'true' && needs.build-website.result == 'success' && needs.build-product.result == 'success')) }}
     timeout-minutes: 10
     steps:
       - name: Set up SSH
@@ -888,7 +896,7 @@ jobs:
     timeout-minutes: 10
     needs: [detect-changes, deploy, verify]
     # 僅在 deploy 成功且 verify 成功（或被跳過但非失敗）時更新；避免部分部署失敗卻前移 ref 導致下次增量檢測遺漏
-    if: ${{ always() && needs.deploy.result == 'success' && needs.verify.result != 'failure' && needs.verify.result != 'cancelled' && (needs.deploy.outputs.dev-branch != 'true' || needs.detect-changes.outputs.build-website != 'true' || needs.deploy.outputs.website == 'true') }}
+    if: ${{ always() && needs.deploy.result == 'success' && needs.verify.result != 'failure' && needs.verify.result != 'cancelled' && (needs.deploy.outputs.controlled-branch != 'true' || needs.detect-changes.outputs.build-website != 'true' || needs.deploy.outputs.website == 'true') }}
     permissions:
       contents: write
     steps:

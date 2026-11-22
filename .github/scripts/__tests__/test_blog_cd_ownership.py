@@ -32,7 +32,12 @@ def context(branch="dev", managed="true"):
         "needs.build-product.result": "success",
         "needs.deploy.result": "success",
         "needs.verify.result": "success",
-        "needs.deploy.outputs.website": "false",
+        "needs.deploy.outputs.website": "false"
+        if branch == "dev" and managed.lower() not in ("", "false")
+        else "true",
+        "needs.deploy.outputs.controlled-branch": "true"
+        if branch in ("dev", "prod")
+        else "false",
         "needs.deploy.outputs.dev-branch": "true" if branch == "dev" else "false",
         "steps.ownership.outputs.website": "false",
         "inputs.app": "all",
@@ -81,7 +86,9 @@ class BlogCdOwnershipTests(unittest.TestCase):
     def step(self, job, identifier):
         return next(s for s in self.jobs[job]["steps"] if s.get("id") == identifier)
 
-    def run_policy_shell(self, job, branch, flag, requested=True, helper_present=True):
+    def run_policy_shell(
+        self, job, branch, flag, requested=True, helper_present=True, production_flag=""
+    ):
         step = self.step(job, "ownership")
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -91,7 +98,7 @@ class BlogCdOwnershipTests(unittest.TestCase):
                 target.write_bytes(HELPER.read_bytes())
             trusted_sha = "a" * 40
             mutable_sentinel = root / "mutable-helper-executed"
-            if helper_present and job == "detect-changes" and branch == "dev":
+            if helper_present and job == "detect-changes" and branch in ("dev", "prod"):
                 for args in [
                     ["init", "-q"],
                     ["add", ".github/scripts/blog-cd-ownership.py"],
@@ -117,7 +124,7 @@ class BlogCdOwnershipTests(unittest.TestCase):
                     + ").touch()\nraise SystemExit(75)\n"
                 )
             mutable_head = trusted_sha
-            if helper_present and job == "detect-changes" and branch == "dev":
+            if helper_present and job == "detect-changes" and branch in ("dev", "prod"):
                 for args in [
                     ["add", ".github/scripts/blog-cd-ownership.py"],
                     [
@@ -153,6 +160,7 @@ class BlogCdOwnershipTests(unittest.TestCase):
                 "TRUSTED_WORKFLOW_SHA": trusted_sha,
                 "RUNNER_TEMP": str(temporary),
                 "BLOG_DEV_RELEASE_MANAGED": flag,
+                "BLOG_PROD_RELEASE_MANAGED": production_flag,
                 "REQUESTED": str(requested).lower(),
                 "GITHUB_OUTPUT": str(output),
                 "PATH": str(bin_dir) + os.pathsep + os.environ["PATH"],
@@ -169,7 +177,7 @@ class BlogCdOwnershipTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertFalse(sentinel.exists())
             self.assertFalse(mutable_sentinel.exists())
-            if helper_present and job == "detect-changes" and branch == "dev":
+            if helper_present and job == "detect-changes" and branch in ("dev", "prod"):
                 self.assertEqual(
                     subprocess.check_output(
                         ["git", "-C", str(root), "rev-parse", "HEAD"], text=True
@@ -213,9 +221,28 @@ class BlogCdOwnershipTests(unittest.TestCase):
                                 output["dev"], str(branch == "dev").lower()
                             )
 
+    def test_actual_production_managed_guard_preserves_product_scope(self):
+        for job in ("detect-changes", "deploy"):
+            for flag in ("true", "TRUE", "unknown"):
+                with self.subTest(job=job, flag=flag):
+                    result = self.run_policy_shell(
+                        job, "prod", "false", production_flag=flag
+                    )
+                    self.assertEqual(result["website"], "false")
+                    self.assertEqual(result["controlled"], "true")
+                    self.assertEqual(
+                        self.step(job, "ownership")["env"]["BLOG_PROD_RELEASE_MANAGED"],
+                        "${{ vars.BLOG_PROD_RELEASE_MANAGED }}",
+                    )
+        data = context("prod")
+        data["needs.build-website.result"] = "skipped"
+        data["needs.deploy.outputs.website"] = "false"
+        self.assertTrue(workflow_condition(self.jobs["verify"]["if"], data))
+        self.assertFalse(workflow_condition(self.jobs["update-deploy-ref"]["if"], data))
+
     def test_nondev_older_checkout_does_not_require_the_new_helper(self):
         for job in ["detect-changes", "deploy"]:
-            for branch in ["prod", "feat/example", "DEV"]:
+            for branch in ["feat/example", "DEV"]:
                 self.assertEqual(
                     self.run_policy_shell(job, branch, "true", helper_present=False)[
                         "website"
@@ -264,9 +291,9 @@ class BlogCdOwnershipTests(unittest.TestCase):
             )
         )
 
-    def test_prod_job_has_no_new_helper_checkout_dependency(self):
+    def test_prod_job_uses_the_trusted_ownership_helper(self):
         checkout = self.step("deploy", "ownership-source")
-        self.assertFalse(workflow_condition(checkout["if"], context("prod")))
+        self.assertTrue(workflow_condition(checkout["if"], context("prod")))
         self.assertEqual(checkout["with"]["ref"], "${{ github.workflow_sha }}")
         self.assertFalse(checkout["with"]["persist-credentials"])
 
@@ -276,7 +303,7 @@ class BlogCdOwnershipTests(unittest.TestCase):
         self.assertTrue(workflow_condition(self.jobs["verify"]["if"], data))
         data["needs.build-product.result"] = "failure"
         self.assertFalse(workflow_condition(self.jobs["verify"]["if"], data))
-        for branch in ["prod", "feat/example"]:
+        for branch in ["feat/example"]:
             data = context(branch)
             self.assertTrue(workflow_condition(self.jobs["verify"]["if"], data))
             data["needs.build-website.result"] = "skipped"
