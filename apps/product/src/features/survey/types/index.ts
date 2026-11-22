@@ -42,6 +42,10 @@ export interface SurveyConfig {
 export interface SurveyWithQuestions extends Survey {
   questions: SurveyQuestion[];
   coverUrl?: string;
+  logoUrl?: string;
+  managedVersion?: number;
+  isPublic?: boolean;
+  hasResponded?: boolean;
   cohortFeedback?: {
     state: "login_required" | "ineligible" | "ready" | "completed";
     privacyNotice: string;
@@ -55,6 +59,11 @@ export interface SurveyQuestion {
   surveyId: string;
   questionText: string;
   questionType: QuestionType;
+  inputType?: "text" | "textarea" | "email" | "url";
+  scaleMin?: number | null;
+  scaleMax?: number | null;
+  scaleMinLabel?: string | null;
+  scaleMaxLabel?: string | null;
   options: QuestionOption[];
   isRequired: boolean;
   conditions: Condition[];

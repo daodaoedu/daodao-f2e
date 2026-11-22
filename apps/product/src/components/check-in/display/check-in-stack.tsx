@@ -18,6 +18,7 @@ import {
   type MoodType as MoodTypeType,
   mapApiMoodToMoodType,
 } from "@/constants/mood";
+import { useCohortViewQuery } from "@/lib/cohort-view-query";
 import type { IBodyPosition, ICheckInItem, ISvgGeometry } from "../types";
 import { computeBodyDisplayLeft } from "./check-in-stack-utils";
 
@@ -279,6 +280,7 @@ interface ICheckInStackProps {
 
 export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const cohortViewQuery = useCohortViewQuery();
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const svgRefsRef = useRef<(SVGSVGElement | null)[]>([]);
   const bodiesRef = useRef<Matter.Body[]>([]);
@@ -637,7 +639,7 @@ export const CheckInStack = ({ practiceId, checkInsData }: ICheckInStackProps) =
           return (
             <Link
               key={id}
-              href={`/practices/${practiceId}/check-ins/${item.id}`}
+              href={`/practices/${practiceId}/check-ins/${item.id}${cohortViewQuery}`}
               className="absolute cursor-pointer hover:shadow-2xl"
               style={{
                 width: w,

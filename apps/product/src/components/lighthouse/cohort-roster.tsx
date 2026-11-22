@@ -9,9 +9,11 @@ import {
   rotateLighthouseJoinToken,
   useLighthouseCohort,
   useLighthouseCohortEnrollments,
+  useMutate,
 } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
+import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Input } from "@daodao/ui/components/input";
 import { toast } from "@daodao/ui/components/sonner";
 import { Textarea } from "@daodao/ui/components/textarea";
@@ -74,6 +76,7 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
   const [resendTarget, setResendTarget] = useState<{ id: number; email: string } | null>(null);
   const cohortQuery = useLighthouseCohort(programId, cohortId);
   const enrollmentQuery = useLighthouseCohortEnrollments(programId, cohortId);
+  const mutate = useMutate();
   const cohort = cohortQuery.data?.data;
   const enrollments = enrollmentQuery.data?.data;
   const joinUrl = useJoinUrl(cohort?.joinToken);
@@ -92,7 +95,7 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
   async function confirm(title: string, message: string, actionLabel: string, danger = false) {
     const result = await openWarningDialog({
       title,
-      message,
+      message: danger ? <span className="dark:text-foreground">{message}</span> : message,
       buttons: [
         { label: t("cancel"), value: "cancel", variant: "outline" },
         { label: actionLabel, value: "ok", variant: danger ? "orange" : "default" },
@@ -192,7 +195,37 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
       toast.error(t("member_remove_failed"));
       return;
     }
-    await enrollmentQuery.mutate();
+    // Clear removed practices from previously visited tabs before they revalidate.
+    // Matching path params also cover every filter/query variant of this cohort.
+    const cohortPaths = [
+      "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/enrollments",
+      "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/dashboard",
+      "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/participants",
+      "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/focus",
+      "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/feed",
+      "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/outcome",
+      "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/activities",
+      "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/participants/{userId}/practices/{practiceId}/checkins",
+    ] as const;
+    await Promise.all([
+      ...cohortPaths.map((path) =>
+        mutate([path, { params: { path: { programId, cohortId } } }], undefined, {
+          revalidate: true,
+        })
+      ),
+      ...(organization
+        ? [
+            mutate(
+              [
+                "/api/v1/lighthouse/organizations/{organizationId}/cohorts",
+                { params: { path: { organizationId: organization.id } } },
+              ],
+              undefined,
+              { revalidate: true }
+            ),
+          ]
+        : []),
+    ]);
     toast.success(t("member_removed"));
   }
 
@@ -466,6 +499,11 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
           <h2 id="roster-list-title" className="text-xl font-semibold">
             {t("roster_title")}
           </h2>
+          <Button asChild variant="outline" size="sm" className="shrink-0">
+            <CustomLink href={`/cohorts/${cohortId}?programId=${programId}`}>
+              {t("review_participant_practices")}
+            </CustomLink>
+          </Button>
           <p className="text-xs text-[#78928F]">
             {pendingCount > 0
               ? t("roster_summary", { count: memberCount, pending: pendingCount })

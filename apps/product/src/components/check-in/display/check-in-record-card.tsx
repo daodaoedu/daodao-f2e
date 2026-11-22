@@ -12,9 +12,14 @@ import type { IMoodStat } from "../types";
 interface ICheckInRecordCardProps {
   checkInsData?: PracticeCheckInsResponse;
   isLoading?: boolean;
+  hideTitle?: boolean;
 }
 
-export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInRecordCardProps) => {
+export const CheckInRecordCard = ({
+  checkInsData,
+  isLoading = false,
+  hideTitle = false,
+}: ICheckInRecordCardProps) => {
   const t = useTranslations("check_in");
   const [isExpanded, setIsExpanded] = useState(true);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -55,10 +60,10 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
   );
 
   useLayoutEffect(() => {
-    if (contentRef.current) {
+    if (!isLoading && contentRef.current) {
       setContentHeight(contentRef.current.scrollHeight);
     }
-  }, []);
+  }, [isLoading]);
 
   const handleToggle = () => {
     setIsExpanded((prev) => !prev);
@@ -74,7 +79,7 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
   if (isLoading) {
     return (
       <div>
-        <h3 className="font-medium text-text-dark mb-3">{t("record_title")}</h3>
+        {!hideTitle && <h3 className="font-medium text-text-dark mb-3">{t("record_title")}</h3>}
         <div className="bg-white rounded-lg px-4 py-2">
           <div className="text-xs text-text-dark font-medium text-center py-4">{t("loading")}</div>
         </div>
@@ -84,7 +89,7 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
 
   return (
     <div>
-      <h3 className="font-medium text-text-dark mb-3">{t("record_title")}</h3>
+      {!hideTitle && <h3 className="font-medium text-text-dark mb-3">{t("record_title")}</h3>}
       <div className="bg-white rounded-lg px-4 py-2">
         <div className="flex items-center justify-between mb-3">
           <div className="text-xs text-text-dark font-medium">{t("mood_ranking")}</div>

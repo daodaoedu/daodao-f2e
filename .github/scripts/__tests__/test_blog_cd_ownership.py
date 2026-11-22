@@ -1,4 +1,5 @@
 import os
+import re
 import subprocess
 import tempfile
 import unittest
@@ -32,7 +33,12 @@ def context(branch="dev", managed="true"):
         "needs.build-product.result": "success",
         "needs.deploy.result": "success",
         "needs.verify.result": "success",
-        "needs.deploy.outputs.website": "false",
+        "needs.deploy.outputs.website": "false"
+        if branch == "dev" and managed.lower() not in ("", "false")
+        else "true",
+        "needs.deploy.outputs.controlled-branch": "true"
+        if branch in ("dev", "prod")
+        else "false",
         "needs.deploy.outputs.dev-branch": "true" if branch == "dev" else "false",
         "steps.ownership.outputs.website": "false",
         "inputs.app": "all",
@@ -40,6 +46,132 @@ def context(branch="dev", managed="true"):
 
 
 class BlogCdOwnershipTests(unittest.TestCase):
+    def test_product_only_production_keeps_production_environment(self):
+        data = context("prod")
+        data["needs.build-website.outputs.image-tag"] = ""
+        data["needs.build-product.outputs.image-tag"] = "prod"
+        self.assertTrue(
+            workflow_condition(
+                self.jobs["deploy"]["environment"]
+                .replace("'production'", "true")
+                .replace("'development'", "false"),
+                data,
+            ),
+        )
+
+    def test_product_detection_uses_last_successful_product_revision(self):
+        step = next(
+            s
+            for s in self.jobs["detect-changes"]["steps"]
+            if s.get("name") == "Detect file changes"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+
+            def git(*args):
+                return subprocess.check_output(
+                    ["git", "-C", str(root), "-c", "core.hooksPath=/dev/null", *args],
+                    text=True,
+                ).strip()
+
+            git("init", "-q")
+            git("config", "user.name", "Fixture")
+            git("config", "user.email", "fixture@example.invalid")
+            (root / "initial").touch()
+            git("add", ".")
+            git("commit", "-qm", "initial")
+            git("update-ref", "refs/deploy/prod", "HEAD")
+            (root / "apps/product").mkdir(parents=True)
+            (root / "apps/product/product.ts").write_text("already deployed")
+            git("add", ".")
+            git("commit", "-qm", "product")
+            git("update-ref", "refs/deploy/prod-product", "HEAD")
+            (root / "apps/website").mkdir(parents=True)
+            (root / "apps/website/site.ts").write_text("website only")
+            git("add", ".")
+            git("commit", "-qm", "website")
+            output = root / "outputs"
+            subprocess.run(
+                ["bash", "-e", "-c", step["run"]],
+                cwd=root,
+                env={
+                    **os.environ,
+                    "BRANCH_NAME": "prod",
+                    "EVENT_NAME": "workflow_run",
+                    "APP_INPUT": "",
+                    "GITHUB_OUTPUT": str(output),
+                },
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            actual = dict(
+                line.split("=", 1) for line in output.read_text().splitlines()
+            )
+            self.assertEqual(actual["website"], "true")
+            self.assertEqual(actual["product"], "false")
+
+    def test_product_reference_advances_only_after_verified_production_product(self):
+        data = context("prod")
+        data.update(
+            {
+                "github.event.workflow_run.head_branch": "prod",
+                "github.ref_name": "dev",
+                "needs.deploy.outputs.product": "true",
+            }
+        )
+        expression = self.jobs["update-product-deploy-ref"]["if"]
+        self.assertTrue(workflow_condition(expression, data))
+        for key, value in (
+            ("needs.verify.result", "failure"),
+            ("needs.verify.result", "cancelled"),
+            ("needs.deploy.result", "failure"),
+            ("needs.deploy.outputs.product", "false"),
+            ("github.event.workflow_run.head_branch", "dev"),
+        ):
+            with self.subTest(key=key, value=value):
+                self.assertFalse(workflow_condition(expression, {**data, key: value}))
+
+    def test_all_legacy_channels_lock_before_shared_host_mutation(self):
+        step = next(
+            s
+            for s in self.jobs["deploy"]["steps"]
+            if s.get("name") == "Deploy to Linode"
+        )
+        parts = re.split(
+            r"\n\s*export APP_DIR=", step["run"].split("<< ENDSSH\n", 1)[1], maxsplit=1
+        )
+        self.assertEqual(len(parts), 2)
+        prefix = parts[0]
+        for channel in ("prod", "dev", "feat"):
+            with (
+                self.subTest(channel=channel),
+                tempfile.TemporaryDirectory() as directory,
+            ):
+                root = Path(directory)
+                lock = root / "host.lock"
+                marker = root / "locked"
+                binary = root / "flock"
+                binary.write_text('#!/bin/sh\nprintf "%s\\n" "$*" > "$LOCK_LOG"\n')
+                binary.chmod(0o755)
+                source = prefix.replace(
+                    "/var/lock/daodao-production-deploy.lock", str(lock)
+                )
+                subprocess.run(
+                    ["bash", "-e", "-c", source],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                    env={
+                        **os.environ,
+                        "APP_ENV": channel,
+                        "LOCK_LOG": str(marker),
+                        "PATH": str(root) + os.pathsep + os.environ["PATH"],
+                    },
+                )
+                self.assertTrue(lock.is_file())
+                self.assertEqual(marker.read_text().strip(), "-w 600 9")
+
     def setUp(self):
         self.jobs = yaml.safe_load(WORKFLOW.read_text())["jobs"]
 
@@ -81,7 +213,9 @@ class BlogCdOwnershipTests(unittest.TestCase):
     def step(self, job, identifier):
         return next(s for s in self.jobs[job]["steps"] if s.get("id") == identifier)
 
-    def run_policy_shell(self, job, branch, flag, requested=True, helper_present=True):
+    def run_policy_shell(
+        self, job, branch, flag, requested=True, helper_present=True, production_flag=""
+    ):
         step = self.step(job, "ownership")
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -91,7 +225,7 @@ class BlogCdOwnershipTests(unittest.TestCase):
                 target.write_bytes(HELPER.read_bytes())
             trusted_sha = "a" * 40
             mutable_sentinel = root / "mutable-helper-executed"
-            if helper_present and job == "detect-changes" and branch == "dev":
+            if helper_present and job == "detect-changes" and branch in ("dev", "prod"):
                 for args in [
                     ["init", "-q"],
                     ["add", ".github/scripts/blog-cd-ownership.py"],
@@ -117,7 +251,7 @@ class BlogCdOwnershipTests(unittest.TestCase):
                     + ").touch()\nraise SystemExit(75)\n"
                 )
             mutable_head = trusted_sha
-            if helper_present and job == "detect-changes" and branch == "dev":
+            if helper_present and job == "detect-changes" and branch in ("dev", "prod"):
                 for args in [
                     ["add", ".github/scripts/blog-cd-ownership.py"],
                     [
@@ -153,6 +287,7 @@ class BlogCdOwnershipTests(unittest.TestCase):
                 "TRUSTED_WORKFLOW_SHA": trusted_sha,
                 "RUNNER_TEMP": str(temporary),
                 "BLOG_DEV_RELEASE_MANAGED": flag,
+                "BLOG_PROD_RELEASE_MANAGED": production_flag,
                 "REQUESTED": str(requested).lower(),
                 "GITHUB_OUTPUT": str(output),
                 "PATH": str(bin_dir) + os.pathsep + os.environ["PATH"],
@@ -169,7 +304,7 @@ class BlogCdOwnershipTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertFalse(sentinel.exists())
             self.assertFalse(mutable_sentinel.exists())
-            if helper_present and job == "detect-changes" and branch == "dev":
+            if helper_present and job == "detect-changes" and branch in ("dev", "prod"):
                 self.assertEqual(
                     subprocess.check_output(
                         ["git", "-C", str(root), "rev-parse", "HEAD"], text=True
@@ -213,9 +348,28 @@ class BlogCdOwnershipTests(unittest.TestCase):
                                 output["dev"], str(branch == "dev").lower()
                             )
 
+    def test_actual_production_managed_guard_preserves_product_scope(self):
+        for job in ("detect-changes", "deploy"):
+            for flag in ("true", "TRUE", "unknown"):
+                with self.subTest(job=job, flag=flag):
+                    result = self.run_policy_shell(
+                        job, "prod", "false", production_flag=flag
+                    )
+                    self.assertEqual(result["website"], "false")
+                    self.assertEqual(result["controlled"], "true")
+                    self.assertEqual(
+                        self.step(job, "ownership")["env"]["BLOG_PROD_RELEASE_MANAGED"],
+                        "${{ vars.BLOG_PROD_RELEASE_MANAGED }}",
+                    )
+        data = context("prod")
+        data["needs.build-website.result"] = "skipped"
+        data["needs.deploy.outputs.website"] = "false"
+        self.assertTrue(workflow_condition(self.jobs["verify"]["if"], data))
+        self.assertFalse(workflow_condition(self.jobs["update-deploy-ref"]["if"], data))
+
     def test_nondev_older_checkout_does_not_require_the_new_helper(self):
         for job in ["detect-changes", "deploy"]:
-            for branch in ["prod", "feat/example", "DEV"]:
+            for branch in ["feat/example", "DEV"]:
                 self.assertEqual(
                     self.run_policy_shell(job, branch, "true", helper_present=False)[
                         "website"
@@ -264,9 +418,9 @@ class BlogCdOwnershipTests(unittest.TestCase):
             )
         )
 
-    def test_prod_job_has_no_new_helper_checkout_dependency(self):
+    def test_prod_job_uses_the_trusted_ownership_helper(self):
         checkout = self.step("deploy", "ownership-source")
-        self.assertFalse(workflow_condition(checkout["if"], context("prod")))
+        self.assertTrue(workflow_condition(checkout["if"], context("prod")))
         self.assertEqual(checkout["with"]["ref"], "${{ github.workflow_sha }}")
         self.assertFalse(checkout["with"]["persist-credentials"])
 
@@ -276,7 +430,7 @@ class BlogCdOwnershipTests(unittest.TestCase):
         self.assertTrue(workflow_condition(self.jobs["verify"]["if"], data))
         data["needs.build-product.result"] = "failure"
         self.assertFalse(workflow_condition(self.jobs["verify"]["if"], data))
-        for branch in ["prod", "feat/example"]:
+        for branch in ["feat/example"]:
             data = context(branch)
             self.assertTrue(workflow_condition(self.jobs["verify"]["if"], data))
             data["needs.build-website.result"] = "skipped"

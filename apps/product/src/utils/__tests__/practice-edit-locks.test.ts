@@ -1,7 +1,11 @@
 import enMessages from "@daodao/i18n/locales/en";
 import zhTWMessages from "@daodao/i18n/locales/zh-TW";
 import { describe, expect, it } from "vitest";
-import { getEditScheduleLocks } from "../practice-schedule-lock";
+import {
+  getCohortPracticeDisplayStatus,
+  getEditScheduleLocks,
+  withoutLighthouseLockedScheduleFields,
+} from "../practice-schedule-lock";
 
 /**
  * daodao#385：共同挑戰只鎖名稱、期間（開始日、天數）與隱私（server CHALLENGE_LOCKED_UPDATE_FIELDS、FRD FR-CC-10），
@@ -42,6 +46,35 @@ describe("getEditScheduleLocks", () => {
       periodLocked: false,
       frequencyLocked: false,
     });
+  });
+
+  it("Lighthouse 場次一開始就鎖期間，頻率仍依既有規則", () => {
+    expect(getEditScheduleLocks({ isLighthouseCohortPractice: true, checkInCount: 0 })).toEqual({
+      periodLocked: true,
+      frequencyLocked: false,
+    });
+  });
+});
+
+describe("Lighthouse cohort participant controls", () => {
+  it("omits locked start date and duration from the save request", () => {
+    expect(
+      withoutLighthouseLockedScheduleFields(
+        { startDate: "2026-12-01", durationDays: 30, title: "每日寫作" },
+        true
+      )
+    ).toEqual({ title: "每日寫作" });
+  });
+
+  it("does not change schedules for other practices", () => {
+    const request = { startDate: "2026-12-01", durationDays: 30 };
+    expect(withoutLighthouseLockedScheduleFields(request, false)).toBe(request);
+  });
+
+  it("shows an assigned cohort draft as not started without changing other statuses", () => {
+    expect(getCohortPracticeDisplayStatus("draft", true)).toBe("not_started");
+    expect(getCohortPracticeDisplayStatus("draft", false)).toBe("draft");
+    expect(getCohortPracticeDisplayStatus("active", true)).toBe("active");
   });
 });
 

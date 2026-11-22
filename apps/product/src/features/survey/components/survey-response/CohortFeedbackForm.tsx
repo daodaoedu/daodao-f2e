@@ -31,6 +31,9 @@ export function CohortFeedbackForm({ survey, submitResponse }: CohortFeedbackFor
   const [completed, setCompleted] = useState(false);
   const firstQuestion = useRef<HTMLFieldSetElement>(null);
   const feedback = survey.cohortFeedback;
+  const feedbackTitle = feedback?.cohortName
+    ? t("feedback_survey_title", { cohortName: feedback.cohortName })
+    : survey.title;
 
   async function handleSubmit() {
     if (submitting || !feedback || feedback.state !== "ready") return;
@@ -68,12 +71,22 @@ export function CohortFeedbackForm({ survey, submitResponse }: CohortFeedbackFor
     return (
       <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
         <section className="rounded-3xl border border-[#CDEBE8] bg-white p-8 text-center sm:p-12">
+          <header className="mb-6">
+            {feedback?.organizationName && (
+              <p className="text-xs font-medium tracking-wide text-[#78928F]">
+                {feedback.organizationName}
+              </p>
+            )}
+            <h1 className="mt-4 text-2xl font-semibold tracking-[-0.04em] text-[#0D3036]">
+              {feedbackTitle}
+            </h1>
+          </header>
           <div className="mx-auto grid size-12 place-items-center rounded-full bg-[#EAF7F5] text-[#0D7773]">
             <Check className="size-6" aria-hidden="true" />
           </div>
-          <h1 className="mt-4 text-xl font-semibold text-[#0D3036]">
+          <h2 className="mt-4 text-xl font-semibold text-[#0D3036]">
             {t("feedback_survey_completed")}
-          </h1>
+          </h2>
           <Button type="button" variant="outline" className="mt-6" onClick={() => router.push("/")}>
             {t("feedback_survey_home")}
           </Button>
@@ -91,9 +104,7 @@ export function CohortFeedbackForm({ survey, submitResponse }: CohortFeedbackFor
             </p>
           )}
           <h1 className="mt-4 text-2xl font-semibold tracking-[-0.04em] text-[#0D3036]">
-            {feedback?.cohortName
-              ? t("feedback_survey_title", { cohortName: feedback.cohortName })
-              : survey.title}
+            {feedbackTitle}
           </h1>
           <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[#5A7B79]">
             {t("feedback_survey_description")}

@@ -2,6 +2,8 @@
 
 import type { ChatMessageType } from "@daodao/api";
 import { editChatMessage, sendChatMessage } from "@daodao/api";
+import type { MentionCandidate } from "@daodao/features-mention";
+import { MentionInput, useMentionInput } from "@daodao/features-mention";
 import { useTranslations } from "@daodao/i18n";
 import { useCompositionState } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
@@ -13,6 +15,8 @@ import { useServerErrorMessage } from "@/lib/server-error/use-server-error-messa
 
 interface ChatInputProps {
   roomId: number;
+  isHost: boolean;
+  mentionCandidates: MentionCandidate[];
   replyTo?: ChatMessageType | null;
   editingMessage?: ChatMessageType | null;
   onClearReply?: () => void;
@@ -23,6 +27,8 @@ interface ChatInputProps {
 
 export function ChatInput({
   roomId,
+  isHost,
+  mentionCandidates,
   replyTo,
   editingMessage,
   onClearReply,
@@ -36,13 +42,14 @@ export function ChatInput({
   const [sending, setSending] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { isComposing, compositionProps } = useCompositionState();
-
+  const { handleMentionSelect, getActiveMentionIds, reset: resetMentions } = useMentionInput();
   useEffect(() => {
     if (editingMessage) {
       setValue(editingMessage.body);
+      resetMentions();
       textareaRef.current?.focus();
     }
-  }, [editingMessage]);
+  }, [editingMessage, resetMentions]);
 
   const resetInput = useCallback(() => {
     setValue("");
@@ -64,10 +71,17 @@ export function ChatInput({
           return;
         }
         resetInput();
+        resetMentions();
         onClearEdit?.();
         onMessageEdited?.();
       } else {
-        const response = await sendChatMessage(roomId, trimmed, replyTo?.id);
+        const response = await sendChatMessage(
+          roomId,
+          trimmed,
+          replyTo?.id,
+          getActiveMentionIds(trimmed),
+          isHost && /(?:^|\s)@all(?=$|\s)/i.test(trimmed)
+        );
         if (response.error) {
           toast.error(
             errorMessage(response.error, t("send_failed"), { status: response.response.status })
@@ -75,6 +89,7 @@ export function ChatInput({
           return;
         }
         resetInput();
+        resetMentions();
         onClearReply?.();
         onMessageSent?.();
       }
@@ -94,6 +109,9 @@ export function ChatInput({
     onMessageSent,
     onMessageEdited,
     resetInput,
+    getActiveMentionIds,
+    resetMentions,
+    isHost,
     t,
     errorMessage,
   ]);
@@ -113,17 +131,11 @@ export function ChatInput({
     [isComposing, handleSubmit, editingMessage, onClearEdit, resetInput]
   );
 
-  const handleInput = useCallback(() => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-    textarea.style.height = "auto";
-    textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
-  }, []);
-
   const handleCancelEdit = useCallback(() => {
     onClearEdit?.();
     resetInput();
-  }, [onClearEdit, resetInput]);
+    resetMentions();
+  }, [onClearEdit, resetInput, resetMentions]);
 
   const hasContext = !!editingMessage || !!replyTo;
   const canSend = !!value.trim() && !sending;
@@ -185,17 +197,21 @@ export function ChatInput({
             hasContext ? "rounded-[0_0_18px_18px]" : "rounded-[22px]"
           )}
         >
-          <textarea
-            ref={textareaRef}
+          <MentionInput
+            inputRef={textareaRef}
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={setValue}
             onKeyDown={handleKeyDown}
-            onInput={handleInput}
-            onCompositionStart={compositionProps.onCompositionStart}
-            onCompositionEnd={compositionProps.onCompositionEnd}
             placeholder={t("input_placeholder")}
             rows={1}
-            className="max-h-[120px] min-w-0 flex-1 resize-none overflow-hidden border-0 bg-transparent py-2 text-sm leading-[1.7] text-[oklch(0.445_0.056_192)] outline-none placeholder:text-[oklch(0.445_0.056_192/0.4)]"
+            participants={mentionCandidates.filter(
+              (candidate) => candidate.userId !== "all" || isHost
+            )}
+            suggestionPosition="above"
+            onMentionSelect={handleMentionSelect}
+            onCompositionStart={compositionProps.onCompositionStart}
+            onCompositionEnd={compositionProps.onCompositionEnd}
+            className="block max-h-[120px] min-w-0 w-full flex-1 resize-none overflow-y-auto border-0 bg-transparent py-2 text-sm leading-[1.7] text-[oklch(0.445_0.056_192)] outline-none placeholder:text-[oklch(0.445_0.056_192/0.4)]"
           />
           <Button
             size="icon"

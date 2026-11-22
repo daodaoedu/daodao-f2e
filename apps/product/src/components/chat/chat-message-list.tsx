@@ -1,11 +1,14 @@
 "use client";
 
 import type { ChatMessageType } from "@daodao/api";
+import { isOwnChatMessage } from "@daodao/api";
+import type { MentionCandidate } from "@daodao/features-mention";
 import { useLocale, useTranslations } from "@daodao/i18n";
 import { Spinner } from "@daodao/ui/components/spinner";
 import { useEffect, useRef } from "react";
 import type { TimelineItem } from "@/hooks/use-chat-timeline";
 import { chatDayLabelParts } from "@/utils/chat-format";
+import { decideChatScroll, isNearBottom, resolveUnreadAnchor } from "@/utils/chat-scroll";
 import { ChatMessageItem } from "./chat-message-item";
 
 interface ChatMessageListProps {
@@ -13,6 +16,9 @@ interface ChatMessageListProps {
   isLoading: boolean;
   isHost: boolean;
   viewerUserId: number | null;
+  mentionCandidates: MentionCandidate[];
+  /** 進入聊天室當下的第一則未讀 ID；沒有未讀時 null */
+  firstUnreadMessageId: number | null;
   onReply?: (message: ChatMessageType) => void;
   onEdit?: (message: ChatMessageType) => void;
   onDelete?: (message: ChatMessageType) => void;
@@ -24,6 +30,8 @@ export function ChatMessageList({
   isLoading,
   isHost,
   viewerUserId,
+  mentionCandidates,
+  firstUnreadMessageId,
   onReply,
   onEdit,
   onDelete,
@@ -34,18 +42,56 @@ export function ChatMessageList({
   const bottomRef = useRef<HTMLDivElement>(null);
   const prevCountRef = useRef(0);
 
+  // 進入聊天室時的第一則未讀；停在那裡直到使用者自己捲回底部（daodao#555）
+  const anchoredRef = useRef(false);
+
   useEffect(() => {
-    const msgCount = timeline.filter((i) => i.type === "message").length;
-    if (msgCount > 0 && msgCount !== prevCountRef.current) {
-      // 只捲對話區自己的捲動容器；scrollIntoView 會連 window 一起捲，把聊天室標頭推出畫面
-      const scroller = bottomRef.current?.closest<HTMLElement>("[data-chat-scroll]");
-      scroller?.scrollTo({
-        top: scroller.scrollHeight,
-        behavior: prevCountRef.current === 0 ? "instant" : "smooth",
-      });
-      prevCountRef.current = msgCount;
+    const messages = timeline.filter((i) => i.type === "message");
+    const msgCount = messages.length;
+    const last = messages[msgCount - 1];
+    const scroller = bottomRef.current?.closest<HTMLElement>("[data-chat-scroll]");
+    const prevCount = prevCountRef.current;
+    const anchorId = resolveUnreadAnchor(
+      firstUnreadMessageId,
+      messages.flatMap((i) => (i.type === "message" ? [i.message.id] : []))
+    );
+    const action = decideChatScroll({
+      prevCount,
+      nextCount: msgCount,
+      firstUnreadMessageId: anchorId,
+      firstUnreadLoaded: anchorId !== null,
+      anchored: anchoredRef.current,
+      lastIsOwn: last?.type === "message" && isOwnChatMessage(last.message, viewerUserId),
+    });
+    if (msgCount !== prevCountRef.current) prevCountRef.current = msgCount;
+    if (!scroller || action === "none") return;
+    if (action === "first-unread") {
+      const target = scroller.querySelector<HTMLElement>(`[data-chat-message="${anchorId}"]`);
+      if (target) {
+        // 只捲對話區自己的捲動容器；scrollIntoView 會連 window 一起捲，把聊天室標頭推出畫面
+        const offset = target.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+        scroller.scrollTo({ top: scroller.scrollTop + offset - 16, behavior: "instant" });
+        anchoredRef.current = true;
+        return;
+      }
     }
-  }, [timeline]);
+    anchoredRef.current = false;
+    scroller.scrollTo({
+      top: scroller.scrollHeight,
+      behavior: prevCount === 0 ? "instant" : "smooth",
+    });
+  }, [timeline, firstUnreadMessageId, viewerUserId]);
+
+  // 使用者自己捲回底部後，恢復「新訊息自動捲到底」
+  useEffect(() => {
+    const scroller = bottomRef.current?.closest<HTMLElement>("[data-chat-scroll]");
+    if (!scroller) return;
+    const onScroll = () => {
+      if (anchoredRef.current && isNearBottom(scroller)) anchoredRef.current = false;
+    };
+    scroller.addEventListener("scroll", onScroll, { passive: true });
+    return () => scroller.removeEventListener("scroll", onScroll);
+  });
 
   if (isLoading) {
     return (
@@ -84,6 +130,7 @@ export function ChatMessageList({
             isGroupEnd={item.isGroupEnd}
             isHost={isHost}
             viewerUserId={viewerUserId}
+            mentionCandidates={mentionCandidates}
             onReply={onReply}
             onEdit={onEdit}
             onDelete={onDelete}

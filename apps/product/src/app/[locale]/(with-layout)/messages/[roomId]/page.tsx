@@ -8,14 +8,17 @@ import {
   markChatRoomRead,
   selectChatDelta,
   selectChatHistory,
+  selectChatMembers,
   selectChatPins,
   selectChatRoom,
+  useChatMembers,
   useChatMessageDelta,
   useChatMessageHistory,
   useChatPins,
   useChatRoom,
   useMyChatRooms,
 } from "@daodao/api";
+import type { MentionCandidate } from "@daodao/features-mention";
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
@@ -35,6 +38,7 @@ import { SearchBar } from "@/components/chat/search-bar";
 import { useChatTimeline } from "@/hooks/use-chat-timeline";
 import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { runOptimisticDelete } from "@/utils/chat-optimistic-delete";
+import { CHAT_UNREAD_HISTORY_LIMIT } from "@/utils/chat-scroll";
 
 export default function ChatRoomPage() {
   const t = useTranslations("messages");
@@ -51,6 +55,39 @@ export default function ChatRoomPage() {
   const room = selectChatRoom(roomData);
   // 訊息 author.userId 是內部 users.id；/users/me 只給 UUID，所以用聊天室詳情的 viewerUserId 判斷本人訊息
   const viewerUserId = room?.viewerUserId ?? null;
+  const { data: membersData } = useChatMembers(roomId || null);
+  const isHost = room?.viewerRole === "host";
+  const mentionCandidates = useMemo<MentionCandidate[]>(() => {
+    const candidates = selectChatMembers(membersData)
+      // 沒有暱稱的成員無法用「@暱稱」辨識，server 也不會為他建立提及通知，不列入候選
+      .flatMap((member) =>
+        member.userId !== viewerUserId && member.nickname
+          ? [{ ...member, nickname: member.nickname }]
+          : []
+      )
+      .map((member) => ({
+        userId: String(member.userId),
+        numericUserId: member.userId,
+        name: member.nickname,
+        photoURL: member.avatar ?? undefined,
+      }));
+
+    candidates.unshift({ userId: "all", numericUserId: 0, name: "all", photoURL: undefined });
+    return candidates;
+  }, [membersData, viewerUserId]);
+  // 進入聊天室當下的第一則未讀，只取一次：標記已讀後聊天室詳情會重抓、值變 null，
+  // 若跟著變，歷史訊息的查詢條件會改變而整批重載、捲動位置跑掉（daodao#555）
+  const [entryUnread, setEntryUnread] = useState<{
+    roomId: number;
+    firstUnreadMessageId: number | null;
+  } | null>(null);
+  useEffect(() => {
+    // room.id 要對得上目前的 roomId，避免切換聊天室時拿到上一間的快取
+    if (room && room.id === roomId && entryUnread?.roomId !== roomId) {
+      setEntryUnread({ roomId, firstUnreadMessageId: room.firstUnreadMessageId ?? null });
+    }
+  }, [room, roomId, entryUnread?.roomId]);
+  const roomEntry = entryUnread?.roomId === roomId ? entryUnread : null;
   const { mutate: mutateRooms } = useMyChatRooms();
   const { data: pinsData, mutate: mutatePins } = useChatPins(roomId || null);
 
@@ -58,7 +95,10 @@ export default function ChatRoomPage() {
     data: historyData,
     isLoading: historyLoading,
     mutate: mutateHistory,
-  } = useChatMessageHistory(roomId || null);
+  } = useChatMessageHistory(
+    roomEntry ? roomId || null : null,
+    roomEntry?.firstUnreadMessageId != null ? CHAT_UNREAD_HISTORY_LIMIT : undefined
+  );
 
   const historyMessages: ChatMessageType[] = useMemo(
     () => selectChatHistory(historyData),
@@ -88,7 +128,6 @@ export default function ChatRoomPage() {
   const [showMembers, setShowMembers] = useState(false);
   const [showPins, setShowPins] = useState(false);
 
-  const isHost = room?.viewerRole === "host";
   const pinnedCount = selectChatPins(pinsData).length;
 
   useEffect(() => {
@@ -222,6 +261,8 @@ export default function ChatRoomPage() {
                 isLoading={historyLoading}
                 isHost={isHost}
                 viewerUserId={viewerUserId}
+                mentionCandidates={mentionCandidates}
+                firstUnreadMessageId={roomEntry?.firstUnreadMessageId ?? null}
                 onReply={handleReply}
                 onEdit={handleEdit}
                 onDelete={setDeleteTarget}
@@ -243,6 +284,8 @@ export default function ChatRoomPage() {
           </div>
           <ChatInput
             roomId={roomId}
+            isHost={isHost}
+            mentionCandidates={mentionCandidates}
             replyTo={replyTo}
             editingMessage={editingMessage}
             onClearReply={() => setReplyTo(null)}

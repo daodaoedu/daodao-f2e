@@ -26,9 +26,14 @@ type RawQuestion = {
   id: number;
   question_text: string;
   question_type: string;
+  input_type?: SurveyQuestion["inputType"];
+  scale_min?: number | null;
+  scale_max?: number | null;
+  scale_min_label?: string | null;
+  scale_max_label?: string | null;
   is_required: boolean;
   position: number;
-  conditions: RawCondition[];
+  conditions?: RawCondition[];
   options: Array<{ id: number; option_text: string; position: number }>;
 };
 
@@ -39,12 +44,17 @@ type RawSurvey = {
   description: string | null;
   status: string;
   is_anonymous: boolean;
+  is_public?: boolean;
+  managed_version?: number | null;
+  has_responded?: boolean;
+  logo_url?: string | null;
+  thank_you_message?: string | null;
   max_responses: number | null;
-  tags: string[];
+  tags?: string[];
   cover_url: string | null;
-  created_by: number;
-  created_at: string;
-  updated_at: string;
+  created_by?: number;
+  created_at?: string;
+  updated_at?: string;
   questions: RawQuestion[];
   cohort_feedback?: {
     state: "login_required" | "ineligible" | "ready" | "completed";
@@ -75,6 +85,11 @@ function mapQuestion(q: RawQuestion, allQuestions: RawQuestion[]): SurveyQuestio
     surveyId: "",
     questionText: q.question_text,
     questionType: q.question_type as QuestionType,
+    inputType: q.input_type,
+    scaleMin: q.scale_min,
+    scaleMax: q.scale_max,
+    scaleMinLabel: q.scale_min_label,
+    scaleMaxLabel: q.scale_max_label,
     options: q.options.map((o) => ({ id: o.id, label: o.option_text, order: o.position })),
     isRequired: q.is_required,
     conditions: (q.conditions ?? []).map((c) => ({
@@ -98,28 +113,32 @@ function mapSurvey(raw: RawSurvey): SurveyWithQuestions {
     description: raw.description ?? "",
     purpose: "",
     status: raw.status as SurveyStatus,
-    createdBy: String(raw.created_by),
+    createdBy: raw.created_by === undefined ? "" : String(raw.created_by),
     coverUrl: raw.cover_url ?? undefined,
+    logoUrl: raw.logo_url ?? undefined,
+    managedVersion: raw.managed_version ?? undefined,
+    isPublic: raw.is_public,
+    hasResponded: raw.has_responded,
     config: {
       isAnonymous: raw.is_anonymous,
       isPublished: raw.status === "active",
       maxResponses: raw.max_responses,
       deadlineAt: null,
       submitButtonText: "提交",
-      successMessage: "感謝你的回應！",
+      successMessage: raw.managed_version === 1 ? (raw.thank_you_message ?? "") : "感謝你的回應！",
       showProgressBar: true,
       oneResponsePerUser: false,
     },
     responseCount: 0,
-    createdAt: raw.created_at,
-    updatedAt: raw.updated_at,
+    createdAt: raw.created_at ?? "",
+    updatedAt: raw.updated_at ?? "",
     tags: raw.tags,
     cohortFeedback: raw.cohort_feedback
       ? {
           state: raw.cohort_feedback.state,
           privacyNotice: raw.cohort_feedback.privacy_notice,
-          organizationName: raw.cohort_feedback.organization_name ?? "",
-          cohortName: raw.cohort_feedback.cohort_name ?? "",
+          organizationName: raw.cohort_feedback.organization_name?.trim() ?? "",
+          cohortName: raw.cohort_feedback.cohort_name?.trim() ?? "",
         }
       : undefined,
     questions: raw.questions.map((q) => ({

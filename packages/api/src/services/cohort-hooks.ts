@@ -254,8 +254,8 @@ export const useLighthouseTemplates = (organizationId?: number) => {
   return useValidatedResponse(query, lighthouseTemplatesResponseSchema);
 };
 
-export const useMyCohorts = () => {
-  const query = useQuery("/api/v1/me/cohorts", EMPTY_QUERY_INIT);
+export const useMyCohorts = (enabled = true) => {
+  const query = useQuery("/api/v1/me/cohorts", enabled ? EMPTY_QUERY_INIT : null);
   return useValidatedResponse(query, myCohortsResponseSchema);
 };
 

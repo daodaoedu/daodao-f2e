@@ -21,6 +21,7 @@ export const NotificationType = {
   buddyRequestFollower: "buddy-request-follower",
   buddyAccepted: "buddy-accepted",
   feedbackReplied: "feedback-replied",
+  chatMessage: "chat-message",
 } as const;
 
 export type NotificationTypeType = (typeof NotificationType)[keyof typeof NotificationType];

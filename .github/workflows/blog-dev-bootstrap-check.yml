@@ -3,10 +3,12 @@ on:
   pull_request:
     paths:
       - '.github/scripts/blog_bootstrap/**'
+      - '.github/scripts/blog_prod_*.py'
       - '.github/scripts/blog-cd-ownership.py'
       - '.github/scripts/__tests__/test_blog*.py'
       - '.github/scripts/__tests__/integration_blog_publication_prepare.py'
       - '.github/workflows/blog-dev-bootstrap*.yml'
+      - '.github/workflows/blog-prod-publish.yml'
       - '.github/workflows/linode-cd.yml'
       - '.github/known-hosts/linode-dev.pub'
       - 'docker/blog-dev/**'
@@ -16,10 +18,12 @@ on:
     branches: [dev]
     paths:
       - '.github/scripts/blog_bootstrap/**'
+      - '.github/scripts/blog_prod_*.py'
       - '.github/scripts/blog-cd-ownership.py'
       - '.github/scripts/__tests__/test_blog*.py'
       - '.github/scripts/__tests__/integration_blog_publication_prepare.py'
       - '.github/workflows/blog-dev-bootstrap*.yml'
+      - '.github/workflows/blog-prod-publish.yml'
       - '.github/workflows/linode-cd.yml'
       - '.github/known-hosts/linode-dev.pub'
       - 'docker/blog-dev/**'
@@ -39,6 +43,17 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.12'
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '20.19.4'
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: '10.20.0'
+          run_install: false
+      - name: Install native content validator runtime
+        run: pnpm install --frozen-lockfile --filter "@daodao/blog-content..."
+      - name: Generate shared runtime configuration
+        run: pnpm --filter @daodao/config generate:env
       - run: 'python3 -m pip install --only-binary=:all: PyYAML==6.0.2'
       - run: python3 -m unittest discover -s .github/scripts/__tests__ -p 'test_blog*.py' -v
       - run: python3 -m unittest discover -s scripts/__tests__ -p 'test_blog_release.py' -v
