@@ -37,7 +37,7 @@ a{color:var(--primary-darker)}
 :focus-visible{outline:2px solid var(--primary-base);outline-offset:3px;border-radius:8px}
 .mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:var(--s-1);font-weight:600;color:var(--bg-dark);letter-spacing:.06em}
-.lede{color:var(--text-muted);font-size:var(--s1);max-width:34em}
+.lede{color:var(--text-body);font-size:var(--s1);max-width:34em}
 .h2{font-size:var(--s3);color:var(--primary-darker)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.4em;min-height:48px;padding:0 1.6em;border-radius:999px;font:600 var(--s0)/1 var(--f-body);text-decoration:none;cursor:pointer;border:2px solid transparent;transition:background .2s,color .2s,box-shadow .2s}
 .btn-orange{background:var(--tips);border-color:var(--tips);color:var(--white);box-shadow:0 8px 10px 0 rgba(255,161,11,.2)}
@@ -61,17 +61,16 @@ html.dark-nav .btn-cta{background:var(--primary-lighter);color:var(--bg-dark)}
 .nav-right{display:flex;align-items:center;gap:14px}
 @media (min-width:480px){.nav-links{display:flex}}
 .hero{position:relative;overflow:visible;min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding-block:clamp(48px,7vw,96px) clamp(56px,7vw,104px);background:linear-gradient(145deg,var(--page) 0%,#E8F7F5 60%,#D4F0F5 100%)}
-@media(min-width:600px){.hero{min-height:700px}}
+@media(min-width:600px){.hero{min-height:100svh}}
 .hero .wrap{position:relative;z-index:1;display:grid;gap:48px;align-items:center}
-@media (min-width:980px){.hero .wrap{grid-template-columns:1fr 1.05fr}}
+@media (min-width:980px){.hero .wrap{grid-template-columns:1.4fr 1fr}}
 .hero-copy{position:relative}
-.hero h1{font-size:var(--s4);color:var(--bg-dark);margin-block:16px 20px}
+.hero h1{font-size:clamp(1.65rem,1.1rem + 2.4vw,3.1rem);color:var(--bg-dark);margin-block:16px 20px;text-wrap:pretty}
 .hero h1 span{color:var(--primary-darker);display:block}
 .cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
 .hero-shapes{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
 .hero-shapes img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;object-position:left top;opacity:.85;pointer-events:none}
-.hero-visual{position:relative;overflow:visible}
-.frame{background:var(--white);border:1px solid var(--bg-gray);border-radius:20px;box-shadow:0 30px 60px -30px rgba(13,48,54,.28);overflow:hidden;min-width:0}
+.hero-visual{position:relative;overflow:visible}.frame{background:var(--white);border:1px solid var(--bg-gray);border-radius:20px;box-shadow:0 30px 60px -30px rgba(13,48,54,.28);overflow:hidden;min-width:0}
 .frame-top{display:flex;align-items:center;gap:10px;padding:14px 32px;border-bottom:1px solid var(--bg-gray)}
 .frame-top .back{font-size:.75rem;color:var(--text-muted)}
 .frame-top strong{font-size:var(--s-1);color:var(--bg-dark)}
@@ -212,7 +211,8 @@ html.dark-nav body::after{opacity:1}
 .uc-checkin-card{border:1px solid var(--bg-gray);border-radius:12px;padding:12px;margin-bottom:8px}
 .uc-checkin-card:last-child{margin-bottom:0}
 .uc-checkin-meta{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.uc-avatar{width:26px;height:26px;border-radius:50%;background:var(--primary-palest);display:grid;place-items:center;font:700 .68rem var(--f-body);color:var(--primary-darker);flex:none}
+.uc-avatar{width:26px;height:26px;border-radius:50%;background:var(--primary-palest);display:grid;place-items:center;font:700 .68rem var(--f-body);color:var(--primary-darker);flex:none;overflow:hidden;object-fit:cover}
+.uc-avatar img{width:26px;height:26px;border-radius:50%;object-fit:cover;object-position:top;display:block}
 .uc-checkin-name{font-size:.78rem;font-weight:600;color:var(--bg-dark)}
 .uc-checkin-date{font-size:.68rem;color:var(--text-muted);margin-left:auto}
 .uc-checkin-text{font-size:.76rem;color:var(--text-dark);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5}
@@ -342,8 +342,8 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
   <div class="wrap">
     <a class="nav-logo" href="#" data-goto="home" aria-label="島島阿學 首頁"><img src="/assets/landing-page/logo-simple.svg" alt="島島阿學" width="150" height="44"></a>
     <nav class="nav-links" aria-label="頁面導覽">
-      <a href="#" data-page-link="home" data-goto="home">解決方案</a>
-      <a href="#tutorial" data-page-link="tutorial">使用教學</a>
+      <a href="#" data-page-link="home" data-goto="home#cases">解決方案</a>
+      <a href="#tutorial" data-page-link="tutorial">功能介紹</a>
     </nav>
     <div class="nav-right">
       <a class="btn btn-orange btn-sm" data-goto="home#pilot" href="#">申請免費試用</a>
@@ -358,19 +358,19 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
     </div>
     <div class="wrap">
       <div class="hero-copy">
-        <p class="eyebrow">給每一位用心陪伴學員的導師</p>
-        <h1>讓每一次陪伴，<span>都成為成長的延續。</span></h1>
-        <p class="lede">從學員的實踐紀錄、回饋到參與進度，讓每一段成長都有跡可循，每一次引導都能接續前進。</p>
+        <p class="eyebrow">陪伴參與者的導師與教練</p>
+        <h1>讓專業陪伴延續到日常，<span>支持更多人持續成長。</span></h1>
+        <p class="lede">我們幫助導師和教練，能更輕鬆了解參與者的進度、想法和給予回饋。讓參與者的成長延續在日常，也讓教練、導師的專業服務走得更長遠。</p>
         <div class="cta-row">
           <a class="btn btn-orange btn-huge" href="#tutorial">申請免費試用 →</a>
         </div>
       </div>
       <div class="hero-visual">
         <div class="hv-avatars" aria-hidden="true">
-          <div class="hv-av hv-teacher"><img src="/assets/landing-page/teacher.webp" alt="帶班老師" width="92" height="92"><div class="hv-teacher-bubble"><span style="display:block;font-size:.65rem;color:var(--text-muted);margin-bottom:3px">導師</span>不用一直翻訊息，也能清楚看見<br>每位學員的進度和近況！</div></div>
-          <div class="hv-av hv-s1"><img src="/assets/landing-page/person-1.webp" alt="學員" width="60" height="60"></div>
-          <div class="hv-av hv-s2"><img src="/assets/landing-page/person-2.webp" alt="學員" width="60" height="60"></div>
-          <div class="hv-av hv-s3"><img src="/assets/landing-page/person-3.webp" alt="學員" width="60" height="60"></div>
+          <div class="hv-av hv-teacher"><img src="/assets/landing-page/teacher.webp" alt="導師" width="92" height="92"><div class="hv-teacher-bubble"><span style="display:block;font-size:.65rem;color:var(--text-muted);margin-bottom:3px">導師</span>不用一直翻訊息，也能清楚看見<br>每位參與者的進度和近況！</div></div>
+          <div class="hv-av hv-s1"><img src="/assets/landing-page/person-1.webp" alt="參與者" width="60" height="60"></div>
+          <div class="hv-av hv-s2"><img src="/assets/landing-page/person-2.webp" alt="參與者" width="60" height="60"></div>
+          <div class="hv-av hv-s3"><img src="/assets/landing-page/person-3.webp" alt="參與者" width="60" height="60"></div>
         </div>
         <div class="frame" role="img" aria-label="燈塔今日焦點示意">
           <div class="frame-top"><strong>信念改寫陪跑營 · 第 3 梯</strong></div>
@@ -386,9 +386,9 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
       </div>
     </div>
   </div>
-  <section id="pain-section" class="pain-section" aria-labelledby="p-title">
+<section id="pain-section" class="pain-section" aria-labelledby="p-title">
     <div class="wrap">
-      <div class="pain-intro"><h2>這是你的<em>帶班日常</em>嗎？</h2></div>
+      <div class="pain-intro"><h2>你也常遇到這些狀況嗎？</h2></div>
     <div class="chat-grid">
       <div>
         <div class="sec-head"><p class="eyebrow">現在的陪跑日常</p><h2 id="p-title" class="h2">打卡其實有在寫，只是找不到</h2></div>
@@ -409,8 +409,8 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
         <blockquote class="quote">「課程結束後大家都回 LINE 群了，我一直鼓勵他們分享，但我其實不知道誰還在練習。」<cite>一位帶高敏內耗陪跑營的生命教練<span class="quote-note">情境示例</span></cite></blockquote>
       </div>
     </div>
-    <div style="margin-top:48px;padding-top:40px;border-top:1px solid rgba(255,255,255,.12);text-align:center">
-      <p style="font-size:clamp(2rem,4.2vw,3.6rem);font-weight:700;color:var(--white);line-height:1.25;margin:0 0 12px">完整關注一整梯每個參與者的行動</p>
+    <div class="reveal" style="margin-top:48px;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;border-top:1px solid rgba(255,255,255,.12);text-align:center">
+      <p style="font-size:clamp(2rem,4.2vw,3.6rem);font-weight:700;color:var(--white);line-height:1.25;margin:0 0 12px">在這裡，你可以完整關注每個參與者的行動</p>
       <p style="font-size:1.1rem;color:rgba(255,255,255,.55);line-height:1.6;margin:0">不只看見誰完成了任務，也能留意誰暫時停下腳步</p>
     </div>
     </div>
@@ -441,13 +441,13 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
     <div class="wrap">
       <div class="sec-head center"><p class="eyebrow">為每一段用心的陪跑，提供剛剛好的支持</p><h2 id="v-title" class="h2">從看見進展，到持續陪伴</h2></div>
       <div class="pillar-grid">
-        <div class="pillar"><span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="3" width="13" height="18" rx="2"/><path d="M4 7h3M4 12h3M4 17h3M10 8h5M10 12h5"/></svg></span><h3>找得到紀錄</h3><p>學員的打卡與實踐心得集中保存，不再被 LINE 訊息淹沒。誰做了什麼、遇到哪些困難，都有跡可循。</p></div>
-        <div class="pillar"><span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h10v7H8l-4 3z"/><path d="M14 8h6v8l-3-2h-6v-3"/></svg></span><h3>接得上回饋</h3><p>隨時回顧學員先前的實踐與心得，不必每次交流都重新了解近況，讓每一次回饋都能接續上一次的成長。</p></div>
-        <div class="pillar"><span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 19v-4M12 19V10M18 19V5"/></svg></span><h3>看得見參與</h3><p>透過打卡紀錄與實踐進度，掌握學員的投入情況。留意誰持續前進、誰暫時停下腳步，讓支持更有方向。</p></div>
+        <div class="pillar"><span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="3" width="13" height="18" rx="2"/><path d="M4 7h3M4 12h3M4 17h3M10 8h5M10 12h5"/></svg></span><h3>找得到紀錄</h3><p>參與者的打卡與實踐心得集中保存，不再被 LINE 訊息淹沒。誰做了什麼、遇到哪些困難，都有跡可循。</p></div>
+        <div class="pillar"><span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h10v7H8l-4 3z"/><path d="M14 8h6v8l-3-2h-6v-3"/></svg></span><h3>接得上回饋</h3><p>隨時回顧參與者先前的實踐與心得，不必每次交流都重新了解近況，讓每一次回饋都能接續上一次的成長。</p></div>
+        <div class="pillar"><span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 19v-4M12 19V10M18 19V5"/></svg></span><h3>看得見參與</h3><p>透過打卡紀錄與實踐進度，掌握參與者的投入情況。留意誰持續前進、誰暫時停下腳步，讓支持更有方向。</p></div>
       </div>
     </div>
   </section>
-  <section class="case-band" aria-labelledby="uc-title">
+  <section id="cases" class="case-band" aria-labelledby="uc-title">
     <div class="wrap">
       <div class="sec-head center"><h2 id="uc-title" class="h2">不只帶領學習，更陪伴實踐發生</h2><p class="lede">從實作課程、團體陪跑到工作坊後續行動，讓每一種學習活動，都能延續課堂之外的成長。</p></div>
       <div class="uc-tabs-wrap">
@@ -463,35 +463,34 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
           <p class="case-for">實作班・訓練營・企業包班</p>
           <h3>讓每一堂課的學習，都能累積成看得見的成果</h3>
           <ul class="ticks">
-            <li><div><strong>安排實作任務</strong><small>依照課程節奏安排每階段的練習，讓學員知道下一步可以做什麼。</small></div></li>
-            <li><div><strong>掌握學員進度</strong><small>透過學員的實踐紀錄，了解參與情形與遇到的困難。</small></div></li>
+            <li><div><strong>安排實作任務</strong><small>依照課程節奏安排每階段的練習，讓參與者知道下一步可以做什麼。</small></div></li>
+            <li><div><strong>掌握參與者進度</strong><small>透過參與者的實踐紀錄，了解參與情形與遇到的困難。</small></div></li>
             <li><div><strong>累積成果與回饋</strong><small>整理每次練習的發現，作為導師回饋及成果分享的依據。</small></div></li>
           </ul>
         </div>
         <div class="uc-visual" aria-hidden="true">
           <div class="case-ex" style="margin-bottom:14px"><span class="case-ex-label">情境範例</span><strong>21 天 AI 工作應用實作班</strong></div>
-          <div class="uc-mock-bar"><span class="dot"></span><span class="dot"></span><span class="uc-mock-title">課程任務進度</span><span class="uc-mock-badge">第 2 週 / 共 3 週</span></div>
-          <div class="uc-task-row"><span class="uc-task-num">1</span><div class="uc-task-label"><strong style="font-size:.82rem">用 AI 工具整理一份工作筆記</strong><small>截止 11/10・第一週任務</small></div><div class="uc-task-prog"><b style="color:var(--primary-darker)">18 / 20</b><span>已完成</span></div></div>
-          <div class="uc-task-row"><span class="uc-task-num" style="background:var(--logo-orange,#FF6E0B);color:white">2</span><div class="uc-task-label"><strong style="font-size:.82rem">設計一個 AI 輔助的工作流程</strong><small>截止 11/17・進行中</small></div><div class="uc-task-prog"><b style="color:#FF6E0B">9 / 20</b><span>進行中</span></div></div>
-          <div class="uc-task-row"><span class="uc-task-num" style="background:var(--bg-gray);color:var(--text-muted)">3</span><div class="uc-task-label"><strong style="font-size:.82rem;color:var(--text-muted)">分享一個實際應用的案例</strong><small>截止 11/24・尚未開始</small></div><div class="uc-task-prog"><b style="color:var(--text-muted)">─</b><span>待開始</span></div></div>
+          <div class="uc-mock-bar"><span class="dot"></span><span class="dot"></span><span class="uc-mock-title">近期打卡心得</span><span class="uc-mock-badge">本週 14 人打卡</span></div>
+          <div class="uc-checkin-card"><div class="uc-checkin-meta"><span class="uc-avatar">安</span><span class="uc-checkin-name">小安</span><span class="uc-checkin-date">昨天</span></div><p class="uc-checkin-text">試著用 AI 幫我整理每週工作回顧，節省了將近一個小時，但發現提示詞還要再調整。</p><span class="uc-checkin-tag">#提示詞練習</span></div>
+          <div class="uc-checkin-card"><div class="uc-checkin-meta"><span class="uc-avatar">B</span><span class="uc-checkin-name">Benson</span><span class="uc-checkin-date">2 天前</span></div><p class="uc-checkin-text">把 AI 整理的結果給主管看，他有點驚訝。第一次覺得這個工具真的能用在工作上。</p><span class="uc-checkin-tag">#職場應用</span></div>
         </div>
       </div>
       <!-- Panel 2 -->
       <div class="case-panel" id="uc-panel-2" role="tabpanel" aria-labelledby="uc-tab-2" hidden>
         <div class="case-story">
           <p class="case-for">團體教練・學習陪跑・成長計畫</p>
-          <h3>每一次會談之間，也能持續陪伴學員前進</h3>
-          <p>陪跑的價值，不只在定期會談的那一小時。透過實踐紀錄與反思分享，你可以持續了解學員的行動與變化，在下一次會談前掌握需要討論的重點，讓支持更貼近每個人的真實需求。</p>
+          <h3>每一次會談之間，也能持續陪伴參與者前進</h3>
+          <p>陪跑的價值，不只在定期會談的那一小時。透過實踐紀錄與反思分享，你可以持續了解參與者的行動與變化，在下一次會談前掌握需要討論的重點，讓支持更貼近每個人的真實需求。</p>
           <ul class="ticks">
-            <li><div><strong>建立行動節奏</strong><small>將每週討論的方向轉化成可實踐的小任務，協助學員持續嘗試。</small></div></li>
-            <li><div><strong>看見過程中的變化</strong><small>從實踐回報與心得，了解學員的進展、卡關與新發現。</small></div></li>
+            <li><div><strong>建立行動節奏</strong><small>將每週討論的方向轉化成可實踐的小任務，協助參與者持續嘗試。</small></div></li>
+            <li><div><strong>看見過程中的變化</strong><small>從實踐回報與心得，了解參與者的進展、卡關與新發現。</small></div></li>
             <li><div><strong>讓會談更有焦點</strong><small>運用累積的紀錄進行回顧與討論，給予更有脈絡的支持。</small></div></li>
           </ul>
         </div>
         <div class="uc-visual" aria-hidden="true">
           <div class="case-ex" style="margin-bottom:14px"><span class="case-ex-label">情境範例</span><strong>8 週專業成長陪跑計畫</strong></div>
           <div class="uc-mock-bar"><span class="dot"></span><span class="dot"></span><span class="uc-mock-title">近期打卡心得</span><span class="uc-mock-badge">本週 5 人打卡</span></div>
-          <div class="uc-checkin-card"><div class="uc-checkin-meta"><span class="uc-avatar">明</span><span class="uc-checkin-name">明宇</span><span class="uc-checkin-date">2 天前</span></div><p class="uc-checkin-text">這週終於開口跟主管說了，沒想到比預期順利。還是很緊張，但說完感覺鬆了一口氣。</p><span class="uc-checkin-tag">#職場溝通</span></div>
+          <div class="uc-checkin-card"><div class="uc-checkin-meta"><span class="uc-avatar">吉</span><span class="uc-checkin-name">百事大吉</span><span class="uc-checkin-date">2 天前</span></div><p class="uc-checkin-text">這週終於開口跟主管說了，沒想到比預期順利。還是很緊張，但說完感覺鬆了一口氣。</p><span class="uc-checkin-tag">#職場溝通</span></div>
           <div class="uc-checkin-card"><div class="uc-checkin-meta"><span class="uc-avatar">雅</span><span class="uc-checkin-name">雅婷</span><span class="uc-checkin-date">3 天前</span></div><p class="uc-checkin-text">卡在要不要換工作這個問題上，試著把想法寫下來，發現自己其實還有很多沒釐清的地方。</p><span class="uc-checkin-tag">#轉職思考</span></div>
         </div>
       </div>
@@ -500,21 +499,18 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
         <div class="case-story">
           <p class="case-for">企業內訓・主題工作坊・培訓活動</p>
           <h3>工作坊結束後，才是學習真正開始的地方</h3>
-          <p>一場精彩的工作坊，未必能讓學員回到生活或職場後持續應用。將課堂上的收穫轉化為後續實踐任務，透過定期回報與階段回顧，幫助學員把當下的啟發，逐步帶回真實情境。</p>
+          <p>一場精彩的工作坊，未必能讓參與者回到生活或職場後持續應用。將課堂上的收穫轉化為後續實踐任務，透過定期回報與階段回顧，幫助參與者把當下的啟發，逐步帶回真實情境。</p>
           <ul class="ticks">
-            <li><div><strong>延伸課後行動</strong><small>將工作坊中的練習延伸為課後任務，讓學員有機會實際應用。</small></div></li>
-            <li><div><strong>追蹤實際應用情形</strong><small>透過打卡與心得紀錄，了解學員如何嘗試，以及遇到了哪些問題。</small></div></li>
+            <li><div><strong>延伸課後行動</strong><small>將工作坊中的練習延伸為課後任務，讓參與者有機會實際應用。</small></div></li>
+            <li><div><strong>追蹤實際應用情形</strong><small>透過打卡與心得紀錄，了解參與者如何嘗試，以及遇到了哪些問題。</small></div></li>
             <li><div><strong>回顧學習收穫</strong><small>整理實踐過程中的成果與反思，作為後續交流與課程優化的參考。</small></div></li>
           </ul>
         </div>
         <div class="uc-visual" aria-hidden="true">
           <div class="case-ex" style="margin-bottom:14px"><span class="case-ex-label">情境範例</span><strong>AI 工具應用工作坊 ＋ 4 週實踐</strong></div>
-          <div class="uc-mock-bar"><span class="dot"></span><span class="dot"></span><span class="uc-mock-title">課後實踐階段</span><span class="uc-mock-badge">AI 工具應用工作坊</span></div>
-          <div class="uc-stage-row"><span class="uc-stage-dot done"></span><div class="uc-stage-label"><strong style="font-size:.8rem">工作坊當日</strong><small>11/1・課程與實作練習</small></div><span class="uc-stage-status done">✓ 完成</span></div>
-          <div class="uc-stage-row"><span class="uc-stage-dot done"></span><div class="uc-stage-label"><strong style="font-size:.8rem">第 1 週任務</strong><small>11/2–11/8・職場實際應用一次</small></div><span class="uc-stage-status done">22 人完成</span></div>
-          <div class="uc-stage-row"><span class="uc-stage-dot now"></span><div class="uc-stage-label"><strong style="font-size:.8rem">第 2 週任務</strong><small>11/9–11/15・分享遇到的問題</small></div><span class="uc-stage-status now">進行中</span></div>
-          <div class="uc-stage-row"><span class="uc-stage-dot pending"></span><div class="uc-stage-label"><strong style="font-size:.8rem;color:var(--text-muted)">第 3 週任務</strong><small>11/16–11/22・整理個人應用心得</small></div><span class="uc-stage-status pending">待開始</span></div>
-          <div class="uc-stage-row"><span class="uc-stage-dot pending"></span><div class="uc-stage-label"><strong style="font-size:.8rem;color:var(--text-muted)">成果回顧</strong><small>11/23・線上分享會</small></div><span class="uc-stage-status pending">待開始</span></div>
+          <div class="uc-mock-bar"><span class="dot"></span><span class="dot"></span><span class="uc-mock-title">近期打卡心得</span><span class="uc-mock-badge">本週 19 人打卡</span></div>
+          <div class="uc-checkin-card"><div class="uc-checkin-meta"><span class="uc-avatar">雅</span><span class="uc-checkin-name">雅婷</span><span class="uc-checkin-date">昨天</span></div><p class="uc-checkin-text">工作坊學的提示詞架構終於在開會前用上了，整理出一份摘要給老闆看，省了很多來回確認。</p><span class="uc-checkin-tag">#職場應用</span></div>
+          <div class="uc-checkin-card"><div class="uc-checkin-meta"><span class="uc-avatar">岑</span><span class="uc-checkin-name">岑岑</span><span class="uc-checkin-date">3 天前</span></div><p class="uc-checkin-text">試了三次還是覺得輸出太制式，不知道是我問的方式有問題還是工具本身限制。</p><span class="uc-checkin-tag">#卡關記錄</span></div>
         </div>
       </div>
     </div>
@@ -569,7 +565,7 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
 <main>
   <section aria-labelledby="h-title">
     <div class="wrap">
-      <div class="sec-head center"><p class="eyebrow">怎麼開始</p><h2 id="h-title" class="h2">三步驟，把下一梯搬進燈塔</h2></div>
+      <div class="sec-head center"><p class="eyebrow">怎麼開始</p><h2 id="h-title" class="h2">三步驟，讓陪伴歷程更清楚</h2></div>
       <div class="steps">
         <div class="step"><span class="n">1</span><h3>設定活動與行動任務</h3><p>建立系列與場次，設定日期和互動方式，加入這一梯要練的行動任務。</p></div>
         <div class="step"><span class="n">2</span><h3>邀請參與者加入</h3><p>貼上 Email 名單或上傳 CSV 寄出邀請，參與者加入後自動進到群組聊天。</p></div>
@@ -585,13 +581,13 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
         <div class="feature">
           <div class="copy">
             <p class="q-tag">這群人整體狀態如何？</p>
-            <h3>儀表板：看學習容器有沒有在運作</h3>
-            <p>打卡量、節奏、島民常寫的標籤和心情，都整理成看得懂的圖。可以看全部實踐，也可以只看其中一個。</p>
+            <h3>儀表板：快速了解整體參與情形</h3>
+            <p>打卡量、節奏、參與者常寫的標籤和心情，都整理成看得懂的圖。可以看全部實踐，也可以只看其中一個。</p>
             <ul class="ticks">
               <li>已加入、已開始、本週持續行動中的人數</li>
               <li>打卡熱度圖、近兩週走勢、偏好的打卡時段</li>
               <li>打卡標籤與情緒分佈</li>
-              <li>參與者明細：打卡、留言、瀏覽、迴響</li>
+              <li>參與者明細：打卡次數、收到留言、收到迴響</li>
             </ul>
           </div>
           <div class="mock" aria-hidden="true">
@@ -599,10 +595,10 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
               <div class="card-lite">
                 <h4>情緒分佈</h4><small>打卡時情緒分佈</small>
                 <div class="mood">
-                  <div><span>平靜</span><span>24</span><span class="bar"><i style="width:78%"></i></span></div>
-                  <div><span>有點累</span><span>17</span><span class="bar"><i style="width:55%"></i></span></div>
+                  <div><span>不錯</span><span>24</span><span class="bar"><i style="width:78%"></i></span></div>
+                  <div><span>普通</span><span>17</span><span class="bar"><i style="width:55%"></i></span></div>
                   <div><span>開心</span><span>14</span><span class="bar"><i style="width:45%"></i></span></div>
-                  <div><span>焦慮</span><span>9</span><span class="bar"><i style="width:29%"></i></span></div>
+                  <div><span>受挫</span><span>9</span><span class="bar"><i style="width:29%"></i></span></div>
                 </div>
               </div>
               <div class="card-lite">
@@ -613,15 +609,16 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
               </div>
             </div>
             <div style="margin-top:16px">
-              <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:4px">打卡時段　偏好在哪些時段打卡（24 小時制）</div>
-              <div class="hours">
-                <div><i style="height:26%"></i><span>06–09</span></div>
-                <div><i style="height:39%"></i><span>09–12</span></div>
-                <div><i style="height:30%"></i><span>12–15</span></div>
-                <div><i style="height:22%"></i><span>15–18</span></div>
-                <div><i style="height:61%"></i><span>18–21</span></div>
-                <div><i style="height:100%"></i><span>21–24</span></div>
-              </div>
+              <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:4px">打卡時段（Asia/Taipei）　偏好在哪些時段打卡（24 小時制）</div>
+              <svg viewBox="0 0 400 130" width="100%" role="img" aria-label="打卡時段折線圖" style="display:block;margin-top:8px">
+                <path d="M25 77.5L75 65.8L125 71.7L175 83.3L225 54.2L275 42.5L325 25L375 60V100H25Z" fill="var(--primary-palest)"/>
+                <polyline points="25,77.5 75,65.8 125,71.7 175,83.3 225,54.2 275,42.5 325,25 375,60" fill="none" stroke="var(--primary-base)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <g fill="var(--primary-base)"><circle cx="25" cy="77.5" r="3.5"/><circle cx="75" cy="65.8" r="3.5"/><circle cx="125" cy="71.7" r="3.5"/><circle cx="175" cy="83.3" r="3.5"/><circle cx="225" cy="54.2" r="3.5"/><circle cx="275" cy="42.5" r="3.5"/><circle cx="325" cy="25" r="3.5"/><circle cx="375" cy="60" r="3.5"/></g>
+                <g font-size="11" fill="var(--text-muted)" text-anchor="middle" font-family="var(--f-body)">
+                  <text x="25" y="66">3</text><text x="75" y="54">5</text><text x="125" y="60">4</text><text x="175" y="72">2</text><text x="225" y="43">7</text><text x="275" y="31">9</text><text x="325" y="14">12</text><text x="375" y="49">6</text>
+                  <text x="25" y="120">07</text><text x="75" y="120">09</text><text x="125" y="120">12</text><text x="175" y="120">15</text><text x="225" y="120">18</text><text x="275" y="120">20</text><text x="325" y="120">21</text><text x="375" y="120">22</text>
+                </g>
+              </svg>
             </div>
           </div>
         </div>
@@ -630,18 +627,18 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
           <div class="copy">
             <p class="q-tag">大家還能在同一個地方聊天嗎？</p>
             <h3>群組聊天：每個活動課程都有自己的聊天室</h3>
-            <p>建立活動課程時，聊天室就自動開好；島民加入課程後自動進來，不用另外拉群。重要的事情置頂，大家都看得到。</p>
+            <p>建立活動課程時，聊天室就自動開好；參與者加入課程後自動進來，不用另外拉群。重要的事情置頂，大家都看得到。</p>
             <ul class="ticks">
-              <li>發起人訊息有專屬標記，可以置頂、整理訊息</li>
+              <li>發起人名字旁有盾牌標記，可以置頂重要訊息</li>
               <li>回覆引用、按讚，看見彼此的回應</li>
-              <li>搜尋過去的對話，重要內容不會被沖掉</li>
-              <li>課程結束後，聊天室仍可繼續交流</li>
+              <li>聊天室內搜尋過去的對話，重要內容不會被沖掉</li>
             </ul>
           </div>
           <div class="mock" aria-hidden="true" style="padding:0;overflow:hidden">
             <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--bg-gray)">
               <div style="width:32px;height:32px;border-radius:8px;background:var(--primary-palest);display:grid;place-items:center;font:700 .75rem var(--f-body);color:var(--primary-darker)">信</div>
               <div style="flex:1;min-width:0"><div style="font-size:.85rem;font-weight:700;color:var(--bg-dark)">信念改寫陪跑營・第 3 梯</div></div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
               <div style="display:flex;gap:-4px"><span style="width:22px;height:22px;border-radius:50%;background:var(--primary-palest);border:2px solid white;font-size:.6rem;display:grid;place-items:center;color:var(--primary-darker);font-weight:700">安</span><span style="width:22px;height:22px;border-radius:50%;background:#FFF3E0;border:2px solid white;font-size:.6rem;display:grid;place-items:center;color:#E65100;font-weight:700;margin-left:-6px">涵</span><span style="width:22px;height:22px;border-radius:50%;background:#E8F5E9;border:2px solid white;font-size:.6rem;display:grid;place-items:center;color:#2E7D32;font-weight:700;margin-left:-6px">宇</span><span style="width:22px;height:22px;border-radius:50%;background:#EDE7F6;border:2px solid white;font-size:.6rem;display:grid;place-items:center;color:#4527A0;font-weight:700;margin-left:-6px">18</span></div>
             </div>
             <div style="padding:12px 14px;background:#F9F5E8;border-bottom:1px solid var(--bg-gray);display:flex;align-items:center;gap:8px"><span style="color:#E65100;font-size:.75rem">📌</span><span style="font-size:.75rem;color:var(--bg-dark)"><b>依婷</b>　週四晚上 8 點直播，主題是「說不的練習」</span></div>
@@ -678,6 +675,7 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
                 <h4>邀請成員</h4>
                 <div style="background:var(--page);border:1px solid var(--bg-gray);border-radius:10px;padding:10px;font-size:.72rem;color:var(--text-muted);margin-bottom:10px;line-height:1.9">an.chen@example.com<br>yuting.w@example.com<br>sya.lin@example.com</div>
                 <div style="font-size:.7rem;color:var(--text-muted);margin-bottom:8px">上傳名單前請確認已取得當事人同意，邀請信只用於本場次。</div>
+                <div style="margin-bottom:10px"><span class="mini-btn solid">預覽名單</span></div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border:1px solid var(--bg-gray);border-radius:8px;margin-bottom:6px"><span style="font-size:.78rem;color:var(--bg-dark)">小安・10/02 加入</span><span style="font-size:.7rem;font-weight:600;color:var(--primary-darker);background:var(--primary-palest);padding:2px 8px;border-radius:999px">已加入</span></div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border:1px solid var(--bg-gray);border-radius:8px"><span style="font-size:.78rem;color:var(--bg-dark)">yuting.w@…</span><span style="font-size:.7rem;font-weight:600;color:#E65100;background:#FFF3E0;padding:2px 8px;border-radius:999px">待確認</span></div>
               </div>
@@ -688,7 +686,7 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
                   <span style="font-size:.7rem;color:#6aacaa;font-weight:500">QR Code</span>
                 </div>
                 <button type="button" style="width:100%;padding:8px;border:2px solid var(--primary-base);border-radius:999px;background:transparent;color:var(--primary-darker);font:600 .78rem var(--f-body);cursor:pointer">複製連結</button>
-                <div style="text-align:center;margin-top:8px;font-size:.7rem;color:var(--text-muted)">暫停加入・重置加入連結</div>
+                <div style="display:flex;justify-content:center;gap:8px;margin-top:10px"><span class="mini-btn">重置加入連結</span><span style="font:600 .72rem var(--f-body);padding:5px 8px;color:var(--text-muted)">暫停加入</span></div>
               </div>
             </div>
           </div>
@@ -698,13 +696,13 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
           <div class="copy">
             <p class="q-tag">探索活動課程</p>
             <h3>讓下一梯，被對的人找到</h3>
-            <p>想公開招生的場次，可以列在島島的「探索活動課程」頁面。這裡是島民自己發起的活動與課程目錄，訪客不用登入就能瀏覽，先認識你，再決定要不要報名。</p>
+            <p>想公開招生的場次，可以列在島島的「探索活動課程」頁面。這裡是參與者自己發起的活動與課程目錄，訪客不用登入就能瀏覽，先認識你，再決定要不要報名。</p>
           </div>
           <div class="mock" aria-hidden="true" style="padding:0;overflow:hidden">
-            <div style="padding:14px 16px;border-bottom:1px solid var(--bg-gray);display:flex;align-items:center;justify-content:space-between"><span style="font-size:.85rem;font-weight:700;color:var(--bg-dark)">探索活動課程</span><span style="font-size:.72rem;color:var(--text-muted)">訪客也能瀏覽</span></div>
+            <div style="padding:14px 16px;border-bottom:1px solid var(--bg-gray);display:flex;align-items:center;justify-content:space-between"><span style="font-size:.85rem;font-weight:700;color:var(--bg-dark)">探索活動課程</span><span style="font-size:.72rem;color:var(--text-muted)">島民自己發起的活動與課程</span></div>
             <div style="padding:12px 14px">
               <div style="display:flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid var(--bg-gray);border-radius:999px;margin-bottom:10px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="#A0AEC0" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="#A0AEC0" stroke-width="2" stroke-linecap="round"/></svg><span style="font-size:.78rem;color:var(--text-muted)">搜尋活動名稱、介紹或發起人</span></div>
-              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"><span style="padding:4px 12px;border-radius:999px;background:var(--primary-base);color:white;font-size:.72rem;font-weight:600">全部</span><span style="padding:4px 12px;border-radius:999px;background:var(--bg-gray);color:var(--text-muted);font-size:.72rem">開放報名</span><span style="padding:4px 12px;border-radius:999px;background:var(--bg-gray);color:var(--text-muted);font-size:.72rem">進行中</span><span style="padding:4px 12px;border-radius:999px;background:var(--bg-gray);color:var(--text-muted);font-size:.72rem">免費</span></div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"><span style="padding:4px 12px;border-radius:999px;background:var(--primary-base);color:white;font-size:.72rem;font-weight:600">全部</span><span style="padding:4px 12px;border-radius:999px;background:var(--bg-gray);color:var(--text-muted);font-size:.72rem">開放報名</span><span style="padding:4px 12px;border-radius:999px;background:var(--bg-gray);color:var(--text-muted);font-size:.72rem">進行中</span><span style="padding:4px 12px;border-radius:999px;background:var(--bg-gray);color:var(--text-muted);font-size:.72rem">已結束</span><span style="padding:4px 12px;border-radius:999px;background:var(--bg-gray);color:var(--text-muted);font-size:.72rem">免費</span><span style="padding:4px 12px;border-radius:999px;background:var(--bg-gray);color:var(--text-muted);font-size:.72rem">付費</span></div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
                 <div style="border:1px solid var(--bg-gray);border-radius:12px;overflow:hidden">
                   <div style="background:repeating-linear-gradient(45deg,#E0F5F4,#E0F5F4 4px,#C5EBE9 4px,#C5EBE9 8px);padding:8px 10px;display:flex;align-items:center;justify-content:space-between"><span style="font-size:.66rem;font-weight:700;color:var(--primary-darker);background:white;padding:2px 7px;border-radius:999px">開放報名</span><span style="font-size:.66rem;color:var(--primary-darker)">3 個主題實踐</span></div>
@@ -790,7 +788,9 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
     e.preventDefault();
     const [page,anchor]=el.dataset.goto.split('#');
     const p=page||'home';
+    const alreadyOnPage=getPage()===p;
     location.hash=p==='home'?'':p;
+    if(alreadyOnPage&&!anchor){window.scrollTo({top:0,behavior:'smooth'});return;}
     showPage(p);
     if(anchor) setTimeout(()=>document.getElementById(anchor)?.scrollIntoView({behavior:'smooth'}),60);
   });
@@ -819,6 +819,7 @@ footer .wrap{max-width:1200px;margin-inline:auto;padding-inline:clamp(16px,5vw,4
     ];
     const els=[];
     revealTargets.forEach(sel=>{document.querySelectorAll(sel).forEach(el=>{if(!el.classList.contains('reveal')&&!el.closest('[hidden]')){el.classList.add('reveal');els.push(el)}})});
+    document.querySelectorAll('.reveal:not(.visible)').forEach(el=>{if(!els.includes(el)&&!el.closest('[hidden]'))els.push(el)});
     if(!('IntersectionObserver' in window)){els.forEach(el=>{el.classList.add('visible')});return}
     const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target)}})},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
     els.forEach((el,i)=>{el.style.animationDelay=(i*0.04)+'s';io.observe(el)});
