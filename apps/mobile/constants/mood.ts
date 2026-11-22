@@ -1,3 +1,4 @@
+import BoredSvg from "@daodao/assets/images/emotion/bored.svg";
 import FineSvg from "@daodao/assets/images/emotion/fine.svg";
 import FrustratedSvg from "@daodao/assets/images/emotion/frustrated.svg";
 import HappySvg from "@daodao/assets/images/emotion/happy.svg";
@@ -37,14 +38,21 @@ export const MOOD_OPTIONS: IMoodOption[] = [
   { id: MoodType.happy, label: "開心", labelKey: "mood_happy", emoji: "😊" },
 ];
 
+/** Display-only compatibility for persisted six-value API moods. */
+export const MOOD_DISPLAY_OPTIONS: IMoodOption[] = [
+  ...MOOD_OPTIONS.slice(0, 2),
+  { id: MoodType.bored, label: "無聊", labelKey: "mood_bored", emoji: "😑" },
+  ...MOOD_OPTIONS.slice(2),
+];
+
 /**
  * 心情插畫 SVG 映射（對齊 apps/product 用 @daodao/assets 的心情圖）。
  * 保留 MOOD_OPTIONS.emoji 原生字串供其他用途，此處提供 SVG 版給需與 product 對齊的卡片。
  */
-export const MOOD_EMOJI_SVG: Partial<Record<
-  MoodType,
-  ComponentType<{ width?: number; height?: number; color?: string }>
->> = {
+export const MOOD_EMOJI_SVG: Partial<
+  Record<MoodType, ComponentType<{ width?: number; height?: number; color?: string }>>
+> = {
+  bored: BoredSvg,
   hopeless: HopelessSvg,
   frustrated: FrustratedSvg,
   neutral: NeutralSvg,

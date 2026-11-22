@@ -9,7 +9,7 @@ import { useCallback, useEffect, useMemo, useState, useTransition } from "react"
 import { isApiCommentNode } from "@/components/check-in/display/api-comment-node";
 import { CheckInDescriptionText } from "@/components/check-in/display/check-in-description-text";
 import { CheckInCommentSheetContent } from "@/components/check-in/display/check-in-detail";
-import { MOOD_OPTIONS, MoodType, mapApiMoodToMoodType } from "@/constants/mood";
+import { MOOD_DISPLAY_OPTIONS, MoodType, mapApiMoodToMoodType } from "@/constants/mood";
 import { useCohortViewQuery } from "@/lib/cohort-view-query";
 import { countTotalComments } from "@/utils/count-comments";
 
@@ -82,7 +82,7 @@ function CheckInCommentGroup({
   }
 
   const mood = mapApiMoodToMoodType(checkIn.mood) ?? MoodType.neutral;
-  const Emoji = MOOD_OPTIONS.find((option) => option.id === mood)?.emoji;
+  const Emoji = MOOD_DISPLAY_OPTIONS.find((option) => option.id === mood)?.emoji;
 
   return (
     <li className={isVisible ? "overflow-hidden rounded-xl bg-white shadow-sm" : "hidden"}>

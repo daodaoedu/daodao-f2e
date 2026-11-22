@@ -15,7 +15,7 @@ import { CheckInCard } from "@/components/check-in/display/check-in-card";
 import { CheckInCommentSheetContent } from "@/components/check-in/display/check-in-detail";
 import { ReactionPickerButton } from "@/components/check-in/reactions";
 import type { ApiMoodType } from "@/constants/mood";
-import { MOOD_OPTIONS, mapApiMoodToMoodType } from "@/constants/mood";
+import { MOOD_DISPLAY_OPTIONS, mapApiMoodToMoodType } from "@/constants/mood";
 import { useCardReactions } from "@/hooks/use-card-reactions";
 
 type CheckInShowcaseCardProps = IShowcaseCheckIn & {
@@ -82,7 +82,7 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
   }, [menuOpen]);
 
   const frontendMood = mapApiMoodToMoodType(mood as ApiMoodType);
-  const moodOption = frontendMood ? MOOD_OPTIONS.find((m) => m.id === frontendMood) : null;
+  const moodOption = frontendMood ? MOOD_DISPLAY_OPTIONS.find((m) => m.id === frontendMood) : null;
   const MoodEmoji = moodOption?.emoji;
   const moodLabel = moodOption && frontendMood ? checkInT(`moods.${frontendMood}`) : null;
 
@@ -381,7 +381,9 @@ export function CheckInShowcaseCard(props: CheckInShowcaseCardProps) {
           <div
             className="border-t border-basic-200 pt-3"
             onClick={(e) => e.stopPropagation()}
-            onPointerDown={() => { suppressNextCardClickRef.current = true; }}
+            onPointerDown={() => {
+              suppressNextCardClickRef.current = true;
+            }}
             onMouseDown={(e) => e.stopPropagation()}
           >
             {footer}

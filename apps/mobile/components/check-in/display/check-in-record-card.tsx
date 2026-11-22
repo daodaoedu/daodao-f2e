@@ -4,8 +4,8 @@ import { LayoutAnimation, Platform, Pressable, UIManager } from "react-native";
 import { Spinner, Text, View, XStack, YStack } from "tamagui";
 import {
   type ApiMoodType,
+  MOOD_DISPLAY_OPTIONS,
   MOOD_EMOJI_SVG,
-  MOOD_OPTIONS,
   type MoodType,
   mapApiMoodToMoodType,
 } from "@/constants/mood";
@@ -40,7 +40,7 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
   // 從打卡記錄計算心情統計
   const moodStats: IMoodStat[] = useMemo(() => {
     if (!checkInsData?.data) {
-      return MOOD_OPTIONS.map((option) => ({
+      return MOOD_DISPLAY_OPTIONS.map((option) => ({
         mood: option.id,
         count: 0,
       }));
@@ -48,13 +48,12 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
 
     // 初始化所有心情的計數為 0
     const moodCountMap = new Map<MoodType, number>();
-    MOOD_OPTIONS.forEach((option) => {
+    MOOD_DISPLAY_OPTIONS.forEach((option) => {
       moodCountMap.set(option.id, 0);
     });
 
     // 統計每個心情的出現次數
     checkInsData.data.forEach((checkIn) => {
-      if (checkIn.mood === "bored") return;
       const moodType = mapApiMoodToMoodType(checkIn.mood);
       if (moodType) {
         const currentCount = moodCountMap.get(moodType) ?? 0;
@@ -63,7 +62,7 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
     });
 
     // 轉換為陣列格式
-    return MOOD_OPTIONS.map((option) => ({
+    return MOOD_DISPLAY_OPTIONS.map((option) => ({
       mood: option.id,
       count: moodCountMap.get(option.id) ?? 0,
     }));
@@ -135,7 +134,7 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
         {/* Mood Ranking */}
         {isExpanded && (
           <XStack justifyContent="center" gap="$4" paddingBottom="$2">
-            {MOOD_OPTIONS.map((moodOption, index) => {
+            {MOOD_DISPLAY_OPTIONS.map((moodOption, index) => {
               const stat = moodStats[index];
               const count = stat?.mood === moodOption.id ? stat.count : 0;
               const barHeight = totalMoodCount > 0 ? (count / totalMoodCount) * MAX_BAR_HEIGHT : 0;

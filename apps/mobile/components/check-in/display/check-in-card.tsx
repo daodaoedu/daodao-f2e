@@ -12,7 +12,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { Image, Text, View, XStack, YStack } from "tamagui";
-import { MOOD_EMOJI_SVG, MOOD_OPTIONS, type MoodType } from "@/constants/mood";
+import { MOOD_DISPLAY_OPTIONS, MOOD_EMOJI_SVG, type MoodType } from "@/constants/mood";
 import { colors } from "@/generated/design-tokens";
 import { useMobileTranslation } from "@/i18n";
 
@@ -83,7 +83,7 @@ export const CheckInCard = ({
     [recomputeFade]
   );
   const moodOption = useMemo(
-    () => (mood ? MOOD_OPTIONS.find((option) => option.id === mood) : null),
+    () => (mood ? MOOD_DISPLAY_OPTIONS.find((option) => option.id === mood) : null),
     [mood]
   );
   const MoodEmojiSvg = mood && moodOption ? MOOD_EMOJI_SVG[mood] : null;
