@@ -2,7 +2,9 @@ name: Linode CD
 
 # ===== 並發控制設定 =====
 concurrency:
-  group: linode-cd-${{ github.ref }}-${{ github.event.workflow_run.event }}
+  # workflow_run 的 github.ref 一律是預設分支：以觸發 CI 的分支分組，feature 分支部署才不會取消 dev／prod。
+  # 不同分支的部署在主機上由 /var/lock/daodao-production-deploy.lock 依序執行。
+  group: linode-cd-${{ github.event.workflow_run.head_branch || github.ref_name }}-${{ github.event.workflow_run.event }}
   cancel-in-progress: true
 
 # ===== 觸發條件設定 =====
