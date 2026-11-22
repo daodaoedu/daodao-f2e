@@ -18303,7 +18303,7 @@ export interface paths {
                         /** @example 2026 夏季期 */
                         displayName: string;
                         /**
-                         * @description 一句話簡介（≤80 字）
+                         * @description 簡介（≤100 字）
                          * @example 一起學習、一起成長
                          */
                         tagline?: string;
@@ -18926,7 +18926,7 @@ export interface paths {
                     "application/json": {
                         slug?: string;
                         displayName?: string;
-                        /** @description 一句話簡介 */
+                        /** @description 簡介（≤100 字） */
                         tagline?: string | null;
                         startDate?: string;
                         endDate?: string;
