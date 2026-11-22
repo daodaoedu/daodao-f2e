@@ -80,3 +80,66 @@ describe("public survey feedback mapping", () => {
     });
   });
 });
+
+describe("managed survey contract", () => {
+  it("preserves branding, empty thank-you copy, member completion and custom scale endpoints", async () => {
+    getPublicSurvey.mockResolvedValueOnce({
+      ...rawSurvey,
+      managed_version: 1,
+      is_public: false,
+      has_responded: true,
+      logo_url: "https://images.example.com/logo.png",
+      cover_url: "https://images.example.com/banner.png",
+      thank_you_message: "",
+      questions: [
+        {
+          ...rawSurvey.questions[0],
+          question_type: "scale",
+          scale_min: -2,
+          scale_max: 8,
+          scale_min_label: "低",
+          scale_max_label: "高",
+          input_type: "text",
+        },
+      ],
+    });
+    const result = await getSurveyByShareId("feedback-survey");
+    expect(result).toMatchObject({
+      managedVersion: 1,
+      isPublic: false,
+      hasResponded: true,
+      logoUrl: "https://images.example.com/logo.png",
+      coverUrl: "https://images.example.com/banner.png",
+      config: { successMessage: "" },
+      questions: [
+        {
+          questionType: "scale",
+          scaleMin: -2,
+          scaleMax: 8,
+          scaleMinLabel: "低",
+          scaleMaxLabel: "高",
+        },
+      ],
+    });
+    expect(result.cohortFeedback).toBeUndefined();
+  });
+
+  it("submits ranked IDs in selection order and preserves negative scale values and false", async () => {
+    submitPublicSurvey.mockResolvedValueOnce({ completed: true });
+    await submitResponse({
+      externalId: "managed",
+      answers: [
+        { questionId: "2", value: [15, 12, 14] },
+        { questionId: "3", value: -2 },
+        { questionId: "4", value: false },
+      ],
+    });
+    expect(submitPublicSurvey).toHaveBeenLastCalledWith("managed", {
+      answers: [
+        { question_id: 2, selected_option_ids: [15, 12, 14] },
+        { question_id: 3, rating_value: -2 },
+        { question_id: 4, boolean_value: false },
+      ],
+    });
+  });
+});
