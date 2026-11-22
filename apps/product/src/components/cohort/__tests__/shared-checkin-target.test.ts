@@ -43,6 +43,16 @@ describe("resolveSharedCheckinTarget", () => {
     );
   });
 
+  it("結束日已過的草稿回報已結束，不引導去啟用", () => {
+    expect(
+      resolveSharedCheckinTarget(
+        [practice({ status: "draft", endDate: "2026-11-21T00:00:00.000Z" })],
+        50,
+        NOW
+      ).kind
+    ).toBe("ended");
+  });
+
   it("封存實踐無法重新啟用，回報已結束而非引導啟用", () => {
     expect(resolveSharedCheckinTarget([practice({ status: "archived" })], 50, NOW).kind).toBe(
       "ended"
