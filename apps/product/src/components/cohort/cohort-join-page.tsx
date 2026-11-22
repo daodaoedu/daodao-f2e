@@ -9,7 +9,7 @@ import { toast } from "@daodao/ui/components/sonner";
 import { ArrowUpRight, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CohortErrorState } from "@/components/lighthouse/cohort-error-state";
-import { formatActivityPeriod } from "@/utils/activity-detail";
+import { formatActivityPeriod, formatCalendarDate } from "@/utils/activity-detail";
 import { resolveCohortInvitationState } from "@/utils/cohort-invitation-state";
 import { resolveJoinConsentCopy } from "@/utils/cohort-join-consent";
 import { resolveJoinUnavailableCopy } from "@/utils/cohort-join-unavailable";
@@ -90,7 +90,7 @@ function CohortJoinContent({ joinToken }: { joinToken: string }) {
           {copy?.showDeadline && (
             <p className="mt-2 text-sm text-[#78928F]">
               {t("unavailable_expired_deadline", {
-                date: (info.joinDeadline ?? info.endDate).slice(0, 10),
+                date: formatCalendarDate(info.joinDeadline ?? info.endDate),
               })}
             </p>
           )}

@@ -5,6 +5,7 @@ import {
   createComment,
   deleteComment,
   updateComment,
+  updatePractice,
   useAllPracticeCheckIns,
   useArchivePractice,
   useComments,
@@ -55,6 +56,7 @@ import { useServerErrorMessage } from "@/lib/server-error/use-server-error-messa
 import { countTotalComments } from "@/utils/count-comments";
 import { formatFrequencyRange } from "@/utils/practice-edit-schedule";
 import { resolvePracticeDurationDays } from "@/utils/practice-period";
+import { getCohortPracticeDisplayStatus } from "@/utils/practice-schedule-lock";
 
 interface IPracticeDetailData {
   title: string;
@@ -228,6 +230,32 @@ export default function PracticeDetailPage() {
   });
 
   const isOwner = practiceData?.data?.user?.id === currentUserData?.data?.id;
+  const isCohortPractice =
+    practiceData?.data?.isCohortPractice === true && practiceData?.data?.isChallenge !== true;
+  const practiceStatus = getCohortPracticeDisplayStatus(
+    practiceData?.data?.status,
+    isCohortPractice
+  );
+  const tCohort = useTranslations("cohort");
+  // 場次實踐在 DB 仍是草稿：比照場次卡片，打卡前先啟用（daodao#544）
+  const activateCohortDraft = useCallback(async (): Promise<boolean> => {
+    try {
+      const response = await updatePractice(practiceId, { status: "active", isDraft: false });
+      if (response.error) {
+        toast.error(
+          serverErrorMessage(response.error, tCohort("activate_failed"), {
+            status: response.response.status,
+          })
+        );
+        return false;
+      }
+      await mutatePractice();
+      return true;
+    } catch {
+      toast.error(tCohort("activate_failed"));
+      return false;
+    }
+  }, [practiceId, mutatePractice, serverErrorMessage, tCohort]);
   const { openArchiveDialog } = useArchivePracticeDialog();
   const { openDeleteDialog } = useDeletePracticeDialog();
   const { archivePractice, restorePractice } = useArchivePractice(practiceId);
@@ -567,11 +595,8 @@ export default function PracticeDetailPage() {
           isCopyRestricted: practiceData?.data
             ? isPracticeCopyRestricted(practiceData.data)
             : false,
-          isCohortPractice:
-            practiceData?.data?.isCohortPractice === true ||
-            isReadOnlyCohortView ||
-            isCohortMemberView,
-          status: practiceData?.data?.status,
+          isCohortPractice: isCohortPractice || isReadOnlyCohortView || isCohortMemberView,
+          status: practiceStatus,
           actionDescription: practice.actionDescription,
           frequency: practice.frequency,
           durationMinutes: practice.durationMinutes,
@@ -649,7 +674,13 @@ export default function PracticeDetailPage() {
                 className="w-full sm:max-w-[288px]"
                 practiceId={practiceId}
                 isChallenge={practiceData?.data?.isChallenge === true}
-                practiceStatus={practiceData?.data?.status}
+                practiceStatus={practiceStatus}
+                disableBeforeStartDate={isCohortPractice}
+                beforeCheckIn={
+                  isCohortPractice && practiceData?.data?.status === "draft"
+                    ? activateCohortDraft
+                    : undefined
+                }
                 lastCheckInDate={checkInsData?.data?.[0]?.createdAt || undefined}
                 startDate={practice.startDate}
                 endDate={practiceData?.data?.endDate}
