@@ -120,6 +120,17 @@ class ProductionWorkflowTests(unittest.TestCase):
             install["run"].index("pnpm install"),
         )
         self.assertNotIn("pnpm install", build["run"])
+        self.assertLess(
+            install["run"].index("pnpm install --frozen-lockfile"),
+            install["run"].index("pnpm --filter @daodao/config generate:env"),
+        )
+
+    def test_new_publisher_actions_are_all_immutable_full_commit_pins(self):
+        actions = [step["uses"] for step in self.steps if "uses" in step]
+        self.assertGreaterEqual(len(actions), 5)
+        for action in actions:
+            with self.subTest(action=action):
+                self.assertRegex(action, r"@[a-f0-9]{40}$")
 
     def test_host_receives_trusted_previous_sha_and_explicit_bootstrap_boolean(self):
         self.assertEqual(
@@ -147,6 +158,55 @@ class ProductionWorkflowTests(unittest.TestCase):
             if "blog_prod_gate.py" in step.get("run", ""):
                 self.assertNotIn("legacy_bootstrap", str(step))
                 self.assertNotIn("if", step)
+
+    def test_contract_job_sets_up_real_native_runtime_before_unfiltered_discovery(self):
+        contract = yaml.safe_load(
+            (ROOT / ".github/workflows/blog-dev-bootstrap-check.yml").read_text()
+        )
+        events = contract.get("on", contract.get(True))
+        for event in ("push", "pull_request"):
+            self.assertIn(".github/scripts/blog_prod_*.py", events[event]["paths"])
+            self.assertIn(
+                ".github/workflows/blog-prod-publish.yml", events[event]["paths"]
+            )
+        steps = contract["jobs"]["contract"]["steps"]
+        node_index = next(
+            i
+            for i, step in enumerate(steps)
+            if step.get("uses", "").startswith("actions/setup-node@")
+        )
+        pnpm_index = next(
+            i
+            for i, step in enumerate(steps)
+            if step.get("uses", "").startswith("pnpm/action-setup@")
+        )
+        install_index = next(
+            i
+            for i, step in enumerate(steps)
+            if 'pnpm install --frozen-lockfile --filter "@daodao/blog-content..."'
+            == step.get("run")
+        )
+        config_index = next(
+            i
+            for i, step in enumerate(steps)
+            if step.get("run") == "pnpm --filter @daodao/config generate:env"
+        )
+        tests_index = next(
+            i
+            for i, step in enumerate(steps)
+            if step.get("run")
+            == "python3 -m unittest discover -s .github/scripts/__tests__ -p 'test_blog*.py' -v"
+        )
+        self.assertEqual(steps[node_index]["with"]["node-version"], "20.19.4")
+        self.assertLess(node_index, pnpm_index)
+        self.assertLess(pnpm_index, install_index)
+        self.assertLess(install_index, config_index)
+        self.assertLess(config_index, tests_index)
+        for step in steps:
+            self.assertNotIn("continue-on-error", step)
+            self.assertNotIn("if", step)
+            if "uses" in step:
+                self.assertRegex(step["uses"], r"@[a-f0-9]{40}$")
 
     def test_stage_and_both_rechecks_use_the_original_snapshot_and_digest(self):
         stage = self.step("Stage frozen approved content")
@@ -206,6 +266,10 @@ class ProductionWorkflowTests(unittest.TestCase):
             "${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website@${{ steps.image.outputs.digest }}",
         )
         self.assertIn("blog_prod_deploy.py", deploy["run"])
+        self.assertNotIn("--manifest", deploy["run"])
+        artifact = self.step("Record exact public release bytes")["run"]
+        for caller_path_option in ("--out", "--nginx", "--manifest"):
+            self.assertNotIn(caller_path_option, artifact)
         all_commands = "\n".join(step.get("run", "") for step in self.steps)
         self.assertNotIn("gh workflow run", all_commands)
         self.assertNotIn("force_deploy", all_commands)

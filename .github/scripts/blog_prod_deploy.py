@@ -29,13 +29,21 @@ ORIGIN = "https://daodao.so"
 MAX_BUNDLE = 4 * 1024 * 1024
 MAX_BODY = 8 * 1024 * 1024
 MAX_OLD_PUBLIC_BYTES = 64 * 1024 * 1024
+MIME_JSON = "application/json"
+MIME_HTML = "text/html"
+MIME_JPEG = "image/jpeg"
+MARKER_PATH = "/blog-release.json"
+PENDING_FILE = "pending.json"
+PUBLIC_MANIFEST = "blog-prod-public-manifest.json"
+INVALID_FILE = "Safe literal relative file path required"
+INVALID_PATH = "Only unique literal public paths allowed"
 LEGACY_CONTENT_SHA = "0daa4231bb2072657c807813e960919b982f9d8e"
 OLD_ROOTS = ("zh-TW/blog.html", "zh-TW/blog", "en/blog.html", "en/blog", "blog-images")
 INVENTORY = 'set -o pipefail; find "$@" ! -type d -exec stat -c "%F|%n" {} \\; | head -c 4194305'
 IMAGE_MIME = {
     "png": "image/png",
-    "jpg": "image/jpeg",
-    "jpeg": "image/jpeg",
+    "jpg": MIME_JPEG,
+    "jpeg": MIME_JPEG,
     "webp": "image/webp",
     "avif": "image/avif",
     "gif": "image/gif",
@@ -61,7 +69,7 @@ class PublicationError(RuntimeError):
         super().__init__("Production publication failed; inspect recovery report")
 
 
-def validate_payload(item):
+def validate_source_identity(item):
     if not isinstance(item, dict) or item.get("schema") != 1:
         raise ValueError("Unsupported publication data")
     for key in ("frontend_sha", "content_sha", "baseline_content_sha"):
@@ -76,6 +84,66 @@ def validate_payload(item):
         or len(item["compose"].encode()) > 128 * 1024
     ):
         raise ValueError("Bounded frozen Compose source required")
+
+
+def validate_relative_file(file_path):
+    if not isinstance(file_path, str) or file_path.startswith("/"):
+        raise ValueError(INVALID_FILE)
+    if not ROUTE.fullmatch("/" + file_path) or "%" in file_path:
+        raise ValueError(INVALID_FILE)
+    if {".", ".."}.intersection(file_path.split("/")):
+        raise ValueError(INVALID_FILE)
+
+
+def validate_public_path(path, observed):
+    if not isinstance(path, str) or not ROUTE.fullmatch(path):
+        raise ValueError(INVALID_PATH)
+    if path.startswith("//") or "%" in path or path in observed:
+        raise ValueError(INVALID_PATH)
+    if {".", ".."}.intersection(path.split("/")):
+        raise ValueError(INVALID_PATH)
+
+
+SUPPORTED_MIME = {
+    MIME_JSON,
+    MIME_HTML,
+    "text/plain",
+    "text/css",
+    "application/javascript",
+    "text/javascript",
+    "image/png",
+    MIME_JPEG,
+    "image/webp",
+    "image/avif",
+    "image/svg+xml",
+    "image/gif",
+    "image/x-icon",
+    "font/woff",
+    "font/woff2",
+    "application/xml",
+    "text/xml",
+    "application/octet-stream",
+}
+
+
+def validate_route(route, observed):
+    if not isinstance(route, dict):
+        raise TypeError("Invalid public route")
+    validate_relative_file(route.get("file_path", ""))
+    validate_public_path(route.get("path", ""), observed)
+    if not isinstance(route.get("sha256"), str) or not DIGEST.fullmatch(
+        route["sha256"]
+    ):
+        raise ValueError("Expected public bytes digest required")
+    if (
+        not isinstance(route.get("content_type"), str)
+        or route["content_type"] not in SUPPORTED_MIME
+    ):
+        raise ValueError("Unsupported expected MIME")
+    observed.add(route["path"])
+
+
+def validate_manifest(item):
     manifest = item.get("manifest")
     if not isinstance(manifest, dict) or manifest.get("schema") != 1:
         raise ValueError("Public verification manifest required")
@@ -86,57 +154,14 @@ def validate_payload(item):
         raise ValueError("Bounded public route inventory required")
     observed = set()
     for route in routes:
-        if not isinstance(route, dict):
-            raise TypeError("Invalid public route")
-        path = route.get("path", "")
-        file_path = route.get("file_path", "")
-        if (
-            not isinstance(file_path, str)
-            or not ROUTE.fullmatch("/" + file_path)
-            or file_path.startswith("/")
-            or "." in file_path.split("/")
-            or ".." in file_path.split("/")
-            or "%" in file_path
-        ):
-            raise ValueError("Safe literal relative file path required")
-        if (
-            not isinstance(path, str)
-            or not ROUTE.fullmatch(path)
-            or path.startswith("//")
-            or "." in path.split("/")
-            or ".." in path.split("/")
-            or "%" in path
-            or path in observed
-        ):
-            raise ValueError("Only unique literal public paths allowed")
-        if not isinstance(route.get("sha256"), str) or not DIGEST.fullmatch(
-            route["sha256"]
-        ):
-            raise ValueError("Expected public bytes digest required")
-        if route.get("content_type") not in (
-            "application/json",
-            "text/html",
-            "text/plain",
-            "text/css",
-            "application/javascript",
-            "text/javascript",
-            "image/png",
-            "image/jpeg",
-            "image/webp",
-            "image/avif",
-            "image/svg+xml",
-            "image/gif",
-            "image/x-icon",
-            "font/woff",
-            "font/woff2",
-            "application/xml",
-            "text/xml",
-            "application/octet-stream",
-        ):
-            raise ValueError("Unsupported expected MIME")
-        observed.add(path)
-    if "/blog-release.json" not in observed:
+        validate_route(route, observed)
+    if MARKER_PATH not in observed:
         raise ValueError("Public version marker required")
+
+
+def validate_payload(item):
+    validate_source_identity(item)
+    validate_manifest(item)
     return item
 
 
@@ -175,7 +200,7 @@ def verify_public(manifest):
         data = read_public(route["path"], route["content_type"])
         if hashlib.sha256(data).hexdigest() != route["sha256"]:
             raise ValueError("Public bytes differ")
-        if route["path"] == "/blog-release.json":
+        if route["path"] == MARKER_PATH:
             marker = json.loads(data)
             if any(
                 marker.get(key) != manifest[key]
@@ -248,13 +273,12 @@ def website(call):
     return item
 
 
-def preserve_published_routes(call, previous, manifest):
-    prefix = "/app/apps/website/out"
+def existing_blog_roots(call, identifier, prefix):
     roots = []
     for relative in OLD_ROOTS:
         candidate = prefix + "/" + relative
         probe = call(
-            ["docker", "exec", previous["id"], "test", "-e", candidate],
+            ["docker", "exec", identifier, "test", "-e", candidate],
             check=False,
             text=True,
             capture_output=True,
@@ -266,42 +290,45 @@ def preserve_published_routes(call, previous, manifest):
             raise ValueError("Cannot inventory the existing public Blog roots")
     if not roots:
         raise ValueError("Existing public Blog roots required")
-    listing = execute(
-        call,
-        [
-            "docker",
-            "exec",
-            previous["id"],
-            "sh",
-            "-c",
-            INVENTORY,
-            "inventory",
-            *roots,
-        ],
-    )
+    return roots
+
+
+def parse_inventory_path(line, prefix):
+    kind, separator, name = line.partition("|")
+    if not separator or kind not in ("regular file", "regular empty file"):
+        raise ValueError("Existing public inventory must contain regular files")
+    if not name.startswith(prefix + "/"):
+        raise ValueError("Unexpected published output path")
+    path = name[len(prefix) :]
+    if not ROUTE.fullmatch(path) or "%" in path or "//" in path:
+        raise ValueError("Unsafe existing public path")
+    if {".", ".."}.intersection(path.split("/")):
+        raise ValueError("Unsafe existing public path")
+    return path
+
+
+def parse_public_inventory(listing, prefix):
     if len(listing.encode()) > MAX_BUNDLE or len(listing.splitlines()) > 3000:
         raise ValueError("Existing public inventory exceeds bounds")
     observed = set()
     routes = {}
     for line in listing.splitlines():
-        kind, separator, name = line.partition("|")
-        if not separator or kind not in ("regular file", "regular empty file"):
-            raise ValueError("Existing public inventory must contain regular files")
-        if not name.startswith(prefix + "/"):
-            raise ValueError("Unexpected published output path")
-        path = name[len(prefix) :]
-        if (
-            not ROUTE.fullmatch(path)
-            or "%" in path
-            or "//" in path
-            or set(path.split("/")).intersection({".", ".."})
-        ):
-            raise ValueError("Unsafe existing public path")
+        path = parse_inventory_path(line, prefix)
         public_routes = old_public_routes(path)
-        if "text/html" in public_routes.values():
+        if MIME_HTML in public_routes.values():
             observed.add(path)
-        for route, content_type in public_routes.items():
-            routes[route] = content_type
+        routes.update(public_routes)
+    return observed, routes
+
+
+def preserve_published_routes(call, previous, manifest):
+    prefix = "/app/apps/website/out"
+    roots = existing_blog_roots(call, previous["id"], prefix)
+    listing = execute(
+        call,
+        ["docker", "exec", previous["id"], "sh", "-c", INVENTORY, "inventory", *roots],
+    )
+    observed, routes = parse_public_inventory(listing, prefix)
     expected = {"/" + route["file_path"] for route in manifest["routes"]}
     if not observed or not observed.issubset(expected):
         raise ValueError("Publication cannot remove existing Blog HTML routes")
@@ -315,9 +342,9 @@ def old_public_routes(path):
             if path.endswith("/index.html")
             else path.removesuffix(".html")
         )
-        routes = {public: "text/html"}
+        routes = {public: MIME_HTML}
         if public.startswith("/zh-TW/"):
-            routes[public.removeprefix("/zh-TW")] = "text/html"
+            routes[public.removeprefix("/zh-TW")] = MIME_HTML
         return routes
     if path.startswith("/blog-images/") and path.rsplit(".", 1)[-1] in IMAGE_MIME:
         return {path: IMAGE_MIME[path.rsplit(".", 1)[-1]]}
@@ -325,7 +352,7 @@ def old_public_routes(path):
 
 
 def previous_public(read, routes, item):
-    routes = dict(routes, **{"/blog": "text/html", "/en/blog": "text/html"})
+    routes = {**routes, "/blog": MIME_HTML, "/en/blog": MIME_HTML}
     pages = {}
     total = 0
     for path, content_type in sorted(routes.items()):
@@ -338,7 +365,7 @@ def previous_public(read, routes, item):
             "content_type": content_type,
         }
     try:
-        raw = read("/blog-release.json")
+        raw = read(MARKER_PATH)
     except urllib.error.HTTPError as error:
         if error.code != 404:
             raise
@@ -346,7 +373,7 @@ def previous_public(read, routes, item):
         return pages
     try:
         marker = json.loads(raw)
-    except (ValueError, UnicodeError):
+    except ValueError:
         validate_legacy_seed(item)
         return pages  # legacy HTML soft404 is not a version marker
     if not isinstance(marker, dict) or not all(
@@ -356,11 +383,11 @@ def previous_public(read, routes, item):
         raise ValueError("Existing JSON marker has invalid source identity")
     if marker["content_sha"] != item["baseline_content_sha"]:
         raise ValueError("Live production content differs from the frozen baseline")
-    if read("/blog-release.json", "application/json") != raw:
+    if read(MARKER_PATH, MIME_JSON) != raw:
         raise ValueError("Existing version marker changed during baseline capture")
-    pages["/blog-release.json"] = {
+    pages[MARKER_PATH] = {
         "sha256": hashlib.sha256(raw).hexdigest(),
-        "content_type": "application/json",
+        "content_type": MIME_JSON,
     }
     return pages
 
@@ -376,12 +403,12 @@ def validate_legacy_seed(item):
 
 
 def verify_previous_public(read, snapshot):
-    results = [
-        hashlib.sha256(read(path, expected["content_type"])).hexdigest()
-        == expected["sha256"]
-        for path, expected in snapshot.items()
-    ]
-    return all(results)
+    verified = True
+    for path, expected in snapshot.items():
+        actual = hashlib.sha256(read(path, expected["content_type"])).hexdigest()
+        matches = actual == expected["sha256"]
+        verified = verified and matches
+    return verified
 
 
 @contextlib.contextmanager
@@ -404,7 +431,7 @@ def release_workspace(root):
         yield folder
     finally:
         # A failed or killed activation retains its exact frozen recovery inputs.
-        if not (root / "pending.json").exists():
+        if not (root / PENDING_FILE).exists():
             shutil.rmtree(folder)
 
 
@@ -413,7 +440,7 @@ def journal(root, item):
     temporary.write_text(json.dumps(item, indent=2) + "\n")
     with temporary.open("rb") as source:
         os.fsync(source.fileno())
-    temporary.replace(root / "pending.json")
+    temporary.replace(root / PENDING_FILE)
     descriptor = os.open(root, os.O_RDONLY)
     try:
         os.fsync(descriptor)
@@ -435,13 +462,13 @@ def publish(
     root.mkdir(mode=0o700, parents=True, exist_ok=True)
     if root.stat().st_uid != os.getuid() or stat.S_IMODE(root.stat().st_mode) & 0o077:
         raise ValueError("Publication state must be private and owned")
-    if (root / "pending.json").exists() or (root / "pending.json").is_symlink():
+    if (root / PENDING_FILE).exists() or (root / PENDING_FILE).is_symlink():
         raise ValueError("Pending activation requires explicit operator recovery")
     lock = lock_path or root / "deployment.lock"
     descriptor = os.open(lock, os.O_WRONLY | os.O_CREAT | os.O_NOFOLLOW, 0o600)
     with os.fdopen(descriptor, "w") as handle:
         fcntl.flock(handle, fcntl.LOCK_EX)
-        if (root / "pending.json").exists():
+        if (root / PENDING_FILE).exists():
             raise ValueError("Pending activation requires explicit operator recovery")
         return publish_locked(item, call, verify, read, root)
 
@@ -521,7 +548,6 @@ def publish_locked(item, call, verify, read, root):
             ],
         )
         changed = False
-        recovered = False
         journal(
             root,
             {
@@ -554,6 +580,17 @@ def publish_locked(item, call, verify, read, root):
                 call, previous["project"], compose, override, image, environment
             )
 
+        recovery = {
+            "activate": activate,
+            "previous": previous,
+            "call": call,
+            "read": read,
+            "snapshot": previous_pages,
+            "report": report,
+            "product": product,
+            "root": root,
+            "holder": holder,
+        }
         try:
             execute(call, ["docker", "pull", item["image"]])
             check_current_source(call, item["frontend_sha"])
@@ -564,47 +601,63 @@ def publish_locked(item, call, verify, read, root):
             if not report["product_unchanged"]:
                 raise ValueError("Product identity changed")
             report["public_verified"] = True
+        except (KeyboardInterrupt, SystemExit) as error:
+            recover_after_failure(error, changed, recovery)
+            raise
         except (
             ValueError,
             OSError,
             subprocess.SubprocessError,
             http.client.HTTPException,
-            KeyboardInterrupt,
-            SystemExit,
         ) as error:
-            with recovery_signals_blocked():
-                report["failure_type"] = type(error).__name__
-                if changed:
-                    try:
-                        activate(previous["image"])
-                        restored = website(call)
-                        report["rollback_verified"] = restored["image"] == previous[
-                            "image"
-                        ] and verify_previous_public(read, previous_pages)
-                        recovered = report["rollback_verified"]
-                    except (
-                        ValueError,
-                        OSError,
-                        subprocess.SubprocessError,
-                        http.client.HTTPException,
-                        KeyboardInterrupt,
-                        SystemExit,
-                    ) as recovery_error:
-                        report["recovery_failure_type"] = type(recovery_error).__name__
-                report["product_unchanged"] = (
-                    container_ids(call, "prod_product") == product
-                )
-                (root / "last-result.json").write_text(
-                    json.dumps(report, indent=2) + "\n"
-                )
-                if recovered or not changed:
-                    execute(call, ["docker", "rm", holder])
-                    (root / "pending.json").unlink()
-                raise PublicationError(report) from None
+            recover_after_failure(error, changed, recovery)
+            raise PublicationError(report) from None
         (root / "last-result.json").write_text(json.dumps(report, indent=2) + "\n")
         execute(call, ["docker", "rm", holder])
-        (root / "pending.json").unlink()
+        (root / PENDING_FILE).unlink()
     return report
+
+
+def recover_after_failure(error, changed, context):
+    report = context["report"]
+    call, root = context["call"], context["root"]
+    with recovery_signals_blocked():
+        report["failure_type"] = type(error).__name__
+        recovered = restore_previous(context) if changed else False
+        report["product_unchanged"] = (
+            container_ids(call, "prod_product") == context["product"]
+        )
+        write_report(root, report)
+        if recovered or not changed:
+            execute(call, ["docker", "rm", context["holder"]])
+            (root / PENDING_FILE).unlink()
+
+
+def write_report(root, report):
+    (root / "last-result.json").write_text(json.dumps(report, indent=2) + "\n")
+
+
+def restore_previous(context):
+    previous, report = context["previous"], context["report"]
+    try:
+        context["activate"](previous["image"])
+        restored = website(context["call"])
+        report["rollback_verified"] = restored["image"] == previous[
+            "image"
+        ] and verify_previous_public(context["read"], context["snapshot"])
+        return report["rollback_verified"]
+    except (KeyboardInterrupt, SystemExit) as error:
+        report["recovery_failure_type"] = type(error).__name__
+        write_report(context["root"], report)
+        raise
+    except (
+        ValueError,
+        OSError,
+        subprocess.SubprocessError,
+        http.client.HTTPException,
+    ) as error:
+        report["recovery_failure_type"] = type(error).__name__
+        return False
 
 
 BOOTSTRAP = """import hashlib,json,sys
@@ -656,11 +709,13 @@ def ssh_arguments(host, key, known_hosts, digest):
     ]
 
 
+def interrupt_publication(_signum, _frame):
+    raise KeyboardInterrupt()
+
+
 def remote(item):
-    signal.signal(signal.SIGTERM, lambda *_: (_ for _ in ()).throw(KeyboardInterrupt()))
-    signal.signal(signal.SIGINT, lambda *_: (_ for _ in ()).throw(KeyboardInterrupt()))
-    signal.signal(signal.SIGHUP, lambda *_: (_ for _ in ()).throw(KeyboardInterrupt()))
-    signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(KeyboardInterrupt()))
+    for handled in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP, signal.SIGALRM):
+        signal.signal(handled, interrupt_publication)
     signal.alarm(600)
     try:
         report = publish(
@@ -672,6 +727,34 @@ def remote(item):
     print(json.dumps(report), flush=True)
 
 
+def load_public_manifest(environment):
+    configured = Path(environment.get("RUNNER_TEMP", ""))
+    if (
+        not configured.is_absolute()
+        or configured.is_symlink()
+        or not configured.is_dir()
+    ):
+        raise ValueError("Existing trusted runner temporary directory required")
+    root = configured.resolve(strict=True)
+    path = root / PUBLIC_MANIFEST
+    metadata = path.lstat()
+    if (
+        not stat.S_ISREG(metadata.st_mode)
+        or metadata.st_nlink != 1
+        or metadata.st_size > MAX_BUNDLE
+    ):
+        raise ValueError("Public manifest must be a bounded regular non-linked file")
+    descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+    with os.fdopen(descriptor, "rb") as source:
+        opened = os.fstat(source.fileno())
+        if (opened.st_dev, opened.st_ino) != (metadata.st_dev, metadata.st_ino):
+            raise ValueError("Public manifest changed during opening")
+        data = source.read(MAX_BUNDLE + 1)
+    if len(data) > MAX_BUNDLE:
+        raise ValueError("Public manifest exceeds read bounds")
+    return json.loads(data)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--image", required=True)
@@ -679,7 +762,6 @@ def main():
     parser.add_argument("--content-sha", required=True)
     parser.add_argument("--baseline-content-sha", required=True)
     parser.add_argument("--allow-legacy-bootstrap", choices=("0", "1"), default="0")
-    parser.add_argument("--manifest", type=Path, required=True)
     args = parser.parse_args()
     item = {
         "schema": 1,
@@ -688,7 +770,7 @@ def main():
         "content_sha": args.content_sha,
         "baseline_content_sha": args.baseline_content_sha,
         "allow_legacy_bootstrap": args.allow_legacy_bootstrap == "1",
-        "manifest": json.loads(args.manifest.read_text()),
+        "manifest": load_public_manifest(os.environ),
         "compose": (ROOT / "docker-compose.yaml").read_text(),
     }
     validate_payload(item)

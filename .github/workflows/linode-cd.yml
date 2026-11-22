@@ -635,11 +635,9 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o ConnectTimeout=10 root@$LINODE_INSTANCE_IP << ENDSSH
             set -e
-            # Serialize production host mutations with the dedicated Blog publisher.
-            if [ "${APP_ENV}" = "prod" ]; then
-              exec 9>/var/lock/daodao-production-deploy.lock
-              flock -w 600 9
-            fi
+            # All channels share this Docker daemon and checkout, including global cleanup.
+            exec 9>/var/lock/daodao-production-deploy.lock
+            flock -w 600 9
             export APP_DIR=/root/daodao-f2e
             export COMPOSE_FILE=docker-compose.yaml
             export APP_ENV=${APP_ENV}

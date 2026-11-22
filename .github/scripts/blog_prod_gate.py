@@ -35,7 +35,7 @@ def full_sha(value):
 
 
 def positive_id(value):
-    if not isinstance(value, str) or not re.fullmatch(r"[1-9][0-9]*", value):
+    if not isinstance(value, str) or not re.fullmatch(r"[1-9]\d*", value, re.ASCII):
         raise ValueError("CI run ID must be a positive decimal integer")
     return int(value)
 
@@ -342,10 +342,13 @@ def stage_snapshot(snapshot, environment):
     helper.prepare(staged_environment, snapshot["content_sha"])
     # The existing helper intentionally defaults to no baseline. Add the trusted
     # previous-content identity baseline and validate before allowing the build.
-    values = dict(
-        line.split("=", 1)
-        for line in Path(environment["GITHUB_ENV"]).read_text().splitlines()
-    )
+    values = {
+        key: value
+        for key, value in (
+            line.split("=", 1)
+            for line in Path(environment["GITHUB_ENV"]).read_text().splitlines()
+        )
+    }
     evidence = Path(values["BLOG_EVIDENCE_ROOT"])
     old_report = shared_validation(old_content, evidence)
     baseline = published_baseline(old_report)

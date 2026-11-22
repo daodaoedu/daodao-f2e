@@ -108,7 +108,7 @@ class GateTests(unittest.TestCase):
                 self.assertEqual(self.calls, [])
 
     def test_invalid_sha_and_ci_ids_rejected_without_api(self):
-        for ci in ("0", "-1", "45\n", "4e2", "+45", "４５"):
+        for ci in ("0", "-1", "45\n", "4e2", "+45", "４５", "4５", "4٥"):
             with self.subTest(ci=ci), self.assertRaises(ValueError):
                 gate.authorize(self.env, ci, SHA, self.api)
         for key in (
@@ -224,10 +224,9 @@ class GateTests(unittest.TestCase):
             tampered = json.loads(path.read_text())
             tampered["release_id"] = "different"
             path.write_text(json.dumps(tampered))
+            tampered_snapshot = gate.read_snapshot(path, self.env)
             with self.assertRaises(ValueError):
-                gate.check_snapshot(
-                    gate.read_snapshot(path, self.env), self.env, SHA, self.api
-                )
+                gate.check_snapshot(tampered_snapshot, self.env, SHA, self.api)
 
     def test_snapshot_rejects_workspace_location_symlink_and_public_mode(self):
         snapshot = self.authorize()

@@ -48,7 +48,7 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '20.19.4'
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
         with:
           run_install: false
 
@@ -99,10 +99,8 @@ jobs:
           RELEASE_ID: ${{ steps.gate.outputs.release-id }}
         run: |
           python3 .github/scripts/blog_prod_artifact.py \
-            --out apps/website/out --frontend-sha "$FRONTEND_SHA" \
-            --content-sha "$CONTENT_SHA" --release-id "$RELEASE_ID" \
-            --manifest "$RUNNER_TEMP/blog-prod-public-manifest.json" \
-            --nginx docker/production/nginx.conf
+            --frontend-sha "$FRONTEND_SHA" --content-sha "$CONTENT_SHA" \
+            --release-id "$RELEASE_ID"
 
       - name: Recheck source, approvals and deployment quiescence before registry access
         env:
@@ -111,14 +109,14 @@ jobs:
           SNAPSHOT_SHA256: ${{ steps.gate.outputs.snapshot-sha256 }}
         run: python3 .github/scripts/blog_prod_gate.py check --snapshot "$SNAPSHOT" --snapshot-sha256 "$SNAPSHOT_SHA256"
 
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/login-action@v3
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       - name: Build immutable Website image
         id: image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5
         with:
           context: .
           file: docker/production/Dockerfile
@@ -155,8 +153,7 @@ jobs:
           unset BLOG_SSH_PRIVATE_KEY BLOG_PROD_APPROVALS
           BLOG_SSH_KEY_FILE="$identity" python3 .github/scripts/blog_prod_deploy.py \
             --image "$IMAGE" --frontend-sha "$FRONTEND_SHA" --content-sha "$CONTENT_SHA" \
-            --baseline-content-sha "$BASELINE_CONTENT_SHA" --allow-legacy-bootstrap "$ALLOW_LEGACY_BOOTSTRAP" \
-            --manifest "$RUNNER_TEMP/blog-prod-public-manifest.json"
+            --baseline-content-sha "$BASELINE_CONTENT_SHA" --allow-legacy-bootstrap "$ALLOW_LEGACY_BOOTSTRAP"
 
       - name: Remove private runner inputs
         if: always()

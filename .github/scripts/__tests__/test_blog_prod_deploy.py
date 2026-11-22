@@ -1,8 +1,10 @@
 """Observable website-only activation, recovery and transport boundaries."""
 
+import hashlib
 import http.client
 import importlib.util
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -105,6 +107,86 @@ class Docker:
 
 
 class DeploymentTests(unittest.TestCase):
+    def test_rollback_reads_all_routes_even_after_first_mismatch(self):
+        requested = []
+        expected = hashlib.sha256(b"old bytes").hexdigest()
+        snapshot = {
+            path: {"sha256": expected, "content_type": "text/html"}
+            for path in ("/blog/first", "/blog/second", "/en/blog/third")
+        }
+
+        def read(path, content_type=None):
+            requested.append(path)
+            return b"wrong bytes" if path == "/blog/first" else b"old bytes"
+
+        self.assertFalse(deploy.verify_previous_public(read, snapshot))
+        self.assertEqual(requested, list(snapshot))
+
+    def test_public_manifest_uses_only_fixed_regular_file_in_runner_temp(self):
+        item = payload()["manifest"]
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            fixed = root / "blog-prod-public-manifest.json"
+            fixed.write_text(json.dumps(item))
+            (root / "other.json").write_text('{"untrusted":"alternate"}')
+            self.assertEqual(deploy.load_public_manifest({"RUNNER_TEMP": folder}), item)
+
+    def test_public_manifest_rejects_symlink_hardlink_special_and_oversized(self):
+        for kind in ("symlink", "hardlink", "fifo", "oversize"):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as folder:
+                root = Path(folder)
+                fixed = root / "blog-prod-public-manifest.json"
+                source = root / "source.json"
+                source.write_text("{}")
+                if kind == "symlink":
+                    fixed.symlink_to(source)
+                elif kind == "hardlink":
+                    os.link(source, fixed)
+                elif kind == "fifo":
+                    os.mkfifo(fixed)
+                else:
+                    fixed.write_bytes(b"x" * (deploy.MAX_BUNDLE + 1))
+                environment = {"RUNNER_TEMP": folder}
+                with self.assertRaises(ValueError):
+                    deploy.load_public_manifest(environment)
+
+    def test_public_manifest_rejects_relative_or_symlink_runner_root(self):
+        relative = {"RUNNER_TEMP": "relative"}
+        with self.assertRaises(ValueError):
+            deploy.load_public_manifest(relative)
+        with tempfile.TemporaryDirectory() as folder:
+            link = Path(folder) / "alias"
+            link.symlink_to(Path(folder), target_is_directory=True)
+            environment = {"RUNNER_TEMP": str(link)}
+            with self.assertRaises(ValueError):
+                deploy.load_public_manifest(environment)
+
+    def test_system_exit_preserves_original_code_after_verified_recovery(self):
+        docker = Docker()
+        original = SystemExit(23)
+
+        def terminate(*_):
+            raise original
+
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            item = payload()
+            prepared_argument_1 = lambda *_: b"old bytes"
+            with self.assertRaises(SystemExit) as failure:
+                deploy.publish(
+                    item,
+                    call=docker,
+                    verify=terminate,
+                    read=prepared_argument_1,
+                    root=root,
+                )
+            self.assertIs(failure.exception, original)
+            self.assertEqual(failure.exception.code, 23)
+            report = json.loads((root / "last-result.json").read_text())
+            self.assertTrue(report["rollback_verified"])
+            self.assertFalse((root / "pending.json").exists())
+        self.assertEqual(docker.image, "sha256:" + "1" * 64)
+
     def test_article_update_may_replace_digest_image_url_while_retaining_html(self):
         docker = Docker()
         docker.published_paths.append(
@@ -147,10 +229,12 @@ class DeploymentTests(unittest.TestCase):
                     return subprocess.CompletedProcess(argv, 0, supplied, "")
                 return current(argv, **kwargs)
 
-            with self.subTest(listing=listing[:80]), self.assertRaises(ValueError):
-                deploy.preserve_published_routes(
-                    invoke, {"id": "old"}, payload()["manifest"]
-                )
+            with self.subTest(listing=listing[:80]):
+                prepared_argument_1 = payload()
+                with self.assertRaises(ValueError):
+                    deploy.preserve_published_routes(
+                        invoke, {"id": "old"}, prepared_argument_1["manifest"]
+                    )
 
     def test_old_snapshot_hashes_every_route_and_passes_expected_mime(self):
         calls = []
@@ -200,12 +284,14 @@ class DeploymentTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
+            prepared_argument_1 = payload()
+            prepared_argument_2 = lambda *_: b"old bytes"
             with self.assertRaises(deploy.PublicationError) as failure:
                 deploy.publish(
-                    payload(),
+                    prepared_argument_1,
                     call=docker,
                     verify=interrupted_response,
-                    read=lambda *_: b"old bytes",
+                    read=prepared_argument_2,
                     root=root,
                 )
             self.assertTrue(failure.exception.report["rollback_verified"])
@@ -266,7 +352,7 @@ class DeploymentTests(unittest.TestCase):
                     )
                 self.assertFalse(failure.exception.report["rollback_verified"])
                 self.assertTrue((root / "pending.json").exists())
-                self.assertTrue(any(path == broken_path for path, _ in requested))
+                self.assertTrue(any((path == broken_path for path, _ in requested)))
                 self.assertFalse(
                     any(cmd[:2] == ["docker", "rm"] for cmd in docker.commands)
                 )
@@ -281,14 +367,18 @@ class DeploymentTests(unittest.TestCase):
                 ).encode()
             return b"old page"
 
-        with tempfile.TemporaryDirectory() as folder, self.assertRaises(ValueError):
-            deploy.publish(
-                payload(),
-                call=docker,
-                verify=lambda *_: None,
-                read=read,
-                root=Path(folder),
-            )
+        with tempfile.TemporaryDirectory() as folder:
+            prepared_argument_1 = payload()
+            prepared_argument_2 = lambda *_: None
+            prepared_argument_3 = Path(folder)
+            with self.assertRaises(ValueError):
+                deploy.publish(
+                    prepared_argument_1,
+                    call=docker,
+                    verify=prepared_argument_2,
+                    read=read,
+                    root=prepared_argument_3,
+                )
         self.assertFalse(any("up" in command for command in docker.commands))
 
     def test_legacy_seed_needs_explicit_flag_and_known_accepted_content(self):
@@ -300,30 +390,21 @@ class DeploymentTests(unittest.TestCase):
             item.update(changes)
             docker = Docker()
             with self.subTest(changes=changes), tempfile.TemporaryDirectory() as folder:
+                prepared_argument_1 = lambda *_: None
+                prepared_argument_2 = lambda *_: b"legacy soft404"
+                prepared_argument_3 = Path(folder)
                 with self.assertRaises(ValueError):
                     deploy.publish(
                         item,
                         call=docker,
-                        verify=lambda *_: None,
-                        read=lambda *_: b"legacy soft404",
-                        root=Path(folder),
+                        verify=prepared_argument_1,
+                        read=prepared_argument_2,
+                        root=prepared_argument_3,
                     )
                 self.assertFalse(any("up" in command for command in docker.commands))
 
     def test_all_handled_signals_are_queued_and_drained_during_recovery(self):
-        source = """import importlib.util,signal,sys
-spec=importlib.util.spec_from_file_location("deploy",sys.argv[1])
-module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
-def interrupted(*_):
- raise KeyboardInterrupt()
-signals=(signal.SIGTERM,signal.SIGINT,signal.SIGHUP,signal.SIGALRM)
-for item in signals: signal.signal(item,interrupted)
-with module.recovery_signals_blocked():
- for item in signals: signal.raise_signal(item)
- assert signal.sigpending().issuperset(signals)
-assert not signal.sigpending().intersection(signals)
-print("recovery completed")
-"""
+        source = 'import importlib.util,signal,sys\nspec=importlib.util.spec_from_file_location("deploy",sys.argv[1])\nmodule=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)\ndef interrupted(*_):\n raise KeyboardInterrupt()\nsignals=(signal.SIGTERM,signal.SIGINT,signal.SIGHUP,signal.SIGALRM)\nfor item in signals: signal.signal(item,interrupted)\nwith module.recovery_signals_blocked():\n for item in signals: signal.raise_signal(item)\n assert signal.sigpending().issuperset(signals)\nassert not signal.sigpending().intersection(signals)\nprint("recovery completed")\n'
         result = subprocess.run(
             [sys.executable, "-c", source, str(SCRIPT)],
             check=False,
@@ -339,13 +420,17 @@ print("recovery completed")
             (Path(folder) / "pending.json").write_text(
                 '{"status":"activation-pending"}'
             )
+            prepared_argument_1 = payload()
+            prepared_argument_2 = lambda *_: None
+            prepared_argument_3 = lambda *_: b"prior"
+            prepared_argument_4 = Path(folder)
             with self.assertRaises(ValueError):
                 deploy.publish(
-                    payload(),
+                    prepared_argument_1,
                     call=docker,
-                    verify=lambda *_: None,
-                    read=lambda *_: b"prior",
-                    root=Path(folder),
+                    verify=prepared_argument_2,
+                    read=prepared_argument_3,
+                    root=prepared_argument_4,
                 )
         self.assertEqual(docker.commands, [])
 
@@ -358,12 +443,14 @@ print("recovery completed")
             def mismatch(*_):
                 raise ValueError("Public mismatch")
 
+            prepared_argument_1 = payload()
+            prepared_argument_2 = lambda *_: b"prior"
             with self.assertRaises(deploy.PublicationError) as failure:
                 deploy.publish(
-                    payload(),
+                    prepared_argument_1,
                     call=docker,
                     verify=mismatch,
-                    read=lambda *_: b"prior",
+                    read=prepared_argument_2,
                     root=root,
                 )
             self.assertFalse(failure.exception.report["rollback_verified"])
@@ -376,12 +463,14 @@ print("recovery completed")
                 any(cmd[:2] == ["docker", "rm"] for cmd in docker.commands)
             )
             commands_before = len(docker.commands)
+            prepared_argument_1 = payload()
+            prepared_argument_2 = lambda *_: b"prior"
             with self.assertRaises(ValueError):
                 deploy.publish(
-                    payload(),
+                    prepared_argument_1,
                     call=docker,
                     verify=mismatch,
-                    read=lambda *_: b"prior",
+                    read=prepared_argument_2,
                     root=root,
                 )
             self.assertEqual(len(docker.commands), commands_before)
@@ -410,28 +499,7 @@ print("recovery completed")
         self.assertEqual(observed, ["sha256:" + "1" * 64])
 
     def test_real_subprocess_fake_docker_restores_on_public_failure(self):
-        fake_source = """import json,sys
-from pathlib import Path
-statefile=Path(sys.argv[1]); args=sys.argv[2:]
-state=json.loads(statefile.read_text()); state["calls"].append(args)
-output=""
-if args[0]=="-c":
- output="a"*40+"\\trefs/heads/prod"
-elif args[0]=="ps":
- output=state["product"] if "label=com.docker.compose.service=prod_product" in args else state["active"]
-elif args[0]=="inspect":
- output=json.dumps({"id":state["active"],"image":state["image"],"project":"daodao-f2e","service":"prod_website"})
-elif args[0]=="exec":
- if args[2]=="test":
-  statefile.write_text(json.dumps(state))
-  sys.exit(0 if args[-1]=="/app/apps/website/out/zh-TW/blog.html" else 1)
- output="regular file|/app/apps/website/out/zh-TW/blog.html"
-elif args[0]=="compose" and "up" in args:
- override=Path(args[args.index("-f",args.index("-f")+1)+1])
- state["image"]=json.loads(override.read_text())["services"]["prod_website"]["image"]
- state["active"]="candidate" if "@" in state["image"] else "restored"
-statefile.write_text(json.dumps(state)); print(output)
-"""
+        fake_source = 'import json,sys\nfrom pathlib import Path\nstatefile=Path(sys.argv[1]); args=sys.argv[2:]\nstate=json.loads(statefile.read_text()); state["calls"].append(args)\noutput=""\nif args[0]=="-c":\n output="a"*40+"\\trefs/heads/prod"\nelif args[0]=="ps":\n output=state["product"] if "label=com.docker.compose.service=prod_product" in args else state["active"]\nelif args[0]=="inspect":\n output=json.dumps({"id":state["active"],"image":state["image"],"project":"daodao-f2e","service":"prod_website"})\nelif args[0]=="exec":\n if args[2]=="test":\n  statefile.write_text(json.dumps(state))\n  sys.exit(0 if args[-1]=="/app/apps/website/out/zh-TW/blog.html" else 1)\n output="regular file|/app/apps/website/out/zh-TW/blog.html"\nelif args[0]=="compose" and "up" in args:\n override=Path(args[args.index("-f",args.index("-f")+1)+1])\n state["image"]=json.loads(override.read_text())["services"]["prod_website"]["image"]\n state["active"]="candidate" if "@" in state["image"] else "restored"\nstatefile.write_text(json.dumps(state)); print(output)\n'
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             fake = root / "docker.py"
@@ -459,12 +527,14 @@ statefile.write_text(json.dumps(state)); print(output)
             def mismatch(*_):
                 raise ValueError("Actual public mismatch")
 
+            prepared_argument_1 = payload()
+            prepared_argument_2 = lambda *_: b"prior"
             with self.assertRaises(deploy.PublicationError) as failure:
                 deploy.publish(
-                    payload(),
+                    prepared_argument_1,
                     call=invoke,
                     verify=mismatch,
-                    read=lambda *_: b"prior",
+                    read=prepared_argument_2,
                     root=root,
                 )
             state = json.loads(statefile.read_text())
@@ -490,13 +560,16 @@ statefile.write_text(json.dumps(state)); print(output)
             item.update(change)
             docker = Docker()
             with self.subTest(change=change), tempfile.TemporaryDirectory() as folder:
+                prepared_argument_1 = lambda *_: None
+                prepared_argument_2 = lambda *_: b"prior"
+                prepared_argument_3 = Path(folder)
                 with self.assertRaises(ValueError):
                     deploy.publish(
                         item,
                         call=docker,
-                        verify=lambda *_: None,
-                        read=lambda *_: b"prior",
-                        root=Path(folder),
+                        verify=prepared_argument_1,
+                        read=prepared_argument_2,
+                        root=prepared_argument_3,
                     )
                 self.assertEqual(docker.commands, [])
 
@@ -527,17 +600,18 @@ statefile.write_text(json.dumps(state)); print(output)
         def failed(*_):
             raise ValueError("public bytes differ")
 
-        with (
-            tempfile.TemporaryDirectory() as folder,
-            self.assertRaises(deploy.PublicationError) as failure,
-        ):
-            deploy.publish(
-                payload(),
-                call=docker,
-                verify=failed,
-                read=lambda *_: b"prior",
-                root=Path(folder),
-            )
+        with tempfile.TemporaryDirectory() as folder:
+            prepared_argument_1 = payload()
+            prepared_argument_2 = lambda *_: b"prior"
+            prepared_argument_3 = Path(folder)
+            with self.assertRaises(deploy.PublicationError) as failure:
+                deploy.publish(
+                    prepared_argument_1,
+                    call=docker,
+                    verify=failed,
+                    read=prepared_argument_2,
+                    root=prepared_argument_3,
+                )
         self.assertTrue(failure.exception.report["rollback_verified"])
         self.assertTrue(failure.exception.report["product_unchanged"])
         self.assertEqual(docker.image, "sha256:" + "1" * 64)
@@ -547,21 +621,33 @@ statefile.write_text(json.dumps(state)); print(output)
         for mode in ("health", "termination"):
             docker = Docker()
             docker.fail_health = mode == "health"
+            original = KeyboardInterrupt()
 
-            def verify(*_, selected=mode):
+            def verify(*_, selected=mode, interruption=original):
                 if selected == "termination":
-                    raise KeyboardInterrupt()
+                    raise interruption
 
             with self.subTest(mode=mode), tempfile.TemporaryDirectory() as folder:
-                with self.assertRaises(deploy.PublicationError) as failure:
+                root = Path(folder)
+                item = payload()
+                expected = (
+                    KeyboardInterrupt
+                    if mode == "termination"
+                    else deploy.PublicationError
+                )
+                prepared_argument_1 = lambda *_: b"prior"
+                with self.assertRaises(expected) as failure:
                     deploy.publish(
-                        payload(),
+                        item,
                         call=docker,
                         verify=verify,
-                        read=lambda *_: b"prior",
-                        root=Path(folder),
+                        read=prepared_argument_1,
+                        root=root,
                     )
-                self.assertTrue(failure.exception.report["rollback_verified"])
+                report = json.loads((root / "last-result.json").read_text())
+                self.assertTrue(report["rollback_verified"])
+                if mode == "termination":
+                    self.assertIs(failure.exception, original)
 
     def test_invalid_manifest_paths_and_duplicate_routes_rejected(self):
         for path in (
@@ -583,14 +669,19 @@ statefile.write_text(json.dumps(state)); print(output)
     def test_stale_source_rejected_inside_lock_before_docker_mutation(self):
         docker = Docker()
         docker.frontend = "f" * 40
-        with tempfile.TemporaryDirectory() as folder, self.assertRaises(ValueError):
-            deploy.publish(
-                payload(),
-                call=docker,
-                verify=lambda *_: None,
-                read=lambda *_: b"prior",
-                root=Path(folder),
-            )
+        with tempfile.TemporaryDirectory() as folder:
+            prepared_argument_1 = payload()
+            prepared_argument_2 = lambda *_: None
+            prepared_argument_3 = lambda *_: b"prior"
+            prepared_argument_4 = Path(folder)
+            with self.assertRaises(ValueError):
+                deploy.publish(
+                    prepared_argument_1,
+                    call=docker,
+                    verify=prepared_argument_2,
+                    read=prepared_argument_3,
+                    root=prepared_argument_4,
+                )
         self.assertEqual(len(docker.commands), 1)
         self.assertEqual(docker.commands[0][0], "git")
 
@@ -623,14 +714,18 @@ statefile.write_text(json.dumps(state)); print(output)
         docker = Docker()
         docker.published_paths.append("/app/apps/website/out/en/blog/old-article.html")
         item = payload()
-        with tempfile.TemporaryDirectory() as folder, self.assertRaises(ValueError):
-            deploy.publish(
-                item,
-                call=docker,
-                verify=lambda *_: None,
-                read=lambda *_: b"prior",
-                root=Path(folder),
-            )
+        with tempfile.TemporaryDirectory() as folder:
+            prepared_argument_1 = lambda *_: None
+            prepared_argument_2 = lambda *_: b"prior"
+            prepared_argument_3 = Path(folder)
+            with self.assertRaises(ValueError):
+                deploy.publish(
+                    item,
+                    call=docker,
+                    verify=prepared_argument_1,
+                    read=prepared_argument_2,
+                    root=prepared_argument_3,
+                )
         self.assertFalse(any("up" in cmd or "pull" in cmd for cmd in docker.commands))
 
     def test_previous_bilingual_pages_must_both_be_restored(self):
@@ -643,17 +738,20 @@ statefile.write_text(json.dumps(state)); print(output)
                 return b"<html>legacy soft404</html>"
             return path.encode()
 
-        with (
-            tempfile.TemporaryDirectory() as folder,
-            self.assertRaises(deploy.PublicationError) as failure,
-        ):
-            deploy.publish(
-                payload(),
-                call=docker,
-                verify=lambda *_: (_ for _ in ()).throw(ValueError("mismatch")),
-                read=read,
-                root=Path(folder),
+        with tempfile.TemporaryDirectory() as folder:
+            prepared_argument_1 = payload()
+            prepared_argument_2 = lambda *_: (_ for _ in ()).throw(
+                ValueError("mismatch")
             )
+            prepared_argument_3 = Path(folder)
+            with self.assertRaises(deploy.PublicationError) as failure:
+                deploy.publish(
+                    prepared_argument_1,
+                    call=docker,
+                    verify=prepared_argument_2,
+                    read=read,
+                    root=prepared_argument_3,
+                )
         self.assertTrue(failure.exception.report["rollback_verified"])
         self.assertGreaterEqual(calls.count("/blog"), 2)
         self.assertGreaterEqual(calls.count("/en/blog"), 2)

@@ -1,4 +1,5 @@
 import os
+import re
 import subprocess
 import tempfile
 import unittest
@@ -49,14 +50,13 @@ class BlogCdOwnershipTests(unittest.TestCase):
         data = context("prod")
         data["needs.build-website.outputs.image-tag"] = ""
         data["needs.build-product.outputs.image-tag"] = "prod"
-        self.assertEqual(
+        self.assertTrue(
             workflow_condition(
                 self.jobs["deploy"]["environment"]
                 .replace("'production'", "true")
                 .replace("'development'", "false"),
                 data,
             ),
-            True,
         )
 
     def test_product_detection_uses_last_successful_product_revision(self):
@@ -131,6 +131,46 @@ class BlogCdOwnershipTests(unittest.TestCase):
         ):
             with self.subTest(key=key, value=value):
                 self.assertFalse(workflow_condition(expression, {**data, key: value}))
+
+    def test_all_legacy_channels_lock_before_shared_host_mutation(self):
+        step = next(
+            s
+            for s in self.jobs["deploy"]["steps"]
+            if s.get("name") == "Deploy to Linode"
+        )
+        parts = re.split(
+            r"\n\s*export APP_DIR=", step["run"].split("<< ENDSSH\n", 1)[1], maxsplit=1
+        )
+        self.assertEqual(len(parts), 2)
+        prefix = parts[0]
+        for channel in ("prod", "dev", "feat"):
+            with (
+                self.subTest(channel=channel),
+                tempfile.TemporaryDirectory() as directory,
+            ):
+                root = Path(directory)
+                lock = root / "host.lock"
+                marker = root / "locked"
+                binary = root / "flock"
+                binary.write_text('#!/bin/sh\nprintf "%s\\n" "$*" > "$LOCK_LOG"\n')
+                binary.chmod(0o755)
+                source = prefix.replace(
+                    "/var/lock/daodao-production-deploy.lock", str(lock)
+                )
+                subprocess.run(
+                    ["bash", "-e", "-c", source],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                    env={
+                        **os.environ,
+                        "APP_ENV": channel,
+                        "LOCK_LOG": str(marker),
+                        "PATH": str(root) + os.pathsep + os.environ["PATH"],
+                    },
+                )
+                self.assertTrue(lock.is_file())
+                self.assertEqual(marker.read_text().strip(), "-w 600 9")
 
     def setUp(self):
         self.jobs = yaml.safe_load(WORKFLOW.read_text())["jobs"]
