@@ -104,5 +104,15 @@
   "weekday_4": "Thu",
   "weekday_5": "Fri",
   "weekday_6": "Sat",
-  "event_period": "Event period"
+  "event_period": "Event period",
+  "shared_checkin_title": "Cohort practice check-in",
+  "shared_checkin_not_member": "You are not a member of this cohort, so you can't view or check in. If you signed up, make sure you're logged in with the account you used.",
+  "shared_checkin_not_found": "We couldn't find your practice for this link in this cohort. Please contact the host.",
+  "shared_checkin_ambiguous": "You have more than one matching practice in this cohort, so we can't tell which one to check in. Please contact the host.",
+  "shared_checkin_unavailable": "This practice hasn't been activated yet. Activate it from the cohort home first.",
+  "shared_checkin_not_started": "This practice starts on {date}. You can check in once it starts.",
+  "shared_checkin_ended": "This practice has ended and no longer accepts check-ins.",
+  "shared_checkin_ready": "Use the button below to check in for this practice.",
+  "shared_checkin_go_cohort": "Go to cohort home",
+  "shared_checkin_view_practice": "View practice"
 }

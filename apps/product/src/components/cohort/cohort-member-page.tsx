@@ -32,7 +32,7 @@ import { CohortQueryScope } from "./cohort-query-scope";
 /** 與「我的」頁一致的預設卡片主題色 */
 const DEFAULT_PRACTICE_THEME = "#FCDD84";
 
-function isNotMemberError(error: unknown): boolean {
+export function isNotMemberError(error: unknown): boolean {
   if (typeof error !== "object" || error === null || !("error" in error)) return false;
   const inner = (error as { error: unknown }).error;
   return (

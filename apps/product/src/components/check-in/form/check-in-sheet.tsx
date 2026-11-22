@@ -7,7 +7,7 @@ import { Form } from "@daodao/ui/components/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isBefore, startOfDay } from "date-fns";
 import { CalendarCheck, Check, ChevronDown, Eye, History, Sparkles } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { CheckInStatus } from "@/constants/check-in-status";
 import { useCheckInSheet } from "@/hooks/use-check-in-sheet";
@@ -212,6 +212,8 @@ interface ICheckInButtonProps
   beforeCheckIn?: () => Promise<boolean>;
   /** 開始日前停用打卡，且不提供提早開始 */
   disableBeforeStartDate?: boolean;
+  /** 掛載後自動開啟打卡表單一次（共用打卡連結使用）；不可打卡時不動作 */
+  autoOpen?: boolean;
   /**
    * 打卡前的進度百分比（用於顯示進度動畫）
    */
@@ -241,6 +243,7 @@ export const CheckInButton = ({
   labelOverride,
   beforeCheckIn,
   disableBeforeStartDate = false,
+  autoOpen = false,
   disabled: disabledProp,
   variant = "secondary",
   className,
@@ -321,6 +324,13 @@ export const CheckInButton = ({
 
     openCheckInSheet();
   };
+
+  const autoOpenedRef = useRef(false);
+  useEffect(() => {
+    if (!autoOpen || autoOpenedRef.current || !canCheckIn) return;
+    autoOpenedRef.current = true;
+    void handleClick();
+  });
 
   // 決定顯示的圖標
   const renderIcon = () => {
