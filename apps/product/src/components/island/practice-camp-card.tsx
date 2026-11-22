@@ -7,7 +7,7 @@ import { format } from "date-fns";
 import { BookOpenText, ChevronDown, ChevronUp, Flame, Home, X } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
-import { type ApiMoodType, MOOD_OPTIONS, mapApiMoodToMoodType } from "@/constants/mood";
+import { type ApiMoodType, MOOD_DISPLAY_OPTIONS, mapApiMoodToMoodType } from "@/constants/mood";
 
 /**
  * 島上實踐營火札記：
@@ -47,7 +47,7 @@ function CampCardContent({
     ? mapApiMoodToMoodType(latestCheckin.mood as ApiMoodType | undefined)
     : null;
   const MoodIcon = moodType
-    ? MOOD_OPTIONS.find((option) => option.id === moodType)?.emoji
+    ? MOOD_DISPLAY_OPTIONS.find((option) => option.id === moodType)?.emoji
     : undefined;
 
   return (
@@ -164,7 +164,7 @@ function CampCardContent({
                       checkin.mood as ApiMoodType | undefined
                     );
                     const CheckinMoodIcon = checkinMoodType
-                      ? MOOD_OPTIONS.find((option) => option.id === checkinMoodType)?.emoji
+                      ? MOOD_DISPLAY_OPTIONS.find((option) => option.id === checkinMoodType)?.emoji
                       : undefined;
                     return (
                       <li

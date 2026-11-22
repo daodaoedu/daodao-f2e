@@ -3,7 +3,7 @@
 import type { PracticeCheckInsResponse } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { useMemo } from "react";
-import { MOOD_OPTIONS, MoodType, mapApiMoodToMoodType } from "@/constants/mood";
+import { MOOD_DISPLAY_OPTIONS, MoodType, mapApiMoodToMoodType } from "@/constants/mood";
 import type { IMoodStat } from "../types";
 
 interface ICheckInRecordCardProps {
@@ -22,7 +22,7 @@ export const CheckInRecordCard = ({
   // 從打卡記錄計算心情統計
   const moodStats: IMoodStat[] = useMemo(() => {
     if (!checkInsData?.data) {
-      return MOOD_OPTIONS.map((option) => ({
+      return MOOD_DISPLAY_OPTIONS.map((option) => ({
         mood: option.id,
         count: 0,
       }));
@@ -30,20 +30,19 @@ export const CheckInRecordCard = ({
 
     // 初始化所有心情的計數為 0
     const moodCountMap = new Map<MoodType, number>();
-    MOOD_OPTIONS.forEach((option) => {
+    MOOD_DISPLAY_OPTIONS.forEach((option) => {
       moodCountMap.set(option.id, 0);
     });
 
     // 統計每個心情的出現次數（NULL mood fallback 到 neutral，避免被排除在心情排行之外）
     checkInsData.data.forEach((checkIn) => {
-      if (checkIn.mood === "bored") return;
       const moodType = mapApiMoodToMoodType(checkIn.mood) ?? MoodType.neutral;
       const currentCount = moodCountMap.get(moodType) ?? 0;
       moodCountMap.set(moodType, currentCount + 1);
     });
 
     // 轉換為陣列格式
-    return MOOD_OPTIONS.map((option) => ({
+    return MOOD_DISPLAY_OPTIONS.map((option) => ({
       mood: option.id,
       count: moodCountMap.get(option.id) ?? 0,
     }));
@@ -67,7 +66,7 @@ export const CheckInRecordCard = ({
         <div className="flex items-center justify-center gap-6">
           <div className="shrink-0 text-xs font-medium text-text-dark">{t("mood")}</div>
           <ul className="flex min-w-0 list-none items-center gap-1.5" aria-label={t("mood")}>
-            {MOOD_OPTIONS.map((moodOption, index) => {
+            {MOOD_DISPLAY_OPTIONS.map((moodOption, index) => {
               const stat = moodStats[index];
               const count = stat?.mood === moodOption.id ? stat.count : 0;
               const Emoji = moodOption.emoji;

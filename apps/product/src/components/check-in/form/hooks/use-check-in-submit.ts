@@ -2,7 +2,7 @@ import { useCreatePracticeCheckIn, useUpdatePracticeCheckIn } from "@daodao/api"
 import { useTranslations } from "@daodao/i18n";
 import { toast } from "@daodao/ui/components/sonner";
 import { useRef } from "react";
-import { mapMoodTypeToApiMood, MoodType, type MoodType as MoodTypeValue } from "@/constants/mood";
+import { MoodType, type MoodType as MoodTypeValue, mapMoodTypeToApiMood } from "@/constants/mood";
 import { useCheckInSuccessDialog } from "@/hooks/use-check-in-success-dialog";
 import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import type { ICheckInFormData } from "../../types";
@@ -77,7 +77,7 @@ export const useCheckInSubmit = ({
             : undefined;
 
         // 顯示成功對話框
-        const successResult = await openSuccessDialog(
+        await openSuccessDialog(
           progressPercentage,
           newProgressPercentage,
           encouragement,
@@ -87,19 +87,17 @@ export const useCheckInSubmit = ({
           }
         );
         let savedMood = initialMood;
-        if (successResult.value === "complete") {
-          const selectedMood = selectedMoodRef.current;
-          if (selectedMood !== initialMood) {
-            try {
-              await updateCheckIn(
-                { mood: mapMoodTypeToApiMood(selectedMood) },
-                String(response.data.id)
-              );
-              savedMood = selectedMood;
-            } catch (error) {
-              console.error("Check-in mood update failed:", error);
-              toast.error(t("mood_update_failed"));
-            }
+        const selectedMood = selectedMoodRef.current;
+        if (selectedMood !== initialMood) {
+          try {
+            await updateCheckIn(
+              { mood: mapMoodTypeToApiMood(selectedMood) },
+              String(response.data.id)
+            );
+            savedMood = selectedMood;
+          } catch (error) {
+            console.error("Check-in mood update failed:", error);
+            toast.error(t("mood_update_failed"));
           }
         }
 

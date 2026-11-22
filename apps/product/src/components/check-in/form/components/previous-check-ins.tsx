@@ -3,7 +3,7 @@
 import { usePracticeCheckIns } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { format, isValid, parse } from "date-fns";
-import { MOOD_OPTIONS, mapApiMoodToMoodType } from "@/constants/mood";
+import { MOOD_DISPLAY_OPTIONS, mapApiMoodToMoodType } from "@/constants/mood";
 import { CheckInDescriptionText } from "../../display/check-in-description-text";
 
 interface IPreviousCheckInsProps {
@@ -34,7 +34,7 @@ export function PreviousCheckIns({ practiceId }: IPreviousCheckInsProps) {
           {records.map((record) => {
             const date = parse(record.checkinDate, "yyyy-MM-dd", new Date());
             const moodType = mapApiMoodToMoodType(record.mood);
-            const mood = MOOD_OPTIONS.find((option) => option.id === moodType);
+            const mood = MOOD_DISPLAY_OPTIONS.find((option) => option.id === moodType);
             const MoodIcon = mood?.emoji;
 
             return (

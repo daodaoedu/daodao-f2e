@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { ICheckInFormData } from "@/components/check-in/types";
-import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
+import { MoodType } from "@/constants/mood";
 
 /**
  * 打卡表單驗證 schema
@@ -8,7 +8,7 @@ import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 export const createCheckInFormSchema = (t: (key: string) => string) =>
   z.object({
     mood: z
-      .enum(MOOD_OPTIONS.map((option) => option.id) as [MoodType, ...MoodType[]])
+      .enum(Object.values(MoodType) as [MoodType, ...MoodType[]])
       .nullable()
       .default(null)
       .refine((val) => val !== null, { message: t("validation_mood_required") }),

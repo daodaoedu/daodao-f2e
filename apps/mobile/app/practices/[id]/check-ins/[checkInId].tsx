@@ -41,7 +41,7 @@ import { ReactionPickerButton } from "@/components/reactions/ReactionPickerButto
 import { Button } from "@/components/ui/button";
 import {
   type ApiMoodType,
-  MOOD_OPTIONS,
+  MOOD_DISPLAY_OPTIONS,
   type MoodType,
   mapApiMoodToMoodType,
   mapMoodTypeToApiMood,
@@ -119,7 +119,7 @@ const normalizeMood = (mood?: ApiMoodType | MoodType | null): MoodType | null =>
   const apiMood = mapApiMoodToMoodType(mood as ApiMoodType);
   if (apiMood) return apiMood;
 
-  return MOOD_OPTIONS.some((option) => option.id === mood) ? (mood as MoodType) : null;
+  return MOOD_DISPLAY_OPTIONS.some((option) => option.id === mood) ? (mood as MoodType) : null;
 };
 
 /** 檢舉表單（對齊 product 的 tally 連結） */

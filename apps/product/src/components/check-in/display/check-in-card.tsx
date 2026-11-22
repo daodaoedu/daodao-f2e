@@ -4,7 +4,7 @@ import { NotebookHoleSvg, StampSvg, TapeSvg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
 import { cn } from "@daodao/ui/lib/utils";
 import * as React from "react";
-import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
+import { MOOD_DISPLAY_OPTIONS, type MoodType } from "@/constants/mood";
 import { isBlankContent } from "@/utils/check-in-content";
 import { getCheckInDateLabel } from "@/utils/check-in-date-label";
 import { MOOD_LABEL_CLASSNAME, TAG_CLASSNAME } from "./check-in-card-classnames";
@@ -60,7 +60,7 @@ export const CheckInCard = ({
   isCapture = false,
 }: ICheckInCardProps) => {
   const t = useTranslations("check_in");
-  const moodOption = mood ? MOOD_OPTIONS.find((option) => option.id === mood) : null;
+  const moodOption = mood ? MOOD_DISPLAY_OPTIONS.find((option) => option.id === mood) : null;
   const moodLabel = mood ? t(`moods.${mood}`) : "";
   const MoodEmoji = moodOption?.emoji;
 
