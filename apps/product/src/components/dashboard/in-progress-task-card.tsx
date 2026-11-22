@@ -183,7 +183,8 @@ export const InProgressTaskCard = ({
         {/* Check-in Button — always visible at bottom, separated from content */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: 此處用於阻止事件冒泡到父元素 */}
         <span
-          className={cn("mt-3 shrink-0 block", presentation !== "default" && "flex justify-end")}
+          // 非 default 時只佔按鈕本身寬度並靠右，避免整列空白處吃掉點擊而無法跳頁
+          className={cn("mt-3 shrink-0 block", presentation !== "default" && "ml-auto w-fit")}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();

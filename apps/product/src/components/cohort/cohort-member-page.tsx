@@ -136,57 +136,60 @@ function CohortMemberContent({ cohortId }: { cohortId: number }) {
 
       <main className="relative z-[25] pb-[72px] bg-very-light-gray">
         <div className="max-w-[640px] px-4 mx-auto pt-4">
-          <div className="mb-4 flex items-start justify-between gap-3">
-            <div>
-              <p className="text-xs font-medium text-logo-cyan">{home?.organization.name}</p>
-              <h1 className="mt-1 text-lg font-bold text-text-dark">
-                {home?.displayName ?? t("cohort_home")}
-              </h1>
+          <div className="mb-4">
+            <div className="flex items-center justify-between gap-3">
+              <p className="min-w-0 truncate text-xs font-medium text-logo-cyan">
+                {home?.organization.name}
+              </p>
+              <div className="flex shrink-0 items-center gap-1">
+                {home && (
+                  <CohortMeetingCalendar
+                    key={cohortId}
+                    sessions={home.sessions}
+                    sourceTimezone={home.timezone}
+                    location={home.location}
+                    meetingUrl={home.meetingUrl}
+                  />
+                )}
+                <Popover open={settingsMenuOpen} onOpenChange={setSettingsMenuOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-9 shrink-0 text-text-dark/60"
+                      aria-label={t("settings")}
+                    >
+                      <Settings className="size-5" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="min-w-48">
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        setSettingsMenuOpen(false);
+                        setPrivacySettingsOpen(true);
+                      }}
+                      className="w-full justify-start gap-2 text-text-dark"
+                    >
+                      <Settings className="size-4" />
+                      {t("settings_privacy")}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={contactCourseAdmin}
+                      className="w-full justify-start gap-2 text-text-dark"
+                    >
+                      <LogOut className="size-4" />
+                      {t("exit_program_activity")}
+                    </Button>
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
-            <div className="flex shrink-0 items-center gap-1">
-              {home && (
-                <CohortMeetingCalendar
-                  key={cohortId}
-                  sessions={home.sessions}
-                  sourceTimezone={home.timezone}
-                  location={home.location}
-                  meetingUrl={home.meetingUrl}
-                />
-              )}
-              <Popover open={settingsMenuOpen} onOpenChange={setSettingsMenuOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-9 shrink-0 text-text-dark/60"
-                    aria-label={t("settings")}
-                  >
-                    <Settings className="size-5" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent align="end" className="min-w-48">
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      setSettingsMenuOpen(false);
-                      setPrivacySettingsOpen(true);
-                    }}
-                    className="w-full justify-start gap-2 text-text-dark"
-                  >
-                    <Settings className="size-4" />
-                    {t("settings_privacy")}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={contactCourseAdmin}
-                    className="w-full justify-start gap-2 text-text-dark"
-                  >
-                    <LogOut className="size-4" />
-                    {t("exit_program_activity")}
-                  </Button>
-                </PopoverContent>
-              </Popover>
-            </div>
+            {/* 標題獨佔一列，不與右側圖示按鈕搶寬度 */}
+            <h1 className="text-lg font-bold text-text-dark">
+              {home?.displayName ?? t("cohort_home")}
+            </h1>
           </div>
 
           <h2 className="mb-4 text-sm font-medium text-text-dark">{t("my_cohort_practices")}</h2>
