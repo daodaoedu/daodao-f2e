@@ -58,6 +58,8 @@ export interface INotificationData {
   connectionRequestId?: string;
   /** 快速操作用的 buddyRequestId */
   buddyRequestId?: string;
+  chatNotificationKind?: "mention" | "general";
+  chatRoomName?: string;
 }
 
 export interface NotificationItemProps {
@@ -162,6 +164,18 @@ function NotificationText({ notification }: { notification: INotificationData })
             ：<span className="font-semibold">{content}</span>
           </>
         )}
+      </p>
+    );
+  }
+
+  if (type === NotificationType.chatMessage) {
+    const actionKey =
+      notification.chatNotificationKind === "mention"
+        ? "chat_message_mention"
+        : "chat_message_general";
+    return (
+      <p className="text-sm leading-5 line-clamp-2">
+        {name} {t(actionKey, { roomName: notification.chatRoomName || t("group_chat") })}
       </p>
     );
   }

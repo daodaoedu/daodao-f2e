@@ -7,7 +7,7 @@ import { Link } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { Input } from "@daodao/ui/components/input";
 import { cn } from "@daodao/ui/lib/utils";
-import { ChevronLeft, Search, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { useState } from "react";
 import { getChatRoomCover } from "@/constants/chat";
 import { chatRoomPreview, chatRoomTimeLabel } from "@/utils/chat-format";
@@ -126,19 +126,8 @@ export function ChatRoomList({ activeRoomId }: ChatRoomListProps) {
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
-      {/* Title area：返回、標題、搜尋 */}
+      {/* Title area：標題、搜尋 */}
       <div data-chat-room-list-head className="shrink-0 px-5 pt-6 pb-3">
-        {/* POC：返回「空間」頁 */}
-        <Button
-          asChild
-          variant="ghost"
-          size="icon"
-          className="mb-2.5 -ml-1.5 size-[30px] rounded-full text-[oklch(0.711_0.12_190.6)] hover:bg-[#F0F9F8] hover:text-[oklch(0.445_0.056_192)] [&_svg]:size-[18px]"
-        >
-          <Link href="/spaces" aria-label={t("room_header_back")}>
-            <ChevronLeft />
-          </Link>
-        </Button>
         <h1 className="mt-0 mb-3 text-xl font-bold text-[oklch(0.287_0.041_210.8)]">
           {t("title")}
         </h1>

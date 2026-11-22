@@ -16,7 +16,8 @@ export function ChatLayout({ roomId, children }: ChatLayoutProps) {
 
   return (
     // 手機版：上方留 68px 給固定的 app logo（全站慣例 pt-[68px]），否則返回鈕會被 logo 蓋住
-    <div className="flex h-[calc(100dvh-68px)] overflow-hidden pt-[68px] md:h-dvh md:pt-0">
+    // 桌機／平板收合側邊導覽（144px → 68px）時，往左補回 76px 貼齊導覽列（daodao#555）
+    <div className="flex h-[calc(100dvh-68px)] overflow-hidden pt-[68px] transition-[margin] duration-300 ease-in-out md:h-dvh md:pt-0 md:[:root[data-sidebar-collapsed=true]_&]:-ml-[76px]">
       {showList && (
         <aside
           className={cn(

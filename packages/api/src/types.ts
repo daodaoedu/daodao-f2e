@@ -8741,6 +8741,8 @@ export interface paths {
                                 } | null;
                                 /** @description 最近活動時間（ISO） */
                                 lastActivityAt: string;
+                                /** @description 第一則未讀訊息 ID；沒有未讀訊息時為 null */
+                                firstUnreadMessageId: number | null;
                                 /**
                                  * @description 當前使用者角色
                                  * @enum {string}
@@ -9423,6 +9425,10 @@ export interface paths {
                          * @example 42
                          */
                         replyToMessageId?: number;
+                        /** @description 被 @mention 的聊天室成員 ID 列表 */
+                        mentionedUserIds?: number[];
+                        /** @description 是否 @all（僅聊天室管理員可用） */
+                        mentionAll?: boolean;
                     };
                 };
             };
@@ -18297,7 +18303,7 @@ export interface paths {
                         /** @example 2026 夏季期 */
                         displayName: string;
                         /**
-                         * @description 一句話簡介（≤80 字）
+                         * @description 簡介（≤100 字）
                          * @example 一起學習、一起成長
                          */
                         tagline?: string;
@@ -18920,7 +18926,7 @@ export interface paths {
                     "application/json": {
                         slug?: string;
                         displayName?: string;
-                        /** @description 一句話簡介 */
+                        /** @description 簡介（≤100 字） */
                         tagline?: string | null;
                         startDate?: string;
                         endDate?: string;
@@ -51710,6 +51716,13 @@ export interface components {
              */
             created_at: string;
             actor: components["schemas"]["NotificationActor"];
+            /**
+             * @description 聊天室提及或一般新訊息
+             * @enum {string}
+             */
+            chatNotificationKind?: "mention" | "general";
+            /** @description 群組聊天室名稱 */
+            chatRoomName?: string;
             /**
              * @description 通知關聯內容的名稱
              * @example 學習地圖

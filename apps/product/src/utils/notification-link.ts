@@ -34,6 +34,25 @@ export function buildNotificationDeepLink(item: NotificationApiItem): string | n
   const extId = item.entityId;
 
   switch (item.entityType) {
+    case "chat_message":
+      if (!item.url) return null;
+      try {
+        const url = new URL(item.url, "https://app.daodao.so");
+        if (
+          url.protocol !== "https:" ||
+          !["app.daodao.so", "app-dev.daodao.so"].includes(url.host) ||
+          url.username ||
+          url.password ||
+          url.search ||
+          url.hash ||
+          !/^\/(?:en\/|zh-TW\/)?messages\/\d+$/.test(url.pathname)
+        ) {
+          return null;
+        }
+        return url.pathname.replace(/^\/(?:en|zh-TW)(?=\/)/, "");
+      } catch {
+        return null;
+      }
     case "comment":
       if (extId && item.checkinId) return `/practices/${extId}/check-ins/${item.checkinId}`;
       return extId ? `/practices/${extId}` : null;

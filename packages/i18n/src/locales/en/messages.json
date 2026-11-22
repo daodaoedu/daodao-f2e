@@ -11,7 +11,7 @@
   "last_message_mine": "You: {body}",
   "members_count": "{count} members",
   "room_header_back": "Back",
-  "input_placeholder": "Say something, the islanders are here",
+  "input_placeholder": "Share something",
   "input_hint": "Enter to send　·　Shift + Enter for a new line",
   "send": "Send",
   "system_message": "System message",
