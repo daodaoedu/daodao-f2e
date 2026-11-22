@@ -3,11 +3,11 @@
 import { useTranslations } from "@daodao/i18n";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
+import { format, parseISO } from "date-fns";
 import type { ICheckInDate, ICheckInDisplayData } from "../types";
 
 interface ICheckInDateButtonProps {
   item: ICheckInDate;
-  index: number;
   checkIns: Record<string, ICheckInDisplayData>;
   activeCheckInId: string;
   /** 目前打卡的日期（yyyy-MM-dd），用於同日多筆打卡時正確高亮 */
@@ -17,17 +17,16 @@ interface ICheckInDateButtonProps {
 }
 
 /**
- * 根據打卡次數計算橘色填充的透明度
- * 1 次 = 10%, 2 次 = 20%, ..., 10 次以上 = 100%
+ * 根據打卡次數計算橘色填充的透明度，讓單次打卡也能清楚辨識
+ * 1 次 = 28%，每多一次增加 8%，最多 100%
  */
 const getCheckInOpacity = (checkInCount: number): number => {
   if (checkInCount <= 0) return 0;
-  return Math.min(checkInCount * 0.1, 1);
+  return Math.min(0.28 + (checkInCount - 1) * 0.08, 1);
 };
 
 export const CheckInDateButton = ({
   item,
-  index,
   checkIns,
   activeCheckInId,
   activeDate,
@@ -42,6 +41,7 @@ export const CheckInDateButton = ({
   // 計算打卡次數對應的透明度
   const checkInCount = item.checkInCount ?? (hasCheckIn ? 1 : 0);
   const fillOpacity = getCheckInOpacity(checkInCount);
+  const date = parseISO(item.date);
 
   return (
     <Button
@@ -71,13 +71,14 @@ export const CheckInDateButton = ({
           ? `linear-gradient(to bottom, rgba(255, 157, 0, ${fillOpacity}), rgba(255, 157, 0, ${fillOpacity})), white`
           : "white",
       }}
+      aria-current={isActive ? "date" : undefined}
       aria-label={
         hasCheckIn
           ? t("date_select_record", { date: item.date })
           : t("date_no_record", { date: item.date })
       }
     >
-      <span className="relative z-10">{index + 1}</span>
+      <span className="relative z-10 text-base font-semibold">{format(date, "d")}</span>
     </Button>
   );
 };

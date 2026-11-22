@@ -57,12 +57,16 @@ export { isApiCommentNode } from "./api-comment-node";
 
 interface ICheckInDetailProps {
   checkInData: ICheckInDisplayData;
+  cohortName?: string;
+  organizationName?: string;
   /** 編輯完成回調 */
   onEditComplete?: (data: ICheckInFormData) => Promise<void> | void;
   /** 標題下方額外內容（如同日打卡切換導航） */
   afterTitle?: React.ReactNode;
   /** 所屬實踐頁路徑 */
   parentPracticeHref?: string;
+  /** Visitor-facing, read-only view with an explicit author label. */
+  visitorView?: boolean;
   /**
    * 是否為本人的打卡（控制選單內容）
    * true（預設）→ 顯示「編輯打卡」+「瀏覽活動」
@@ -281,14 +285,26 @@ export function CheckInCommentSheetContent({
 
 export const CheckInDetail = ({
   checkInData,
+  cohortName,
+  organizationName,
   onEditComplete,
   afterTitle,
   parentPracticeHref,
+  visitorView = false,
   isOwner = true,
 }: ICheckInDetailProps) => {
   const t = useTranslations("check_in");
   const locale = useLocale();
-  const { date, mood, content, tags, images, practiceTitle, viewCount } = checkInData;
+  const {
+    date,
+    mood,
+    content,
+    tags,
+    images,
+    practiceTitle,
+    authorName,
+    viewCount,
+  } = checkInData;
   const checkInId = checkInData.id;
 
   const [lightboxOpen, setLightboxOpen] = React.useState(false);
@@ -404,8 +420,17 @@ export const CheckInDetail = ({
       description: content,
       media: [],
       date,
+      authorName,
+      cohortName,
+      organizationName,
       images,
-    } as ICheckInFormData & { date: string; images?: string[] },
+    } as ICheckInFormData & {
+      date: string;
+      images?: string[];
+      authorName?: string;
+      cohortName?: string;
+      organizationName?: string;
+    },
   });
 
   const handleImageClick = useCallback((index: number) => {
@@ -449,6 +474,7 @@ export const CheckInDetail = ({
               showCloseButton: true,
             })
           }
+          aria-label={t("open_comments")}
           className="flex items-center gap-1.5 p-1.5 text-text-dark cursor-pointer"
         >
           <DialogOutlineSvg className="size-[22px]" />
@@ -467,6 +493,7 @@ export const CheckInDetail = ({
             <Button
               variant="ghost"
               size="icon"
+              aria-label={t("more_options")}
               className="size-9 rounded-full bg-primary-darker/60 text-white hover:bg-primary-darker/80 hover:text-white"
             >
               <Ellipsis className="size-5" />
@@ -513,6 +540,38 @@ export const CheckInDetail = ({
 
       <CheckInCard
         taskTitle={practiceTitle}
+        authorName={visitorView ? undefined : authorName}
+        cohortName={visitorView ? undefined : cohortName}
+        organizationName={visitorView ? undefined : organizationName}
+        titleMeta={
+          visitorView && authorName ? (
+            <div className="mt-1">
+              <p className="text-sm font-medium text-white">{authorName}</p>
+              {(organizationName || cohortName) && (
+                <p className="mx-auto mt-0.5 max-w-[280px] truncate text-xs text-white/80">
+                  {[organizationName, cohortName].filter(Boolean).join(" · ")}
+                </p>
+              )}
+            </div>
+          ) : undefined
+        }
+        paperFooterContent={
+          !visitorView && (authorName || cohortName || organizationName) ? (
+            <div className="min-w-0 pl-[22px] text-left text-logo-gray">
+              {(cohortName || organizationName) && (
+                <p className="max-w-[230px] truncate text-[10px] font-medium">
+                  {[organizationName, cohortName].filter(Boolean).join(" · ")}
+                </p>
+              )}
+              {authorName && !visitorView && (
+                <p className="mt-0.5 max-w-[230px] truncate text-xs">
+                  {authorName}
+                </p>
+              )}
+            </div>
+          ) : undefined
+        }
+        titleClassName="text-white"
         date={date}
         mood={mood}
         content={content}

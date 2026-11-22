@@ -8,8 +8,10 @@ import { cn } from "@daodao/ui/lib/utils";
 import { Plus, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { useTagPrompt } from "../hooks/use-tag-prompt";
 import type { CheckInFormValuesType } from "../schema";
+
+const isHiddenTag = (tag: string) =>
+  tag === "實作" || tag.trim().toLowerCase() === "practice";
 
 interface ITagSelectorProps {
   form: UseFormReturn<CheckInFormValuesType>;
@@ -23,10 +25,8 @@ interface ITagSelectorProps {
 export const TagSelector = ({ form, fallbackTags }: ITagSelectorProps) => {
   const t = useTranslations("check_in");
   const [customTagInput, setCustomTagInput] = useState("");
-  const [promptEnabled, setPromptEnabled] = useState(false);
   const locale = useLocale();
   const tags = form.watch("tags");
-  const { fetchAndAddPrompt } = useTagPrompt(form);
 
   // 取得引導句列表（用於顯示標籤選項）
   const { data: tagPromptsData } = useTagPrompts({
@@ -37,11 +37,15 @@ export const TagSelector = ({ form, fallbackTags }: ITagSelectorProps) => {
   // 從引導句列表中提取標籤名稱（限制 8 個）
   const availableTagsFromApi = useMemo(() => {
     if (!tagPromptsData?.data) return [];
-    return tagPromptsData.data.map((item: { tagName: string }) => item.tagName).slice(0, 8);
+    return tagPromptsData.data
+      .map((item: { tagName: string }) => item.tagName)
+      .filter((tag) => !isHiddenTag(tag))
+      .slice(0, 8);
   }, [tagPromptsData]);
 
   // API 無資料時使用 fallbackTags
-  const baseTagList = availableTagsFromApi.length > 0 ? availableTagsFromApi : (fallbackTags ?? []);
+  const baseTagList = (availableTagsFromApi.length > 0 ? availableTagsFromApi : (fallbackTags ?? []))
+    .filter((tag) => !isHiddenTag(tag));
 
   // 合併 API 取得的標籤和使用者自訂的標籤
   const availableTags = useMemo(
@@ -49,7 +53,7 @@ export const TagSelector = ({ form, fallbackTags }: ITagSelectorProps) => {
     [baseTagList, tags]
   );
 
-  const handleAddCustomTag = async () => {
+  const handleAddCustomTag = () => {
     const trimmedTag = customTagInput.trim();
     if (!trimmedTag) return;
 
@@ -58,9 +62,6 @@ export const TagSelector = ({ form, fallbackTags }: ITagSelectorProps) => {
 
     if (!tagExists) {
       form.setValue("tags", [...currentTags, trimmedTag]);
-      if (promptEnabled) {
-        await fetchAndAddPrompt(trimmedTag);
-      }
     }
     setCustomTagInput("");
   };
@@ -77,46 +78,20 @@ export const TagSelector = ({ form, fallbackTags }: ITagSelectorProps) => {
       control={form.control}
       name="tags"
       render={({ field }) => {
-        const handleToggle = async (tag: string) => {
+        const handleToggle = (tag: string) => {
           const currentTags = field.value || [];
           const isSelected = currentTags.includes(tag);
           const newTags = isSelected
             ? currentTags.filter((t: string) => t !== tag)
             : [...currentTags, tag];
           field.onChange(newTags);
-
-          // 當選中標籤且引導句開啟時，取得該標籤的引導句並更新 description
-          if (!isSelected && promptEnabled) {
-            await fetchAndAddPrompt(tag);
-          }
         };
 
         return (
           <FormItem className="mb-3">
             <FormControl>
               <div>
-                {/* 引導句開關 */}
-                <div className="flex items-center gap-2 mb-3">
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={promptEnabled}
-                    onClick={() => setPromptEnabled((v) => !v)}
-                    className={cn(
-                      "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
-                      promptEnabled ? "bg-logo-gray" : "bg-gray-200"
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow transition-transform",
-                        promptEnabled ? "translate-x-4" : "translate-x-0"
-                      )}
-                    />
-                  </button>
-                  <span className="text-sm text-gray-500">{t("auto_fill_text")}</span>
-                </div>
-                <div className="flex flex-wrap gap-x-2 gap-y-3 mb-3">
+                <div className="mb-3 flex flex-wrap gap-x-2 gap-y-2">
                   {availableTags.map((tag) => {
                     const isSelected = field.value?.includes(tag);
                     const checkboxId = `tag-${tag}`;
@@ -126,7 +101,7 @@ export const TagSelector = ({ form, fallbackTags }: ITagSelectorProps) => {
                         <label
                           htmlFor={checkboxId}
                           className={cn(
-                            "px-5 py-1.5 text-sm rounded-full border transition-colors flex items-center gap-1 cursor-pointer",
+                            "flex cursor-pointer items-center gap-1 rounded-full border px-3 py-1 text-sm transition-colors",
                             isSelected
                               ? "bg-logo-gray text-white border-logo-gray"
                               : "bg-white text-gray-700 border-logo-cyan hover:bg-logo-cyan/10"

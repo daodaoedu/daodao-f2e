@@ -86,7 +86,7 @@ export const CheckInCard = ({
     () => (mood ? MOOD_OPTIONS.find((option) => option.id === mood) : null),
     [mood]
   );
-  const MoodEmojiSvg = mood ? MOOD_EMOJI_SVG[mood] : null;
+  const MoodEmojiSvg = mood && moodOption ? MOOD_EMOJI_SVG[mood] : null;
   const contentSegments = useMemo(() => parseTextLinks(content), [content]);
 
   const handleOpenLink = useCallback(async (url: string) => {

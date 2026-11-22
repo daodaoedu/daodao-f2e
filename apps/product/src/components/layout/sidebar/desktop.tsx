@@ -8,22 +8,21 @@ import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { AccountMenu } from "./account-menu";
 import { BreathingDot } from "./breathing-dot";
 import { ChatUnreadBadge } from "./chat-unread-badge";
 import { menuItems } from "./constant";
-import type { SidebarProps } from "./type";
+import type { DesktopSidebarState, SidebarProps } from "./type";
 
-export const DesktopSidebar = ({ identifier }: SidebarProps) => {
+export const DesktopSidebar = ({
+  identifier,
+  isCollapsed,
+  onToggleSidebar,
+}: SidebarProps & DesktopSidebarState) => {
   const pathname = usePathname();
   const t = useTranslations("app_product");
-  const [isCollapsed, setIsCollapsed] = useState(false);
-
-  const handleToggleSidebar = useCallback(() => {
-    setIsCollapsed((prev) => !prev);
-  }, []);
 
   // 讓版面跟著收合：layout 的 md:pl-[144px] 是固定值，需要貼齊導覽列的頁面（聊天室）讀這個屬性（daodao#555）
   useEffect(() => {
@@ -51,7 +50,7 @@ export const DesktopSidebar = ({ identifier }: SidebarProps) => {
           "absolute z-10 size-[30px] rounded-full bg-white hover:bg-gray-50 transition-all duration-300",
           isCollapsed ? "top-3 left-1/2 -translate-x-1/2" : "top-3 right-[10px]"
         )}
-        onClick={handleToggleSidebar}
+        onClick={onToggleSidebar}
         aria-label={isCollapsed ? t("sidebar_expand") : t("sidebar_collapse")}
       >
         {isCollapsed ? (

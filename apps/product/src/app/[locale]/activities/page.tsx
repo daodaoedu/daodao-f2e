@@ -46,6 +46,7 @@ export default function ExploreActivitiesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<ActivityStatusFilter>("all");
   const [feeFilter, setFeeFilter] = useState<ActivityFeeFilter>(null);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const [hostDialogUserId, setHostDialogUserId] = useState<number | null>(null);
   const [hostDialogOpen, setHostDialogOpen] = useState(false);
@@ -119,7 +120,10 @@ export default function ExploreActivitiesPage() {
             />
             {content}
           </div>
-          <Sidebar />
+          <Sidebar
+            isCollapsed={isSidebarCollapsed}
+            onToggleSidebar={() => setIsSidebarCollapsed((collapsed) => !collapsed)}
+          />
         </>
       ) : (
         <>
