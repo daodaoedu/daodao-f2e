@@ -7,6 +7,7 @@ import re
 import stat
 import subprocess
 import tempfile
+import uuid
 from pathlib import Path
 
 DEV_ORIGIN = "https://dev.daodao.so"
@@ -20,10 +21,11 @@ OWNED_BASE_NAME = "base-compose.yaml"
 OVERLAY = OPERATOR / "compose.json"
 NGINX = OPERATOR / "nginx.conf"
 IMAGE = re.compile(r"^sha256:[a-f0-9]{64}$")
+CONFIGURATION_LABEL = "so.daodao.dev.configuration-operation"
 RELEASE = re.compile(r"^[a-f0-9]{64}$")
 
 
-def validate_container(value):
+def validate_container(value, allow_stopped=False):
     labels = value.get("Config", {}).get("Labels", {})
     if (
         labels.get("com.docker.compose.service") != SERVICE
@@ -38,7 +40,7 @@ def validate_container(value):
         )
     if not IMAGE.fullmatch(value.get("Image", "")):
         raise ValueError("Existing immutable image ID is required")
-    if value.get("State", {}).get("Status") != "running":
+    if not allow_stopped and value.get("State", {}).get("Status") != "running":
         raise ValueError("Existing development website is not running")
     mounts = value.get("Mounts", [])
     permitted = {
@@ -71,6 +73,7 @@ def validate_container(value):
         "image": value["Image"],
         "name": value["Name"],
         "managedMounts": bool(mounts),
+        "configurationToken": labels.get(CONFIGURATION_LABEL),
     }
 
 
@@ -104,12 +107,12 @@ def restored_legacy_namespace(image):
     return namespace
 
 
-def inspect_container(call=subprocess.check_output):
+def inspect_container(call=subprocess.check_output, allow_stopped=False):
     ids = call(
         [
             "docker",
             "ps",
-            "-q",
+            "-aq" if allow_stopped else "-q",
             "--filter",
             "label=com.docker.compose.service=" + SERVICE,
             "--filter",
@@ -123,14 +126,17 @@ def inspect_container(call=subprocess.check_output):
         )
     template = '{"Id":{{json .Id}},"Name":{{json .Name}},"Image":{{json .Image}},"Config":{"Image":{{json .Config.Image}},"Labels":{{json .Config.Labels}}},"State":{"Status":{{json .State.Status}}},"NetworkSettings":{"Networks":{{json .NetworkSettings.Networks}}},"Mounts":{{json .Mounts}}}'
     return validate_container(
-        json.loads(call(["docker", "inspect", "--format", template, ids[0]], text=True))
+        json.loads(
+            call(["docker", "inspect", "--format", template, ids[0]], text=True)
+        ),
+        allow_stopped=allow_stopped,
     )
 
 
-def overlay_payload(image):
+def overlay_payload(image, token=None):
     if not IMAGE.fullmatch(image):
         raise ValueError("An existing immutable image ID is required")
-    return {
+    result = {
         "services": {
             SERVICE: {
                 "image": image,
@@ -142,8 +148,14 @@ def overlay_payload(image):
         }
     }
 
+    if token is not None:
+        if not re.fullmatch("[a-f0-9]{32}", token):
+            raise ValueError("Fixed configuration operation token required")
+        result["services"][SERVICE]["labels"] = {CONFIGURATION_LABEL: token}
+    return result
 
-def compose_command(overlay=None):
+
+def compose_command(overlay=None, recreate=False):
     result = [
         "docker",
         "compose",
@@ -158,11 +170,21 @@ def compose_command(overlay=None):
         if Path(overlay) not in (OVERLAY, OPERATOR / "restore.json"):
             raise ValueError("Only owned fixed development overlays may be used")
         result += ["-f", str(overlay)]
-    return result + ["up", "-d", "--no-deps", "--wait", "--wait-timeout", "90", SERVICE]
+    return (
+        result
+        + ["up", "-d", "--no-deps", "--wait", "--wait-timeout", "90"]
+        + (["--force-recreate"] if recreate else [])
+        + [SERVICE]
+    )
 
 
 def compose_environment(snapshot):
-    namespace = snapshot.get("registryNamespace")
+    # Managed dev uses the captured image digest; this only fills unrelated base interpolation.
+    namespace = (
+        "managed-dev-unused"
+        if snapshot.get("managedMounts")
+        else snapshot.get("registryNamespace")
+    )
     if not namespace or not re.fullmatch(r"[a-z0-9][a-z0-9_.-]*", namespace):
         raise ValueError("Captured public image namespace is required")
     environment = {
@@ -356,6 +378,130 @@ def write_owned_overlay(image, nginx_source):
     atomic_owned_write(OVERLAY, json.dumps(overlay_payload(image), indent=2).encode())
 
 
+def managed_overlay(snapshot):
+    raw = read_owned_file(OVERLAY)
+    payload = json.loads(raw)
+    token = (
+        payload.get("services", {})
+        .get(SERVICE, {})
+        .get("labels", {})
+        .get(CONFIGURATION_LABEL)
+    )
+    if payload != overlay_payload(snapshot["image"], token):
+        raise ValueError("Managed compose provenance changed; unchanged")
+    if token != snapshot.get("configurationToken"):
+        raise ValueError("Managed configuration operation label differs; unchanged")
+    return raw
+
+
+def prepare_configuration(snapshot, nginx_source):
+    if not snapshot["managedMounts"]:
+        return snapshot
+    establish_operator()
+    previous_overlay = managed_overlay(snapshot)
+    previous_nginx = read_owned_file(NGINX)
+    if previous_nginx == nginx_source:
+        return snapshot
+    token = uuid.uuid4().hex
+    state = {
+        "schema": 1,
+        "token": token,
+        "snapshot": snapshot,
+        "previousNginx": previous_nginx.hex(),
+        "previousOverlay": previous_overlay.hex(),
+        "targetNginxSha256": hashlib.sha256(nginx_source).hexdigest(),
+        "targetOverlay": json.dumps(overlay_payload(snapshot["image"], token), indent=2)
+        .encode()
+        .hex(),
+    }
+    atomic_owned_write(
+        OPERATOR / "configuration-transition.json", json.dumps(state).encode()
+    )
+    return {**snapshot, "configurationTransition": token}
+
+
+def configuration_state(snapshot):
+    state = json.loads(read_owned_file(OPERATOR / "configuration-transition.json"))
+    original = {
+        key: value
+        for key, value in snapshot.items()
+        if key not in {"configurationTransition", "primaryFailure", "verifiedPreimage"}
+    }
+    # Recovery adds diagnostics, while the captured source identity stays immutable.
+    if (
+        state.get("schema") != 1
+        or state.get("token") != snapshot.get("configurationTransition")
+        or state.get("snapshot") != original
+    ):
+        raise ValueError("Configuration preimage identity changed; unchanged")
+    return state
+
+
+def validate_nginx(snapshot, nginx_source, run):
+    candidate = OPERATOR / "candidate-nginx.conf"
+    atomic_owned_write(candidate, nginx_source, 0o644)
+    run(
+        [
+            "docker",
+            "run",
+            "--rm",
+            "--network=none",
+            "--read-only",
+            "--cap-drop=ALL",
+            "--security-opt",
+            "no-new-privileges",
+            "--user",
+            "100:101",
+            "--tmpfs",
+            "/run:uid=100,gid=101,mode=0700",
+            "--tmpfs",
+            "/var/cache/nginx:uid=100,gid=101,mode=0700",
+            "--tmpfs",
+            "/var/log/nginx:uid=100,gid=101,mode=0700",
+            "--tmpfs",
+            "/var/lib/nginx/tmp:uid=100,gid=101,mode=0700",
+            "--tmpfs",
+            "/run/nginx:uid=100,gid=101,mode=0700",
+            "--mount",
+            "type=bind,src="
+            + str(candidate)
+            + ",dst=/etc/nginx/http.d/default.conf,readonly",
+            "--entrypoint",
+            "nginx",
+            snapshot["image"],
+            "-t",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+
+
+def recreate_managed(snapshot, run):
+    command = compose_command(OVERLAY, recreate=True)
+    prefix = command[: command.index("up")]
+    result = run(
+        prefix + ["config", "--format", "json"],
+        env=compose_environment(snapshot),
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    rendered = json.loads(result.stdout)
+    if rendered.get("services", {}).get(SERVICE, {}).get("image") != snapshot["image"]:
+        raise ValueError("Rendered managed image differs from captured immutable image")
+    run(
+        command,
+        env=compose_environment(snapshot),
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+
+
 def apply_overlay(snapshot, expected_compose_digest, nginx_source, run=subprocess.run):
     base_bytes = reviewed_base_compose(expected_compose_digest)
     current = inspect_container()
@@ -363,23 +509,86 @@ def apply_overlay(snapshot, expected_compose_digest, nginx_source, run=subproces
         raise ValueError("Development website changed since snapshot; no mutation")
     establish_store()
     if snapshot["managedMounts"]:
-        if read_owned_file(NGINX) != nginx_source:
+        if read_owned_file(NGINX) != nginx_source and not snapshot.get(
+            "configurationTransition"
+        ):
             raise ValueError(
                 "Managed Nginx configuration transition requires separate review; unchanged"
             )
-        if json.loads(read_owned_file(OVERLAY)) != overlay_payload(snapshot["image"]):
-            raise ValueError("Managed compose provenance changed; unchanged")
-        return current
-    atomic_owned_write(OPERATOR / OWNED_BASE_NAME, base_bytes)
-    write_owned_overlay(snapshot["image"], nginx_source)
-    run(
-        compose_command(OVERLAY),
-        env=compose_environment(snapshot),
-        check=True,
-        capture_output=True,
-        text=True,
-        timeout=120,
-    )
+        if (
+            hashlib.sha256(read_owned_file(OPERATOR / OWNED_BASE_NAME)).hexdigest()
+            != expected_compose_digest
+        ):
+            raise ValueError(
+                "Saved reviewed compose differs; no configuration mutation"
+            )
+        managed_overlay(snapshot)
+        if not snapshot.get("configurationTransition"):
+            return current
+        state = configuration_state(snapshot)
+        if (
+            read_owned_file(NGINX).hex() != state["previousNginx"]
+            or read_owned_file(OVERLAY).hex() != state["previousOverlay"]
+            or hashlib.sha256(nginx_source).hexdigest() != state["targetNginxSha256"]
+        ):
+            raise ValueError("Configuration transition input changed; unchanged")
+        validate_nginx(snapshot, nginx_source, run)
+        # Recheck all mutable preimages after the isolated syntax probe.
+        if (
+            inspect_container()["id"] != snapshot["id"]
+            or read_owned_file(NGINX).hex() != state["previousNginx"]
+            or read_owned_file(OVERLAY).hex() != state["previousOverlay"]
+        ):
+            raise ValueError("Configuration preimage changed during syntax probe")
+        atomic_owned_write(NGINX, nginx_source, 0o644)
+        atomic_owned_write(OVERLAY, bytes.fromhex(state["targetOverlay"]))
+    else:
+        atomic_owned_write(OPERATOR / OWNED_BASE_NAME, base_bytes)
+        write_owned_overlay(snapshot["image"], nginx_source)
+    if snapshot["managedMounts"]:
+        recreate_managed(snapshot, run)
+    else:
+        run(
+            compose_command(OVERLAY),
+            env=compose_environment(snapshot),
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+    return inspect_container()
+
+
+def restore_configuration(snapshot, run):
+    state = configuration_state(snapshot)
+    current = inspect_container(allow_stopped=True)
+    if (
+        current["image"] != snapshot["image"]
+        or not current["managedMounts"]
+        or (
+            current["id"] != snapshot["id"]
+            and current.get("configurationToken") != state["token"]
+        )
+    ):
+        raise ValueError("Managed service changed outside this operation; no overwrite")
+    nginx = read_owned_file(NGINX)
+    overlay = read_owned_file(OVERLAY)
+    if hashlib.sha256(nginx).hexdigest() not in {
+        hashlib.sha256(bytes.fromhex(state["previousNginx"])).hexdigest(),
+        state["targetNginxSha256"],
+    } or overlay.hex() not in {state["previousOverlay"], state["targetOverlay"]}:
+        raise ValueError(
+            "Managed configuration changed outside this operation; no overwrite"
+        )
+    if (
+        nginx.hex() == state["previousNginx"]
+        and overlay.hex() == state["previousOverlay"]
+        and current["id"] == snapshot["id"]
+    ):
+        return inspect_container()
+    atomic_owned_write(NGINX, bytes.fromhex(state["previousNginx"]), 0o644)
+    atomic_owned_write(OVERLAY, bytes.fromhex(state["previousOverlay"]))
+    recreate_managed(snapshot, run)
     return inspect_container()
 
 
@@ -390,6 +599,8 @@ def restore_previous(snapshot, expected_compose_digest, run=subprocess.run):
     if hashlib.sha256(saved_base).hexdigest() != expected_compose_digest:
         raise ValueError("Saved reviewed compose differs; no restore mutation")
     if snapshot["managedMounts"]:
+        if snapshot.get("configurationTransition"):
+            return restore_configuration(snapshot, run)
         current = inspect_container()
         if current["image"] != snapshot["image"] or not current["managedMounts"]:
             raise ValueError(

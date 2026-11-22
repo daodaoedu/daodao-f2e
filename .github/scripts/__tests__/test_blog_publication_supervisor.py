@@ -35,6 +35,7 @@ class PublicationSupervisorTests(unittest.TestCase):
             verify_base_compose=Mock(),
             establish_store=Mock(),
             record_journal=Mock(),
+            prepare_configuration=lambda snapshot, source: snapshot,
             apply_overlay=Mock(),
             restore_previous=Mock(),
         )
@@ -96,6 +97,7 @@ class PublicationSupervisorTests(unittest.TestCase):
             verify_base_compose=Mock(),
             establish_store=Mock(),
             record_journal=Mock(),
+            prepare_configuration=lambda snapshot, source: snapshot,
             apply_overlay=Mock(),
             restore_previous=Mock(),
         )
@@ -155,6 +157,50 @@ class PublicationSupervisorTests(unittest.TestCase):
         self.assertTrue(state["legacyContainerRestored"])
         self.assertFalse(state["recovery"]["localRecoveryVerified"])
         self.assertEqual(outcome, "recovery-failed")
+
+    def test_managed_config_restore_precedes_public_recovery_and_failure_stays_failed(
+        self,
+    ):
+        for restore_fails in (False, True):
+            with self.subTest(restore_fails=restore_fails):
+                events = []
+
+                def restore(*args, events=events, restore_fails=restore_fails):
+                    events.append("configuration")
+                    if restore_fails:
+                        raise ValueError("external container replaced operation")
+
+                adapter = SimpleNamespace(
+                    restore_previous=restore, record_journal=Mock()
+                )
+                snapshot = {"managedMounts": True, "configurationTransition": "d" * 32}
+
+                def recover(
+                    *args, events=events, restore_fails=restore_fails, **kwargs
+                ):
+                    events.append("release")
+                    return {
+                        "summary": {
+                            "localRecoveryVerified": True,
+                            "publicRecoveryVerified": not restore_fails,
+                        }
+                    }
+
+                with patch.object(SUPERVISOR, "phase", side_effect=recover):
+                    SUPERVISOR.recover_snapshot(
+                        adapter,
+                        Path("/owned"),
+                        {"baseComposeSha256": "b" * 64, "producerSha256": "c" * 64},
+                        snapshot,
+                        {"summary": {"previousId": "a" * 64}},
+                        True,
+                    )
+                self.assertEqual(events, ["configuration", "release"])
+                state, _, outcome = adapter.record_journal.call_args.args
+                self.assertEqual(state["configurationRestored"], not restore_fails)
+                self.assertEqual(
+                    outcome, "recovery-failed" if restore_fails else "restored"
+                )
 
     def test_public_input_dirs_are_traversable_under_private_umask(self):
         contents = {name: b"source" for name in SUPERVISOR.SOURCE_NAMES}

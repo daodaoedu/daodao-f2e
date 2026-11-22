@@ -254,9 +254,16 @@ def recover_snapshot(adapter, base, config, snapshot, initial, mounting):
         raise ValueError("Verified recovery identity missing")
     recovery = {"localRecoveryVerified": False, "publicRecoveryVerified": False}
     restored_container = snapshot["managedMounts"]
+    configuration_restored = not snapshot.get("configurationTransition")
+    if snapshot.get("configurationTransition"):
+        try:
+            adapter.restore_previous(snapshot, config["baseComposeSha256"])
+            configuration_restored = True
+        except RECOVERY_ERRORS:
+            recovery["configurationRestoreFailed"] = True
     try:
         recovered = phase(base, config, "recover", recovery=previous)
-        recovery = recovered["summary"]
+        recovery = {**recovery, **recovered["summary"]}
     except RECOVERY_ERRORS:
         recovery["stage"] = "capless-recovery-failed"
     finally:
@@ -269,11 +276,16 @@ def recover_snapshot(adapter, base, config, snapshot, initial, mounting):
     state = {
         **snapshot,
         "recovery": recovery,
+        "configurationRestored": configuration_restored,
         "legacyContainerRestored": restored_container
         if not snapshot["managedMounts"]
         else None,
     }
-    completed = recovery.get("localRecoveryVerified") is True and restored_container
+    completed = (
+        recovery.get("localRecoveryVerified") is True
+        and restored_container
+        and configuration_restored
+    )
     adapter.record_journal(
         state, config["producerSha256"], "restored" if completed else "recovery-failed"
     )
@@ -284,6 +296,10 @@ def execute_adapter(adapter, base, config):
     adoption = adapter.classify_adoption(snapshot)
     adapter.verify_base_compose(config["baseComposeSha256"])
     adapter.establish_store()
+    if snapshot["managedMounts"]:
+        snapshot = adapter.prepare_configuration(
+            snapshot, (base / "input/nginx.conf").read_bytes()
+        )
     adapter.record_journal(snapshot, config["producerSha256"], "prepared")
     try:
         initial = phase(
