@@ -37,8 +37,16 @@ describe("resolveSharedCheckinTarget", () => {
     expect(resolveSharedCheckinTarget(practices, 50, NOW)).toEqual({ kind: "ambiguous", count: 2 });
   });
 
-  it.each(["draft", "archived"] as const)("%s 實踐不可打卡", (status) => {
-    expect(resolveSharedCheckinTarget([practice({ status })], 50, NOW).kind).toBe("unavailable");
+  it("草稿實踐需先啟用，回報不可用", () => {
+    expect(resolveSharedCheckinTarget([practice({ status: "draft" })], 50, NOW).kind).toBe(
+      "unavailable"
+    );
+  });
+
+  it("封存實踐無法重新啟用，回報已結束而非引導啟用", () => {
+    expect(resolveSharedCheckinTarget([practice({ status: "archived" })], 50, NOW).kind).toBe(
+      "ended"
+    );
   });
 
   it("開始日在明天時回報尚未開始；開始日是今天則可打卡", () => {
