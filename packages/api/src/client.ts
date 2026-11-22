@@ -124,6 +124,7 @@ const executeFetch = async (input: RequestInfo | URL, init?: RequestInit): Promi
     const method = (init?.method ?? input.method ?? "GET").toUpperCase();
     const signal = init?.signal ?? input.signal ?? undefined;
     const credentials = init?.credentials ?? input.credentials;
+    const cache = init?.cache ?? input.cache;
     const url = applyMobileBaseUrl(input.url);
 
     let body: BodyInit | undefined;
@@ -141,6 +142,7 @@ const executeFetch = async (input: RequestInfo | URL, init?: RequestInit): Promi
       ...(signal ? { signal } : {}),
       // 僅在明確設定時帶 credentials（web cookie）；mobile 用 Bearer
       ...(credentials && credentials !== "same-origin" ? { credentials } : {}),
+      ...(cache && cache !== "default" ? { cache } : {}),
     });
   }
 

@@ -20,6 +20,30 @@ describe("client mobile auth bridge", () => {
     vi.restoreAllMocks();
   });
 
+  it.each([
+    { requestCache: "no-store", initCache: undefined, expected: "no-store" },
+    { requestCache: "reload", initCache: "no-cache", expected: "no-cache" },
+    { requestCache: "no-store", initCache: "default", expected: undefined },
+    { requestCache: "default", initCache: undefined, expected: undefined },
+  ] as const)("preserves explicit cache precedence: $requestCache / $initCache", async ({
+    requestCache,
+    initCache,
+    expected,
+  }) => {
+    const { unauthorizedHandler } = await importClient();
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(null));
+
+    await unauthorizedHandler.wrapFetch(
+      new Request("https://web.example/api/v1/auth/me", { cache: requestCache }),
+      initCache === undefined ? undefined : { cache: initCache }
+    );
+
+    const init = fetchMock.mock.calls[0]?.[1];
+    expect(init?.cache).toBe(expected);
+    if (expected === undefined) expect(init).not.toHaveProperty("cache");
+    expect(init?.credentials).toBe("include");
+  });
+
   it("keeps cookie credentials for web requests", async () => {
     const { clearMobileTokenProvider, unauthorizedHandler } = await importClient();
     clearMobileTokenProvider();
@@ -36,6 +60,41 @@ describe("client mobile auth bridge", () => {
     expect(fetchMock.mock.calls[0]?.[1]).toMatchObject({
       credentials: "include",
     });
+  });
+
+  it("preserves no-store through mobile URL rewriting and a refreshed-token retry", async () => {
+    const { client, initMobileClient, clearMobileClient, unauthorizedHandler } =
+      await importClient();
+    let token = "old-token";
+    initMobileClient({
+      baseUrl: "https://mobile.example:8443",
+      getToken: async () => token,
+    });
+    unauthorizedHandler.setHandler(async () => {
+      token = "new-token";
+      return true;
+    });
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(new Response(null, { status: 401 }))
+      .mockResolvedValueOnce(new Response("{}", { status: 200 }));
+
+    try {
+      await client.GET("/api/v1/auth/me", { cache: "no-store" });
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      for (const [index, [url, init]] of fetchMock.mock.calls.entries()) {
+        expect(url).toBe("https://mobile.example:8443/api/v1/auth/me");
+        expect(init?.cache).toBe("no-store");
+        expect(init).not.toHaveProperty("credentials");
+        expect(init).not.toHaveProperty("body");
+        expect(new Headers(init?.headers).get("Authorization")).toBe(
+          index === 0 ? "Bearer old-token" : "Bearer new-token"
+        );
+      }
+    } finally {
+      unauthorizedHandler.clearHandler();
+      clearMobileClient();
+    }
   });
 
   it("uses bearer token without cookie credentials for mobile requests", async () => {
