@@ -1,6 +1,7 @@
 "use client";
 
 import { useCohortMemberHome } from "@daodao/api";
+import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { Link } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
@@ -26,6 +27,16 @@ interface ICohortSharedCheckinPageProps {
  * 依登入者身分找出自己的實踐並開啟既有打卡表單。登入導回由 AuthProvider 的受保護路由處理。
  */
 export function CohortSharedCheckinPage(props: ICohortSharedCheckinPageProps) {
+  const { user } = useAuth();
+  // CohortQueryScope 以使用者 id 為 key；在登入者載入前就掛載，會先以 guest 掛一次、取得使用者後再重掛一次，
+  // 兩次掛載各自 autoOpen，疊出兩個打卡表單（dev 實測）。等登入者確定後才掛載，只開一次。
+  // 未登入者由 AuthProvider 的受保護路由導去登入，不會停在這裡。
+  if (!user)
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Spinner className="size-6" />
+      </div>
+    );
   return (
     <CohortQueryScope>
       <CohortSharedCheckinContent {...props} />
