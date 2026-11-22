@@ -93,10 +93,12 @@ class PreviewContextTests(unittest.TestCase):
         self.assertEqual(context["branch"], "content/review-42")
         self.assertEqual(context["origin"], self.environment["CF_PAGES_URL"])
         for root in (self.content, self.frontend):
-            self.assertEqual(
-                (git(root, "rev-parse", "HEAD"), git(root, "status", "--porcelain")),
-                before[str(root)],
+            actual_checkout_state = (
+                git(root, "rev-parse", "HEAD"),
+                git(root, "status", "--porcelain"),
             )
+            expected_checkout_state = before[str(root)]
+            self.assertEqual(actual_checkout_state, expected_checkout_state)
 
     def test_dependency_install_must_be_explicitly_disabled(self):
         for value in ("1", "true"):
@@ -252,6 +254,66 @@ class PullRequestIdentityTests(unittest.TestCase):
 
 
 class BuildEnvironmentTests(unittest.TestCase):
+    def setUp(self):
+        self.context = {
+            "content_sha": "a" * 40,
+            "frontend_sha": "b" * 40,
+            "branch": "content/review-42",
+            "origin": "https://c1d2e3f4.daodao-blog.pages.dev",
+        }
+
+    def test_missing_home_or_path_rejects_configuration(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            for missing in ("HOME", "PATH"):
+                for value in (None, ""):
+                    environment = {"HOME": str(root), "PATH": "/usr/bin:/bin"}
+                    if value is None:
+                        environment.pop(missing)
+                    else:
+                        environment[missing] = value
+                    with (
+                        self.subTest(missing=missing, value=value),
+                        patch.dict(os.environ, environment, clear=True),
+                        self.assertRaises(ValueError),
+                    ):
+                        preview.clean_build_environment(self.context, root)
+
+    def test_missing_home_stops_before_loading_helpers_or_running_build(self):
+        with (
+            tempfile.TemporaryDirectory() as temporary,
+            patch.dict(os.environ, {"PATH": "/usr/bin:/bin"}, clear=True),
+            patch.object(preview, "artifact_helper") as helper,
+            patch.object(preview.subprocess, "run") as child_run,
+        ):
+            root = Path(temporary).resolve()
+            with self.assertRaises(ValueError):
+                preview.build_preview(self.context, 42, root, root / "out")
+            helper.assert_not_called()
+            child_run.assert_not_called()
+
+    def test_home_cannot_be_public_writable_missing_file_or_symlink(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            writable = root / "writable"
+            writable.mkdir()
+            writable.chmod(0o777)
+            regular_file = root / "file"
+            regular_file.write_text("Not a home directory\n")
+            symlink = root / "linked-home"
+            symlink.symlink_to(root, target_is_directory=True)
+            for home in (writable, root / "missing", regular_file, symlink):
+                with (
+                    self.subTest(home=home.name),
+                    patch.dict(
+                        os.environ,
+                        {"HOME": str(home), "PATH": "/usr/bin:/bin"},
+                        clear=True,
+                    ),
+                    self.assertRaises(ValueError),
+                ):
+                    preview.clean_build_environment(self.context, root)
+
     def test_build_uses_only_controlled_public_configuration_and_draft_mode(self):
         context = {
             "content_sha": "a" * 40,
@@ -263,7 +325,7 @@ class BuildEnvironmentTests(unittest.TestCase):
             snapshot = Path(temporary).resolve()
             ambient = {
                 "PATH": "/usr/bin:/bin",
-                "HOME": "/home/preview-builder",
+                "HOME": str(snapshot),
                 "CI": "true",
                 "CLOUDFLARE_API_TOKEN": "private-cloudflare-token",
                 "GITHUB_TOKEN": "private-github-token",

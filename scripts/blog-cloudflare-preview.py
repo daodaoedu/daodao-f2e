@@ -6,6 +6,7 @@ import json
 import os
 import re
 import shutil
+import stat
 import subprocess
 import tempfile
 import time
@@ -16,11 +17,12 @@ from urllib.request import HTTPRedirectHandler, Request, build_opener
 CONTENT_REPOSITORY = "https://github.com/daodaoedu/daodao-blog.git"
 CONTENT_NAME = "daodaoedu/daodao-blog"
 SHA = re.compile(r"[a-f0-9]{40}")
+DISABLE_GIT_HOOKS = "core.hooksPath=/dev/null"
 
 
 def git(root, *args):
     return subprocess.check_output(
-        ["git", "-c", "core.hooksPath=/dev/null", "-C", str(root), *args],
+        ["git", "-c", DISABLE_GIT_HOOKS, "-C", str(root), *args],
         text=True,
         timeout=30,
     ).strip()
@@ -118,9 +120,35 @@ def resolve_pr(context, getter):
 
 
 def clean_build_environment(context, snapshot):
+    home = os.environ.get("HOME", "")
+    path = os.environ.get("PATH", "")
+    if (
+        not home
+        or not path
+        or any(character in home + path for character in ("\r", "\n"))
+        or any(
+            not entry or not Path(entry).is_absolute()
+            for entry in path.split(os.pathsep)
+        )
+    ):
+        raise ValueError("Explicit caller HOME and absolute PATH entries required")
+    home_root = Path(home)
+    try:
+        home_info = home_root.lstat()
+        canonical_home = home_root.resolve(strict=True)
+    except OSError as error:
+        raise ValueError("Caller HOME must be an existing owned directory") from error
+    if (
+        not home_root.is_absolute()
+        or canonical_home != home_root
+        or not stat.S_ISDIR(home_info.st_mode)
+        or home_info.st_uid != os.getuid()
+        or home_info.st_mode & 0o022
+    ):
+        raise ValueError("Caller HOME must be owned and not writable by other users")
     return {
-        "HOME": os.environ.get("HOME", "/tmp"),
-        "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+        "HOME": home,
+        "PATH": path,
         "CI": "1",
         "NEXT_OUTPUT": "export",
         "BLOG_CONTENT_MODE": "draft",
@@ -170,6 +198,7 @@ def artifact_helper(frontend_root):
 
 
 def build_preview(context, pr_number, frontend_root, output):
+    environment = clean_build_environment(context, frontend_root)
     helper = artifact_helper(frontend_root)
     with tempfile.TemporaryDirectory(prefix="daodao-article-preview-") as temporary:
         source = frontend_root / ".blog-dev-preview-source"
@@ -179,7 +208,7 @@ def build_preview(context, pr_number, frontend_root, output):
             [
                 "git",
                 "-c",
-                "core.hooksPath=/dev/null",
+                DISABLE_GIT_HOOKS,
                 "clone",
                 "--no-checkout",
                 "--filter=blob:none",
@@ -193,7 +222,7 @@ def build_preview(context, pr_number, frontend_root, output):
             [
                 "git",
                 "-c",
-                "core.hooksPath=/dev/null",
+                DISABLE_GIT_HOOKS,
                 "-C",
                 str(source),
                 "checkout",
@@ -211,7 +240,7 @@ def build_preview(context, pr_number, frontend_root, output):
             Path(temporary),
             origin=context["origin"],
         )
-        environment = clean_build_environment(context, Path(stage["snapshot"]))
+        environment["BLOG_CONTENT_DIR"] = stage["snapshot"]
         node = subprocess.check_output(
             ["node", "--version"], text=True, env=environment
         ).strip()

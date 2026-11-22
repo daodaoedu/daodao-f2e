@@ -17,7 +17,7 @@ Pages 的 build command 由維護者設定，從官方 `daodao-f2e` 取得完整
 | `SKIP_DEPENDENCY_INSTALL` | `true` |
 | `BLOG_PREVIEW_FRONTEND_SHA` | 已核准前端的完整 SHA |
 
-不新增 Cloudflare API token、不把憑證交給文章作者；沿用 Pages 的既有 Git integration。建置 child process 只取得 allowlist 的公開 dev URLs 與 draft/export 設定，不繼承正式站核准紀錄、分析 key、token、NODE_OPTIONS 或任意 NEXT_PUBLIC_*。
+不新增 Cloudflare API token、不把憑證交給文章作者；沿用 Pages 的既有 Git integration。建置 child process 只取得 allowlist 的公開 dev URLs 與 draft/export 設定，不繼承正式站核准紀錄、分析 key、token、NODE_OPTIONS 或任意 NEXT_PUBLIC_*。呼叫端必須提供明確 HOME 與絕對 PATH；HOME 必須是目前執行者擁有、非 symlink 且不可由其他使用者寫入的既有目錄，缺少時在載入 helper 或 clone 前停止，不回退到公用暫存目錄。
 
 受控 bootstrap command 必須先驗證 frontend pin 為完整40碼 SHA，建立全新暫存 checkout，固定官方 repo 並 checkout 該 pin，再呼叫：
 
@@ -35,13 +35,15 @@ python3 "$frontend/scripts/blog-cloudflare-preview.py" --content-root "$content"
 
 `blog-preview.json` 記錄 article PR、content/frontend SHA、雙語摘要值、路由與輸出檔案雜湊。預覽建置結束前再次核對 PR head；舊建置不能宣稱新版本已可審。各篇 PR 的不可變網址互不覆蓋，不需要取代共用 dev Website 或執行工程故障／回復矩陣。
 
-Pages 成功後，AI 從 PR 的 Cloudflare check 取得實際 deployment permalink，讀取 marker 並核對 PR/current head，再執行：
+Pages 成功後，AI 從 PR 的 Cloudflare check 取得實際 deployment permalink，讀取 marker 並核對 PR/current head。由可信任呼叫端先設定 `BLOG_PREVIEW_EVIDENCE_ROOT` 為獨立、受控的證據目錄，再執行：
 
 ```sh
 python3 scripts/blog-article-preview.py verify --origin https://DEPLOYMENT.daodao-blog.pages.dev --marker /private/expected-blog-preview.json
 ```
 
 `DEPLOYMENT` 必須是該次部署的實際八碼 ID，不能照抄 placeholder 或改用可移動 alias。expected marker 來自此次可信任建置／版本核對，不由任意網址自授權。驗證包含逐檔 bytes/MIME、兩語正文及未知文章404。完成桌機與手機渲染檢查後才交付中英文預覽網址；報告列出實際 viewport。
+
+CLI 的 `--validation`／`--marker` 僅能讀取上述受控目錄內的既有 regular JSON；不得由 CLI 檔案參數反推或擴大證據 root。沿用既有 bounded/no-follow 檔案讀取，拒絕 root 外路徑、檔案／父目錄 symlink 與超大輸入。`finalize --output` 預設只接受本 checkout 的 `apps/website/out` 範圍內既有目錄；獨立 artifact 存放方式須由可信任呼叫端另設 `BLOG_PREVIEW_ARTIFACT_ROOT`。`stage` 僅使用實際 frontend ROOT、受控 `RUNNER_TEMP`，若寫環境檔則必須完全匹配既有 `GITHUB_ENV`。這些 CLI 設定不改動受控建置程式直接呼叫 library 時的來源檢查。
 
 修改後維持同一 PR，等待新部署並更新審稿網址。內容、圖片或其依賴資料改變後，舊核准不適用。核准綁定已驗證的雙語 digest；合併後 digest 相同可沿用該核准，不要求因 merge SHA 改變而重審。
 

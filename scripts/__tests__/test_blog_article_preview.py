@@ -2,12 +2,16 @@ import copy
 import hashlib
 import importlib.util
 import json
+import os
 import subprocess
 import tempfile
 import threading
 import unittest
+import urllib.error
+import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import unquote
 
 SCRIPT = Path(__file__).resolve().parents[1] / "blog-article-preview.py"
 spec = importlib.util.spec_from_file_location("article_preview", SCRIPT)
@@ -165,33 +169,176 @@ class ArtifactTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "symlink"):
             self.finalize()
 
-    def test_cli_rejects_symlink_artifact_root(self):
-        linked = self.root / "linked-output"
-        linked.symlink_to(self.site, target_is_directory=True)
-        validation_file = self.root / "validation.json"
-        validation_file.write_text(json.dumps(self.validation))
-        result = subprocess.run(
-            [
-                "python3",
-                str(SCRIPT),
-                "finalize",
-                "--output",
-                str(linked),
-                "--validation",
-                str(validation_file),
-                "--pr-number",
-                "23",
-                "--content-sha",
-                "a" * 40,
-                "--frontend-sha",
-                "b" * 40,
-            ],
+    def cli(self, *arguments, environment=None):
+        env = os.environ.copy()
+        for key in (
+            "BLOG_PREVIEW_EVIDENCE_ROOT",
+            "BLOG_PREVIEW_ARTIFACT_ROOT",
+            "RUNNER_TEMP",
+            "GITHUB_ENV",
+        ):
+            env.pop(key, None)
+        env.update(environment or {})
+        return subprocess.run(
+            ["python3", str(SCRIPT), *arguments],
+            env=env,
             capture_output=True,
             text=True,
             check=False,
         )
+
+    def finalize_cli(self, validation, environment, output=None):
+        return self.cli(
+            "finalize",
+            "--output",
+            str(output or self.site),
+            "--validation",
+            str(validation),
+            "--pr-number",
+            "23",
+            "--content-sha",
+            "a" * 40,
+            "--frontend-sha",
+            "b" * 40,
+            environment=environment,
+        )
+
+    def evidence(self):
+        root = self.root / "evidence"
+        root.mkdir(exist_ok=True)
+        path = root / "validation.json"
+        path.write_text(json.dumps(self.validation))
+        return root, path
+
+    def test_cli_requires_independent_evidence_root_before_read(self):
+        _, validation = self.evidence()
+        result = self.finalize_cli(
+            validation, {"BLOG_PREVIEW_ARTIFACT_ROOT": str(self.site)}
+        )
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("Regular artifact directory", result.stderr)
+        self.assertIn("BLOG_PREVIEW_EVIDENCE_ROOT", result.stderr)
+        self.assertFalse((self.site / "blog-preview.json").exists())
+
+    def test_cli_rejects_validation_outside_evidence_scope(self):
+        scope, _ = self.evidence()
+        outside = self.root / "outside.json"
+        outside.write_text(json.dumps(self.validation))
+        result = self.finalize_cli(
+            outside,
+            {
+                "BLOG_PREVIEW_EVIDENCE_ROOT": str(scope),
+                "BLOG_PREVIEW_ARTIFACT_ROOT": str(self.site),
+            },
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("evidence root", result.stderr)
+        self.assertFalse((self.site / "blog-preview.json").exists())
+
+    def test_cli_rejects_symlink_and_parent_symlink_evidence(self):
+        scope, validation = self.evidence()
+        link = scope / "linked.json"
+        link.symlink_to(validation)
+        directory_link = scope / "linked-directory"
+        directory_link.symlink_to(scope, target_is_directory=True)
+        environment = {
+            "BLOG_PREVIEW_EVIDENCE_ROOT": str(scope),
+            "BLOG_PREVIEW_ARTIFACT_ROOT": str(self.site),
+        }
+        for path in (link, directory_link / "validation.json"):
+            result = self.finalize_cli(path, environment)
+            with self.subTest(path=path):
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("evidence root", result.stderr)
+        self.assertFalse((self.site / "blog-preview.json").exists())
+
+    def test_cli_bounds_evidence_read(self):
+        scope, validation = self.evidence()
+        validation.write_text(
+            json.dumps({**self.validation, "padding": "x" * (16 * 1024 * 1024)})
+        )
+        result = self.finalize_cli(
+            validation,
+            {
+                "BLOG_PREVIEW_EVIDENCE_ROOT": str(scope),
+                "BLOG_PREVIEW_ARTIFACT_ROOT": str(self.site),
+            },
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("evidence root", result.stderr)
+        self.assertFalse((self.site / "blog-preview.json").exists())
+
+    def test_cli_rejects_unconfigured_artifact_destination(self):
+        scope, validation = self.evidence()
+        result = self.finalize_cli(
+            validation, {"BLOG_PREVIEW_EVIDENCE_ROOT": str(scope)}
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("ARTIFACT", result.stderr.upper())
+        self.assertFalse((self.site / "blog-preview.json").exists())
+
+    def test_cli_authorized_artifact_and_evidence_succeed(self):
+        scope, validation = self.evidence()
+        result = self.finalize_cli(
+            validation,
+            {
+                "BLOG_PREVIEW_EVIDENCE_ROOT": str(scope),
+                "BLOG_PREVIEW_ARTIFACT_ROOT": str(self.site),
+            },
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue((self.site / "blog-preview.json").is_file())
+
+    def test_verify_cli_rejects_marker_outside_evidence_before_network(self):
+        scope, _ = self.evidence()
+        outside = self.root / "outside-marker.json"
+        outside.write_text("not JSON")
+        result = self.cli(
+            "verify",
+            "--origin",
+            "https://0123abcd.daodao-blog.pages.dev",
+            "--marker",
+            str(outside),
+            environment={"BLOG_PREVIEW_EVIDENCE_ROOT": str(scope)},
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("evidence root", result.stderr)
+
+    def test_verify_cli_accepts_scoped_marker_and_real_public_readback(self):
+        marker = self.finalize()
+        scope, _ = self.evidence()
+        receipt = scope / "marker.json"
+        receipt.write_text(json.dumps(marker))
+        origin = self.server()
+        result = self.cli(
+            "verify",
+            "--origin",
+            origin,
+            "--marker",
+            str(receipt),
+            environment={"BLOG_PREVIEW_EVIDENCE_ROOT": str(scope)},
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        verified = json.loads(result.stdout)
+        self.assertTrue(verified["ok"])
+        self.assertEqual(verified["content_sha"], "a" * 40)
+        self.assertEqual(
+            verified["routes"], [origin + "/blog/review", origin + "/en/blog/review"]
+        )
+
+    def test_cli_rejects_symlink_artifact_root(self):
+        linked = self.root / "linked-output"
+        linked.symlink_to(self.site, target_is_directory=True)
+        scope, validation = self.evidence()
+        result = self.finalize_cli(
+            validation,
+            {
+                "BLOG_PREVIEW_EVIDENCE_ROOT": str(scope),
+                "BLOG_PREVIEW_ARTIFACT_ROOT": str(self.root),
+            },
+            output=linked,
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("artifact root", result.stderr)
         self.assertFalse((self.site / "blog-preview.json").exists())
 
     def test_missing_article_and_404_rejected(self):
@@ -205,25 +352,29 @@ class ArtifactTests(unittest.TestCase):
 
     def server(self, tamper=None, unknown_status=404, redirect=False):
         site = self.site
+        routes = {"/": site / "index.html"}
+        for path in site.rglob("*"):
+            if not path.is_file():
+                continue
+            route = "/" + path.relative_to(site).as_posix()
+            routes[route] = path
+            if path.suffix == ".html":
+                routes[route[:-5]] = path
 
         class Handler(BaseHTTPRequestHandler):
             def do_GET(self):
-                route = self.path.split("?")[0]
+                route = unquote(self.path.split("?")[0])
                 if redirect:
                     self.send_response(302)
                     self.send_header("Location", "/index")
                     self.end_headers()
                     return
-                path = site / route.lstrip("/")
-                if route == "/":
-                    path = site / "index.html"
-                elif not path.is_file():
-                    path = site / (route.lstrip("/") + ".html")
-                if not path.is_file():
+                path = routes.get(route)
+                if path is None or not path.is_file():
                     self.send_response(unknown_status)
                     self.send_header("Content-Type", "text/html")
                     self.end_headers()
-                    self.wfile.write((site / "404.html").read_bytes())
+                    self.wfile.write((site / preview.NOT_FOUND_FILE).read_bytes())
                     return
                 data = (
                     tamper
@@ -251,6 +402,18 @@ class ArtifactTests(unittest.TestCase):
         self.addCleanup(server.shutdown)
         return "http://127.0.0.1:" + str(server.server_port)
 
+    def test_actual_http_server_blocks_plain_and_encoded_traversal(self):
+        secret = self.root / "private.txt"
+        secret.write_bytes(b"private evidence must remain outside server")
+        origin = self.server()
+        for path in ("/../private.txt", "/%2e%2e/private.txt", "/%2e%2e%2fprivate.txt"):
+            with self.subTest(path=path):
+                with self.assertRaises(urllib.error.HTTPError) as error:
+                    urllib.request.urlopen(origin + path)
+                self.assertEqual(error.exception.code, 404)
+                self.assertNotIn(secret.read_bytes(), error.exception.read())
+                error.exception.close()
+
     def test_actual_http_bytes_routes_mime_and_404_pass(self):
         marker = self.finalize()
         result = preview.verify(self.server(), marker)
@@ -259,8 +422,9 @@ class ArtifactTests(unittest.TestCase):
 
     def test_actual_http_changed_article_fails(self):
         marker = self.finalize()
+        origin = self.server(tamper=HTML + b"changed")
         with self.assertRaisesRegex(ValueError, "bytes or MIME"):
-            preview.verify(self.server(tamper=HTML + b"changed"), marker)
+            preview.verify(origin, marker)
 
     def test_wrong_marker_and_soft404_fail(self):
         marker = self.finalize()
@@ -269,15 +433,17 @@ class ArtifactTests(unittest.TestCase):
         origin = self.server()
         with self.assertRaisesRegex(ValueError, "marker differs"):
             preview.verify(origin, bad)
+        soft404_origin = self.server(unknown_status=200)
         with self.assertRaisesRegex(ValueError, "HTTP404"):
-            preview.verify(self.server(unknown_status=200), marker)
+            preview.verify(soft404_origin, marker)
 
     def test_redirects_are_not_followed(self):
         from urllib.error import HTTPError
 
         marker = self.finalize()
+        origin = self.server(redirect=True)
         with self.assertRaises(HTTPError):
-            preview.verify(self.server(redirect=True), marker)
+            preview.verify(origin, marker)
 
     def test_verify_does_not_allow_prod_or_moving_alias(self):
         for origin in (
@@ -398,6 +564,74 @@ class StageTests(unittest.TestCase):
         ):
             with self.subTest(kwargs=kwargs), self.assertRaises(ValueError):
                 self.stage(**kwargs)
+
+    def stage_cli(self, workspace, temporary, environment=None, output_env=None):
+        env = os.environ.copy()
+        for key in ("RUNNER_TEMP", "GITHUB_ENV"):
+            env.pop(key, None)
+        env.update(environment or {})
+        command = [
+            "python3",
+            str(SCRIPT),
+            "stage",
+            "--workspace",
+            str(workspace),
+            "--temporary",
+            str(temporary),
+            "--pr-number",
+            "23",
+            "--content-sha",
+            self.content_sha,
+            "--frontend-sha",
+            self.frontend_sha,
+        ]
+        if output_env:
+            command.extend(["--output-env", str(output_env)])
+        return subprocess.run(
+            command, env=env, capture_output=True, text=True, check=False
+        )
+
+    def test_cli_rejects_alternate_workspace(self):
+        result = self.stage_cli(
+            self.workspace, self.temporary, {"RUNNER_TEMP": str(self.temporary)}
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("trusted frontend ROOT", result.stderr)
+
+    def test_cli_requires_independent_temporary_scope(self):
+        result = self.stage_cli(SCRIPT.parents[1], self.temporary)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("RUNNER_TEMP", result.stderr)
+
+    def test_cli_rejects_temporary_escape(self):
+        result = self.stage_cli(
+            SCRIPT.parents[1], self.root, {"RUNNER_TEMP": str(self.temporary)}
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("temporary root", result.stderr)
+
+    def test_cli_rejects_environment_output_escape(self):
+        allowed = self.root / "allowed-env"
+        allowed.touch()
+        outside = self.root / "outside-env"
+        result = self.stage_cli(
+            SCRIPT.parents[1],
+            self.temporary,
+            {"RUNNER_TEMP": str(self.temporary), "GITHUB_ENV": str(allowed)},
+            outside,
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("trusted GITHUB_ENV", result.stderr)
+        self.assertFalse(outside.exists())
+
+    def test_environment_writer_refuses_symlink(self):
+        private = self.root / "private"
+        private.write_text("unchanged")
+        linked = self.root / "linked-env"
+        linked.symlink_to(private)
+        with self.assertRaises(OSError):
+            self.stage(output_env=linked)
+        self.assertEqual(private.read_text(), "unchanged")
 
     def test_nested_link_is_rejected_not_uploaded(self):
         (self.content / "articles/leak.md").symlink_to(self.root / "private")

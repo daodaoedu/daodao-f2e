@@ -5,10 +5,13 @@ import hashlib
 import importlib.util
 import json
 import mimetypes
+import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
+from functools import cache
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.error import HTTPError
@@ -22,6 +25,7 @@ MAX_FILES = 20000
 MAX_FILE_BYTES = 32 * 1024 * 1024
 MAX_TOTAL_BYTES = 2 * 1024 * 1024 * 1024
 MARKER = "blog-preview.json"
+NOT_FOUND_FILE = "404.html"
 
 
 def identity(pr_number, content_sha, frontend_sha):
@@ -118,12 +122,23 @@ def stage(
         if any("\n" in v or "\r" in v for v in values.values()):
             raise ValueError("Unsafe environment value")
         if output_env:
-            with output_env.open("a") as output:
-                output.writelines(f"{key}={value}\n" for key, value in values.items())
+            append_environment(output_env, values)
         return {**record, "snapshot": str(snapshot), "environment": values}
     except Exception:
         shutil.rmtree(snapshot)
         raise
+
+
+def append_environment(path, values):
+    descriptor = os.open(
+        path, os.O_WRONLY | os.O_APPEND | os.O_CREAT | os.O_NOFOLLOW, 0o600
+    )
+    info = os.fstat(descriptor)
+    if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
+        os.close(descriptor)
+        raise ValueError("Independent regular environment output required")
+    with os.fdopen(descriptor, "a") as output:
+        output.writelines(f"{key}={value}\n" for key, value in values.items())
 
 
 class ArticleHTML(HTMLParser):
@@ -196,6 +211,20 @@ def alias_chinese(root):
             shutil.copyfile(path, target)
 
 
+def validated_article_route(article):
+    metadata = article["metadata"]
+    lang, slug, article_id = metadata["lang"], metadata["slug"], metadata["id"]
+    if lang not in ("zh-TW", "en") or not re.fullmatch(
+        r"[a-z0-9]+(?:-[a-z0-9]+)*", slug
+    ):
+        raise ValueError("Unsupported article route from validator")
+    title = metadata.get("title")
+    if not isinstance(title, str) or not title.strip():
+        raise ValueError("Validated article title required")
+    route = ("/en" if lang == "en" else "") + "/blog/" + slug
+    return article_id, lang, route, title
+
+
 def validator_routes(validation):
     if (
         validation.get("ok") is not True
@@ -203,33 +232,21 @@ def validator_routes(validation):
         or validation.get("errors")
     ):
         raise ValueError("Successful shared draft validator result required")
-    routes = []
-    titles = {}
-    pairs = {}
+    titles, pairs = {}, {}
     for article in validation.get("articles", []):
-        metadata = article["metadata"]
-        lang, slug, article_id = metadata["lang"], metadata["slug"], metadata["id"]
-        if lang not in ("zh-TW", "en") or not re.fullmatch(
-            r"[a-z0-9]+(?:-[a-z0-9]+)*", slug
-        ):
-            raise ValueError("Unsupported article route from validator")
+        article_id, lang, route, title = validated_article_route(article)
         pairs.setdefault(article_id, set()).add(lang)
-        route = ("/en" if lang == "en" else "") + "/blog/" + slug
-        if route in routes:
+        if route in titles:
             raise ValueError("Duplicate article route")
-        title = metadata.get("title")
-        if not isinstance(title, str) or not title.strip():
-            raise ValueError("Validated article title required")
         titles[route] = title
-        routes.append(route)
     digests = validation.get("digests", {})
-    if not routes or any(languages != {"zh-TW", "en"} for languages in pairs.values()):
+    if not titles or any(languages != {"zh-TW", "en"} for languages in pairs.values()):
         raise ValueError("Complete bilingual article pairs required")
     if set(digests) != set(pairs) or any(
         not isinstance(v, str) or not DIGEST.fullmatch(v) for v in digests.values()
     ):
         raise ValueError("Shared bilingual digests required")
-    return sorted(routes), digests, titles
+    return sorted(titles), digests, titles
 
 
 def finalize(root, validation, pr_number, content_sha, frontend_sha):
@@ -242,7 +259,7 @@ def finalize(root, validation, pr_number, content_sha, frontend_sha):
         if not path.is_file():
             raise ValueError("Missing rendered bilingual article " + route)
         assert_draft_html(path.read_bytes(), titles[route])
-    if not (root / "404.html").is_file():
+    if not (root / NOT_FOUND_FILE).is_file():
         raise ValueError("Root 404.html required to disable SPA fallback")
     # Preview assets are static only; do not allow uploaded Pages configuration to select code or redirects.
     for name in ("_redirects", "_routes.json", ".assetsignore"):
@@ -332,98 +349,203 @@ def mime_ok(name, content_type):
     return expected is None or actual == expected
 
 
-def verify(origin, marker):
-    origin = preview_origin(origin)
+def validate_marker(marker):
     identity(marker["pr_number"], marker["content_sha"], marker["frontend_sha"])
     if (
         marker.get("kind") != "daodao-article-draft-preview"
         or marker.get("version") != 1
     ):
         raise ValueError("Unsupported preview marker")
-    if (
-        not isinstance(marker.get("files"), dict)
-        or not marker["files"]
-        or len(marker["files"]) > MAX_FILES
-    ):
+    files = marker.get("files")
+    if not isinstance(files, dict) or not files or len(files) > MAX_FILES:
         raise ValueError("Invalid preview file catalog")
-    opener = build_opener(NoRedirect())
 
-    def fetch(route, allow_missing=False):
+
+class PreviewHTTP:
+    def __init__(self, origin):
+        self.origin = preview_origin(origin)
+        self.opener = build_opener(NoRedirect())
+
+    def fetch(self, route, allow_missing=False):
+        url = self.origin + route
         request = Request(
-            origin + route,
+            url,
             headers={
                 "User-Agent": "DaoDao-Article-Preview-Verify/1",
                 "Cache-Control": "no-cache",
             },
         )
         try:
-            response = opener.open(request, timeout=20)
+            response = self.opener.open(request, timeout=20)
         except HTTPError as error:
-            if error.code == 404 and allow_missing:
-                response = error
-            else:
+            if error.code != 404 or not allow_missing:
                 error.close()
                 raise
+            response = error
         with response:
             data = response.read(MAX_FILE_BYTES + 1)
-            if response.geturl() != origin + route or len(data) > MAX_FILE_BYTES:
+            if response.geturl() != url or len(data) > MAX_FILE_BYTES:
                 raise ValueError("Redirected or oversized preview response")
             return data, response.headers, response.status
 
-    live, _, _ = fetch("/" + MARKER)
-    if json.loads(live) != marker:
-        raise ValueError("Public preview marker differs from expected revision")
-    total = 0
-    for name, info in marker["files"].items():
-        path = Path(name)
-        if (
-            path.is_absolute()
-            or ".." in path.parts
-            or any(c in name for c in ("\n", "\r", "\\", "?", "#", "%"))
-        ):
-            raise ValueError("Unsafe catalog path")
-        if name in ("_headers", "404.html"):
-            continue  # Pages consumes its control file rather than serving it.
-        route = "/" + quote(name, safe="/")
-        if name.endswith(".html"):
+
+def catalog_route(name):
+    path = Path(name)
+    if (
+        path.is_absolute()
+        or ".." in path.parts
+        or any(c in name for c in ("\n", "\r", "\\", "?", "#", "%"))
+    ):
+        raise ValueError("Unsafe catalog path")
+    if name in ("_headers", NOT_FOUND_FILE):
+        return None
+    route = "/" + quote(name, safe="/")
+    if name.endswith(".html"):
+        route = route[:-5]
+        if route.endswith("/index"):
             route = route[:-5]
-            if route.endswith("/index"):
-                route = route[:-5]
-        data, headers, _ = fetch(route)
+    return route
+
+
+def same_public_file(name, data, headers, info):
+    return (
+        bool(info)
+        and len(data) == info["size"]
+        and hashlib.sha256(data).hexdigest() == info["sha256"]
+        and mime_ok(name, headers.get("Content-Type", ""))
+    )
+
+
+def verify_catalog(http, files):
+    total = 0
+    for name, info in files.items():
+        route = catalog_route(name)
+        if route is None:
+            continue
+        data, headers, _ = http.fetch(route)
         total += len(data)
-        if (
-            total > MAX_TOTAL_BYTES
-            or len(data) != info["size"]
-            or hashlib.sha256(data).hexdigest() != info["sha256"]
-            or not mime_ok(name, headers.get("Content-Type", ""))
-        ):
+        if total > MAX_TOTAL_BYTES or not same_public_file(name, data, headers, info):
             raise ValueError("Public preview bytes or MIME differ: " + name)
+
+
+def verify_articles(http, marker):
     for route in marker["routes"]:
-        data, headers, _ = fetch(route)
+        data, headers, _ = http.fetch(route)
         assert_draft_html(data, marker["titles"][route])
         if "noindex" not in headers.get("X-Robots-Tag", "").lower():
             raise ValueError("Public preview lacks noindex response header")
-    missing, headers, status = fetch(
-        "/blog/daodao-preview-definitely-missing-" + marker["content_sha"],
-        allow_missing=True,
-    )
+
+
+def verify_missing(http, marker):
+    route = "/blog/daodao-preview-definitely-missing-" + marker["content_sha"]
+    data, headers, status = http.fetch(route, allow_missing=True)
     if status != 404:
         raise ValueError("Unknown article must return HTTP404")
-    expected_404 = marker["files"].get("404.html")
-    if (
-        not expected_404
-        or len(missing) != expected_404["size"]
-        or hashlib.sha256(missing).hexdigest() != expected_404["sha256"]
-        or not mime_ok("404.html", headers.get("Content-Type", ""))
+    if not same_public_file(
+        NOT_FOUND_FILE, data, headers, marker["files"].get(NOT_FOUND_FILE)
     ):
         raise ValueError("Public 404 bytes or MIME differ")
+
+
+def verify(origin, marker):
+    http = PreviewHTTP(origin)
+    validate_marker(marker)
+    live, _, _ = http.fetch("/" + MARKER)
+    if json.loads(live) != marker:
+        raise ValueError("Public preview marker differs from expected revision")
+    verify_catalog(http, marker["files"])
+    verify_articles(http, marker)
+    verify_missing(http, marker)
     return {
         "ok": True,
-        "origin": origin,
+        "origin": http.origin,
         "content_sha": marker["content_sha"],
-        "routes": [origin + route for route in marker["routes"]],
+        "routes": [http.origin + route for route in marker["routes"]],
         "verified_files": len(marker["files"]) - int("_headers" in marker["files"]),
     }
+
+
+@cache
+def evidence_reader():
+    name = "trusted_preview_release_filesystem"
+    spec = importlib.util.spec_from_file_location(
+        name, ROOT / "scripts/blog-release.py"
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def trusted_scope(variable, default=None):
+    configured = os.environ.get(variable, default)
+    if not configured:
+        raise ValueError("Trusted caller " + variable + " is required")
+    path = Path(configured).absolute()
+    if path != path.resolve(strict=True) or not path.is_dir():
+        raise ValueError(
+            "Trusted " + variable + " must be a canonical regular directory"
+        )
+    return path
+
+
+def scoped_directory(candidate, scope, label):
+    absolute = candidate.absolute()
+    if (
+        not absolute.is_relative_to(scope)
+        or absolute != absolute.resolve(strict=True)
+        or not absolute.is_dir()
+    ):
+        raise ValueError("Directory is outside trusted " + label)
+    return absolute
+
+
+def read_evidence_json(path):
+    scope = trusted_scope("BLOG_PREVIEW_EVIDENCE_ROOT")
+    reader = evidence_reader()
+    try:
+        data = reader.caller_input(path, scope)
+    except reader.ReleaseError as error:
+        raise ValueError(str(error)) from error
+    return json.loads(data)
+
+
+def cli_stage(args):
+    workspace = args.workspace.absolute()
+    if workspace != ROOT or workspace != workspace.resolve(strict=True):
+        raise ValueError("Stage workspace must be the trusted frontend ROOT")
+    temporary = scoped_directory(
+        args.temporary, trusted_scope("RUNNER_TEMP"), "temporary root"
+    )
+    if args.output_env:
+        configured = os.environ.get("GITHUB_ENV")
+        if not configured or args.output_env.absolute() != Path(configured).absolute():
+            raise ValueError("Stage output-env must match trusted GITHUB_ENV")
+        output = args.output_env.absolute()
+        if output != output.resolve(strict=True) or not output.is_file():
+            raise ValueError("Trusted GITHUB_ENV must be an existing regular file")
+    return stage(
+        args.pr_number,
+        args.content_sha,
+        args.frontend_sha,
+        workspace,
+        temporary,
+        args.output_env,
+        args.origin,
+    )
+
+
+def cli_finalize(args):
+    validation = read_evidence_json(args.validation)
+    scope = trusted_scope("BLOG_PREVIEW_ARTIFACT_ROOT", str(ROOT / "apps/website/out"))
+    output = scoped_directory(args.output, scope, "artifact root")
+    return finalize(
+        output, validation, args.pr_number, args.content_sha, args.frontend_sha
+    )
+
+
+def cli_verify(args):
+    return verify(args.origin, read_evidence_json(args.marker))
 
 
 def main():
@@ -447,26 +569,8 @@ def main():
     check.add_argument("--marker", type=Path, required=True)
     args = parser.parse_args()
     try:
-        if args.command == "stage":
-            result = stage(
-                args.pr_number,
-                args.content_sha,
-                args.frontend_sha,
-                args.workspace.resolve(),
-                args.temporary.resolve(),
-                args.output_env,
-                args.origin,
-            )
-        elif args.command == "finalize":
-            result = finalize(
-                args.output.absolute(),
-                json.loads(args.validation.read_text()),
-                args.pr_number,
-                args.content_sha,
-                args.frontend_sha,
-            )
-        else:
-            result = verify(args.origin, json.loads(args.marker.read_text()))
+        handlers = {"stage": cli_stage, "finalize": cli_finalize, "verify": cli_verify}
+        result = handlers[args.command](args)
         print(json.dumps(result, ensure_ascii=False))
         return 0
     except (

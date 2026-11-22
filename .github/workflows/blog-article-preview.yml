@@ -4,6 +4,8 @@ on:
     paths:
       - 'scripts/blog-article-preview.py'
       - 'scripts/blog-cloudflare-preview.py'
+      - '.github/scripts/blog-dev-preview.py'
+      - 'scripts/blog-release.py'
       - 'scripts/__tests__/test_blog_article_preview.py'
       - 'scripts/__tests__/test_blog_cloudflare_preview.py'
       - '.github/workflows/blog-article-preview.yml'
@@ -12,6 +14,8 @@ on:
     paths:
       - 'scripts/blog-article-preview.py'
       - 'scripts/blog-cloudflare-preview.py'
+      - '.github/scripts/blog-dev-preview.py'
+      - 'scripts/blog-release.py'
       - 'scripts/__tests__/test_blog_article_preview.py'
       - 'scripts/__tests__/test_blog_cloudflare_preview.py'
       - '.github/workflows/blog-article-preview.yml'
