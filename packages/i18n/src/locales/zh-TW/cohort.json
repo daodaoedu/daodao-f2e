@@ -104,5 +104,15 @@
   "weekday_4": "星期四",
   "weekday_5": "星期五",
   "weekday_6": "星期六",
-  "event_period": "活動期間"
+  "event_period": "活動期間",
+  "shared_checkin_title": "本期實踐打卡",
+  "shared_checkin_not_member": "你不是這一期的成員，無法查看或打卡。若你已報名，請確認登入的是報名時使用的帳號。",
+  "shared_checkin_not_found": "在這一期找不到你對應這個實踐的紀錄，請聯絡帶領人確認。",
+  "shared_checkin_ambiguous": "你在這一期有多筆相同的實踐，系統無法判斷要打卡哪一筆，請聯絡帶領人協助處理。",
+  "shared_checkin_unavailable": "這個實踐尚未啟用，暫時不能打卡。請到本期首頁啟用後再打卡。",
+  "shared_checkin_not_started": "這個實踐將於 {date} 開始，開始後才能打卡。",
+  "shared_checkin_ended": "這個實踐已經結束，無法再打卡。",
+  "shared_checkin_ready": "點下方按鈕即可為這個實踐打卡。",
+  "shared_checkin_go_cohort": "前往本期首頁",
+  "shared_checkin_view_practice": "查看實踐"
 }
