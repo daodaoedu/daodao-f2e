@@ -6,3 +6,4 @@ export { PageShell, type PageShellProps } from "./page-shell";
 export { ResourceFooter } from "./resource-footer";
 export { ResourceHeader } from "./resource-header";
 export { Sidebar } from "./sidebar";
+export { WithLayoutFrame } from "./with-layout-frame";

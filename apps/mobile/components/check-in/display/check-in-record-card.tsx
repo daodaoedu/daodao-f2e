@@ -54,6 +54,7 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
 
     // 統計每個心情的出現次數
     checkInsData.data.forEach((checkIn) => {
+      if (checkIn.mood === "bored") return;
       const moodType = mapApiMoodToMoodType(checkIn.mood);
       if (moodType) {
         const currentCount = moodCountMap.get(moodType) ?? 0;
@@ -159,7 +160,7 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
                     />
                   </View>
                   {/* Mood illustration (對齊 product 用 @daodao/assets 心情插畫) */}
-                  <MoodIcon width={28} height={28} />
+                  {MoodIcon ? <MoodIcon width={28} height={28} /> : null}
                   {/* Count */}
                   <Text
                     fontSize={12}

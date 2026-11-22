@@ -5,8 +5,9 @@ import { useTranslations } from "@daodao/i18n";
 import { Link } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { format, isValid, parse } from "date-fns";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import { isApiCommentNode } from "@/components/check-in/display/api-comment-node";
+import { CheckInDescriptionText } from "@/components/check-in/display/check-in-description-text";
 import { CheckInCommentSheetContent } from "@/components/check-in/display/check-in-detail";
 import { MOOD_OPTIONS, MoodType, mapApiMoodToMoodType } from "@/constants/mood";
 import { useCohortViewQuery } from "@/lib/cohort-view-query";
@@ -23,6 +24,7 @@ interface ICurrentUserProps {
 interface ICheckInCommentGroupProps extends ICurrentUserProps {
   practiceId: string;
   checkIn: PracticeCheckIn;
+  isVisible: boolean;
   onCountChange: (checkInId: string, count: number | null) => void;
 }
 
@@ -35,6 +37,7 @@ const formatCheckInDate = (checkinDate: string): string => {
 function CheckInCommentGroup({
   practiceId,
   checkIn,
+  isVisible,
   onCountChange,
   ...currentUser
 }: ICheckInCommentGroupProps) {
@@ -82,7 +85,7 @@ function CheckInCommentGroup({
   const Emoji = MOOD_OPTIONS.find((option) => option.id === mood)?.emoji;
 
   return (
-    <li className="overflow-hidden rounded-xl bg-white shadow-sm">
+    <li className={isVisible ? "overflow-hidden rounded-xl bg-white shadow-sm" : "hidden"}>
       <Link
         href={`/practices/${practiceId}/check-ins/${checkInId}${cohortViewQuery}`}
         className="flex items-start gap-3 border-b border-[#E4EAE9] bg-[#F0F9F8] px-4 py-3 transition-colors hover:bg-[#E7FAF7]"
@@ -96,7 +99,9 @@ function CheckInCommentGroup({
             <span>{t(`moods.${mood}`)}</span>
           </div>
           {checkIn.note && (
-            <p className="mt-0.5 line-clamp-2 text-sm text-text-dark">{checkIn.note}</p>
+            <p className="mt-0.5 line-clamp-2 text-sm text-text-dark">
+              <CheckInDescriptionText content={checkIn.note} />
+            </p>
           )}
         </div>
       </Link>
@@ -108,10 +113,6 @@ function CheckInCommentGroup({
 interface ICheckInCommentGroupsProps extends ICurrentUserProps {
   practiceId: string;
   checkInsData?: PracticeCheckInsResponse;
-  /** Shown above the groups once at least one check-in has comments */
-  heading: string;
-  /** Total number of comments across all check-ins, as known so far */
-  totalCount: number;
   onCountChange: (checkInId: string, count: number | null) => void;
 }
 
@@ -122,33 +123,69 @@ interface ICheckInCommentGroupsProps extends ICurrentUserProps {
 export function CheckInCommentGroups({
   practiceId,
   checkInsData,
-  heading,
-  totalCount,
   onCountChange,
   ...currentUser
 }: ICheckInCommentGroupsProps) {
+  const t = useTranslations("app_product");
   const checkIns = checkInsData?.data ?? [];
+  const [commentCounts, setCommentCounts] = useState<Record<string, number | null>>({});
+  const [showAll, setShowAll] = useState(false);
+
+  const [, startCountTransition] = useTransition();
+  const handleCountChange = useCallback(
+    (checkInId: string, count: number | null) => {
+      startCountTransition(() => {
+        setCommentCounts((previous) =>
+          previous[checkInId] === count ? previous : { ...previous, [checkInId]: count }
+        );
+      });
+      onCountChange(checkInId, count);
+    },
+    [onCountChange]
+  );
+
+  const checkInsWithComments = useMemo(
+    () => checkIns.filter((checkIn) => (commentCounts[String(checkIn.id)] ?? 0) > 0),
+    [checkIns, commentCounts]
+  );
+  const visibleCheckInIds = useMemo(
+    () =>
+      new Set(
+        (showAll ? checkInsWithComments : checkInsWithComments.slice(0, 2)).map((checkIn) =>
+          String(checkIn.id)
+        )
+      ),
+    [checkInsWithComments, showAll]
+  );
 
   if (checkIns.length === 0) {
     return null;
   }
 
   return (
-    <section className="mx-4 mb-4">
-      {totalCount > 0 && (
-        <h2 className="mb-2 px-1 text-xs font-medium text-[#6B8789]">{heading}</h2>
-      )}
+    <section className="ml-14 mr-4 mt-4 mb-4 md:ml-12 md:mr-0 md:mt-1">
       <ol className="flex flex-col gap-3">
         {checkIns.map((checkIn) => (
           <CheckInCommentGroup
             key={checkIn.id}
             practiceId={practiceId}
             checkIn={checkIn}
-            onCountChange={onCountChange}
+            isVisible={visibleCheckInIds.has(String(checkIn.id))}
+            onCountChange={handleCountChange}
             {...currentUser}
           />
         ))}
       </ol>
+      {checkInsWithComments.length > 2 && (
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => setShowAll((value) => !value)}
+          className="mt-1 w-full h-auto py-3 text-sm text-[#6B8789] hover:text-text-dark/60"
+        >
+          {t(showAll ? "comments_show_less" : "comments_show_more")}
+        </Button>
+      )}
     </section>
   );
 }
