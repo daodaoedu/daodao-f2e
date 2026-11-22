@@ -37,7 +37,10 @@ import {
   toEditScheduleValues,
 } from "@/utils/practice-edit-schedule";
 import { minEditableStartDate } from "@/utils/practice-period";
-import { getEditScheduleLocks } from "@/utils/practice-schedule-lock";
+import {
+  getEditScheduleLocks,
+  withoutLighthouseLockedScheduleFields,
+} from "@/utils/practice-schedule-lock";
 
 // API 錯誤響應類型
 interface ApiErrorResponse {
@@ -94,13 +97,13 @@ export default function EditPracticePage() {
   const isCohortPrivacyLocked =
     (practiceData?.data as { isCohortPrivacyLocked?: boolean } | undefined)
       ?.isCohortPrivacyLocked === true;
+  const isLighthouseCohortPractice = practiceData?.data?.isCohortPractice === true && !isChallenge;
   const isPrivacyLocked = isPracticePrivacyLocked({ isChallenge, isCohortPrivacyLocked });
 
-  // 已有打卡記錄才鎖期間與頻率（與 server stripLockedFields 一致）；
-  // 共同挑戰另鎖期間，但頻率仍可改（server CHALLENGE_LOCKED_UPDATE_FIELDS 不含頻率，daodao#385）
+  // Lighthouse 場次從指派時就鎖期間；一般實踐仍依打卡記錄鎖定，挑戰沿用既有規則。
   const { periodLocked, frequencyLocked } = useMemo(
-    () => getEditScheduleLocks({ ...practiceData?.data, isChallenge }),
-    [practiceData?.data, isChallenge]
+    () => getEditScheduleLocks({ ...practiceData?.data, isChallenge, isLighthouseCohortPractice }),
+    [practiceData?.data, isChallenge, isLighthouseCohortPractice]
   );
 
   // 取得日期驗證的最小日期
@@ -192,9 +195,12 @@ export default function EditPracticePage() {
 
     try {
       const apiRequest = withEditablePrivacy(
-        withoutChallengeLockedFields(
-          convertFormValuesToApiRequest(values, practiceData?.data ?? {}),
-          isChallenge
+        withoutLighthouseLockedScheduleFields(
+          withoutChallengeLockedFields(
+            convertFormValuesToApiRequest(values, practiceData?.data ?? {}),
+            isChallenge
+          ),
+          isLighthouseCohortPractice
         ),
         privacyStatus,
         isPrivacyLocked
@@ -298,6 +304,11 @@ export default function EditPracticePage() {
             {isChallenge && (
               <p className="rounded-lg bg-logo-cyan/10 px-4 py-3 text-sm text-text-dark">
                 {t("edit_challenge_locked")}
+              </p>
+            )}
+            {isLighthouseCohortPractice && (
+              <p className="rounded-lg bg-logo-cyan/10 px-4 py-3 text-sm text-text-dark">
+                {t("edit_cohort_schedule_locked")}
               </p>
             )}
             <Step1 form={form} nameDisabled={isChallenge} />
