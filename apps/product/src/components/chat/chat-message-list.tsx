@@ -8,7 +8,7 @@ import { Spinner } from "@daodao/ui/components/spinner";
 import { useEffect, useRef } from "react";
 import type { TimelineItem } from "@/hooks/use-chat-timeline";
 import { chatDayLabelParts } from "@/utils/chat-format";
-import { decideChatScroll, isNearBottom } from "@/utils/chat-scroll";
+import { decideChatScroll, isNearBottom, resolveUnreadAnchor } from "@/utils/chat-scroll";
 import { ChatMessageItem } from "./chat-message-item";
 
 interface ChatMessageListProps {
@@ -51,22 +51,22 @@ export function ChatMessageList({
     const last = messages[msgCount - 1];
     const scroller = bottomRef.current?.closest<HTMLElement>("[data-chat-scroll]");
     const prevCount = prevCountRef.current;
+    const anchorId = resolveUnreadAnchor(
+      firstUnreadMessageId,
+      messages.flatMap((i) => (i.type === "message" ? [i.message.id] : []))
+    );
     const action = decideChatScroll({
       prevCount,
       nextCount: msgCount,
-      firstUnreadMessageId,
-      firstUnreadLoaded:
-        firstUnreadMessageId !== null &&
-        messages.some((i) => i.type === "message" && i.message.id === firstUnreadMessageId),
+      firstUnreadMessageId: anchorId,
+      firstUnreadLoaded: anchorId !== null,
       anchored: anchoredRef.current,
       lastIsOwn: last?.type === "message" && isOwnChatMessage(last.message, viewerUserId),
     });
     if (msgCount !== prevCountRef.current) prevCountRef.current = msgCount;
     if (!scroller || action === "none") return;
     if (action === "first-unread") {
-      const target = scroller.querySelector<HTMLElement>(
-        `[data-chat-message="${firstUnreadMessageId}"]`
-      );
+      const target = scroller.querySelector<HTMLElement>(`[data-chat-message="${anchorId}"]`);
       if (target) {
         // 只捲對話區自己的捲動容器；scrollIntoView 會連 window 一起捲，把聊天室標頭推出畫面
         const offset = target.getBoundingClientRect().top - scroller.getBoundingClientRect().top;

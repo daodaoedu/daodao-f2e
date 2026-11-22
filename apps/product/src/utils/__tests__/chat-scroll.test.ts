@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { decideChatScroll, isNearBottom } from "../chat-scroll";
+import { decideChatScroll, isNearBottom, resolveUnreadAnchor } from "../chat-scroll";
 
 const base = {
   prevCount: 0,
@@ -54,5 +54,24 @@ describe("isNearBottom", () => {
   it("距底部 80px 內算回到底部，超過不算", () => {
     expect(isNearBottom({ scrollHeight: 1000, scrollTop: 520, clientHeight: 400 })).toBe(true);
     expect(isNearBottom({ scrollHeight: 1000, scrollTop: 500, clientHeight: 400 })).toBe(false);
+  });
+});
+
+describe("resolveUnreadAnchor", () => {
+  it("第一則未讀已載入就停在它", () => {
+    expect(resolveUnreadAnchor(42, [40, 41, 42, 43])).toBe(42);
+  });
+
+  it("未讀比載入的還多時，停在已載入最舊的一則", () => {
+    expect(resolveUnreadAnchor(10, [200, 201, 202])).toBe(200);
+  });
+
+  it("沒有未讀或還沒有訊息時不停留", () => {
+    expect(resolveUnreadAnchor(null, [1, 2])).toBeNull();
+    expect(resolveUnreadAnchor(5, [])).toBeNull();
+  });
+
+  it("第一則未讀比最新還新（例如已被刪除）時不停留", () => {
+    expect(resolveUnreadAnchor(300, [200, 201])).toBeNull();
   });
 });

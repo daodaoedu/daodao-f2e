@@ -38,6 +38,7 @@ import { SearchBar } from "@/components/chat/search-bar";
 import { useChatTimeline } from "@/hooks/use-chat-timeline";
 import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { runOptimisticDelete } from "@/utils/chat-optimistic-delete";
+import { CHAT_UNREAD_HISTORY_LIMIT } from "@/utils/chat-scroll";
 
 export default function ChatRoomPage() {
   const t = useTranslations("messages");
@@ -58,17 +59,22 @@ export default function ChatRoomPage() {
   const isHost = room?.viewerRole === "host";
   const mentionCandidates = useMemo<MentionCandidate[]>(() => {
     const candidates = selectChatMembers(membersData)
-      .filter((member) => member.userId !== viewerUserId)
+      // 沒有暱稱的成員無法用「@暱稱」辨識，server 也不會為他建立提及通知，不列入候選
+      .flatMap((member) =>
+        member.userId !== viewerUserId && member.nickname
+          ? [{ ...member, nickname: member.nickname }]
+          : []
+      )
       .map((member) => ({
         userId: String(member.userId),
         numericUserId: member.userId,
-        name: member.nickname ?? t("deleted_user"),
+        name: member.nickname,
         photoURL: member.avatar ?? undefined,
       }));
 
     candidates.unshift({ userId: "all", numericUserId: 0, name: "all", photoURL: undefined });
     return candidates;
-  }, [membersData, viewerUserId, t]);
+  }, [membersData, viewerUserId]);
   // 進入聊天室當下的第一則未讀，只取一次：標記已讀後聊天室詳情會重抓、值變 null，
   // 若跟著變，歷史訊息的查詢條件會改變而整批重載、捲動位置跑掉（daodao#555）
   const [entryUnread, setEntryUnread] = useState<{
@@ -76,7 +82,8 @@ export default function ChatRoomPage() {
     firstUnreadMessageId: number | null;
   } | null>(null);
   useEffect(() => {
-    if (room && entryUnread?.roomId !== roomId) {
+    // room.id 要對得上目前的 roomId，避免切換聊天室時拿到上一間的快取
+    if (room && room.id === roomId && entryUnread?.roomId !== roomId) {
       setEntryUnread({ roomId, firstUnreadMessageId: room.firstUnreadMessageId ?? null });
     }
   }, [room, roomId, entryUnread?.roomId]);
@@ -90,7 +97,7 @@ export default function ChatRoomPage() {
     mutate: mutateHistory,
   } = useChatMessageHistory(
     roomEntry ? roomId || null : null,
-    roomEntry?.firstUnreadMessageId != null ? roomEntry.firstUnreadMessageId + 1 : undefined
+    roomEntry?.firstUnreadMessageId != null ? CHAT_UNREAD_HISTORY_LIMIT : undefined
   );
 
   const historyMessages: ChatMessageType[] = useMemo(

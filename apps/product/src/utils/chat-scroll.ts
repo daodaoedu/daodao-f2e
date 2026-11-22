@@ -42,3 +42,20 @@ export function isNearBottom(el: {
 }) {
   return el.scrollHeight - el.scrollTop - el.clientHeight <= CHAT_NEAR_BOTTOM_PX;
 }
+
+/** 有未讀時一次載入的歷史則數（server CHAT_PAGE_MAX） */
+export const CHAT_UNREAD_HISTORY_LIMIT = 100;
+
+/**
+ * 進聊天室要停在哪一則：第一則未讀已載入就停在它；
+ * 未讀比載入的還多（第一則未讀比已載入最舊的還舊）時，停在已載入最舊的一則；沒有未讀回 null。
+ */
+export function resolveUnreadAnchor(
+  firstUnreadMessageId: number | null,
+  loadedIds: readonly number[]
+): number | null {
+  if (firstUnreadMessageId === null || loadedIds.length === 0) return null;
+  if (loadedIds.includes(firstUnreadMessageId)) return firstUnreadMessageId;
+  const oldest = Math.min(...loadedIds);
+  return firstUnreadMessageId < oldest ? oldest : null;
+}
