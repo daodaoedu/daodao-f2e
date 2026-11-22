@@ -36,7 +36,10 @@ class LinodeCdConcurrencyTest(unittest.TestCase):
         self.assertNotEqual(dev, feature)
 
     def test_newer_deploy_of_the_same_branch_still_replaces_the_older_one(self):
-        self.assertEqual(render_group(self.group, self.run_for("dev")), render_group(self.group, self.run_for("dev")))
+        older = render_group(self.group, {**self.run_for("dev"), "github.event.workflow_run.head_sha": "085162fd"})
+        newer = render_group(self.group, {**self.run_for("dev"), "github.event.workflow_run.head_sha": "e23dc526"})
+        self.assertEqual(older, newer)
+        self.assertEqual(newer, "linode-cd-dev-push")
         self.assertTrue(self.workflow["concurrency"]["cancel-in-progress"])
 
     def test_manual_dispatch_groups_by_its_own_branch(self):
