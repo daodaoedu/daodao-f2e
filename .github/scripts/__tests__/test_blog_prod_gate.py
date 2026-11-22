@@ -436,6 +436,62 @@ class GateTests(unittest.TestCase):
                 gate.stage_snapshot(snapshot, self.env)
             self.assertEqual(output.read_text(), "")
 
+    def test_corrupted_helper_env_output_cannot_authorize_external_baseline_write(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            snapshot, output, _ = self.stage_fixture(root)
+            outside = root / "outside-runner"
+            outside.mkdir(mode=0o700)
+            helper = gate.preview_helper()
+            original = helper.prepare
+
+            def corrupt_environment(staged, pin):
+                original(staged, pin)
+                with output.open("a") as stream:
+                    stream.write(f"BLOG_EVIDENCE_ROOT={outside}\n")
+
+            helper.prepare = corrupt_environment
+            with patch.object(gate, "preview_helper", return_value=helper):
+                try:
+                    gate.stage_snapshot(snapshot, self.env)
+                except ValueError:
+                    pass  # Rejection is safe only if the external path stayed untouched.
+            self.assertFalse((outside / "published-baseline.json").exists())
+
+    def test_validator_rejects_unknown_mode_and_external_private_files_before_child(
+        self,
+    ):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            cli = root / "packages/blog-content/node_modules/tsx/dist/cli.mjs"
+            cli.parent.mkdir(parents=True)
+            marker = root / "child-ran"
+            cli.write_text(
+                "import fs from 'node:fs';\n"
+                f"fs.writeFileSync({json.dumps(str(marker))}, 'unexpected');\n"
+                "process.stdout.write(JSON.stringify({ok:true}));\n"
+            )
+            content = root / "content"
+            content.mkdir()
+            evidence = root / "evidence"
+            evidence.mkdir(mode=0o700)
+            outside = root / "outside.json"
+            outside.write_text("[]")
+            outside.chmod(0o600)
+            linked = evidence / "approvals.json"
+            linked.symlink_to(outside)
+            inputs = [
+                {"mode": "--version"},
+                {"mode": "publish", "approvals": outside},
+                {"mode": "publish", "approvals": linked},
+                {"baseline": outside},
+            ]
+            for options in inputs:
+                with self.subTest(options=options), patch.object(gate, "ROOT", root):
+                    with self.assertRaises(ValueError):
+                        gate.shared_validation(content, evidence, **options)
+                    self.assertFalse(marker.exists())
+
     def test_validator_runtime_failure_and_malformed_report_fail_closed_without_stderr(
         self,
     ):

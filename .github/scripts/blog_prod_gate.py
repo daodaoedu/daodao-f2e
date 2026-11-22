@@ -254,8 +254,43 @@ def checked_baseline_checkout(snapshot, environment):
     return source
 
 
+def validation_directory(path):
+    if (
+        not isinstance(path, Path)
+        or not path.is_absolute()
+        or path.is_symlink()
+        or not path.is_dir()
+        or path.resolve(strict=True) != path
+    ):
+        raise ValueError("Validation inputs require canonical regular directories")
+    return path
+
+
+def private_validation_input(path, evidence, name):
+    fixed = evidence / name
+    if (
+        path != fixed
+        or fixed.is_symlink()
+        or not fixed.is_file()
+        or fixed.resolve(strict=True) != fixed
+        or fixed.stat().st_uid != os.getuid()
+        or stat.S_IMODE(fixed.stat().st_mode) != 0o600
+        or stat.S_IMODE(evidence.stat().st_mode) != 0o700
+    ):
+        raise ValueError("Validation evidence must use its private fixed runner path")
+    return fixed
+
+
 def shared_validation(content, evidence, mode="draft", approvals=None, baseline=None):
     """Invoke the actual shared CLI without pnpm's presentation/logging wrapper."""
+    if mode == "draft":
+        selected_mode = "draft"
+    elif mode == "publish":
+        selected_mode = "publish"
+    else:
+        raise ValueError("Unknown shared validation mode")
+    content = validation_directory(content)
+    evidence = validation_directory(evidence)
     command = [
         "node",
         str(ROOT / "packages/blog-content/node_modules/tsx/dist/cli.mjs"),
@@ -263,12 +298,16 @@ def shared_validation(content, evidence, mode="draft", approvals=None, baseline=
         "--root",
         str(content),
         "--mode",
-        mode,
+        selected_mode,
     ]
     if approvals is not None:
-        command += ["--approvals", str(approvals)]
+        approvals_file = private_validation_input(approvals, evidence, "approvals.json")
+        command += ["--approvals", str(approvals_file)]
     if baseline is not None:
-        command += ["--baseline", str(baseline)]
+        baseline_file = private_validation_input(
+            baseline, evidence, "published-baseline.json"
+        )
+        command += ["--baseline", str(baseline_file)]
     child_environment = {
         key: os.environ[key]
         for key in ("PATH", "HOME", "SystemRoot")
@@ -325,28 +364,17 @@ def published_baseline(report):
 
 
 def stage_snapshot(snapshot, environment):
-    """Use only the frozen approvals when invoking the existing shared staging helper."""
-    staged_environment = dict(environment)
-    staged_environment.update(
-        {
-            "BRANCH_NAME": "prod",
-            "BLOG_PROD_CONTENT_SHA": snapshot["content_sha"],
-            "BLOG_PROD_APPROVALS": canonical(snapshot["approvals"]).decode(),
-        }
-    )
+    """Keep runner-generated scope objects authoritative, never re-read output data."""
     helper = preview_helper()
     old_source = checked_baseline_checkout(snapshot, environment)
-    old_content = helper.snapshot_public_content(
-        old_source, private_runner_directory(environment)
-    )
-    helper.prepare(staged_environment, snapshot["content_sha"])
-    # The existing helper intentionally defaults to no baseline. Add the trusted
-    # previous-content identity baseline and validate before allowing the build.
-    values = {}
-    for line in Path(environment["GITHUB_ENV"]).read_text().splitlines():
-        key, value = line.split("=", 1)
-        values[key] = value
-    evidence = Path(values["BLOG_EVIDENCE_ROOT"])
+    source, temporary = helper.checked_checkout(environment, snapshot["content_sha"])
+    old_content = helper.snapshot_public_content(old_source, temporary)
+    content = helper.snapshot_public_content(source, temporary)
+    evidence = Path(tempfile.mkdtemp(prefix="blog-prod-evidence-", dir=temporary))
+    approvals_file = evidence / "approvals.json"
+    with approvals_file.open("xb") as output:
+        os.chmod(approvals_file, 0o600)
+        output.write(canonical(snapshot["approvals"]))
     old_report = shared_validation(old_content, evidence)
     baseline = published_baseline(old_report)
     baseline_file = evidence / "published-baseline.json"
@@ -354,18 +382,25 @@ def stage_snapshot(snapshot, environment):
         os.chmod(baseline_file, 0o600)
         output.write(canonical(baseline))
     report = shared_validation(
-        Path(values["BLOG_CONTENT_DIR"]),
+        content,
         evidence,
         mode="publish",
-        approvals=Path(values["BLOG_APPROVALS_FILE"]),
+        approvals=approvals_file,
         baseline=baseline_file,
     )
     if not set(baseline).issubset(
         {article["metadata"]["id"] for article in report["articles"]}
     ):
         raise ValueError("A publication cannot remove or replace existing article IDs")
+    values = {
+        "BLOG_CONTENT_DIR": str(content),
+        "BLOG_CONTENT_MODE": "publish",
+        "BLOG_APPROVALS_FILE": str(approvals_file),
+        "BLOG_PUBLISHED_BASELINE_FILE": str(baseline_file),
+        "BLOG_EVIDENCE_ROOT": str(evidence),
+    }
     with Path(environment["GITHUB_ENV"]).open("a") as output:
-        output.write(f"BLOG_PUBLISHED_BASELINE_FILE={baseline_file}\n")
+        output.writelines(f"{key}={value}\n" for key, value in values.items())
 
 
 def main():
