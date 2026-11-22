@@ -23,6 +23,22 @@ describe("parseTextLinks", () => {
       ],
     ],
     [
+      "URL followed directly by full-width punctuation (zh-TW)",
+      "我的日記 https://app-dev.daodao.so/practices/1。下次見，https://daodao.so！",
+      [
+        { type: "text", value: "我的日記 " },
+        { type: "url", value: "https://app-dev.daodao.so/practices/1" },
+        { type: "text", value: "。下次見，" },
+        { type: "url", value: "https://daodao.so" },
+        { type: "text", value: "！" },
+      ],
+    ],
+    [
+      "non-http scheme is not linked",
+      "看 javascript:alert(1) 這個",
+      [{ type: "text", value: "看 javascript:alert(1) 這個" }],
+    ],
+    [
       "multiple URLs",
       "http://a.com and https://b.com",
       [
