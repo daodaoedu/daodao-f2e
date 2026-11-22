@@ -1,4 +1,5 @@
 import {
+  BoredSvg,
   FineSvg,
   FrustratedSvg,
   HappySvg,
@@ -36,6 +37,13 @@ export const MOOD_OPTIONS: MoodOption[] = [
   { id: MoodType.neutral, label: "neutral", emoji: NeutralSvg },
   { id: MoodType.fine, label: "fine", emoji: FineSvg },
   { id: MoodType.happy, label: "happy", emoji: HappySvg },
+];
+
+/** Display all persisted API moods, including historical bored records. */
+export const MOOD_DISPLAY_OPTIONS: MoodOption[] = [
+  ...MOOD_OPTIONS.slice(0, 2),
+  { id: MoodType.bored, label: "bored", emoji: BoredSvg },
+  ...MOOD_OPTIONS.slice(2),
 ];
 
 /** 新增或修改打卡時可選擇的心情 */

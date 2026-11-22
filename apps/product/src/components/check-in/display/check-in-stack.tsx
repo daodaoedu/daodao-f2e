@@ -13,7 +13,7 @@ import Matter from "matter-js";
 import * as decomp from "poly-decomp-es";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  MOOD_OPTIONS,
+  MOOD_DISPLAY_OPTIONS,
   MoodType,
   type MoodType as MoodTypeType,
   mapApiMoodToMoodType,
@@ -259,7 +259,7 @@ const createPathBody = (x: number, y: number, pathElement: SVGPathElement): Matt
 };
 
 const MOOD_MAP = Object.fromEntries(
-  MOOD_OPTIONS.map((option) => [option.id, option.emoji])
+  MOOD_DISPLAY_OPTIONS.map((option) => [option.id, option.emoji])
 ) as Partial<Record<MoodTypeType, React.FC<React.SVGProps<SVGSVGElement>>>>;
 
 /**

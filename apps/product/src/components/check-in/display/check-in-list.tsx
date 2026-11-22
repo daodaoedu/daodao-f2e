@@ -7,7 +7,7 @@ import { Button } from "@daodao/ui/components/button";
 import { format, isValid, parse } from "date-fns";
 import { ChevronRight } from "lucide-react";
 import { useState } from "react";
-import { MOOD_OPTIONS, MoodType, mapApiMoodToMoodType } from "@/constants/mood";
+import { MOOD_DISPLAY_OPTIONS, MoodType, mapApiMoodToMoodType } from "@/constants/mood";
 import { useCohortViewQuery } from "@/lib/cohort-view-query";
 import { CheckInDescriptionText } from "./check-in-description-text";
 
@@ -49,7 +49,7 @@ export const CheckInList = ({ practiceId, checkInsData }: ICheckInListProps) => 
     <ol className="flex flex-col gap-2">
       {checkIns.slice(0, visibleCount).map((checkIn) => {
         const mood = mapApiMoodToMoodType(checkIn.mood) ?? MoodType.neutral;
-        const moodOption = MOOD_OPTIONS.find((option) => option.id === mood);
+        const moodOption = MOOD_DISPLAY_OPTIONS.find((option) => option.id === mood);
         const Emoji = moodOption?.emoji;
         const moodLabel = moodOption ? t(`moods.${mood}`) : null;
 

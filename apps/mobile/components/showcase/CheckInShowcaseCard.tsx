@@ -13,7 +13,7 @@ import { CommentSheet } from "@/components/persona/CommentSheet";
 import { CommentSection } from "@/components/practice/detail/CommentSection";
 import { ReactionPickerButton } from "@/components/reactions/ReactionPickerButton";
 import { Button } from "@/components/ui/button";
-import { MOOD_EMOJI_SVG, MOOD_OPTIONS, mapApiMoodToMoodType } from "@/constants/mood";
+import { MOOD_DISPLAY_OPTIONS, MOOD_EMOJI_SVG, mapApiMoodToMoodType } from "@/constants/mood";
 import type { ReactionTypeType } from "@/constants/reaction-type";
 import { colors } from "@/generated/design-tokens";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -83,7 +83,7 @@ export function CheckInShowcaseCard({
   );
 
   const frontendMood = mapApiMoodToMoodType(mood);
-  const moodOption = frontendMood ? MOOD_OPTIONS.find((m) => m.id === frontendMood) : null;
+  const moodOption = frontendMood ? MOOD_DISPLAY_OPTIONS.find((m) => m.id === frontendMood) : null;
   const MoodEmojiSvg = frontendMood ? MOOD_EMOJI_SVG[frontendMood] : null;
   const moodLabel = moodOption ? checkInT(`moods.${moodOption.id}`) : null;
   const hasContent = !!(note || (image_urls && image_urls.length > 0) || tags?.length);
