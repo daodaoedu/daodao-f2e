@@ -45288,6 +45288,11 @@ export interface components {
              */
             isCohortPractice?: boolean;
             /**
+             * @description 是否禁止複製（仍屬於場次或由場次模板建立，包含已解除關聯者；只在詳情回傳）
+             * @example false
+             */
+            isCopyRestricted?: boolean;
+            /**
              * @description 是否為燈塔場次實踐（隱私由場次統一設定，學員不可修改；只在詳情回傳）
              * @example false
              */

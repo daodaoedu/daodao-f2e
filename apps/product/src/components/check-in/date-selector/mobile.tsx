@@ -6,6 +6,7 @@ import { useSafeRouter } from "@daodao/ui/hooks/use-safe-router";
 import { cn } from "@daodao/ui/lib/utils";
 import { X } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCohortViewQuery } from "@/lib/cohort-view-query";
 import { CheckInDateButton } from "./check-in-date-button";
 import type { ICheckInDateSelectorProps } from "./types";
 
@@ -20,6 +21,8 @@ export const MobileCheckInDateSelector = ({
 }: ICheckInDateSelectorProps) => {
   const t = useTranslations("check_in");
   const router = useSafeRouter();
+
+  const cohortViewQuery = useCohortViewQuery();
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);
   const navRef = useRef<HTMLElement>(null);
@@ -131,7 +134,7 @@ export const MobileCheckInDateSelector = ({
   // 處理日期選擇
   const handleDateSelect = (selectedCheckInId: string) => {
     if (selectedCheckInId !== activeCheckInId) {
-      router.push(`/practices/${practiceId}/check-ins/${selectedCheckInId}`);
+      router.push(`/practices/${practiceId}/check-ins/${selectedCheckInId}${cohortViewQuery}`);
     }
   };
 
