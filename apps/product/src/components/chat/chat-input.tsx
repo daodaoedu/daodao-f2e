@@ -204,7 +204,9 @@ export function ChatInput({
             onKeyDown={handleKeyDown}
             placeholder={t("input_placeholder")}
             rows={1}
-            participants={mentionCandidates.filter((candidate) => candidate.userId !== "all" || isHost)}
+            participants={mentionCandidates.filter(
+              (candidate) => candidate.userId !== "all" || isHost
+            )}
             suggestionPosition="above"
             onMentionSelect={handleMentionSelect}
             onCompositionStart={compositionProps.onCompositionStart}

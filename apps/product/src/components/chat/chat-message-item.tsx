@@ -1,7 +1,6 @@
 "use client";
 
 import type { ChatMessageType } from "@daodao/api";
-import type { MentionCandidate } from "@daodao/features-mention";
 import {
   isOwnChatMessage,
   likeChatMessage,
@@ -9,6 +8,7 @@ import {
   unlikeChatMessage,
   unpinChatMessage,
 } from "@daodao/api";
+import type { MentionCandidate } from "@daodao/features-mention";
 import { useLocale, useTranslations } from "@daodao/i18n";
 import { parseTextLinks } from "@daodao/shared/lib/parse-text-links";
 import { Button } from "@daodao/ui/components/button";
@@ -22,9 +22,9 @@ import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { Heart, MoreHorizontal, Pencil, Pin, PinOff, Reply, Shield, Trash2 } from "lucide-react";
 import { useCallback, useState } from "react";
+import { tokenizeMentionContent } from "@/components/check-in/reactions/comment-mentions";
 import { formatChatClock } from "@/hooks/use-chat-timeline";
 import { formatRelativeTime } from "@/utils/format-time";
-import { tokenizeMentionContent } from "@/components/check-in/reactions/comment-mentions";
 import { ChatAvatar } from "./chat-avatar";
 
 // POC 訊息.dc.html 的色票：TEAL = oklch(0.711 0.12 190.6)、SLATE = oklch(0.445 0.056 192)
@@ -218,19 +218,23 @@ export function ChatMessageItem({
                 ) : (
                   // biome-ignore lint/suspicious/noArrayIndexKey: static parsed message segments
                   <span key={index}>
-                    {tokenizeMentionContent(segment.value, mentionCandidates).map((mention, mentionIndex) =>
-                      mention.type === "mention" ? (
-                        <span
+                    {tokenizeMentionContent(segment.value, mentionCandidates).map(
+                      (mention, mentionIndex) =>
+                        mention.type === "mention" ? (
+                          <span
+                            // biome-ignore lint/suspicious/noArrayIndexKey: static parsed message segments
+                            key={mentionIndex}
+                            className={cn(
+                              "font-semibold underline",
+                              isOwn ? "text-white" : "text-logo-cyan"
+                            )}
+                          >
+                            {mention.text}
+                          </span>
+                        ) : (
                           // biome-ignore lint/suspicious/noArrayIndexKey: static parsed message segments
-                          key={mentionIndex}
-                          className={cn("font-semibold underline", isOwn ? "text-white" : "text-logo-cyan")}
-                        >
-                          {mention.text}
-                        </span>
-                      ) : (
-                        // biome-ignore lint/suspicious/noArrayIndexKey: static parsed message segments
-                        <span key={mentionIndex}>{mention.text}</span>
-                      )
+                          <span key={mentionIndex}>{mention.text}</span>
+                        )
                     )}
                   </span>
                 )

@@ -11,9 +11,9 @@ import {
   selectChatMembers,
   selectChatPins,
   selectChatRoom,
+  useChatMembers,
   useChatMessageDelta,
   useChatMessageHistory,
-  useChatMembers,
   useChatPins,
   useChatRoom,
   useMyChatRooms,
@@ -69,6 +69,18 @@ export default function ChatRoomPage() {
     candidates.unshift({ userId: "all", numericUserId: 0, name: "all", photoURL: undefined });
     return candidates;
   }, [membersData, viewerUserId, t]);
+  // 進入聊天室當下的第一則未讀，只取一次：標記已讀後聊天室詳情會重抓、值變 null，
+  // 若跟著變，歷史訊息的查詢條件會改變而整批重載、捲動位置跑掉（daodao#555）
+  const [entryUnread, setEntryUnread] = useState<{
+    roomId: number;
+    firstUnreadMessageId: number | null;
+  } | null>(null);
+  useEffect(() => {
+    if (room && entryUnread?.roomId !== roomId) {
+      setEntryUnread({ roomId, firstUnreadMessageId: room.firstUnreadMessageId ?? null });
+    }
+  }, [room, roomId, entryUnread?.roomId]);
+  const roomEntry = entryUnread?.roomId === roomId ? entryUnread : null;
   const { mutate: mutateRooms } = useMyChatRooms();
   const { data: pinsData, mutate: mutatePins } = useChatPins(roomId || null);
 
@@ -77,8 +89,8 @@ export default function ChatRoomPage() {
     isLoading: historyLoading,
     mutate: mutateHistory,
   } = useChatMessageHistory(
-    room ? roomId || null : null,
-    room?.firstUnreadMessageId != null ? room.firstUnreadMessageId + 1 : undefined
+    roomEntry ? roomId || null : null,
+    roomEntry?.firstUnreadMessageId != null ? roomEntry.firstUnreadMessageId + 1 : undefined
   );
 
   const historyMessages: ChatMessageType[] = useMemo(
@@ -243,6 +255,7 @@ export default function ChatRoomPage() {
                 isHost={isHost}
                 viewerUserId={viewerUserId}
                 mentionCandidates={mentionCandidates}
+                firstUnreadMessageId={roomEntry?.firstUnreadMessageId ?? null}
                 onReply={handleReply}
                 onEdit={handleEdit}
                 onDelete={setDeleteTarget}
