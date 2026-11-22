@@ -59,6 +59,8 @@ type RawSurvey = {
   cohort_feedback?: {
     state: "login_required" | "ineligible" | "ready" | "completed";
     privacy_notice: string;
+    organization_name?: string;
+    cohort_name?: string;
   };
 };
 
@@ -132,7 +134,12 @@ function mapSurvey(raw: RawSurvey): SurveyWithQuestions {
     updatedAt: raw.updated_at ?? "",
     tags: raw.tags,
     cohortFeedback: raw.cohort_feedback
-      ? { state: raw.cohort_feedback.state, privacyNotice: raw.cohort_feedback.privacy_notice }
+      ? {
+          state: raw.cohort_feedback.state,
+          privacyNotice: raw.cohort_feedback.privacy_notice,
+          organizationName: raw.cohort_feedback.organization_name?.trim() ?? "",
+          cohortName: raw.cohort_feedback.cohort_name?.trim() ?? "",
+        }
       : undefined,
     questions: raw.questions.map((q) => ({
       ...mapQuestion(q, raw.questions),

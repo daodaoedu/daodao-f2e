@@ -31,6 +31,9 @@ export function CohortFeedbackForm({ survey, submitResponse }: CohortFeedbackFor
   const [completed, setCompleted] = useState(false);
   const firstQuestion = useRef<HTMLFieldSetElement>(null);
   const feedback = survey.cohortFeedback;
+  const feedbackTitle = feedback?.cohortName
+    ? t("feedback_survey_title", { cohortName: feedback.cohortName })
+    : survey.title;
 
   async function handleSubmit() {
     if (submitting || !feedback || feedback.state !== "ready") return;
@@ -68,12 +71,22 @@ export function CohortFeedbackForm({ survey, submitResponse }: CohortFeedbackFor
     return (
       <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
         <section className="rounded-3xl border border-[#CDEBE8] bg-white p-8 text-center sm:p-12">
+          <header className="mb-6">
+            {feedback?.organizationName && (
+              <p className="text-xs font-medium tracking-wide text-[#78928F]">
+                {feedback.organizationName}
+              </p>
+            )}
+            <h1 className="mt-4 text-2xl font-semibold tracking-[-0.04em] text-[#0D3036]">
+              {feedbackTitle}
+            </h1>
+          </header>
           <div className="mx-auto grid size-12 place-items-center rounded-full bg-[#EAF7F5] text-[#0D7773]">
             <Check className="size-6" aria-hidden="true" />
           </div>
-          <h1 className="mt-4 text-xl font-semibold text-[#0D3036]">
+          <h2 className="mt-4 text-xl font-semibold text-[#0D3036]">
             {t("feedback_survey_completed")}
-          </h1>
+          </h2>
           <Button type="button" variant="outline" className="mt-6" onClick={() => router.push("/")}>
             {t("feedback_survey_home")}
           </Button>
@@ -85,14 +98,16 @@ export function CohortFeedbackForm({ survey, submitResponse }: CohortFeedbackFor
     <main className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
       <section className="overflow-hidden rounded-3xl border border-[#CDEBE8] bg-white shadow-sm">
         <header className="border-b border-[#E8F3F2] px-5 py-5 sm:px-8 sm:py-7">
-          <p className="text-xs font-medium tracking-wide text-[#78928F]">
-            {t("feedback_survey_brand")}
-          </p>
+          {feedback?.organizationName && (
+            <p className="text-xs font-medium tracking-wide text-[#78928F]">
+              {feedback.organizationName}
+            </p>
+          )}
           <h1 className="mt-4 text-2xl font-semibold tracking-[-0.04em] text-[#0D3036]">
-            {survey.title}
+            {feedbackTitle}
           </h1>
           <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[#5A7B79]">
-            {survey.description}
+            {t("feedback_survey_description")}
           </p>
         </header>
         <form
@@ -104,7 +119,7 @@ export function CohortFeedbackForm({ survey, submitResponse }: CohortFeedbackFor
         >
           <div className="rounded-2xl border border-[#F1D7A8] bg-[#FFF9ED] p-4 text-sm leading-6 text-[#76551D]">
             <span className="font-semibold">{t("feedback_survey_privacy_title")}</span>
-            {feedback?.privacyNotice}
+            {t("feedback_survey_privacy")}
           </div>
           {feedback?.state === "login_required" && (
             <div className="space-y-4">
@@ -137,7 +152,7 @@ export function CohortFeedbackForm({ survey, submitResponse }: CohortFeedbackFor
                     key={question.id}
                     ref={firstQuestion}
                     className={cn(
-                      "rounded-2xl border p-4 sm:p-5",
+                      "min-h-[172px] rounded-2xl border px-5 py-7 sm:px-6 sm:py-8",
                       requiredError ? "border-[#B74C42]" : "border-[#E3EFED]"
                     )}
                   >
@@ -145,7 +160,7 @@ export function CohortFeedbackForm({ survey, submitResponse }: CohortFeedbackFor
                       id={`question-${question.id}`}
                       className="px-1 text-sm font-semibold text-[#0D3036]"
                     >
-                      {question.questionText}{" "}
+                      {t("feedback_question_1")}{" "}
                       <span className="text-[#B74C42]" aria-hidden="true">
                         *
                       </span>
@@ -161,14 +176,14 @@ export function CohortFeedbackForm({ survey, submitResponse }: CohortFeedbackFor
                       aria-required="true"
                       aria-invalid={requiredError}
                       aria-describedby={requiredError ? "feedback-rating-error" : undefined}
-                      className="mt-3 flex flex-wrap gap-2"
+                      className="mt-5 flex flex-wrap gap-2"
                     >
                       {[1, 2, 3, 4, 5].map((value) => (
                         <label
                           htmlFor={`feedback-star-${value}`}
                           key={value}
                           className={cn(
-                            "relative inline-flex min-w-20 cursor-pointer flex-col items-center justify-center gap-1 whitespace-nowrap rounded-full border px-3 py-2 body-md transition-[color,background-color,box-shadow] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[#0D7773] has-[:focus-visible]:ring-offset-2 hover:bg-logo-cyan hover:text-white",
+                            "relative inline-flex min-w-20 cursor-pointer flex-col items-center justify-center whitespace-nowrap rounded-full border px-3 py-3 body-md transition-[color,background-color,box-shadow] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[#0D7773] has-[:focus-visible]:ring-offset-2 hover:bg-logo-cyan hover:text-white",
                             rating === value
                               ? "border-[#0D7773] bg-[#EAF7F5] text-[#0D5B59]"
                               : "border-[#DCEAE8] text-[#456B68]"
@@ -190,7 +205,6 @@ export function CohortFeedbackForm({ survey, submitResponse }: CohortFeedbackFor
                                 />
                               ))}
                           </span>
-                          <span className="text-[11px]">{t(`feedback_star_${value}`)}</span>
                         </label>
                       ))}
                     </RadioGroup>
@@ -210,25 +224,18 @@ export function CohortFeedbackForm({ survey, submitResponse }: CohortFeedbackFor
                       htmlFor={`feedback-text-${question.id}`}
                       className="text-sm font-semibold text-[#0D3036]"
                     >
-                      {question.questionText}{" "}
-                      <span className="font-normal text-[#78928F]">
-                        {t("feedback_survey_optional")}
-                      </span>
+                      {t(`feedback_question_${index + 1}`)}
                     </label>
                     <Textarea
                       id={`feedback-text-${question.id}`}
-                      aria-describedby={`hint-${question.id}`}
                       value={texts[question.id] ?? ""}
                       onChange={(event) =>
                         setTexts((current) => ({ ...current, [question.id]: event.target.value }))
                       }
                       rows={3}
-                      placeholder={t("feedback_survey_placeholder")}
+                      placeholder={t(`feedback_hint_${index + 1}`)}
                       className="resize-y border-[#DCEAE8]"
                     />
-                    <p id={`hint-${question.id}`} className="text-xs leading-5 text-[#78928F]">
-                      {t(`feedback_hint_${index + 1}`)}
-                    </p>
                   </div>
                 )
               )}
