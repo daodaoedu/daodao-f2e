@@ -38,7 +38,16 @@ PUBLIC_MANIFEST = "blog-prod-public-manifest.json"
 INVALID_FILE = "Safe literal relative file path required"
 INVALID_PATH = "Only unique literal public paths allowed"
 LEGACY_CONTENT_SHA = "0daa4231bb2072657c807813e960919b982f9d8e"
-OLD_ROOTS = ("zh-TW/blog.html", "zh-TW/blog", "en/blog.html", "en/blog", "blog-images")
+OLD_ROOTS = (
+    "zh-TW/blog.html",
+    "zh-TW/blog.txt",
+    "zh-TW/blog",
+    "en/blog.html",
+    "en/blog.txt",
+    "en/blog",
+    "blog-images",
+)
+HOLDER_COMMAND = "while :; do sleep 3600; done"
 INVENTORY = 'set -o pipefail; find "$@" ! -type d -exec stat -c "%F|%n" {} \\; | head -c 4194305'
 IMAGE_MIME = {
     "png": "image/png",
@@ -312,13 +321,26 @@ def parse_public_inventory(listing, prefix):
         raise ValueError("Existing public inventory exceeds bounds")
     observed = set()
     routes = {}
-    for line in listing.splitlines():
-        path = parse_inventory_path(line, prefix)
+    paths = {parse_inventory_path(line, prefix) for line in listing.splitlines()}
+    for path in sorted(paths):
+        if paired_rsc_sidecar(path, paths):
+            continue
         public_routes = old_public_routes(path)
         if MIME_HTML in public_routes.values():
             observed.add(path)
         routes.update(public_routes)
     return observed, routes
+
+
+def paired_rsc_sidecar(path, paths):
+    if not path.endswith(".txt"):
+        return False
+    html = path.removesuffix(".txt") + ".html"
+    if html not in paths or not re.fullmatch(
+        r"/(?:zh-TW|en)/blog(?:/[A-Za-z0-9_./~-]+)?\.html", html
+    ):
+        raise ValueError("RSC sidecars require a matching regular Blog HTML export")
+    return True
 
 
 def preserve_published_routes(call, previous, manifest):
@@ -509,6 +531,65 @@ def activate_website(
     execute(call, argv, environment=environment)
 
 
+def remove_rollback_holder(call, holder):
+    execute(call, ["docker", "rm", "-f", holder])
+
+
+def start_rollback_holder(call, holder, image):
+    command = [
+        "docker",
+        "run",
+        "-d",
+        "--name",
+        holder,
+        "--network",
+        "none",
+        "--read-only",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges",
+        "--user",
+        "65534:65534",
+        "--memory",
+        "16m",
+        "--cpus",
+        "0.1",
+        "--pids-limit",
+        "8",
+        "--restart",
+        "unless-stopped",
+        "--no-healthcheck",
+        "--log-driver",
+        "none",
+        "--label",
+        "daodao.blog.rollback=owned",
+        "--entrypoint",
+        "/bin/sh",
+        image,
+        "-c",
+        HOLDER_COMMAND,
+    ]
+    try:
+        execute(call, command)
+        running = execute(
+            call, ["docker", "inspect", "--format", "{{.State.Running}}", holder]
+        )
+        if running != "true":
+            raise ValueError("Rollback image holder must be running before activation")
+    except (
+        KeyboardInterrupt,
+        SystemExit,
+        ValueError,
+        OSError,
+        subprocess.SubprocessError,
+    ):
+        call(
+            ["docker", "rm", "-f", holder], check=False, capture_output=True, timeout=30
+        )
+        raise
+
+
 def publish_locked(item, call, verify, read, root):
     check_current_source(call, item["frontend_sha"])
     previous = website(call)
@@ -533,20 +614,7 @@ def publish_locked(item, call, verify, read, root):
         with compose.open("rb") as source:
             os.fsync(source.fileno())
         holder = "daodao-blog-rollback-" + folder.name
-        execute(
-            call,
-            [
-                "docker",
-                "create",
-                "--name",
-                holder,
-                "--network",
-                "none",
-                "--label",
-                "daodao.blog.rollback=owned",
-                previous["image"],
-            ],
-        )
+        start_rollback_holder(call, holder, previous["image"])
         changed = False
         journal(
             root,
@@ -613,7 +681,7 @@ def publish_locked(item, call, verify, read, root):
             recover_after_failure(error, changed, recovery)
             raise PublicationError(report) from None
         (root / "last-result.json").write_text(json.dumps(report, indent=2) + "\n")
-        execute(call, ["docker", "rm", holder])
+        remove_rollback_holder(call, holder)
         (root / PENDING_FILE).unlink()
     return report
 
@@ -629,7 +697,7 @@ def recover_after_failure(error, changed, context):
         )
         write_report(root, report)
         if recovered or not changed:
-            execute(call, ["docker", "rm", context["holder"]])
+            remove_rollback_holder(call, context["holder"])
             (root / PENDING_FILE).unlink()
 
 

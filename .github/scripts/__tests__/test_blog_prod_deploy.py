@@ -57,6 +57,8 @@ class Docker:
         self.fail_health = False
         self.fail_recovery = False
         self.frontend = "a" * 40
+        self.holder_running = False
+        self.holder_start_succeeds = True
         self.published_paths = ["/app/apps/website/out/zh-TW/blog.html"]
 
     def __call__(self, argv, **kwargs):
@@ -71,6 +73,10 @@ class Docker:
                 else self.active
             )
         elif argv[:2] == ["docker", "inspect"]:
+            if argv[3] == "{{.State.Running}}":
+                return subprocess.CompletedProcess(
+                    argv, 0, str(self.holder_running).lower(), ""
+                )
             output = json.dumps(
                 {
                     "id": self.active,
@@ -79,6 +85,10 @@ class Docker:
                     "service": "prod_website",
                 }
             )
+        elif argv[:2] == ["docker", "run"]:
+            self.holder_running = self.holder_start_succeeds
+        elif argv[:2] == ["docker", "rm"]:
+            self.holder_running = False
         elif argv[:2] == ["docker", "compose"] and "up" in argv:
             override = Path(argv[argv.index("-f", argv.index("-f") + 1) + 1])
             self.image = json.loads(override.read_text())["services"]["prod_website"][
@@ -107,6 +117,105 @@ class Docker:
 
 
 class DeploymentTests(unittest.TestCase):
+    def test_failed_recovery_retains_a_running_inert_holder(self):
+        docker = Docker()
+        docker.fail_recovery = True
+        item = payload()
+
+        def mismatch(*_):
+            raise ValueError("Public bytes differ")
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            with self.assertRaises(deploy.PublicationError) as failure:
+                deploy.publish(
+                    item,
+                    call=docker,
+                    verify=mismatch,
+                    read=lambda *_: b"old bytes",
+                    root=root,
+                )
+            self.assertFalse(failure.exception.report["rollback_verified"])
+            self.assertTrue((root / "pending.json").exists())
+        self.assertTrue(docker.holder_running)
+        launch = next(
+            command for command in docker.commands if command[:2] == ["docker", "run"]
+        )
+        self.assertIn("--read-only", launch)
+        self.assertEqual(launch[launch.index("--network") + 1], "none")
+        self.assertEqual(launch[launch.index("--cap-drop") + 1], "ALL")
+        self.assertEqual(
+            launch[launch.index("--security-opt") + 1], "no-new-privileges"
+        )
+        self.assertEqual(launch[launch.index("--entrypoint") + 1], "/bin/sh")
+        self.assertEqual(launch[-2:], ["-c", "while :; do sleep 3600; done"])
+
+    def test_holder_must_be_running_before_website_activation(self):
+        docker = Docker()
+        docker.holder_start_succeeds = False
+        item = payload()
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            with self.assertRaises(ValueError):
+                deploy.publish(
+                    item,
+                    call=docker,
+                    verify=lambda *_: None,
+                    read=lambda *_: b"old bytes",
+                    root=root,
+                )
+        self.assertFalse(
+            any(command[:2] == ["docker", "compose"] for command in docker.commands)
+        )
+        self.assertFalse(docker.holder_running)
+
+    def test_paired_regular_rsc_sidecars_do_not_block_html_or_image_verification(self):
+        docker = Docker()
+        docker.published_paths.extend(
+            [
+                "/app/apps/website/out/zh-TW/blog.txt",
+                "/app/apps/website/out/en/blog/guide.html",
+                "/app/apps/website/out/en/blog/guide.txt",
+            ]
+        )
+        item = payload()
+        item["manifest"]["routes"].append(
+            {
+                "path": "/en/blog/guide",
+                "file_path": "en/blog/guide.html",
+                "sha256": "d" * 64,
+                "content_type": "text/html",
+            }
+        )
+        captured = []
+
+        def read(path, content_type=None):
+            captured.append(path)
+            return b"old bytes"
+
+        with tempfile.TemporaryDirectory() as temporary:
+            result = deploy.publish(
+                item,
+                call=docker,
+                verify=lambda *_: None,
+                read=read,
+                root=Path(temporary),
+            )
+        self.assertTrue(result["public_verified"])
+        self.assertIn("/en/blog/guide", captured)
+        self.assertFalse(any(path.endswith(".txt") for path in captured))
+
+    def test_orphan_and_symlink_sidecars_remain_rejected(self):
+        prefix = "/app/apps/website/out"
+        for sidecar in (
+            "regular file|" + prefix + "/en/blog/orphan.txt",
+            "symbolic link|" + prefix + "/zh-TW/blog.txt",
+            "regular file|" + prefix + "/blog-images/unrelated.txt",
+        ):
+            listing = "regular file|" + prefix + "/zh-TW/blog.html\n" + sidecar
+            with self.subTest(sidecar=sidecar), self.assertRaises(ValueError):
+                deploy.parse_public_inventory(listing, prefix)
+
     def test_rollback_reads_all_routes_even_after_first_mismatch(self):
         requested = []
         expected = hashlib.sha256(b"old bytes").hexdigest()
@@ -499,7 +608,7 @@ class DeploymentTests(unittest.TestCase):
         self.assertEqual(observed, ["sha256:" + "1" * 64])
 
     def test_real_subprocess_fake_docker_restores_on_public_failure(self):
-        fake_source = 'import json,sys\nfrom pathlib import Path\nstatefile=Path(sys.argv[1]); args=sys.argv[2:]\nstate=json.loads(statefile.read_text()); state["calls"].append(args)\noutput=""\nif args[0]=="-c":\n output="a"*40+"\\trefs/heads/prod"\nelif args[0]=="ps":\n output=state["product"] if "label=com.docker.compose.service=prod_product" in args else state["active"]\nelif args[0]=="inspect":\n output=json.dumps({"id":state["active"],"image":state["image"],"project":"daodao-f2e","service":"prod_website"})\nelif args[0]=="exec":\n if args[2]=="test":\n  statefile.write_text(json.dumps(state))\n  sys.exit(0 if args[-1]=="/app/apps/website/out/zh-TW/blog.html" else 1)\n output="regular file|/app/apps/website/out/zh-TW/blog.html"\nelif args[0]=="compose" and "up" in args:\n override=Path(args[args.index("-f",args.index("-f")+1)+1])\n state["image"]=json.loads(override.read_text())["services"]["prod_website"]["image"]\n state["active"]="candidate" if "@" in state["image"] else "restored"\nstatefile.write_text(json.dumps(state)); print(output)\n'
+        fake_source = 'import json,sys\nfrom pathlib import Path\nstatefile=Path(sys.argv[1]); args=sys.argv[2:]\nstate=json.loads(statefile.read_text()); state["calls"].append(args)\noutput=""\nif args[0]=="-c":\n output="a"*40+"\\trefs/heads/prod"\nelif args[0]=="ps":\n output=state["product"] if "label=com.docker.compose.service=prod_product" in args else state["active"]\nelif args[0]=="inspect":\n output="true" if args[2]=="{{.State.Running}}" else json.dumps({"id":state["active"],"image":state["image"],"project":"daodao-f2e","service":"prod_website"})\nelif args[0]=="exec":\n if args[2]=="test":\n  statefile.write_text(json.dumps(state))\n  sys.exit(0 if args[-1]=="/app/apps/website/out/zh-TW/blog.html" else 1)\n output="regular file|/app/apps/website/out/zh-TW/blog.html"\nelif args[0]=="compose" and "up" in args:\n override=Path(args[args.index("-f",args.index("-f")+1)+1])\n state["image"]=json.loads(override.read_text())["services"]["prod_website"]["image"]\n state["active"]="candidate" if "@" in state["image"] else "restored"\nstatefile.write_text(json.dumps(state)); print(output)\n'
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             fake = root / "docker.py"
