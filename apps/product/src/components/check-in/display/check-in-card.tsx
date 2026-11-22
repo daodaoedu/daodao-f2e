@@ -198,7 +198,7 @@ export const CheckInCard = ({
                             <img
                               src={imageUrl}
                               alt={t("image_alt", { n: actualIndex + 1 })}
-                              className="absolute inset-0 w-full h-full object-contain bg-white"
+                              className="block h-auto w-auto max-w-[150px]"
                             />
                           </>
                         );
@@ -210,7 +210,7 @@ export const CheckInCard = ({
                               key={imageUrl}
                               onClick={() => onImageClick(actualIndex)}
                               className={cn(
-                                "relative block aspect-103/67 rounded border w-[206px] cursor-pointer transition-shadow hover:shadow-lg",
+                                "relative block w-fit max-w-[150px] rounded cursor-pointer transition-shadow hover:shadow-lg",
                                 displayIndex === 0 && "top-16 left-4 -rotate-8 z-2",
                                 displayIndex === 1 && "ml-auto right-4 rotate-12 z-1",
                                 displayIndex === 2 && "mx-auto bottom-5"
@@ -226,7 +226,7 @@ export const CheckInCard = ({
                           <div
                             key={imageUrl}
                             className={cn(
-                              "relative block aspect-103/67 rounded border overflow-hidden w-[206px]",
+                              "relative block w-fit max-w-[150px] rounded",
                               displayIndex === 0 && "top-16 left-4 -rotate-8 z-2",
                               displayIndex === 1 && "ml-auto right-4 rotate-12 z-1",
                               displayIndex === 2 && "mx-auto bottom-5"
