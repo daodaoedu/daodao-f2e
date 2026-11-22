@@ -276,6 +276,19 @@ class ArtifactTests(unittest.TestCase):
         self.assertIn("ARTIFACT", result.stderr.upper())
         self.assertFalse((self.site / "blog-preview.json").exists())
 
+    def test_cli_missing_artifact_scope_names_configuration_and_writes_nothing(self):
+        scope, validation = self.evidence()
+        result = self.finalize_cli(
+            validation,
+            {
+                "BLOG_PREVIEW_EVIDENCE_ROOT": str(scope),
+                "BLOG_PREVIEW_ARTIFACT_ROOT": str(self.root / "missing-artifact"),
+            },
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("BLOG_PREVIEW_ARTIFACT_ROOT", result.stderr)
+        self.assertFalse((self.site / "blog-preview.json").exists())
+
     def test_cli_authorized_artifact_and_evidence_succeed(self):
         scope, validation = self.evidence()
         result = self.finalize_cli(

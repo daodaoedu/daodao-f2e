@@ -482,10 +482,13 @@ def trusted_scope(variable, default=None):
     if not configured:
         raise ValueError("Trusted caller " + variable + " is required")
     path = Path(configured).absolute()
-    if path != path.resolve(strict=True) or not path.is_dir():
-        raise ValueError(
-            "Trusted " + variable + " must be a canonical regular directory"
-        )
+    message = "Trusted " + variable + " must be a canonical regular directory"
+    try:
+        valid = path == path.resolve(strict=True) and path.is_dir()
+    except OSError as error:
+        raise ValueError(message) from error
+    if not valid:
+        raise ValueError(message)
     return path
 
 
