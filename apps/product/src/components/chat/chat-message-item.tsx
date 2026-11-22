@@ -19,11 +19,13 @@ import {
   DropdownMenuTrigger,
 } from "@daodao/ui/components/dropdown-menu";
 import { toast } from "@daodao/ui/components/sonner";
+import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { cn } from "@daodao/ui/lib/utils";
 import { Heart, MoreHorizontal, Pencil, Pin, PinOff, Reply, Shield, Trash2 } from "lucide-react";
-import { useCallback, useState } from "react";
+import { type MouseEvent, useCallback, useState } from "react";
 import { tokenizeMentionContent } from "@/components/check-in/reactions/comment-mentions";
 import { formatChatClock } from "@/hooks/use-chat-timeline";
+import { isExternalUrl } from "@/utils/external-link";
 import { formatRelativeTime } from "@/utils/format-time";
 import { ChatAvatar } from "./chat-avatar";
 
@@ -76,6 +78,30 @@ export function ChatMessageItem({
   const t = useTranslations("messages");
   const [liked, setLiked] = useState(message.likedByMe);
   const [likeCount, setLikeCount] = useState(message.likeCount);
+  const { openWarningDialog } = useDialog();
+
+  // 外部連結先跳提醒，使用者確認後才另開分頁；站內連結維持原生行為
+  const handleLinkClick = useCallback(
+    async (event: MouseEvent<HTMLAnchorElement>, url: string) => {
+      if (!isExternalUrl(url, window.location.hostname)) return;
+      event.preventDefault();
+      const result = await openWarningDialog({
+        title: t("external_link_title"),
+        message: (
+          <>
+            {t("external_link_message")}
+            <span className="mt-2 block break-all text-xs opacity-70">{url}</span>
+          </>
+        ),
+        buttons: [
+          { label: t("external_link_cancel"), value: "cancel", variant: "outline" },
+          { label: t("external_link_continue"), value: "continue" },
+        ],
+      });
+      if (result.value === "continue") window.open(url, "_blank", "noopener,noreferrer");
+    },
+    [openWarningDialog, t]
+  );
 
   const handleLikeToggle = useCallback(async () => {
     const prevLiked = liked;
@@ -211,6 +237,7 @@ export function ChatMessageItem({
                     href={segment.value}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={(event) => handleLinkClick(event, segment.value)}
                     className={cn("underline break-all", isOwn ? "text-white" : "text-logo-cyan")}
                   >
                     {segment.value}
