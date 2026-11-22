@@ -581,6 +581,8 @@ export const cohortMemberHomeResponseSchema = apiSuccessSchema(
         practiceAction: z.string().nullable(),
         status: z.enum(["draft", "not_started", "active", "completed", "archived"]),
         creationSource: z.string().nullable(),
+        // 共用打卡連結以 cohortId＋templateId 找出本人實踐；server 尚未回傳時視為沒有模板
+        templateId: z.number().int().nullable().optional(),
         startDate: nullableDateTimeSchema.optional(),
         endDate: nullableDateTimeSchema.optional(),
         progressPercentage: z.number().optional(),
