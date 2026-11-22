@@ -31,6 +31,7 @@ const BACKEND_TYPE_MAP: Record<string, INotificationData["type"]> = {
   PracticeUpdateActivity: NotificationType.updatePractice,
   PartnerUpdateActivity: NotificationType.updatePractice,
   FeedbackReplied: NotificationType.feedbackReplied,
+  ChatMessage: NotificationType.chatMessage,
 };
 
 function normalizeNotificationType(backendType: string): INotificationData["type"] {
@@ -58,6 +59,8 @@ export function apiItemToDisplay(item: NotificationApiItem, locale: string): INo
     entityTitle: item.entityTitle,
     cohortName: item.cohortName,
     message: item.message,
+    chatNotificationKind: item.chatNotificationKind,
+    chatRoomName: item.chatRoomName,
     hasDestination: buildNotificationDeepLink(item) !== null,
     content: item.content,
     connectMessage: item.connectMessage,

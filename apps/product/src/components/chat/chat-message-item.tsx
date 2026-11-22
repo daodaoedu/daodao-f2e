@@ -8,7 +8,9 @@ import {
   unlikeChatMessage,
   unpinChatMessage,
 } from "@daodao/api";
+import type { MentionCandidate } from "@daodao/features-mention";
 import { useLocale, useTranslations } from "@daodao/i18n";
+import { parseTextLinks } from "@daodao/shared/lib/parse-text-links";
 import { Button } from "@daodao/ui/components/button";
 import {
   DropdownMenu,
@@ -20,6 +22,7 @@ import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { Heart, MoreHorizontal, Pencil, Pin, PinOff, Reply, Shield, Trash2 } from "lucide-react";
 import { useCallback, useState } from "react";
+import { tokenizeMentionContent } from "@/components/check-in/reactions/comment-mentions";
 import { formatChatClock } from "@/hooks/use-chat-timeline";
 import { formatRelativeTime } from "@/utils/format-time";
 import { ChatAvatar } from "./chat-avatar";
@@ -37,6 +40,7 @@ interface ChatMessageItemProps {
   isHost: boolean;
   /** 當前使用者的內部 users.id（聊天室詳情 viewerUserId）；未載入時 null */
   viewerUserId: number | null;
+  mentionCandidates: MentionCandidate[];
   onReply?: (message: ChatMessageType) => void;
   onEdit?: (message: ChatMessageType) => void;
   /** 要求刪除（由頁面先跳確認框，確認後才真的刪） */
@@ -63,6 +67,7 @@ export function ChatMessageItem({
   isGroupStart,
   isHost,
   viewerUserId,
+  mentionCandidates,
   onReply,
   onEdit,
   onDelete,
@@ -197,7 +202,44 @@ export function ChatMessageItem({
                 )}
               </div>
             )}
-            <span className="block whitespace-pre-wrap">{message.body}</span>
+            <span className="block whitespace-pre-wrap">
+              {parseTextLinks(message.body).map((segment, index) =>
+                segment.type === "url" ? (
+                  <a
+                    // biome-ignore lint/suspicious/noArrayIndexKey: static parsed message segments
+                    key={index}
+                    href={segment.value}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn("underline break-all", isOwn ? "text-white" : "text-logo-cyan")}
+                  >
+                    {segment.value}
+                  </a>
+                ) : (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: static parsed message segments
+                  <span key={index}>
+                    {tokenizeMentionContent(segment.value, mentionCandidates).map(
+                      (mention, mentionIndex) =>
+                        mention.type === "mention" ? (
+                          <span
+                            // biome-ignore lint/suspicious/noArrayIndexKey: static parsed message segments
+                            key={mentionIndex}
+                            className={cn(
+                              "font-semibold underline",
+                              isOwn ? "text-white" : "text-logo-cyan"
+                            )}
+                          >
+                            {mention.text}
+                          </span>
+                        ) : (
+                          // biome-ignore lint/suspicious/noArrayIndexKey: static parsed message segments
+                          <span key={mentionIndex}>{mention.text}</span>
+                        )
+                    )}
+                  </span>
+                )
+              )}
+            </span>
           </div>
 
           {/* Hover action bar：POC 位置，本人靠右上、他人靠左上，蓋在氣泡上緣（時間在氣泡下方，不會被蓋到） */}

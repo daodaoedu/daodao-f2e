@@ -11,7 +11,7 @@
   "last_message_mine": "你：{body}",
   "members_count": "{count} 位成員",
   "room_header_back": "返回",
-  "input_placeholder": "說點什麼，島民都在",
+  "input_placeholder": "說點什麼",
   "input_hint": "Enter 送出　·　Shift + Enter 換行",
   "send": "送出",
   "system_message": "系統訊息",

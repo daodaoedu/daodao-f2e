@@ -24,6 +24,16 @@ export const DesktopSidebar = ({
   const pathname = usePathname();
   const t = useTranslations("app_product");
 
+  // 讓版面跟著收合：layout 的 md:pl-[144px] 是固定值，需要貼齊導覽列的頁面（聊天室）讀這個屬性（daodao#555）
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isCollapsed) root.dataset.sidebarCollapsed = "true";
+    else delete root.dataset.sidebarCollapsed;
+    return () => {
+      delete root.dataset.sidebarCollapsed;
+    };
+  }, [isCollapsed]);
+
   return (
     <nav
       className={cn(

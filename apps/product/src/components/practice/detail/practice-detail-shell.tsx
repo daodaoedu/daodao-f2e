@@ -54,6 +54,7 @@ import { LottieEmoji } from "@/components/check-in/reactions/lottie-emoji";
 import { PracticeOverviewCard } from "@/components/practice";
 import { CheckInCommentGroups } from "@/components/practice/detail/check-in-comment-groups";
 import { PracticeDetailTitle } from "@/components/practice/detail/practice-detail-title";
+import { PracticeScheduleDetails } from "@/components/practice/detail/practice-schedule-details";
 import {
   BrowseActivityContent,
   type IBrowseActivityFollower,
@@ -93,6 +94,8 @@ interface IPracticeDetailViewModel {
   /** 共同挑戰實踐：不可複製（FR-CC-09），加入挑戰是唯一途徑 */
   isChallenge?: boolean;
   isCohortPractice?: boolean;
+  /** Server copy policy, separate from cohort resource locking. */
+  isCopyRestricted?: boolean;
   status?: PracticeStatus;
   actionDescription: string;
   /** 每週頻率，例 "1-3"、"7"（daodao#370） */
@@ -136,7 +139,11 @@ interface IPracticeDetailShellProps {
   hasTopBar?: boolean;
   checkInsData: React.ComponentProps<typeof CheckInRecordCard>["checkInsData"];
   isLoadingCheckIns: boolean;
+  checkInsError?: boolean;
+  onRetryCheckIns?: () => void;
   isLoadingComments?: boolean;
+  commentsError?: boolean;
+  onRetryComments?: () => void;
   comments: IComment[];
   currentUserName?: string;
   currentUserId?: string;
@@ -271,7 +278,11 @@ export function PracticeDetailShell({
   hasTopBar = false,
   checkInsData,
   isLoadingCheckIns,
+  checkInsError = false,
+  onRetryCheckIns,
   isLoadingComments = false,
+  commentsError = false,
+  onRetryComments,
   comments,
   currentUserName,
   currentUserId,
@@ -296,6 +307,7 @@ export function PracticeDetailShell({
   browseActivity,
 }: IPracticeDetailShellProps) {
   const t = useTranslations("practice");
+  const cohortT = useTranslations("cohort");
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -306,16 +318,32 @@ export function PracticeDetailShell({
     readOnly ? CheckInView.list : CheckInView.bubbles
   );
   // 各打卡的留言數（由 CheckInCommentGroups 回報），用於留言分頁的總數
-  const [checkInCommentCounts, setCheckInCommentCounts] = useState<Record<string, number>>({});
-  const handleCheckInCommentCount = useCallback((checkInId: string, count: number) => {
-    setCheckInCommentCounts((prev) =>
-      prev[checkInId] === count ? prev : { ...prev, [checkInId]: count }
-    );
+  const [checkInCommentCounts, setCheckInCommentCounts] = useState<Record<string, number | null>>(
+    {}
+  );
+  // Many comment requests can settle together. Keep aggregate counter updates
+  // nonurgent so their parent rerenders do not nest inside SWR store notifications.
+  const [, startCommentCountTransition] = useTransition();
+  const handleCheckInCommentCount = useCallback((checkInId: string, count: number | null) => {
+    startCommentCountTransition(() => {
+      setCheckInCommentCounts((prev) =>
+        prev[checkInId] === count ? prev : { ...prev, [checkInId]: count }
+      );
+    });
   }, []);
   const checkInCommentTotal = (checkInsData?.data ?? []).reduce(
     (sum, checkIn) => sum + (checkInCommentCounts[String(checkIn.id)] ?? 0),
     0
   );
+  const commentCountsPending =
+    readOnly &&
+    (isLoadingCheckIns ||
+      checkInsError ||
+      isLoadingComments ||
+      commentsError ||
+      (checkInsData?.data ?? []).some(
+        (checkIn) => checkInCommentCounts[String(checkIn.id)] == null
+      ));
   const practiceCommentCount = commentCount ?? comments.length;
   // 進行中的實踐：手機版先看到打卡，實踐資訊卡預設收合（桌機版兩欄並排，不受影響）
   const isOverviewCollapsible = practice.status === PracticeStatus.active;
@@ -327,8 +355,12 @@ export function PracticeDetailShell({
   const practiceMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!practice.id) return;
     setActiveTab("checkins");
-  }, [practice.id, practice.isCohortPractice, readOnly]);
+    setCheckInView(readOnly ? CheckInView.list : CheckInView.bubbles);
+    setOverviewOpenOnMobile(false);
+    setPracticeMenuOpen(false);
+  }, [practice.id, readOnly]);
 
   useEffect(() => {
     if (!practiceMenuOpen) return;
@@ -385,7 +417,7 @@ export function PracticeDetailShell({
     requestAnimationFrame(() => {
       commentsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
-  }, [isValidTab, tabParam]);
+  }, [isValidTab, tabParam, readOnly]);
 
   const currentUserReaction = (reactionsData?.data?.currentUserReaction ??
     null) as ReactionTypeType | null;
@@ -522,7 +554,7 @@ export function PracticeDetailShell({
                 </Button>
               )}
 
-              {practiceMenuOpen && isOwner && (
+              {!readOnly && practiceMenuOpen && isOwner && (
                 <div className="absolute right-0 top-full mt-1 bg-white rounded-2xl shadow-lg border border-[#E4EAE9] py-2 z-20 min-w-[140px]">
                   <Button
                     type="button"
@@ -536,29 +568,31 @@ export function PracticeDetailShell({
                     <Pencil className="size-[18px] shrink-0" />
                     <span>{t("action_edit")}</span>
                   </Button>
-                  {!practice.isCohortPractice && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      onClick={async () => {
-                        setPracticeMenuOpen(false);
-                        try {
-                          setIsCopying(true);
-                          const { id } = await copyPractice(practiceId);
-                          router.push(`/practices/copy-success?practiceId=${id}`);
-                        } catch {
-                          toast.error(t("copy_failed"));
-                        } finally {
-                          setIsCopying(false);
-                        }
-                      }}
-                      disabled={isCopying}
-                      className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
-                    >
-                      <Copy className="size-[18px] shrink-0" />
-                      <span>{t("action_copy")}</span>
-                    </Button>
-                  )}
+                  {!practice.isCopyRestricted &&
+                    !practice.isCohortPractice &&
+                    !practice.isChallenge && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={async () => {
+                          setPracticeMenuOpen(false);
+                          try {
+                            setIsCopying(true);
+                            const { id } = await copyPractice(practiceId);
+                            router.push(`/practices/copy-success?practiceId=${id}`);
+                          } catch {
+                            toast.error(t("copy_failed"));
+                          } finally {
+                            setIsCopying(false);
+                          }
+                        }}
+                        disabled={isCopying}
+                        className="w-full h-auto justify-start rounded-none gap-3 px-4 py-3 text-sm text-[#295E5C] hover:bg-[#F0F9F8] transition-colors cursor-pointer"
+                      >
+                        <Copy className="size-[18px] shrink-0" />
+                        <span>{t("action_copy")}</span>
+                      </Button>
+                    )}
                   <Button
                     type="button"
                     variant="ghost"
@@ -596,7 +630,7 @@ export function PracticeDetailShell({
                 </div>
               )}
 
-              {practiceMenuOpen && !isOwner && (
+              {!readOnly && practiceMenuOpen && !isOwner && (
                 <div className="absolute right-0 top-full mt-1 bg-white rounded-2xl shadow-lg border border-[#E4EAE9] py-2 z-20 min-w-[140px]">
                   <Button
                     type="button"
@@ -717,32 +751,42 @@ export function PracticeDetailShell({
             />
 
             <div className="px-4">
-              {!readOnly && !isOwner && !practice.isChallenge && !practice.isCohortPractice && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full mb-3 gap-2 rounded-full"
-                  disabled={isCopying}
-                  onClick={async () => {
-                    if (!currentUserId) {
-                      router.push(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
-                      return;
-                    }
-                    try {
-                      setIsCopying(true);
-                      const { id } = await copyPractice(practiceId);
-                      router.push(`/practices/copy-success?practiceId=${id}`);
-                    } catch {
-                      toast.error(t("copy_failed"));
-                    } finally {
-                      setIsCopying(false);
-                    }
-                  }}
-                >
-                  <Copy className="size-4" />
-                  {isCopying ? t("action_copying") : t("action_also_practice")}
-                </Button>
-              )}
+              {!readOnly &&
+                !isOwner &&
+                !practice.isCopyRestricted &&
+                !practice.isChallenge &&
+                !practice.isCohortPractice && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full mb-3 gap-2 rounded-full"
+                    disabled={isCopying}
+                    onClick={async () => {
+                      if (!currentUserId) {
+                        router.push(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
+                        return;
+                      }
+                      try {
+                        setIsCopying(true);
+                        const { id } = await copyPractice(practiceId);
+                        router.push(`/practices/copy-success?practiceId=${id}`);
+                      } catch {
+                        toast.error(t("copy_failed"));
+                      } finally {
+                        setIsCopying(false);
+                      }
+                    }}
+                  >
+                    <Copy className="size-4" />
+                    {isCopying ? t("action_copying") : t("action_also_practice")}
+                  </Button>
+                )}
+              <PracticeScheduleDetails
+                executionTiming={practice.executionTiming}
+                customTiming={practice.customTiming}
+                durationDays={practice.durationDays}
+                startDate={practice.startDate}
+              />
               <div className="flex flex-wrap items-center justify-between gap-2 pb-3">
                 <div className="flex items-center gap-2">
                   <div className="flex w-fit rounded-xl py-1 transition-colors hover:bg-gray-100">
@@ -842,27 +886,36 @@ export function PracticeDetailShell({
                 {t("practice_comments_heading")}
               </h2>
             </div>
-            {isLoadingComments ? (
-              <div className="px-4 py-6 text-xs text-[#9FB5B8] text-center">
-                {t("comments_loading")}
+            {commentsError && (
+              <div role="alert" className="p-4 text-sm">
+                <p>{t("load_failed")}</p>
+                <Button variant="outline" onClick={onRetryComments}>
+                  {cohortT("retry")}
+                </Button>
               </div>
-            ) : (
-              <CommentSection
-                comments={comments}
-                selectedReactions={[]}
-                onSubmit={(content, _reactions, parentId, mentionedUserIds) =>
-                  onSubmitComment(content, parentId, mentionedUserIds)
-                }
-                hasMoreComments
-                previewCount={2}
-                currentUserName={currentUserName}
-                currentUserId={currentUserId}
-                currentUserPhotoURL={currentUserPhotoURL}
-                mentionCandidates={mentionCandidates}
-                onEditComment={onEditComment}
-                onDeleteComment={onDeleteComment}
-              />
             )}
+            {!commentsError &&
+              (isLoadingComments ? (
+                <div className="px-4 py-6 text-xs text-[#9FB5B8] text-center">
+                  {t("comments_loading")}
+                </div>
+              ) : (
+                <CommentSection
+                  comments={comments}
+                  selectedReactions={[]}
+                  onSubmit={(content, _reactions, parentId, mentionedUserIds) =>
+                    onSubmitComment(content, parentId, mentionedUserIds)
+                  }
+                  hasMoreComments
+                  previewCount={2}
+                  currentUserName={currentUserName}
+                  currentUserId={currentUserId}
+                  currentUserPhotoURL={currentUserPhotoURL}
+                  mentionCandidates={mentionCandidates}
+                  onEditComment={onEditComment}
+                  onDeleteComment={onDeleteComment}
+                />
+              ))}
           </div>
         </section>
 
@@ -877,21 +930,24 @@ export function PracticeDetailShell({
             {(() => {
               const countMap: Record<TabType, number> = {
                 comments: checkInCommentTotal,
-                checkins: checkInsData?.data?.length ?? 0,
+                checkins: checkInsData?.pagination?.totalItems ?? checkInsData?.data?.length ?? 0,
                 resources: practice?.resources?.length ?? 0,
               };
               const visibleTabs = readOnly ? TABS : TABS.filter(({ id }) => id !== "comments");
               return visibleTabs.map(({ id, labelKey, Icon }) => {
                 const count = countMap[id];
+                const countPending = id === "comments" && commentCountsPending;
                 const label = id === "comments" ? t("checkin_comments_heading") : t(labelKey);
-                const accessibleLabel = label;
+                const accessibleLabel = countPending
+                  ? `${label} (${t("comments_loading")})`
+                  : `${label}${count > 0 ? ` (${count})` : ""}`;
                 return (
                   <div key={id} className="flex flex-1 items-center justify-center">
                     <Button
                       type="button"
                       variant="ghost"
                       onClick={() => setActiveTab(id)}
-                      aria-label={`${accessibleLabel}${count > 0 ? ` (${count})` : ""}`}
+                      aria-label={accessibleLabel}
                       title={label}
                       className={cn(
                         "h-auto gap-1.5 rounded-none border-b-2 border-transparent px-1 py-3 text-xs font-medium transition-colors cursor-pointer",
@@ -902,7 +958,11 @@ export function PracticeDetailShell({
                     >
                       <Icon aria-hidden="true" className="size-5" />
                       <span>{label}</span>
-                      {count > 0 && <span className="text-xs">{count}</span>}
+                      {countPending ? (
+                        <span className="text-xs">…</span>
+                      ) : (
+                        count > 0 && <span className="text-xs">{count}</span>
+                      )}
                     </Button>
                     {id === "resources" && isOwner && (
                       <Button
@@ -941,6 +1001,14 @@ export function PracticeDetailShell({
 
           {activeTab === "checkins" && (
             <div className="pt-4 md:pt-1">
+              {checkInsError && (
+                <div role="alert" className="p-4 text-sm">
+                  <p>{t("load_failed")}</p>
+                  <Button variant="outline" onClick={onRetryCheckIns}>
+                    {cohortT("retry")}
+                  </Button>
+                </div>
+              )}
               <div className="lg:pl-12 lg:pr-0">
                 <CheckInRecordCard checkInsData={checkInsData} isLoading={isLoadingCheckIns} />
               </div>

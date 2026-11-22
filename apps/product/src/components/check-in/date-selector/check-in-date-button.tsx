@@ -71,15 +71,14 @@ export const CheckInDateButton = ({
           ? `linear-gradient(to bottom, rgba(255, 157, 0, ${fillOpacity}), rgba(255, 157, 0, ${fillOpacity})), white`
           : "white",
       }}
+      aria-current={isActive ? "date" : undefined}
       aria-label={
         hasCheckIn
           ? t("date_select_record", { date: item.date })
           : t("date_no_record", { date: item.date })
       }
     >
-      <span className="relative z-10 text-base font-semibold">
-        {format(date, "d")}
-      </span>
+      <span className="relative z-10 text-base font-semibold">{format(date, "d")}</span>
     </Button>
   );
 };

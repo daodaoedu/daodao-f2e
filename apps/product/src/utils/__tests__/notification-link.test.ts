@@ -65,3 +65,24 @@ describe("getUserProfilePath", () => {
     expect(getUserProfilePath({ id: undefined, customId: null })).toBeNull();
   });
 });
+
+describe("buildNotificationDeepLink — 群組聊天室通知（daodao#555）", () => {
+  const chat = (url: string | undefined) =>
+    makeItem({ type: "ChatMessage", entityType: "chat_message", entityId: "99", url });
+
+  it("後端給的正式站、dev 聊天室網址都導到站內聊天室", () => {
+    expect(buildNotificationDeepLink(chat("https://app.daodao.so/messages/12"))).toBe(
+      "/messages/12"
+    );
+    expect(buildNotificationDeepLink(chat("https://app-dev.daodao.so/en/messages/12"))).toBe(
+      "/messages/12"
+    );
+  });
+
+  it("外部網域、非聊天室路徑、帶查詢參數或缺網址時沒有目的地", () => {
+    expect(buildNotificationDeepLink(chat("https://evil.example/messages/12"))).toBeNull();
+    expect(buildNotificationDeepLink(chat("https://app.daodao.so/settings"))).toBeNull();
+    expect(buildNotificationDeepLink(chat("https://app.daodao.so/messages/12?x=1"))).toBeNull();
+    expect(buildNotificationDeepLink(chat(undefined))).toBeNull();
+  });
+});

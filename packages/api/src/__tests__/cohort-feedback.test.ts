@@ -44,6 +44,29 @@ describe("cohort feedback wire contract", () => {
     expect(firstRequest(requests).credentials).toBe("include");
   });
 
+  it("bypasses a cached closed response when the same survey is reopened", async () => {
+    const requests: Request[] = [];
+    let active = false;
+    const closed = { success: false, message: "Survey closed" };
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (input, init) => {
+      const request = new Request(input, init);
+      requests.push(request);
+      // Model an already cached 410: only a cache-bypassing read reaches reopened state.
+      return active && request.cache === "no-store"
+        ? response(200, { success: true, data: { title: "Reopened survey" } })
+        : response(410, closed);
+    });
+
+    await expect(getPublicSurvey("reopened-survey")).rejects.toMatchObject({ status: 410 });
+    active = true;
+    await expect(getPublicSurvey("reopened-survey")).resolves.toEqual({
+      title: "Reopened survey",
+    });
+    expect(requests.map((request) => request.cache)).toEqual(["no-store", "no-store"]);
+    expect(requests.every((request) => request.credentials === "include")).toBe(true);
+    expect(firstRequest(requests).headers.has("Cache-Control")).toBe(false);
+  });
+
   it("submits a rating and Chinese text without session or timestamp fields", async () => {
     const requests: Request[] = [];
     vi.spyOn(globalThis, "fetch").mockImplementation(async (input, init) => {

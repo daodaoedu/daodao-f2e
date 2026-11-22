@@ -59,4 +59,19 @@ describe("parseTextLinks", () => {
   it.each(cases)("%s", (_, input, expected) => {
     expect(parseTextLinks(input)).toEqual(expected);
   });
+
+  it("網址後面直接接全形標點時，標點不算進連結（zh-TW）", () => {
+    const urls = parseTextLinks(
+      "我的日記 https://app-dev.daodao.so/practices/1。下次見，https://daodao.so！"
+    )
+      .filter((segment) => segment.type === "url")
+      .map((segment) => segment.value);
+    expect(urls).toEqual(["https://app-dev.daodao.so/practices/1", "https://daodao.so"]);
+  });
+
+  it("非 http(s) 的 scheme 不產生連結", () => {
+    expect(
+      parseTextLinks("看 javascript:alert(1) 這個").every((segment) => segment.type === "text")
+    ).toBe(true);
+  });
 });

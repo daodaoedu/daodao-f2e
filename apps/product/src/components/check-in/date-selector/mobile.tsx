@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "@daodao/i18n";
+import { useMediaQuery } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { useSafeRouter } from "@daodao/ui/hooks/use-safe-router";
 import { cn } from "@daodao/ui/lib/utils";
@@ -24,11 +25,14 @@ export const MobileCheckInDateSelector = ({
   const t = useTranslations("check_in");
   const locale = useLocale();
   const router = useSafeRouter();
+  const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const [hasDateOverflow, setHasDateOverflow] = useState(false);
 
   const cohortViewQuery = useCohortViewQuery();
   const [isVisible, setIsVisible] = useState(true);
   const [visibleMonthLabel, setVisibleMonthLabel] = useState(() => {
-    const date = checkInDates.find((item) => item.date === activeDate)?.date ?? checkInDates[0]?.date;
+    const date =
+      checkInDates.find((item) => item.date === activeDate)?.date ?? checkInDates[0]?.date;
     return date
       ? new Intl.DateTimeFormat(locale, { month: "short", year: "numeric" }).format(parseISO(date))
       : "";
@@ -49,9 +53,7 @@ export const MobileCheckInDateSelector = ({
     if (!container) return;
 
     const containerRect = container.getBoundingClientRect();
-    const dateItems = Array.from(
-      container.querySelectorAll<HTMLElement>("[data-check-in-date]")
-    );
+    const dateItems = Array.from(container.querySelectorAll<HTMLElement>("[data-check-in-date]"));
     if (dateItems.length === 0) return;
     // Keep the month label in sync with the first date reaching the strip's
     // visible left edge, rather than switching while that date is still off-screen.
@@ -67,9 +69,25 @@ export const MobileCheckInDateSelector = ({
     if (!dateValue) return;
 
     setVisibleMonthLabel(
-      new Intl.DateTimeFormat(locale, { month: "short", year: "numeric" }).format(parseISO(dateValue))
+      new Intl.DateTimeFormat(locale, { month: "short", year: "numeric" }).format(
+        parseISO(dateValue)
+      )
     );
   }, [locale]);
+
+  // The date count alone cannot determine whether the strip fits on a narrow screen.
+  useLayoutEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    const updateOverflow = () =>
+      setHasDateOverflow(container.scrollWidth > container.clientWidth + 1);
+    updateOverflow();
+    const observer = new ResizeObserver(updateOverflow);
+    observer.observe(container);
+    const list = container.firstElementChild;
+    if (list) observer.observe(list);
+    return () => observer.disconnect();
+  }, []);
 
   // 處理滾動時隱藏/顯示面板
   useEffect(() => {
@@ -168,15 +186,18 @@ export const MobileCheckInDateSelector = ({
     }
   }, []);
 
-  const scrollDates = useCallback((direction: -1 | 1) => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
+  const scrollDates = useCallback(
+    (direction: -1 | 1) => {
+      const container = scrollContainerRef.current;
+      if (!container) return;
 
-    container.scrollBy({
-      left: direction * Math.max(container.clientWidth * 0.75, 160),
-      behavior: "smooth",
-    });
-  }, []);
+      container.scrollBy({
+        left: direction * Math.max(container.clientWidth * 0.75, 160),
+        behavior: prefersReducedMotion ? "instant" : "smooth",
+      });
+    },
+    [prefersReducedMotion]
+  );
 
   // 處理日期選擇
   const handleDateSelect = (selectedCheckInId: string) => {
@@ -213,7 +234,7 @@ export const MobileCheckInDateSelector = ({
         {/* 中間標題，日期提示箭頭分置標題左右 */}
         {title && (
           <div className="flex items-center justify-center gap-2">
-            {checkInDates.length > 7 && (
+            {hasDateOverflow && (
               <Button
                 type="button"
                 variant="ghost"
@@ -228,18 +249,16 @@ export const MobileCheckInDateSelector = ({
             )}
             <h1
               className="text-lg font-medium text-bg-dark"
-              aria-describedby={checkInDates.length > 7 ? "date-scroll-hint" : undefined}
+              aria-describedby={hasDateOverflow ? "date-scroll-hint" : undefined}
             >
               {title}
             </h1>
             {checkInCount !== undefined && (
-              <span
-                className="rounded-md bg-white/45 px-1.5 py-0.5 text-[10px] font-semibold leading-3 text-bg-dark/75"
-              >
+              <span className="rounded-md bg-white/45 px-1.5 py-0.5 text-[10px] font-semibold leading-3 text-bg-dark/75">
                 {checkInCount}
               </span>
             )}
-            {checkInDates.length > 7 && (
+            {hasDateOverflow && (
               <>
                 <Button
                   type="button"
@@ -280,7 +299,7 @@ export const MobileCheckInDateSelector = ({
         </p>
         <div
           ref={scrollContainerRef}
-          className="overflow-x-auto scrollbar-hide px-4"
+          className="overflow-x-auto overscroll-x-contain scrollbar-hide px-4"
           onScroll={updateVisibleMonthLabel}
         >
           <ol className="mx-auto flex w-fit items-center justify-center gap-3 pb-3 pt-3 pr-48">

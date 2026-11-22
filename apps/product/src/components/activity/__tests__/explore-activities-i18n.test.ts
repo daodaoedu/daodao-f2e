@@ -18,6 +18,7 @@ const SOURCES = [
   "app/[locale]/activities/layout.tsx",
   "app/[locale]/activities/[cohortId]/page.tsx",
   "components/activity/activity-card.tsx",
+  "components/activity/activity-detail-view.tsx",
   "components/activity/explore-filters.tsx",
   "components/activity/explore-guest-header.tsx",
   "components/activity/explore-search.tsx",

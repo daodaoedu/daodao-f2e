@@ -2,41 +2,18 @@
 
 import { usePracticeCheckIns } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
-import { format, isValid, parse, subDays } from "date-fns";
+import { format, isValid, parse } from "date-fns";
 import { MOOD_OPTIONS, mapApiMoodToMoodType } from "@/constants/mood";
 import { CheckInDescriptionText } from "../../display/check-in-description-text";
 
 interface IPreviousCheckInsProps {
   practiceId: string;
-  isDemo?: boolean;
 }
 
-export function PreviousCheckIns({ practiceId, isDemo = false }: IPreviousCheckInsProps) {
+export function PreviousCheckIns({ practiceId }: IPreviousCheckInsProps) {
   const t = useTranslations("check_in");
   const { data, error, isLoading } = usePracticeCheckIns(practiceId, { limit: 10 });
   const records = data?.data ?? [];
-  const demoRecords = [
-    {
-      id: "demo-check-in-1",
-      checkinDate: format(subDays(new Date(), 1), "yyyy-MM-dd"),
-      mood: "good" as const,
-      note: "搭車時聽了一集英文 Podcast，記下 3 個新單字。",
-    },
-    {
-      id: "demo-check-in-2",
-      checkinDate: format(subDays(new Date(), 2), "yyyy-MM-dd"),
-      mood: "happy" as const,
-      note: "跟著影片練習自我介紹，開口比昨天更順了。",
-    },
-    {
-      id: "demo-check-in-3",
-      checkinDate: format(subDays(new Date(), 3), "yyyy-MM-dd"),
-      mood: "neutral" as const,
-      note: "今天有點累，只聽了 5 分鐘，但還是完成了。",
-    },
-  ];
-  const historyRecords =
-    isDemo && !isLoading && !error && records.length === 0 ? demoRecords : records;
 
   return (
     <section
@@ -50,11 +27,11 @@ export function PreviousCheckIns({ practiceId, isDemo = false }: IPreviousCheckI
         <p role="alert" className="py-2 text-sm text-text-dark/60">
           {t("checkin_history_error")}
         </p>
-      ) : historyRecords.length === 0 ? (
+      ) : records.length === 0 ? (
         <p className="py-2 text-sm text-text-dark/60">{t("checkin_history_empty")}</p>
       ) : (
         <ol className="flex flex-col gap-2">
-          {historyRecords.map((record) => {
+          {records.map((record) => {
             const date = parse(record.checkinDate, "yyyy-MM-dd", new Date());
             const moodType = mapApiMoodToMoodType(record.mood);
             const mood = MOOD_OPTIONS.find((option) => option.id === moodType);

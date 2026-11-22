@@ -1,6 +1,6 @@
 "use client";
 
-import { client } from "../client";
+import { client, getApiBaseUrl } from "../client";
 import { apiErrorFromBody } from "../errors";
 import type { components, paths } from "../types";
 
@@ -33,11 +33,29 @@ export async function getCohortFeedback(
 export async function getPublicSurvey(externalId: string) {
   const result = await client.GET("/api/v1/surveys/public/{externalId}", {
     params: { path: { externalId } },
+    cache: "no-store",
   });
   if (result.error || !result.data) {
     throw apiErrorFromBody(result.response.status, result.error, "無法載入問卷");
   }
   return result.data.data;
+}
+
+/** Count visits without attaching a member, cookie, session or referring page. */
+export async function recordManagedSurveyView(externalId: string): Promise<void> {
+  try {
+    await fetch(
+      `${getApiBaseUrl()}/api/v1/surveys/public/${encodeURIComponent(externalId)}/views`,
+      {
+        method: "POST",
+        credentials: "omit",
+        cache: "no-store",
+        referrerPolicy: "no-referrer",
+      }
+    );
+  } catch {
+    // A statistics outage must not prevent respondents from filling the survey.
+  }
 }
 
 type PublicSurveySubmissionType = NonNullable<

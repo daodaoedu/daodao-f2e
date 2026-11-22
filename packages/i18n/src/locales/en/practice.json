@@ -106,6 +106,7 @@
   "edit_title": "Edit Practice",
   "edit_challenge_locked": "This practice belongs to a group challenge: its name, period and visibility are set by the challenge and can't be changed here.",
   "edit_cohort_privacy_locked": "This practice belongs to your cohort. Check-in visibility is set by your coach.",
+  "edit_cohort_schedule_locked": "This practice belongs to your cohort. Its start date and duration are set by your coach.",
   "mobile_edit_challenge_locked": "This practice belongs to a group challenge: its name, period and visibility are set by the challenge and can't be changed. You can still adjust the other fields.",
   "edit_save_failed": "Save failed, please try again later",
   "edit_save_success": "Practice updated successfully",
@@ -558,5 +559,10 @@
   "wizard_create_failed": "Couldn't create, please try again",
   "resource_no_link": "No link available",
   "template_access_denied": "Only DaoDao administrators can create official templates. You can create a personal practice instead.",
-  "template_access_create_personal": "Create a personal practice"
+  "template_access_create_personal": "Create a personal practice",
+  "summary_page_publish": "Publish",
+  "summary_page_publish_desc": "Let others see your practice results",
+  "summary_page_publish_label": "Share to Inspiration Square",
+  "summary_page_published": "Published ✓",
+  "summary_page_publishing": "Processing..."
 }

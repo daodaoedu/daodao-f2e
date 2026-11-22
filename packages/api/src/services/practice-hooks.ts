@@ -5,10 +5,11 @@
  * 提供實踐相關的 React Hooks（用於 Client Components）
  */
 
+import { useEffect } from "react";
 import useSWR from "swr";
 import { client, getApiBaseUrl, unauthorizedHandler } from "../client";
 import { apiErrorFromBody } from "../errors";
-import { useMutate, useQuery } from "../hooks";
+import { useInfinite, useMutate, useQuery } from "../hooks";
 import type { components, paths } from "../types";
 import {
   buildCreateCheckInFormData,
@@ -26,6 +27,7 @@ import type {
   PracticeSummary,
 } from "./practice";
 import { copyPractice, getPracticeCheckInTimeline, getPracticeSummary } from "./practice";
+import { mergeCheckInPages } from "./practice-check-in-pages";
 
 export type {
   FormDataFilePart,
@@ -174,22 +176,54 @@ export const usePracticeById = (id: string) => {
 /**
  * 獲取實踐打卡記錄列表的 Hook
  */
-export const usePracticeCheckIns = (id: string, params?: IGetPracticeCheckInsParams) => {
-  return useQuery("/api/v1/practices/{id}/checkins", {
-    params: {
-      path: {
-        id,
-      },
-      query: {
-        page: params?.page,
-        limit: params?.limit,
-        startDate: params?.startDate,
-        endDate: params?.endDate,
-        mood: params?.mood,
-        include: params?.include,
-      },
+export const usePracticeCheckIns = (
+  id: string,
+  params?: IGetPracticeCheckInsParams,
+  enabled = true
+) => {
+  return useQuery(
+    "/api/v1/practices/{id}/checkins",
+    enabled
+      ? {
+          params: {
+            path: {
+              id,
+            },
+            query: {
+              page: params?.page,
+              limit: params?.limit,
+              startDate: params?.startDate,
+              endDate: params?.endDate,
+              mood: params?.mood,
+              include: params?.include,
+            },
+          },
+        }
+      : null
+  );
+};
+
+/** Complete check-in list for cohort review; errors keep the list explicitly incomplete. */
+export const useAllPracticeCheckIns = (id: string, enabled: boolean) => {
+  const result = useInfinite(
+    "/api/v1/practices/{id}/checkins",
+    (index, previousPage) => {
+      if (!enabled || (previousPage && !previousPage.pagination.hasNext)) return null;
+      return { params: { path: { id }, query: { page: index + 1, limit: 100 } } };
     },
-  });
+    { revalidateOnFocus: false }
+  );
+  const hasNext = result.data?.at(-1)?.pagination.hasNext ?? false;
+  useEffect(() => {
+    if (hasNext && !result.isValidating && !result.error) {
+      void result.setSize(result.size + 1);
+    }
+  }, [hasNext, result.error, result.isValidating, result.setSize, result.size]);
+  return {
+    ...result,
+    data: mergeCheckInPages(result.data),
+    isLoading: enabled && (result.isLoading || (hasNext && !result.error)),
+  };
 };
 
 /**
@@ -581,11 +615,7 @@ export const useUpdatePracticeCheckIn = (practiceId: string, checkInId?: string)
     if (!targetCheckInId) {
       throw new Error("A check-in ID is required to update a check-in");
     }
-    const response = await updatePracticeCheckInWithFormData(
-      practiceId,
-      targetCheckInId,
-      formData
-    );
+    const response = await updatePracticeCheckInWithFormData(practiceId, targetCheckInId, formData);
 
     // 刷新打卡列表的 cache（使用空 query 對象來匹配所有 query 參數組合）
     await mutate([

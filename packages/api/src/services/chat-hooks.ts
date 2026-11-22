@@ -29,11 +29,18 @@ export const useChatMembers = (roomId: number | null) =>
     { revalidateOnFocus: false }
   );
 
-/** 歷史訊息（初始載入，不帶 after/since） */
-export const useChatMessageHistory = (roomId: number | null) =>
+/**
+ * 歷史訊息（初始載入最新一頁，不帶 before）。
+ * limit 用於有未讀時多載一些（上限 100），讓第一則未讀盡量在畫面上（daodao#555）；
+ * 不用 before 截在第一則未讀：增量輪詢一次最多回 100 則、游標取自歷史最後一則，
+ * 未讀超過 100 則時最新訊息會永遠載不到。
+ */
+export const useChatMessageHistory = (roomId: number | null, limit?: number) =>
   useQuery(
     "/api/v1/chat-rooms/{roomId}/messages",
-    roomId ? { params: { path: { roomId } } } : null,
+    roomId
+      ? { params: { path: { roomId }, ...(limit !== undefined && { query: { limit } }) } }
+      : null,
     { revalidateOnFocus: false }
   );
 

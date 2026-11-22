@@ -3,12 +3,12 @@
 import { NotebookHoleSvg, StampSvg, TapeSvg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
 import { cn } from "@daodao/ui/lib/utils";
-import { format, isValid } from "date-fns";
 import * as React from "react";
 import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 import { isBlankContent } from "@/utils/check-in-content";
-import { CheckInDescriptionText } from "./check-in-description-text";
+import { getCheckInDateLabel } from "@/utils/check-in-date-label";
 import { MOOD_LABEL_CLASSNAME, TAG_CLASSNAME } from "./check-in-card-classnames";
+import { CheckInDescriptionText } from "./check-in-description-text";
 
 interface ICheckInCardProps {
   taskTitle: string;
@@ -78,15 +78,7 @@ export const CheckInCard = ({
     handleScroll();
   }, [handleScroll]);
 
-  // 格式化日期（將 "2026-01-01" 或 "2026.01.01" 轉換為 Date 物件）
-  const dateStr = date.replace(/\./g, "-");
-  const dateObj = new Date(dateStr);
-
-  // 拆分日期為年份和月/日，用於印章中心顯示
-  const dateYear = isValid(dateObj) ? format(dateObj, "yyyy") : date.split(/[.-]/)[0] || "";
-  const dateMonthDay = isValid(dateObj)
-    ? format(dateObj, "MM/dd")
-    : date.split(/[.-]/).slice(1).join("/") || "";
+  const { year: dateYear, monthDay: dateMonthDay } = getCheckInDateLabel(date);
 
   return (
     <div className="max-w-[350px] mx-auto">

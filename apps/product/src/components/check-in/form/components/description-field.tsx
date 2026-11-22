@@ -23,18 +23,12 @@ import type { CheckInFormValuesType } from "../schema";
 
 interface IDescriptionFieldProps {
   form: UseFormReturn<CheckInFormValuesType>;
+  isEditing?: boolean;
 }
 
 const AutoExpandingTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   function AutoHeightTextarea(
-    {
-      value,
-      onInput,
-      onMouseUp,
-      onTouchEnd,
-      className,
-      ...props
-    },
+    { value, onInput, onMouseUp, onTouchEnd, className, ...props },
     forwardedRef
   ) {
     const innerRef = useRef<HTMLTextAreaElement>(null);
@@ -86,7 +80,7 @@ const AutoExpandingTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 /**
  * 打卡行動紀錄與可選的下一步欄位
  */
-export const DescriptionField = ({ form }: IDescriptionFieldProps) => {
+export const DescriptionField = ({ form, isEditing = false }: IDescriptionFieldProps) => {
   const t = useTranslations("check_in");
   const locale = useLocale();
   const actionObservation = form.watch("actionObservation") ?? "";
@@ -102,11 +96,11 @@ export const DescriptionField = ({ form }: IDescriptionFieldProps) => {
         render={({ field }) => (
           <FormItem className="space-y-2">
             <div className="flex items-center justify-between gap-2">
-              <FormLabel required className="text-base font-medium text-text-dark">
+              <FormLabel required={!isEditing} className="text-base font-medium text-text-dark">
                 {t("description_label")}
               </FormLabel>
               <FormDescription className="text-sm text-light-gray">
-                {locale === "en"
+                {locale === "en" && !isEditing
                   ? t("description_word_count", {
                       count: actionObservationWordCount,
                       max: CHECK_IN_ACTION_OBSERVATION_WORD_LIMIT,
@@ -127,7 +121,7 @@ export const DescriptionField = ({ form }: IDescriptionFieldProps) => {
         )}
       />
 
-      {actionObservation.trim() && (
+      {(actionObservation.trim() || nextStep.trim()) && (
         <FormField
           control={form.control}
           name="nextStep"

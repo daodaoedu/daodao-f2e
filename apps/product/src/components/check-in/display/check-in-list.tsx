@@ -7,9 +7,9 @@ import { Button } from "@daodao/ui/components/button";
 import { format, isValid, parse } from "date-fns";
 import { ChevronRight } from "lucide-react";
 import { useState } from "react";
-import { CheckInDescriptionText } from "./check-in-description-text";
 import { MOOD_OPTIONS, MoodType, mapApiMoodToMoodType } from "@/constants/mood";
 import { useCohortViewQuery } from "@/lib/cohort-view-query";
+import { CheckInDescriptionText } from "./check-in-description-text";
 
 interface ICheckInListProps {
   practiceId: string;

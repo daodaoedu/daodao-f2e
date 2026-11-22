@@ -9,9 +9,14 @@ import type { IMoodStat } from "../types";
 interface ICheckInRecordCardProps {
   checkInsData?: PracticeCheckInsResponse;
   isLoading?: boolean;
+  hideTitle?: boolean;
 }
 
-export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInRecordCardProps) => {
+export const CheckInRecordCard = ({
+  checkInsData,
+  isLoading = false,
+  hideTitle = false,
+}: ICheckInRecordCardProps) => {
   const t = useTranslations("check_in");
 
   // 從打卡記錄計算心情統計
@@ -47,6 +52,7 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
   if (isLoading) {
     return (
       <div>
+        {!hideTitle && <h3 className="font-medium text-text-dark mb-3">{t("record_title")}</h3>}
         <div className="bg-white rounded-lg px-4 py-2">
           <div className="text-xs text-text-dark font-medium text-center py-4">{t("loading")}</div>
         </div>
@@ -56,10 +62,9 @@ export const CheckInRecordCard = ({ checkInsData, isLoading = false }: ICheckInR
 
   return (
     <div>
+      {!hideTitle && <h3 className="font-medium text-text-dark mb-3">{t("record_title")}</h3>}
       <div className="bg-white rounded-lg px-4 py-2">
-        <div
-          className="flex items-center justify-center gap-6"
-        >
+        <div className="flex items-center justify-center gap-6">
           <div className="shrink-0 text-xs font-medium text-text-dark">{t("mood")}</div>
           <ul className="flex min-w-0 list-none items-center gap-1.5" aria-label={t("mood")}>
             {MOOD_OPTIONS.map((moodOption, index) => {

@@ -1,15 +1,18 @@
 "use client";
 
+import { isApiError, recordManagedSurveyView } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
+import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { Loader2 } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import { useSurveyResponse } from "../../hooks/use-survey-response";
 import { trackPartial, trackView } from "../../services/survey";
 import type { Answer } from "../../types";
 import { CohortFeedbackForm } from "./CohortFeedbackForm";
+import { ManagedSurveyForm } from "./ManagedSurveyForm";
 import { QuestionRenderer } from "./QuestionRenderer";
 import { ThankYouPage } from "./ThankYouPage";
 
@@ -35,17 +38,26 @@ export function SurveyResponsePage() {
   const startedAtRef = useRef<string | null>(null);
   const sessionKeyRef = useRef<string | null>(null);
   const lastTrackedPositionRef = useRef<number | null>(null);
+  const countedManagedShareIdRef = useRef<string | null>(null);
 
   // Record start time + session key once survey is loaded
   useEffect(() => {
-    if (!survey || !shareId || survey.cohortFeedback) return;
+    if (!survey || !shareId || survey.cohortFeedback || survey.managedVersion === 1) return;
     if (!startedAtRef.current) startedAtRef.current = new Date().toISOString();
     if (!sessionKeyRef.current) sessionKeyRef.current = getSessionKey(shareId);
   }, [survey, shareId]);
 
   // Track page view once survey is loaded
   useEffect(() => {
-    if (shareId && survey && !survey.cohortFeedback) void trackView(shareId);
+    if (!shareId || !survey || survey.cohortFeedback) return;
+    if (survey.managedVersion === 1) {
+      if (countedManagedShareIdRef.current !== shareId) {
+        countedManagedShareIdRef.current = shareId;
+        void recordManagedSurveyView(shareId);
+      }
+      return;
+    }
+    void trackView(shareId);
   }, [shareId, survey]);
   const [answers, setAnswers] = useState<Record<string, Answer>>({});
   const [submitted, setSubmitted] = useState(false);
@@ -58,7 +70,7 @@ export function SurveyResponsePage() {
 
   // Restore saved answers
   useEffect(() => {
-    if (!shareId || !survey || survey.cohortFeedback) return;
+    if (!shareId || !survey || survey.cohortFeedback || survey.managedVersion === 1) return;
     try {
       const saved = localStorage.getItem(`survey-answers-${shareId}`);
       if (saved) setAnswers(JSON.parse(saved));
@@ -69,7 +81,13 @@ export function SurveyResponsePage() {
 
   // Auto-save answers (debounced)
   useEffect(() => {
-    if (!survey || survey.cohortFeedback || Object.keys(answers).length === 0) return;
+    if (
+      !survey ||
+      survey.cohortFeedback ||
+      survey.managedVersion === 1 ||
+      Object.keys(answers).length === 0
+    )
+      return;
     const timer = setTimeout(() => {
       try {
         localStorage.setItem(`survey-answers-${shareId}`, JSON.stringify(answers));
@@ -182,7 +200,19 @@ export function SurveyResponsePage() {
   if (error)
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-        <p className="text-destructive">{errorMessage(error, t("load_failed"))}</p>
+        <p className="text-destructive dark:text-red-400">
+          {errorMessage(error, t("load_failed"))}
+        </p>
+        {isApiError(error) && error.status === 401 && (
+          <Button
+            className="bg-[#0D7773] text-white hover:bg-[#0A605D]"
+            onClick={() =>
+              router.push(`/auth/login?redirect=${encodeURIComponent(`/survey/r/${shareId}`)}`)
+            }
+          >
+            登入後填寫
+          </Button>
+        )}
         <Button variant="outline" onClick={retry}>
           {t("retry")}
         </Button>
@@ -194,6 +224,11 @@ export function SurveyResponsePage() {
 
   if (submitted) return <ThankYouPage message={survey?.config?.successMessage} />;
   if (!survey) return null;
+
+  if (survey.managedVersion === 1)
+    return (
+      <ManagedSurveyForm key={survey.shareId} survey={survey} submitResponse={submitResponse} />
+    );
 
   if (survey.cohortFeedback)
     return (

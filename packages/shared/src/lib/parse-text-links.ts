@@ -1,6 +1,7 @@
 export type TextSegment = { type: "text"; value: string } | { type: "url"; value: string };
 
-const URL_PATTERN = /https?:\/\/\S+(?<![.?!,;:])/g;
+// 網址遇到空白或全形標點就結束：中文常把「。」「，」直接接在網址後面，不能算進連結
+const URL_PATTERN = /https?:\/\/[^\s，。！？、；：「」『』（）【】《》〈〉]+(?<![.?!,;:])/g;
 
 export function parseTextLinks(text: string): TextSegment[] {
   const segments: TextSegment[] = [];

@@ -5,10 +5,10 @@ import { useTranslations } from "@daodao/i18n";
 import { Link } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { format, isValid, parse } from "date-fns";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import { isApiCommentNode } from "@/components/check-in/display/api-comment-node";
-import { CheckInCommentSheetContent } from "@/components/check-in/display/check-in-detail";
 import { CheckInDescriptionText } from "@/components/check-in/display/check-in-description-text";
+import { CheckInCommentSheetContent } from "@/components/check-in/display/check-in-detail";
 import { MOOD_OPTIONS, MoodType, mapApiMoodToMoodType } from "@/constants/mood";
 import { useCohortViewQuery } from "@/lib/cohort-view-query";
 import { countTotalComments } from "@/utils/count-comments";
@@ -25,7 +25,7 @@ interface ICheckInCommentGroupProps extends ICurrentUserProps {
   practiceId: string;
   checkIn: PracticeCheckIn;
   isVisible: boolean;
-  onCountChange: (checkInId: string, count: number) => void;
+  onCountChange: (checkInId: string, count: number | null) => void;
 }
 
 const formatCheckInDate = (checkinDate: string): string => {
@@ -42,20 +42,42 @@ function CheckInCommentGroup({
   ...currentUser
 }: ICheckInCommentGroupProps) {
   const t = useTranslations("check_in");
+  const practiceT = useTranslations("practice");
+  const cohortT = useTranslations("cohort");
   const checkInId = String(checkIn.id);
   const cohortViewQuery = useCohortViewQuery();
-  const { data: commentsData } = useComments({ targetType: "checkin", targetId: checkInId });
+  const {
+    data: commentsData,
+    error,
+    mutate,
+  } = useComments({ targetType: "checkin", targetId: checkInId });
 
   const count = useMemo(() => {
     const raw = commentsData?.data;
-    return Array.isArray(raw) ? countTotalComments(raw.filter(isApiCommentNode)) : 0;
+    return Array.isArray(raw) ? countTotalComments(raw.filter(isApiCommentNode)) : null;
   }, [commentsData]);
 
   useEffect(() => {
-    onCountChange(checkInId, count);
-  }, [checkInId, count, onCountChange]);
+    onCountChange(checkInId, error ? null : count);
+  }, [checkInId, count, error, onCountChange]);
 
-  if (count === 0) {
+  if (error) {
+    return (
+      <li className="rounded-xl bg-white p-4 text-sm" role="alert">
+        <p>{practiceT("load_failed")}</p>
+        <Button
+          variant="outline"
+          onClick={() => {
+            void mutate();
+          }}
+        >
+          {cohortT("retry")}
+        </Button>
+      </li>
+    );
+  }
+
+  if (count === null || count === 0) {
     return null;
   }
 
@@ -91,7 +113,7 @@ function CheckInCommentGroup({
 interface ICheckInCommentGroupsProps extends ICurrentUserProps {
   practiceId: string;
   checkInsData?: PracticeCheckInsResponse;
-  onCountChange: (checkInId: string, count: number) => void;
+  onCountChange: (checkInId: string, count: number | null) => void;
 }
 
 /**
@@ -106,14 +128,17 @@ export function CheckInCommentGroups({
 }: ICheckInCommentGroupsProps) {
   const t = useTranslations("app_product");
   const checkIns = checkInsData?.data ?? [];
-  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
+  const [commentCounts, setCommentCounts] = useState<Record<string, number | null>>({});
   const [showAll, setShowAll] = useState(false);
 
+  const [, startCountTransition] = useTransition();
   const handleCountChange = useCallback(
-    (checkInId: string, count: number) => {
-      setCommentCounts((previous) =>
-        previous[checkInId] === count ? previous : { ...previous, [checkInId]: count }
-      );
+    (checkInId: string, count: number | null) => {
+      startCountTransition(() => {
+        setCommentCounts((previous) =>
+          previous[checkInId] === count ? previous : { ...previous, [checkInId]: count }
+        );
+      });
       onCountChange(checkInId, count);
     },
     [onCountChange]

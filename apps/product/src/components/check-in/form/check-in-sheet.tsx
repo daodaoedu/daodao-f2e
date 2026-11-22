@@ -16,12 +16,12 @@ import { parseLocalDate } from "@/utils/practice-period";
 import type { ICheckInFormData, ICheckInStatusOptions } from "../types";
 import { submitKeepingValuesOnError } from "./check-in-submit-flow";
 import { DescriptionField } from "./components/description-field";
-import { formatCheckInDescription, parseCheckInDescription } from "./description-answers";
 import { MediaUploadField } from "./components/media-upload-field";
 import { MoodSelector } from "./components/mood-selector";
 import { PreviousCheckIns } from "./components/previous-check-ins";
 import { ReflectionQuestion } from "./components/reflection-question";
 import { TagSelector } from "./components/tag-selector";
+import { formatCheckInDescription, parseCheckInDescription } from "./description-answers";
 import { useCheckInStatus } from "./hooks/use-check-in-status";
 import { useCheckInSubmit } from "./hooks/use-check-in-submit";
 import { type CheckInFormValuesType, createCheckInFormSchema } from "./schema";
@@ -35,6 +35,7 @@ export type { CheckInStatusType as CheckInStatus } from "@/constants/check-in-st
  */
 interface ICheckInSheetContentProps {
   practiceId?: string;
+  isEditing?: boolean;
   taskTitle: string;
   onComplete: (data: ICheckInFormData) => Promise<void> | void;
   /** 初始值（用於編輯模式） */
@@ -49,6 +50,7 @@ interface ICheckInSheetContentProps {
 
 export const CheckInSheetContent = ({
   practiceId,
+  isEditing = false,
   taskTitle,
   onComplete,
   initialValues,
@@ -61,7 +63,7 @@ export const CheckInSheetContent = ({
   const resolvedSubmitButtonText = submitButtonText ?? t("submit_check_in");
   const initialDescriptionAnswers = parseCheckInDescription(initialValues?.description ?? "");
   const form = useForm<CheckInFormValuesType>({
-    resolver: zodResolver(createCheckInFormSchema(t, locale)),
+    resolver: zodResolver(createCheckInFormSchema(t, locale, { isEditing })),
     defaultValues: {
       mood: initialValues?.mood ?? (moodSelectionPosition === "after" ? "neutral" : null),
       tags: initialValues?.tags ?? [],
@@ -128,12 +130,7 @@ export const CheckInSheetContent = ({
             </Button>
           )}
         </div>
-        {showPreviousCheckIns && practiceId && (
-          <PreviousCheckIns
-            practiceId={practiceId}
-            isDemo={taskTitle.trimStart().toLocaleLowerCase().startsWith("demo")}
-          />
-        )}
+        {showPreviousCheckIns && practiceId && <PreviousCheckIns practiceId={practiceId} />}
 
         {moodSelectionPosition === "form" && <MoodSelector form={form} />}
 
@@ -166,7 +163,7 @@ export const CheckInSheetContent = ({
               <ReflectionQuestion />
             </div>
           )}
-          <DescriptionField form={form} />
+          <DescriptionField form={form} isEditing={isEditing} />
           <MediaUploadField
             form={form}
             existingImages={existingImages}
