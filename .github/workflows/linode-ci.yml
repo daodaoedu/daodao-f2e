@@ -43,6 +43,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.19.4'
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - name: Install shared Blog validator dependencies
+        run: |
+          pnpm --filter @daodao/blog-content... install --frozen-lockfile
+          pnpm --filter @daodao/config generate:env
       - name: Install workflow test dependency
         run: python -m pip install PyYAML==6.0.2
       - name: Test quality gate failure propagation

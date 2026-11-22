@@ -48,8 +48,15 @@ class ProductionWorkflowTests(unittest.TestCase):
     def test_entry_has_no_force_or_product_choice_and_serializes_publications(self):
         events = self.workflow.get("on", self.workflow.get(True))
         self.assertEqual(set(events), {"workflow_dispatch"})
-        self.assertEqual(set(events["workflow_dispatch"]["inputs"]), {"ci_run_id"})
+        self.assertEqual(
+            set(events["workflow_dispatch"]["inputs"]),
+            {"ci_run_id", "legacy_bootstrap"},
+        )
         self.assertTrue(events["workflow_dispatch"]["inputs"]["ci_run_id"]["required"])
+        bootstrap = events["workflow_dispatch"]["inputs"]["legacy_bootstrap"]
+        self.assertEqual(bootstrap["type"], "boolean")
+        self.assertFalse(bootstrap["required"])
+        self.assertIs(bootstrap["default"], False)
         self.assertEqual(
             self.workflow["permissions"], {"contents": "read", "actions": "read"}
         )
@@ -83,15 +90,63 @@ class ProductionWorkflowTests(unittest.TestCase):
             for step in self.steps
             if step.get("uses", "").startswith("actions/checkout@")
         ]
-        self.assertEqual(len(checkouts), 2)
+        self.assertEqual(len(checkouts), 3)
         self.assertEqual(checkouts[0]["with"]["ref"], "${{ github.sha }}")
         self.assertEqual(checkouts[1]["with"]["repository"], "daodaoedu/daodao-blog")
         self.assertEqual(
             checkouts[1]["with"]["ref"], "${{ steps.gate.outputs.content-sha }}"
         )
         self.assertEqual(checkouts[1]["with"]["path"], ".blog-dev-preview-source")
+        self.assertEqual(checkouts[2]["with"]["repository"], "daodaoedu/daodao-blog")
+        self.assertEqual(
+            checkouts[2]["with"]["ref"],
+            "${{ steps.gate.outputs.baseline-content-sha }}",
+        )
+        self.assertEqual(checkouts[2]["with"]["path"], ".blog-prod-published-source")
         for step in checkouts:
             self.assertFalse(step["with"]["persist-credentials"])
+
+    def test_dependencies_are_installed_before_shared_validator_stage_without_approval_env(
+        self,
+    ):
+        install = self.step("Install frontend dependencies")
+        stage = self.step("Stage frozen approved content")
+        build = self.step("Build approved website only")
+        self.assertLess(self.steps.index(install), self.steps.index(stage))
+        self.assertLess(self.steps.index(stage), self.steps.index(build))
+        self.assertIn("pnpm install --frozen-lockfile", install["run"])
+        self.assertLess(
+            install["run"].index("unset BLOG_PROD_APPROVALS"),
+            install["run"].index("pnpm install"),
+        )
+        self.assertNotIn("pnpm install", build["run"])
+
+    def test_host_receives_trusted_previous_sha_and_explicit_bootstrap_boolean(self):
+        self.assertEqual(
+            self.job["env"]["BLOG_PROD_PUBLISHED_CONTENT_SHA"],
+            "${{ vars.BLOG_PROD_PUBLISHED_CONTENT_SHA }}",
+        )
+        deploy = self.step(
+            "Deploy Website digest and verify public content with rollback"
+        )
+        self.assertEqual(
+            deploy["env"]["BASELINE_CONTENT_SHA"],
+            "${{ steps.gate.outputs.baseline-content-sha }}",
+        )
+        self.assertEqual(
+            deploy["env"]["ALLOW_LEGACY_BOOTSTRAP"],
+            "${{ inputs.legacy_bootstrap && '1' || '0' }}",
+        )
+        self.assertIn('--baseline-content-sha "$BASELINE_CONTENT_SHA"', deploy["run"])
+        self.assertIn(
+            '--allow-legacy-bootstrap "$ALLOW_LEGACY_BOOTSTRAP"', deploy["run"]
+        )
+        # Bootstrap only selects the host's explicit migration branch; it cannot
+        # skip any CI/source/approval stage in the job.
+        for step in self.steps:
+            if "blog_prod_gate.py" in step.get("run", ""):
+                self.assertNotIn("legacy_bootstrap", str(step))
+                self.assertNotIn("if", step)
 
     def test_stage_and_both_rechecks_use_the_original_snapshot_and_digest(self):
         stage = self.step("Stage frozen approved content")
@@ -162,7 +217,7 @@ class ProductionWorkflowTests(unittest.TestCase):
         build = self.step("Build approved website only")["run"]
         self.assertLess(
             build.index("unset ENV_PROD BLOG_PROD_APPROVALS"),
-            build.index("pnpm install"),
+            build.index("pnpm --filter @daodao/config generate:env"),
         )
         deploy = self.step(
             "Deploy Website digest and verify public content with rollback"

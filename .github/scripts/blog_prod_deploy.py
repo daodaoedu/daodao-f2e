@@ -8,6 +8,7 @@ import argparse
 import contextlib
 import fcntl
 import hashlib
+import http.client
 import ipaddress
 import json
 import os
@@ -27,6 +28,18 @@ ROOT = Path(__file__).resolve().parents[2] if "__file__" in globals() else Path(
 ORIGIN = "https://daodao.so"
 MAX_BUNDLE = 4 * 1024 * 1024
 MAX_BODY = 8 * 1024 * 1024
+MAX_OLD_PUBLIC_BYTES = 64 * 1024 * 1024
+LEGACY_CONTENT_SHA = "0daa4231bb2072657c807813e960919b982f9d8e"
+OLD_ROOTS = ("zh-TW/blog.html", "zh-TW/blog", "en/blog.html", "en/blog", "blog-images")
+INVENTORY = 'set -o pipefail; find "$@" ! -type d -exec stat -c "%F|%n" {} \\; | head -c 4194305'
+IMAGE_MIME = {
+    "png": "image/png",
+    "jpg": "image/jpeg",
+    "jpeg": "image/jpeg",
+    "webp": "image/webp",
+    "avif": "image/avif",
+    "gif": "image/gif",
+}
 COMMIT = re.compile(r"[a-f0-9]{40}", re.ASCII)
 DIGEST = re.compile(r"[a-f0-9]{64}", re.ASCII)
 IMAGE = re.compile(
@@ -51,9 +64,11 @@ class PublicationError(RuntimeError):
 def validate_payload(item):
     if not isinstance(item, dict) or item.get("schema") != 1:
         raise ValueError("Unsupported publication data")
-    for key in ("frontend_sha", "content_sha"):
+    for key in ("frontend_sha", "content_sha", "baseline_content_sha"):
         if not isinstance(item.get(key), str) or not COMMIT.fullmatch(item[key]):
             raise ValueError("Full lowercase source SHA required")
+    if not isinstance(item.get("allow_legacy_bootstrap"), bool):
+        raise TypeError("Explicit legacy bootstrap policy required")
     if not isinstance(item.get("image"), str) or not IMAGE.fullmatch(item["image"]):
         raise ValueError("Website repository digest required")
     if (
@@ -235,51 +250,138 @@ def website(call):
 
 def preserve_published_routes(call, previous, manifest):
     prefix = "/app/apps/website/out"
+    roots = []
+    for relative in OLD_ROOTS:
+        candidate = prefix + "/" + relative
+        probe = call(
+            ["docker", "exec", previous["id"], "test", "-e", candidate],
+            check=False,
+            text=True,
+            capture_output=True,
+            timeout=30,
+        )
+        if probe.returncode == 0:
+            roots.append(candidate)
+        elif probe.returncode != 1:
+            raise ValueError("Cannot inventory the existing public Blog roots")
+    if not roots:
+        raise ValueError("Existing public Blog roots required")
     listing = execute(
         call,
         [
             "docker",
             "exec",
             previous["id"],
-            "find",
-            prefix,
-            "-type",
-            "f",
-            "-name",
-            "*.html",
+            "sh",
+            "-c",
+            INVENTORY,
+            "inventory",
+            *roots,
         ],
     )
+    if len(listing.encode()) > MAX_BUNDLE or len(listing.splitlines()) > 3000:
+        raise ValueError("Existing public inventory exceeds bounds")
     observed = set()
-    for name in listing.splitlines():
+    routes = {}
+    for line in listing.splitlines():
+        kind, separator, name = line.partition("|")
+        if not separator or kind not in ("regular file", "regular empty file"):
+            raise ValueError("Existing public inventory must contain regular files")
         if not name.startswith(prefix + "/"):
             raise ValueError("Unexpected published output path")
         path = name[len(prefix) :]
-        if re.fullmatch(r"/(?:zh-TW|en)/blog(?:/[^\n]+)?\.html", path):
+        if (
+            not ROUTE.fullmatch(path)
+            or "%" in path
+            or "//" in path
+            or set(path.split("/")).intersection({".", ".."})
+        ):
+            raise ValueError("Unsafe existing public path")
+        public_routes = old_public_routes(path)
+        if "text/html" in public_routes.values():
             observed.add(path)
+        for route, content_type in public_routes.items():
+            routes[route] = content_type
     expected = {"/" + route["file_path"] for route in manifest["routes"]}
     if not observed or not observed.issubset(expected):
         raise ValueError("Publication cannot remove existing Blog HTML routes")
+    return routes
 
 
-def previous_public(read):
-    pages = {path: read(path) for path in ("/blog", "/en/blog")}
+def old_public_routes(path):
+    if re.fullmatch(r"/(?:zh-TW|en)/blog(?:/[A-Za-z0-9_./~-]+)?\.html", path):
+        public = (
+            path.removesuffix("/index.html")
+            if path.endswith("/index.html")
+            else path.removesuffix(".html")
+        )
+        routes = {public: "text/html"}
+        if public.startswith("/zh-TW/"):
+            routes[public.removeprefix("/zh-TW")] = "text/html"
+        return routes
+    if path.startswith("/blog-images/") and path.rsplit(".", 1)[-1] in IMAGE_MIME:
+        return {path: IMAGE_MIME[path.rsplit(".", 1)[-1]]}
+    raise ValueError("Unsupported existing public Blog file")
+
+
+def previous_public(read, routes, item):
+    routes = dict(routes, **{"/blog": "text/html", "/en/blog": "text/html"})
+    pages = {}
+    total = 0
+    for path, content_type in sorted(routes.items()):
+        data = read(path, content_type)
+        total += len(data)
+        if len(data) > MAX_BODY or total > MAX_OLD_PUBLIC_BYTES:
+            raise ValueError("Existing public bytes exceed capture bounds")
+        pages[path] = {
+            "sha256": hashlib.sha256(data).hexdigest(),
+            "content_type": content_type,
+        }
     try:
         raw = read("/blog-release.json")
     except urllib.error.HTTPError as error:
         if error.code != 404:
             raise
+        validate_legacy_seed(item)
         return pages
     try:
         marker = json.loads(raw)
     except (ValueError, UnicodeError):
+        validate_legacy_seed(item)
         return pages  # legacy HTML soft404 is not a version marker
     if not isinstance(marker, dict) or not all(
         isinstance(marker.get(key), str) and COMMIT.fullmatch(marker[key])
         for key in ("frontend_sha", "content_sha")
     ):
         raise ValueError("Existing JSON marker has invalid source identity")
-    pages["/blog-release.json"] = raw
+    if marker["content_sha"] != item["baseline_content_sha"]:
+        raise ValueError("Live production content differs from the frozen baseline")
+    if read("/blog-release.json", "application/json") != raw:
+        raise ValueError("Existing version marker changed during baseline capture")
+    pages["/blog-release.json"] = {
+        "sha256": hashlib.sha256(raw).hexdigest(),
+        "content_type": "application/json",
+    }
     return pages
+
+
+def validate_legacy_seed(item):
+    if (
+        not item["allow_legacy_bootstrap"]
+        or item["baseline_content_sha"] != LEGACY_CONTENT_SHA
+    ):
+        raise ValueError(
+            "Legacy bootstrap requires explicit policy and accepted content baseline"
+        )
+
+
+def verify_previous_public(read, snapshot):
+    results = [
+        hashlib.sha256(read(path, expected["content_type"])).hexdigest()
+        == expected["sha256"]
+        for path, expected in snapshot.items()
+    ]
+    return all(results)
 
 
 @contextlib.contextmanager
@@ -386,8 +488,8 @@ def publish_locked(item, call, verify, read, root):
     product = container_ids(call, "prod_product")
     if not product:
         raise ValueError("Existing Product identity required")
-    preserve_published_routes(call, previous, item["manifest"])
-    previous_pages = previous_public(read)
+    previous_routes = preserve_published_routes(call, previous, item["manifest"])
+    previous_pages = previous_public(read, previous_routes, item)
     report = {
         "frontend_sha": item["frontend_sha"],
         "content_sha": item["content_sha"],
@@ -435,9 +537,9 @@ def publish_locked(item, call, verify, read, root):
                 ).hexdigest(),
                 "rollback_holder": holder,
                 "previous_public_sha256": {
-                    path: hashlib.sha256(data).hexdigest()
-                    for path, data in previous_pages.items()
+                    path: data["sha256"] for path, data in previous_pages.items()
                 },
+                "previous_public": previous_pages,
             },
         )
         environment = dict(
@@ -466,6 +568,7 @@ def publish_locked(item, call, verify, read, root):
             ValueError,
             OSError,
             subprocess.SubprocessError,
+            http.client.HTTPException,
             KeyboardInterrupt,
             SystemExit,
         ) as error:
@@ -477,14 +580,13 @@ def publish_locked(item, call, verify, read, root):
                         restored = website(call)
                         report["rollback_verified"] = restored["image"] == previous[
                             "image"
-                        ] and all(
-                            read(path) == data for path, data in previous_pages.items()
-                        )
+                        ] and verify_previous_public(read, previous_pages)
                         recovered = report["rollback_verified"]
                     except (
                         ValueError,
                         OSError,
                         subprocess.SubprocessError,
+                        http.client.HTTPException,
                         KeyboardInterrupt,
                         SystemExit,
                     ) as recovery_error:
@@ -575,6 +677,8 @@ def main():
     parser.add_argument("--image", required=True)
     parser.add_argument("--frontend-sha", required=True)
     parser.add_argument("--content-sha", required=True)
+    parser.add_argument("--baseline-content-sha", required=True)
+    parser.add_argument("--allow-legacy-bootstrap", choices=("0", "1"), default="0")
     parser.add_argument("--manifest", type=Path, required=True)
     args = parser.parse_args()
     item = {
@@ -582,6 +686,8 @@ def main():
         "image": args.image,
         "frontend_sha": args.frontend_sha,
         "content_sha": args.content_sha,
+        "baseline_content_sha": args.baseline_content_sha,
+        "allow_legacy_bootstrap": args.allow_legacy_bootstrap == "1",
         "manifest": json.loads(args.manifest.read_text()),
         "compose": (ROOT / "docker-compose.yaml").read_text(),
     }

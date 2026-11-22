@@ -45,6 +45,93 @@ def context(branch="dev", managed="true"):
 
 
 class BlogCdOwnershipTests(unittest.TestCase):
+    def test_product_only_production_keeps_production_environment(self):
+        data = context("prod")
+        data["needs.build-website.outputs.image-tag"] = ""
+        data["needs.build-product.outputs.image-tag"] = "prod"
+        self.assertEqual(
+            workflow_condition(
+                self.jobs["deploy"]["environment"]
+                .replace("'production'", "true")
+                .replace("'development'", "false"),
+                data,
+            ),
+            True,
+        )
+
+    def test_product_detection_uses_last_successful_product_revision(self):
+        step = next(
+            s
+            for s in self.jobs["detect-changes"]["steps"]
+            if s.get("name") == "Detect file changes"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+
+            def git(*args):
+                return subprocess.check_output(
+                    ["git", "-C", str(root), "-c", "core.hooksPath=/dev/null", *args],
+                    text=True,
+                ).strip()
+
+            git("init", "-q")
+            git("config", "user.name", "Fixture")
+            git("config", "user.email", "fixture@example.invalid")
+            (root / "initial").touch()
+            git("add", ".")
+            git("commit", "-qm", "initial")
+            git("update-ref", "refs/deploy/prod", "HEAD")
+            (root / "apps/product").mkdir(parents=True)
+            (root / "apps/product/product.ts").write_text("already deployed")
+            git("add", ".")
+            git("commit", "-qm", "product")
+            git("update-ref", "refs/deploy/prod-product", "HEAD")
+            (root / "apps/website").mkdir(parents=True)
+            (root / "apps/website/site.ts").write_text("website only")
+            git("add", ".")
+            git("commit", "-qm", "website")
+            output = root / "outputs"
+            subprocess.run(
+                ["bash", "-e", "-c", step["run"]],
+                cwd=root,
+                env={
+                    **os.environ,
+                    "BRANCH_NAME": "prod",
+                    "EVENT_NAME": "workflow_run",
+                    "APP_INPUT": "",
+                    "GITHUB_OUTPUT": str(output),
+                },
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            actual = dict(
+                line.split("=", 1) for line in output.read_text().splitlines()
+            )
+            self.assertEqual(actual["website"], "true")
+            self.assertEqual(actual["product"], "false")
+
+    def test_product_reference_advances_only_after_verified_production_product(self):
+        data = context("prod")
+        data.update(
+            {
+                "github.event.workflow_run.head_branch": "prod",
+                "github.ref_name": "dev",
+                "needs.deploy.outputs.product": "true",
+            }
+        )
+        expression = self.jobs["update-product-deploy-ref"]["if"]
+        self.assertTrue(workflow_condition(expression, data))
+        for key, value in (
+            ("needs.verify.result", "failure"),
+            ("needs.verify.result", "cancelled"),
+            ("needs.deploy.result", "failure"),
+            ("needs.deploy.outputs.product", "false"),
+            ("github.event.workflow_run.head_branch", "dev"),
+        ):
+            with self.subTest(key=key, value=value):
+                self.assertFalse(workflow_condition(expression, {**data, key: value}))
+
     def setUp(self):
         self.jobs = yaml.safe_load(WORKFLOW.read_text())["jobs"]
 

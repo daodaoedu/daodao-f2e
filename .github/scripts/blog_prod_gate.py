@@ -59,8 +59,10 @@ def context(environment):
         raise ValueError(
             "Only the official managed production manual workflow is allowed"
         )
-    return full_sha(environment.get("GITHUB_SHA")), full_sha(
-        environment.get("BLOG_PROD_CONTENT_SHA")
+    return (
+        full_sha(environment.get("GITHUB_SHA")),
+        full_sha(environment.get("BLOG_PROD_CONTENT_SHA")),
+        full_sha(environment.get("BLOG_PROD_PUBLISHED_CONTENT_SHA")),
     )
 
 
@@ -93,7 +95,7 @@ def require_idle_legacy_cd(api):
 
 def authorize(environment, ci_run_id, checkout_sha, api):
     """Return bound release data only after every current source/CI check passes."""
-    frontend, content = context(environment)
+    frontend, content, baseline_content = context(environment)
     run_id = positive_id(ci_run_id)
     approvals = preview_helper().production_approvals(environment)
     if checkout_sha != frontend:
@@ -133,6 +135,7 @@ def authorize(environment, ci_run_id, checkout_sha, api):
         "schema_version": 1,
         "frontend_sha": frontend,
         "content_sha": content,
+        "baseline_content_sha": baseline_content,
         "ci_run_id": run_id,
         "ci_run_attempt": run["run_attempt"],
         "approvals": approvals,
@@ -199,6 +202,7 @@ def public_outputs(snapshot, path):
     values = {
         "frontend-sha": snapshot["frontend_sha"],
         "content-sha": snapshot["content_sha"],
+        "baseline-content-sha": snapshot["baseline_content_sha"],
         "release-id": snapshot["release_id"],
         "snapshot": str(path),
         "snapshot-sha256": digest(path.read_bytes()),
@@ -232,6 +236,94 @@ def checkout_revision(environment):
     return full_sha(result.stdout.strip())
 
 
+def checked_baseline_checkout(snapshot, environment):
+    workspace = preview_helper().directory(environment, "GITHUB_WORKSPACE")
+    source = workspace / ".blog-prod-published-source"
+    if source.is_symlink() or not source.is_dir() or source.resolve() != source:
+        raise ValueError("Published baseline checkout must be a regular directory")
+    actual = subprocess.run(
+        ["git", "-c", "core.hooksPath=/dev/null", "rev-parse", "--verify", "HEAD"],
+        cwd=source,
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=10,
+    ).stdout.strip()
+    if actual != snapshot["baseline_content_sha"]:
+        raise ValueError("Published baseline checkout differs from the frozen revision")
+    return source
+
+
+def shared_validation(content, evidence, mode="draft", approvals=None, baseline=None):
+    """Invoke the actual shared CLI without pnpm's presentation/logging wrapper."""
+    command = [
+        "node",
+        str(ROOT / "packages/blog-content/node_modules/tsx/dist/cli.mjs"),
+        str(ROOT / "packages/blog-content/src/cli.ts"),
+        "--root",
+        str(content),
+        "--mode",
+        mode,
+    ]
+    if approvals is not None:
+        command += ["--approvals", str(approvals)]
+    if baseline is not None:
+        command += ["--baseline", str(baseline)]
+    child_environment = {
+        key: os.environ[key]
+        for key in ("PATH", "HOME", "SystemRoot")
+        if key in os.environ
+    }
+    child_environment.update(
+        BLOG_CONTENT_DIR=str(content), BLOG_EVIDENCE_ROOT=str(evidence), NO_COLOR="1"
+    )
+    result = subprocess.run(
+        command,
+        cwd=ROOT,
+        env=child_environment,
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+    if len(result.stdout.encode()) > 16 * 1024 * 1024:
+        raise ValueError("Shared content validation report exceeds its bound")
+    if not result.stdout.strip():
+        raise ValueError("Shared content validator runtime failed")
+    try:
+        report = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        raise ValueError(
+            "Shared content validator returned an invalid report"
+        ) from None
+    if not isinstance(report, dict):
+        raise TypeError("Shared content validator returned an invalid report")
+    if report.get("ok") is not True:
+        raise ValueError("Shared content validation rejected the release")
+    if result.returncode:
+        raise ValueError("Shared content validator runtime failed")
+    return report
+
+
+def published_baseline(report):
+    baseline = {}
+    for article in report["articles"]:
+        metadata = article["metadata"]
+        entry = baseline.setdefault(
+            metadata["id"],
+            {
+                "published_at": metadata["published_at"],
+                "slugs": {},
+            },
+        )
+        entry["slugs"][metadata["lang"]] = metadata["slug"]
+    if not baseline or any(
+        set(entry["slugs"]) != {"zh-TW", "en"} for entry in baseline.values()
+    ):
+        raise ValueError("Trusted shared report must contain complete published pairs")
+    return baseline
+
+
 def stage_snapshot(snapshot, environment):
     """Use only the frozen approvals when invoking the existing shared staging helper."""
     staged_environment = dict(environment)
@@ -242,7 +334,38 @@ def stage_snapshot(snapshot, environment):
             "BLOG_PROD_APPROVALS": canonical(snapshot["approvals"]).decode(),
         }
     )
-    preview_helper().prepare(staged_environment, snapshot["content_sha"])
+    helper = preview_helper()
+    old_source = checked_baseline_checkout(snapshot, environment)
+    old_content = helper.snapshot_public_content(
+        old_source, private_runner_directory(environment)
+    )
+    helper.prepare(staged_environment, snapshot["content_sha"])
+    # The existing helper intentionally defaults to no baseline. Add the trusted
+    # previous-content identity baseline and validate before allowing the build.
+    values = dict(
+        line.split("=", 1)
+        for line in Path(environment["GITHUB_ENV"]).read_text().splitlines()
+    )
+    evidence = Path(values["BLOG_EVIDENCE_ROOT"])
+    old_report = shared_validation(old_content, evidence)
+    baseline = published_baseline(old_report)
+    baseline_file = evidence / "published-baseline.json"
+    with baseline_file.open("xb") as output:
+        os.chmod(baseline_file, 0o600)
+        output.write(canonical(baseline))
+    report = shared_validation(
+        Path(values["BLOG_CONTENT_DIR"]),
+        evidence,
+        mode="publish",
+        approvals=Path(values["BLOG_APPROVALS_FILE"]),
+        baseline=baseline_file,
+    )
+    if not set(baseline).issubset(
+        {article["metadata"]["id"] for article in report["articles"]}
+    ):
+        raise ValueError("A publication cannot remove or replace existing article IDs")
+    with Path(environment["GITHUB_ENV"]).open("a") as output:
+        output.write(f"BLOG_PUBLISHED_BASELINE_FILE={baseline_file}\n")
 
 
 def main():

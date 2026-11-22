@@ -1,5 +1,6 @@
 """Observable website-only activation, recovery and transport boundaries."""
 
+import http.client
 import importlib.util
 import json
 import subprocess
@@ -20,6 +21,8 @@ def payload():
         "image": "daodao/daodao-website@sha256:" + "c" * 64,
         "frontend_sha": "a" * 40,
         "content_sha": "b" * 40,
+        "baseline_content_sha": "0daa4231bb2072657c807813e960919b982f9d8e",
+        "allow_legacy_bootstrap": True,
         "compose": "services:\n  prod_website:\n    image: unused\n",
         "manifest": {
             "schema": 1,
@@ -85,11 +88,228 @@ class Docker:
             if self.fail_recovery and "@" not in self.image:
                 raise subprocess.CalledProcessError(1, argv)
         elif argv[:2] == ["docker", "exec"]:
-            output = "\n".join(self.published_paths)
+            if argv[3] == "test":
+                root = argv[-1]
+                exists = any(
+                    path == root or path.startswith(root + "/")
+                    for path in self.published_paths
+                )
+                return subprocess.CompletedProcess(argv, 0 if exists else 1, "", "")
+            roots = argv[argv.index("inventory") + 1 :]
+            output = "\n".join(
+                "regular file|" + path
+                for path in self.published_paths
+                if any(path == root or path.startswith(root + "/") for root in roots)
+            )
         return subprocess.CompletedProcess(argv, 0, output, "")
 
 
 class DeploymentTests(unittest.TestCase):
+    def test_article_update_may_replace_digest_image_url_while_retaining_html(self):
+        docker = Docker()
+        docker.published_paths.append(
+            "/app/apps/website/out/blog-images/oldhash/photo.png"
+        )
+        item = payload()
+        item["manifest"]["routes"].append(
+            {
+                "path": "/blog-images/newhash/photo.png",
+                "file_path": "blog-images/newhash/photo.png",
+                "sha256": "d" * 64,
+                "content_type": "image/png",
+            }
+        )
+        captured = []
+
+        def read(path, content_type=None):
+            captured.append((path, content_type))
+            return b"old public bytes"
+
+        with tempfile.TemporaryDirectory() as folder:
+            result = deploy.publish(
+                item, call=docker, verify=lambda *_: None, read=read, root=Path(folder)
+            )
+        self.assertTrue(result["public_verified"])
+        self.assertIn(("/blog-images/oldhash/photo.png", "image/png"), captured)
+
+    def test_existing_inventory_rejects_links_special_files_and_escaping_paths(self):
+        for listing in (
+            "symbolic link|/app/apps/website/out/zh-TW/blog.html",
+            "fifo|/app/apps/website/out/zh-TW/blog.html",
+            "regular file|/app/apps/website/out/zh-TW/blog/../private.html",
+            "regular file|/outside/blog.html",
+            "\n".join(["regular file|/app/apps/website/out/zh-TW/blog.html"] * 3001),
+        ):
+            docker = Docker()
+
+            def invoke(argv, supplied=listing, current=docker, **kwargs):
+                if argv[:2] == ["docker", "exec"] and argv[3] == "sh":
+                    return subprocess.CompletedProcess(argv, 0, supplied, "")
+                return current(argv, **kwargs)
+
+            with self.subTest(listing=listing[:80]), self.assertRaises(ValueError):
+                deploy.preserve_published_routes(
+                    invoke, {"id": "old"}, payload()["manifest"]
+                )
+
+    def test_old_snapshot_hashes_every_route_and_passes_expected_mime(self):
+        calls = []
+
+        def read(path, content_type=None):
+            calls.append((path, content_type))
+            return path.encode()
+
+        snapshot = deploy.previous_public(
+            read,
+            {"/en/blog/old": "text/html", "/blog-images/old.png": "image/png"},
+            payload(),
+        )
+        self.assertIn(("/en/blog/old", "text/html"), calls)
+        self.assertIn(("/blog-images/old.png", "image/png"), calls)
+        self.assertTrue(deploy.verify_previous_public(read, snapshot))
+        self.assertEqual(
+            set(snapshot), {"/blog", "/en/blog", "/en/blog/old", "/blog-images/old.png"}
+        )
+
+    def test_managed_baseline_needs_no_legacy_bootstrap_permission(self):
+        item = payload()
+        item["allow_legacy_bootstrap"] = False
+        docker = Docker()
+
+        def read(path, content_type=None):
+            if path == "/blog-release.json":
+                return json.dumps(
+                    {
+                        "frontend_sha": "e" * 40,
+                        "content_sha": item["baseline_content_sha"],
+                    }
+                ).encode()
+            return b"old bytes"
+
+        with tempfile.TemporaryDirectory() as folder:
+            result = deploy.publish(
+                item, call=docker, verify=lambda *_: None, read=read, root=Path(folder)
+            )
+        self.assertTrue(result["public_verified"])
+
+    def test_incomplete_http_read_after_activation_runs_verified_rollback(self):
+        docker = Docker()
+
+        def interrupted_response(*_):
+            raise http.client.IncompleteRead(b"partial", 5)
+
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            with self.assertRaises(deploy.PublicationError) as failure:
+                deploy.publish(
+                    payload(),
+                    call=docker,
+                    verify=interrupted_response,
+                    read=lambda *_: b"old bytes",
+                    root=root,
+                )
+            self.assertTrue(failure.exception.report["rollback_verified"])
+            self.assertFalse((root / "pending.json").exists())
+        self.assertEqual(docker.image, "sha256:" + "1" * 64)
+
+    def test_old_article_or_image_corruption_cannot_verify_rollback(self):
+        for broken_path in ("/en/blog/old-article", "/blog-images/old.png"):
+            docker = Docker()
+            docker.published_paths.extend(
+                [
+                    "/app/apps/website/out/en/blog/old-article.html",
+                    "/app/apps/website/out/blog-images/old.png",
+                ]
+            )
+            item = payload()
+            item["manifest"]["routes"].extend(
+                [
+                    {
+                        "path": "/en/blog/old-article",
+                        "file_path": "en/blog/old-article.html",
+                        "sha256": "d" * 64,
+                        "content_type": "text/html",
+                    },
+                    {
+                        "path": "/blog-images/newhash/old.png",
+                        "file_path": "blog-images/newhash/old.png",
+                        "sha256": "d" * 64,
+                        "content_type": "image/png",
+                    },
+                ]
+            )
+            requested = []
+
+            def read(
+                path,
+                content_type=None,
+                damaged=broken_path,
+                observed=requested,
+                current=docker,
+            ):
+                observed.append((path, content_type))
+                if current.active == "restored-container" and path == damaged:
+                    return b"wrong old article or image bytes"
+                return b"old public bytes"
+
+            def mismatch(*_):
+                raise ValueError("Candidate public verification failed")
+
+            with (
+                self.subTest(broken=broken_path),
+                tempfile.TemporaryDirectory() as folder,
+            ):
+                root = Path(folder)
+                with self.assertRaises(deploy.PublicationError) as failure:
+                    deploy.publish(
+                        item, call=docker, verify=mismatch, read=read, root=root
+                    )
+                self.assertFalse(failure.exception.report["rollback_verified"])
+                self.assertTrue((root / "pending.json").exists())
+                self.assertTrue(any(path == broken_path for path, _ in requested))
+                self.assertFalse(
+                    any(cmd[:2] == ["docker", "rm"] for cmd in docker.commands)
+                )
+
+    def test_managed_marker_must_match_frozen_baseline_before_activation(self):
+        docker = Docker()
+
+        def read(path, content_type=None):
+            if path == "/blog-release.json":
+                return json.dumps(
+                    {"frontend_sha": "e" * 40, "content_sha": "f" * 40}
+                ).encode()
+            return b"old page"
+
+        with tempfile.TemporaryDirectory() as folder, self.assertRaises(ValueError):
+            deploy.publish(
+                payload(),
+                call=docker,
+                verify=lambda *_: None,
+                read=read,
+                root=Path(folder),
+            )
+        self.assertFalse(any("up" in command for command in docker.commands))
+
+    def test_legacy_seed_needs_explicit_flag_and_known_accepted_content(self):
+        for changes in (
+            {"allow_legacy_bootstrap": False},
+            {"baseline_content_sha": "f" * 40},
+        ):
+            item = payload()
+            item.update(changes)
+            docker = Docker()
+            with self.subTest(changes=changes), tempfile.TemporaryDirectory() as folder:
+                with self.assertRaises(ValueError):
+                    deploy.publish(
+                        item,
+                        call=docker,
+                        verify=lambda *_: None,
+                        read=lambda *_: b"legacy soft404",
+                        root=Path(folder),
+                    )
+                self.assertFalse(any("up" in command for command in docker.commands))
+
     def test_all_handled_signals_are_queued_and_drained_during_recovery(self):
         source = """import importlib.util,signal,sys
 spec=importlib.util.spec_from_file_location("deploy",sys.argv[1])
@@ -202,7 +422,10 @@ elif args[0]=="ps":
 elif args[0]=="inspect":
  output=json.dumps({"id":state["active"],"image":state["image"],"project":"daodao-f2e","service":"prod_website"})
 elif args[0]=="exec":
- output="/app/apps/website/out/zh-TW/blog.html"
+ if args[2]=="test":
+  statefile.write_text(json.dumps(state))
+  sys.exit(0 if args[-1]=="/app/apps/website/out/zh-TW/blog.html" else 1)
+ output="regular file|/app/apps/website/out/zh-TW/blog.html"
 elif args[0]=="compose" and "up" in args:
  override=Path(args[args.index("-f",args.index("-f")+1)+1])
  state["image"]=json.loads(override.read_text())["services"]["prod_website"]["image"]
@@ -400,14 +623,6 @@ statefile.write_text(json.dumps(state)); print(output)
         docker = Docker()
         docker.published_paths.append("/app/apps/website/out/en/blog/old-article.html")
         item = payload()
-        item["manifest"]["routes"].append(
-            {
-                "path": "/blog",
-                "file_path": "zh-TW/blog.html",
-                "sha256": "d" * 64,
-                "content_type": "text/html",
-            }
-        )
         with tempfile.TemporaryDirectory() as folder, self.assertRaises(ValueError):
             deploy.publish(
                 item,
@@ -422,7 +637,7 @@ statefile.write_text(json.dumps(state)); print(output)
         docker = Docker()
         calls = []
 
-        def read(path):
+        def read(path, _content_type=None):
             calls.append(path)
             if path == "/blog-release.json":
                 return b"<html>legacy soft404</html>"

@@ -7,6 +7,11 @@ on:
         description: Successful Linode CI run for the current prod commit
         required: true
         type: string
+      legacy_bootstrap:
+        description: First cutover only, from the verified original legacy content revision
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -25,6 +30,7 @@ jobs:
     env:
       BLOG_PROD_RELEASE_MANAGED: ${{ vars.BLOG_PROD_RELEASE_MANAGED }}
       BLOG_PROD_CONTENT_SHA: ${{ vars.BLOG_PROD_CONTENT_SHA }}
+      BLOG_PROD_PUBLISHED_CONTENT_SHA: ${{ vars.BLOG_PROD_PUBLISHED_CONTENT_SHA }}
       BLOG_PROD_APPROVALS: ${{ vars.BLOG_PROD_APPROVALS }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
@@ -54,6 +60,20 @@ jobs:
           path: .blog-dev-preview-source
           persist-credentials: false
 
+      - name: Checkout trusted previously published content
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          repository: daodaoedu/daodao-blog
+          ref: ${{ steps.gate.outputs.baseline-content-sha }}
+          path: .blog-prod-published-source
+          persist-credentials: false
+
+      - name: Install frontend dependencies
+        run: |
+          unset BLOG_PROD_APPROVALS
+          pnpm install --frozen-lockfile
+          pnpm --filter @daodao/config generate:env
+
       - name: Stage frozen approved content
         env:
           GH_TOKEN: ${{ github.token }}
@@ -69,7 +89,6 @@ jobs:
           printf '%s\n' "$ENV_PROD" > .env
           cp .env apps/website/.env
           unset ENV_PROD BLOG_PROD_APPROVALS
-          pnpm install --frozen-lockfile
           pnpm --filter @daodao/config generate:env
           pnpm --filter @daodao/website build
 
@@ -126,6 +145,8 @@ jobs:
           IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/daodao-website@${{ steps.image.outputs.digest }}
           FRONTEND_SHA: ${{ steps.gate.outputs.frontend-sha }}
           CONTENT_SHA: ${{ steps.gate.outputs.content-sha }}
+          BASELINE_CONTENT_SHA: ${{ steps.gate.outputs.baseline-content-sha }}
+          ALLOW_LEGACY_BOOTSTRAP: ${{ inputs.legacy_bootstrap && '1' || '0' }}
         run: |
           umask 077
           identity=$(mktemp "$RUNNER_TEMP/blog-prod-key.XXXXXX")
@@ -134,6 +155,7 @@ jobs:
           unset BLOG_SSH_PRIVATE_KEY BLOG_PROD_APPROVALS
           BLOG_SSH_KEY_FILE="$identity" python3 .github/scripts/blog_prod_deploy.py \
             --image "$IMAGE" --frontend-sha "$FRONTEND_SHA" --content-sha "$CONTENT_SHA" \
+            --baseline-content-sha "$BASELINE_CONTENT_SHA" --allow-legacy-bootstrap "$ALLOW_LEGACY_BOOTSTRAP" \
             --manifest "$RUNNER_TEMP/blog-prod-public-manifest.json"
 
       - name: Remove private runner inputs
