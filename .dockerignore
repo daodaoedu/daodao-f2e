@@ -83,3 +83,7 @@ README.md
 .cursor
 .specstory
 
+
+# Pinned content checkouts are staged outside the build context
+.blog-dev-preview-source/
+.blog-prod-published-source/

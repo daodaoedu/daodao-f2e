@@ -34,8 +34,33 @@ env:
   PNPM_VERSION: 10
 
 jobs:
+  workflow-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '20.19.4'
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: '10.20.0'
+          run_install: false
+      - run: pnpm install --frozen-lockfile --filter "@daodao/blog-content..."
+      - run: pnpm --filter @daodao/config generate:env
+      - run: 'python3 -m pip install --only-binary=:all: PyYAML==6.0.2'
+      - run: python3 -m unittest discover -s .github/scripts/__tests__ -p 'test_blog*.py' -v
+
   # ===== 主要測試與品質檢查階段 =====
   test:
+    needs: workflow-tests
     runs-on: ubuntu-latest
     steps:
       # ===== 代碼檢出 =====
@@ -76,19 +101,29 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Generate shared runtime configuration
+        run: pnpm --filter @daodao/config generate:env
+
       # ===== 並行品質檢查 =====
       - name: Run checks in parallel
         run: |
           echo "🔍 Running TypeScript type checking..."
           pnpm run typecheck &
+          typecheck_pid=$!
 
           echo "📝 Running linting..."
           pnpm run lint &
+          lint_pid=$!
 
           echo "🧪 Running tests..."
           pnpm test &
+          test_pid=$!
 
-          wait
+          check_result=0
+          wait "$typecheck_pid" || check_result=1
+          wait "$lint_pid" || check_result=1
+          wait "$test_pid" || check_result=1
+          exit "$check_result"
 
 
   # ===== CI 成功通知 =====
