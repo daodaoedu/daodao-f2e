@@ -1,26 +1,52 @@
 "use client";
 
-import { joinCohort, useCohortJoinInfo } from "@daodao/api";
+import { joinCohort, useCohortJoinInfo, useMyCohorts } from "@daodao/api";
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { ArrowUpRight, Users } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { CohortErrorState } from "@/components/lighthouse/cohort-error-state";
 import { formatActivityPeriod } from "@/utils/activity-detail";
+import { resolveCohortInvitationState } from "@/utils/cohort-invitation-state";
 import { resolveJoinConsentCopy } from "@/utils/cohort-join-consent";
 import { resolveJoinUnavailableCopy } from "@/utils/cohort-join-unavailable";
+import { CohortQueryScope } from "./cohort-query-scope";
 import { CohortSessionSchedule } from "./cohort-session-schedule";
 
 export function CohortJoinPage({ joinToken }: { joinToken: string }) {
+  return (
+    <CohortQueryScope>
+      <CohortJoinContent key={joinToken} joinToken={joinToken} />
+    </CohortQueryScope>
+  );
+}
+
+function CohortJoinContent({ joinToken }: { joinToken: string }) {
   const t = useTranslations("cohort");
   const router = useRouter();
-  const { requireAuth } = useAuth();
+  const { isAuthenticated, isLoading: isAuthLoading, requireAuth } = useAuth();
   const query = useCohortJoinInfo(joinToken);
   const info = query.data?.data;
+  const myCohortsQuery = useMyCohorts(Boolean(info && isAuthenticated && !isAuthLoading));
+  const invitationState = info
+    ? resolveCohortInvitationState({
+        isAuthenticated,
+        isAuthLoading,
+        cohortId: info.cohortId,
+        membership: myCohortsQuery,
+      })
+    : "loading";
+  const hasJoined = invitationState === "joined";
   const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (hasJoined && info) router.replace(`/cohorts/${info.cohortId}`);
+  }, [hasJoined, info, router]);
+
   async function join() {
     if (!consent) return;
     setBusy(true);
@@ -34,7 +60,7 @@ export function CohortJoinPage({ joinToken }: { joinToken: string }) {
     }
     router.push(`/cohorts/${response.data.data.cohortId}`);
   }
-  if (query.isLoading)
+  if (query.isLoading || isAuthLoading || (info && invitationState === "loading") || hasJoined)
     return (
       <div className="grid min-h-[60vh] place-items-center text-sm text-[#5A7B79]">
         {t("loading")}
@@ -45,6 +71,14 @@ export function CohortJoinPage({ joinToken }: { joinToken: string }) {
       <div className="mx-auto max-w-xl px-5 py-20 text-center">
         <h1 className="text-xl font-semibold">{t("link_invalid")}</h1>
       </div>
+    );
+  if (invitationState === "error")
+    return (
+      <CohortErrorState
+        message={t("load_failed")}
+        retryLabel={t("retry")}
+        onRetry={() => void myCohortsQuery.mutate()}
+      />
     );
   if (!info.canJoin) {
     const copy = resolveJoinUnavailableCopy(info);
