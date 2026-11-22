@@ -20,6 +20,55 @@ SPEC.loader.exec_module(artifact)
 
 
 class ArtifactTests(unittest.TestCase):
+    def test_prepare_does_not_write_any_files(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, output, _nginx, _runner = self.fixed_fixture(
+                Path(directory).resolve()
+            )
+            before = {
+                path.relative_to(root): path.read_bytes()
+                for path in root.rglob("*")
+                if path.is_file()
+            }
+            manifest = artifact.prepare(output, "a" * 40, "b" * 40, "release-1")
+            after = {
+                path.relative_to(root): path.read_bytes()
+                for path in root.rglob("*")
+                if path.is_file()
+            }
+            self.assertEqual(after, before)
+            self.assertEqual(manifest["content_sha"], "b" * 40)
+
+    def test_stale_exported_marker_never_replaces_new_marker_hash(self):
+        with tempfile.TemporaryDirectory() as directory:
+            _root, output, _nginx, _runner = self.fixed_fixture(
+                Path(directory).resolve()
+            )
+            stale = output / "blog-release.json"
+            previous = b'{"frontend_sha":"old","content_sha":"old"}\n'
+            stale.write_bytes(previous)
+            manifest = artifact.prepare(output, "a" * 40, "b" * 40, "release-1")
+            self.assertEqual(stale.read_bytes(), previous)
+            expected = self.expected_marker()
+            route = next(
+                r for r in manifest["routes"] if r["path"] == "/blog-release.json"
+            )
+            self.assertEqual(route["sha256"], hashlib.sha256(expected).hexdigest())
+            self.assertNotEqual(route["sha256"], hashlib.sha256(previous).hexdigest())
+
+    def expected_marker(self):
+        return (
+            json.dumps(
+                {
+                    "frontend_sha": "a" * 40,
+                    "content_sha": "b" * 40,
+                    "release_id": "release-1",
+                },
+                sort_keys=True,
+            )
+            + "\n"
+        ).encode()
+
     def fixed_fixture(self, base):
         root = base / "workspace"
         output = root / "apps/website/out"
@@ -167,7 +216,8 @@ class ArtifactTests(unittest.TestCase):
             self.assertEqual(
                 routes["/blog-images/photo.png"]["content_type"], "image/png"
             )
-            marker = (root / "blog-release.json").read_bytes()
+            marker = self.expected_marker()
+            self.assertEqual(artifact.marker_text(manifest).encode(), marker)
             self.assertEqual(
                 routes["/blog-release.json"]["sha256"],
                 hashlib.sha256(marker).hexdigest(),

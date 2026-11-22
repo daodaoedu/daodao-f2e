@@ -245,9 +245,10 @@ class GateTests(unittest.TestCase):
             link.symlink_to(path)
             with self.assertRaises(ValueError):
                 gate.read_snapshot(link, self.env)
-            os.chmod(path, 0o644)
-            with self.assertRaises(ValueError):
-                gate.read_snapshot(path, self.env)
+            for mode in (0o400, 0o640):
+                os.chmod(path, mode)
+                with self.subTest(mode=oct(mode)), self.assertRaises(ValueError):
+                    gate.read_snapshot(path, self.env)
 
     def test_pending_legacy_deployment_on_second_page_blocks_release(self):
         pages = []

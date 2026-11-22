@@ -13,6 +13,22 @@ from urllib.parse import quote
 ROOT = Path(__file__).resolve().parents[2]
 QUOTE_SAFE = "/-._~"
 MANIFEST_NAME = "blog-prod-public-manifest.json"
+MARKER_NAME = "blog-release.json"
+
+
+def marker_text(manifest):
+    marker = {
+        key: manifest[key] for key in ("frontend_sha", "content_sha", "release_id")
+    }
+    return json.dumps(marker, sort_keys=True) + "\n"
+
+
+def marker_entry(manifest):
+    return {
+        "sha256": hashlib.sha256(marker_text(manifest).encode()).hexdigest(),
+        "content_type": "application/json",
+        "file_path": MARKER_NAME,
+    }
 
 
 def route_paths(name):
@@ -30,8 +46,7 @@ def manifest_entry(root, path):
         return None
     name = path.relative_to(root).as_posix()
     if not (
-        name == "blog-release.json"
-        or name.startswith("blog-images/")
+        name.startswith("blog-images/")
         or re.fullmatch(r"(?:zh-TW|en)/blog(?:/.*)?\.html", name)
     ):
         return None
@@ -56,15 +71,13 @@ def prepare(root, frontend, content, release):
     if not all((root / f"{locale}/blog.html").is_file() for locale in ("zh-TW", "en")):
         raise ValueError("Both bilingual Blog indexes are required")
     marker = {"frontend_sha": frontend, "content_sha": content, "release_id": release}
-    marker_path = root / "blog-release.json"
-    marker_path.write_text(json.dumps(marker, sort_keys=True) + "\n")
-    routes = {}
-    for path in [*files, marker_path]:
+    routes = {"/" + MARKER_NAME: marker_entry(marker)}
+    for path in files:
         item = manifest_entry(root, path)
         if item is None:
             continue
         name, entry = item
-        routes.update({route: entry for route in route_paths(name)})
+        routes.update(dict.fromkeys(route_paths(name), entry))
     return {
         "schema": 1,
         **marker,
@@ -142,6 +155,7 @@ def main():
     output, nginx, manifest_path = fixed_paths(os.environ)
     configuration = configure_nginx(nginx.read_text())
     manifest = prepare(output, args.frontend_sha, args.content_sha, args.release_id)
+    write_fixed_file(output / MARKER_NAME, marker_text(manifest))
     write_fixed_file(nginx, configuration)
     write_fixed_file(manifest_path, json.dumps(manifest, sort_keys=True) + "\n")
 
