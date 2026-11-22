@@ -152,22 +152,23 @@ export function NotificationList() {
     }
   };
 
-  const handleClick = async (notification: INotificationData) => {
-    // mark as read
+  const handleClick = (notification: INotificationData) => {
+    // Open the destination before background read/cache requests can delay navigation.
+    const apiItem = apiItems.find((n) => String(n.id) === notification.id);
+    if (apiItem) {
+      const link = buildNotificationDeepLink(apiItem);
+      if (link) router.push(link);
+    }
+
     if (!notification.isRead) {
       setLocalOverrides((prev) => ({
         ...prev,
         [notification.id]: { isRead: true },
       }));
-      await markNotificationRead(Number(notification.id)).catch(() => {});
-      await revalidateAllNotifications();
-    }
-
-    // navigate
-    const apiItem = apiItems.find((n) => String(n.id) === notification.id);
-    if (apiItem) {
-      const link = buildNotificationDeepLink(apiItem);
-      if (link) router.push(link);
+      void markNotificationRead(Number(notification.id))
+        .catch(() => {})
+        .then(() => revalidateAllNotifications())
+        .catch(() => {});
     }
   };
 
