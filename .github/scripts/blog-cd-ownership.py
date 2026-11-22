@@ -10,16 +10,19 @@ import os
 from pathlib import Path
 
 
-def decide(branch, requested, managed):
+def decide(branch, requested, managed, production_managed=""):
     dev = branch == "dev"
     managed_dev = dev and managed.lower() not in ("", "false")
+    managed_prod = branch == "prod" and production_managed.lower() not in ("", "false")
+    managed_website = managed_dev or managed_prod
     return {
-        "website": requested and not managed_dev,
+        "website": requested and not managed_website,
         "dev": dev,
-        "managed": managed_dev,
+        "controlled": branch in ("dev", "prod"),
+        "managed": managed_website,
         "reason": (
-            "dev website belongs to managed Blog release; legacy website skipped"
-            if managed_dev
+            f"{branch} website belongs to managed Blog release; legacy website skipped"
+            if managed_website
             else "legacy website decision preserved"
         ),
         "policy_source": "repository vars job-context snapshot; cutover drain required",
@@ -35,11 +38,12 @@ def main():
         args.branch,
         args.requested == "true",
         os.environ.get("BLOG_DEV_RELEASE_MANAGED", ""),
+        os.environ.get("BLOG_PROD_RELEASE_MANAGED", ""),
     )
     with Path(os.environ["GITHUB_OUTPUT"]).open("a") as output:
         output.writelines(
             f"{key}={str(result[key]).lower()}\n"
-            for key in ("website", "dev", "managed")
+            for key in ("website", "dev", "managed", "controlled")
         )
     print(json.dumps(result))
 
