@@ -411,7 +411,7 @@
   "enrollment_status_removed": "Removed",
   "resend": "Resend",
   "remove": "Remove",
-  "member_remove_confirm": "This learner's practices will become personal practices. Continue?",
+  "member_remove_confirm": "This learner's cohort practices will be removed from their personal space. Continue?",
   "member_remove_failed": "Could not remove the learner",
   "member_removed": "Learner removed",
   "overview_active_cohorts": "All cohorts",
