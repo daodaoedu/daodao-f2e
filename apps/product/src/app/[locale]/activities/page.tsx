@@ -14,6 +14,7 @@ import { ExploreGuestHeader } from "@/components/activity/explore-guest-header";
 import { ExploreSearch } from "@/components/activity/explore-search";
 import { HostPreviewDialog } from "@/components/activity/host-preview-dialog";
 import { PageHeader, Sidebar } from "@/components/layout";
+import { CohortErrorState } from "@/components/lighthouse/cohort-error-state";
 import {
   type ActivityFeeFilter,
   type ActivityStatusFilter,
@@ -32,8 +33,15 @@ const SECTION_TITLE_KEY: Record<ActivityStatusFilter, string> = {
 
 export default function ExploreActivitiesPage() {
   const t = useTranslations("explore_activities");
+  const tAuth = useTranslations("auth.privateAccessUnavailable");
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading } = useAuthContext();
+  const {
+    user,
+    isAuthenticated,
+    isLoading: authLoading,
+    authCheckUnavailable,
+    refreshAuth,
+  } = useAuthContext();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<ActivityStatusFilter>("all");
@@ -42,7 +50,10 @@ export default function ExploreActivitiesPage() {
   const [hostDialogUserId, setHostDialogUserId] = useState<number | null>(null);
   const [hostDialogOpen, setHostDialogOpen] = useState(false);
 
-  const { data, isLoading: dataLoading } = useActivities();
+  const { data, isLoading: dataLoading } = useActivities(
+    undefined,
+    authLoading || authCheckUnavailable ? undefined : (user?.id ?? null)
+  );
   const activities = useMemo(() => (data?.data ?? []) as ActivitySummaryType[], [data]);
   const meta = data?.meta as { endedTruncated?: boolean } | undefined;
 
@@ -61,6 +72,18 @@ export default function ExploreActivitiesPage() {
       <div className={cn(PAGE_BACKGROUND, "flex items-center justify-center")}>
         <Spinner />
       </div>
+    );
+  }
+
+  if (authCheckUnavailable) {
+    return (
+      <main className={PAGE_BACKGROUND}>
+        <CohortErrorState
+          message={tAuth("title")}
+          retryLabel={tAuth("retry")}
+          onRetry={() => void refreshAuth()}
+        />
+      </main>
     );
   }
 

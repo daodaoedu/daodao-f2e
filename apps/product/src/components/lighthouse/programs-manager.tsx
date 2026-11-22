@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  type ActivityDetailType,
   archiveLighthouseCohort,
   archiveLighthouseProgram,
   createLighthouseCohort,
@@ -11,7 +12,9 @@ import {
   setLighthouseTemplateBinding,
   updateLighthouseCohort,
   updateLighthouseProgram,
+  useLighthouseCohortEnrollments,
   useLighthouseCohorts,
+  useLighthouseOrganizationMembers,
   useLighthousePrograms,
   useLighthouseTemplates,
 } from "@daodao/api";
@@ -36,6 +39,7 @@ import { Popover, PopoverAnchor, PopoverContent } from "@daodao/ui/components/po
 import { toast } from "@daodao/ui/components/sonner";
 import { Switch } from "@daodao/ui/components/switch";
 import { Textarea } from "@daodao/ui/components/textarea";
+import { format } from "date-fns";
 import {
   AlertTriangle,
   Archive,
@@ -57,10 +61,17 @@ import {
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { type FormEvent, type ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { ActivityDetailView } from "@/components/activity/activity-detail-view";
 import {
   type ServerErrorMessageFn,
   useServerErrorMessage,
 } from "@/lib/server-error/use-server-error-message";
+import {
+  type ActivityPreviewForm,
+  buildActivityPreview,
+  normalizeMeetingUrl,
+  resolvePreviewHost,
+} from "@/utils/activity-preview";
 import { type CohortFieldErrorKey, resolveCohortApiError } from "@/utils/cohort-api-error";
 import {
   generateRecurringSessions,
@@ -135,6 +146,14 @@ const COHORT_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 /** HTML pattern 屬性版本（Chrome 以 v flag 編譯，字元類別結尾的 `-` 會被判定為無效正則而整個忽略） */
 const COHORT_SLUG_HTML_PATTERN = "[a-z0-9]+(-[a-z0-9]+)*";
 
+/** 發布前預覽需要、但不在場次表單裡的系列／組織資料（daodao#543） */
+interface CohortPreviewSource {
+  programName: string;
+  programDescription: string | null;
+  organization: ActivityDetailType["organization"];
+  organizationId: number;
+}
+
 type CohortErrorTranslator = (
   key: CohortFieldErrorKey | "cohort_create_failed" | "save_failed"
 ) => string;
@@ -195,6 +214,7 @@ interface CohortSetupPanelProps {
   cohort?: LighthouseCohortType;
   programId: number;
   organizationId: number;
+  previewSource: CohortPreviewSource;
   templates?: CohortTemplateSummary[];
   onSubmit: (
     formData: FormData,
@@ -224,6 +244,7 @@ function CohortSetupPanel({
   cohort,
   programId,
   organizationId: _organizationId,
+  previewSource,
   templates,
   onSubmit,
   onClose,
@@ -368,6 +389,58 @@ function CohortSetupPanel({
   const [showInviteOnSignup, setShowInviteOnSignup] = useState(
     cohort?.showInviteMessageOnSignup ?? false
   );
+  const [activityPreviewForm, setActivityPreviewForm] = useState<ActivityPreviewForm | null>(null);
+  const [activityPreviewOpen, setActivityPreviewOpen] = useState(false);
+  // 只在開啟預覽時讀場次 owner，用來跟公開活動頁一樣決定發起人
+  const previewEnrollmentsQuery = useLighthouseCohortEnrollments(
+    programId,
+    activityPreviewOpen ? cohort?.id : undefined
+  );
+  const previewOwnersQuery = useLighthouseOrganizationMembers(
+    activityPreviewOpen ? previewSource.organizationId : undefined
+  );
+  const activityPreview = activityPreviewForm
+    ? buildActivityPreview(
+        activityPreviewForm,
+        {
+          cohortId: cohort?.id,
+          programName: previewSource.programName,
+          programDescription: previewSource.programDescription,
+          organization: previewSource.organization,
+          host: resolvePreviewHost(
+            previewEnrollmentsQuery.data?.data ?? [],
+            previewOwnersQuery.data?.data ?? [],
+            previewSource.organization.name
+          ),
+          untitledName: t("cohort_preview_untitled"),
+        },
+        format(new Date(), "yyyy-MM-dd")
+      )
+    : null;
+
+  /** 用目前表單值（含未儲存修改）開啟唯讀預覽；不呼叫任何寫入 API（daodao#543） */
+  function handlePreviewActivity() {
+    const form = panelRef.current;
+    if (!form) return;
+    const formData = new FormData(form);
+    const field = (name: string) => String(formData.get(name) ?? "");
+    setActivityPreviewForm({
+      displayName: field("displayName"),
+      tagline: field("tagline"),
+      startDate: field("startDate"),
+      endDate: field("endDate"),
+      timezone,
+      interactionModes,
+      sessions,
+      location: field("location"),
+      feeType,
+      feeAmount: field("feeAmount"),
+      signupMethod,
+      externalSignupUrl: field("externalSignupUrl"),
+      templateCount: selectedTemplateIds.size,
+    });
+    setActivityPreviewOpen(true);
+  }
   const recurrenceStartDate =
     recurrenceStartDateOverride ??
     sessions.find((session) => session.sessionDate)?.sessionDate ??
@@ -730,6 +803,7 @@ function CohortSetupPanel({
               id={`${prefix}-tagline`}
               name="tagline"
               rows={3}
+              maxLength={100}
               placeholder={t("cohort_tagline_placeholder")}
               value={taglineValue}
               onChange={(e) => setTaglineValue(e.target.value)}
@@ -737,9 +811,9 @@ function CohortSetupPanel({
             <div className="flex items-center justify-between">
               <p className="text-xs text-[#78928F]">{t("cohort_tagline_description")}</p>
               <p
-                className={`text-xs ${taglineValue.length > 80 ? "text-[#C03A3A] font-medium" : "text-[#78928F]"}`}
+                className={`text-xs ${taglineValue.length > 100 ? "text-[#C03A3A] font-medium" : "text-[#78928F]"}`}
               >
-                {taglineValue.length} / 80
+                {taglineValue.length} / 100
               </p>
             </div>
           </div>
@@ -851,7 +925,8 @@ function CohortSetupPanel({
               <Input
                 id={`${prefix}-meeting`}
                 name="meetingUrl"
-                type="url"
+                type="text"
+                inputMode="url"
                 placeholder={t("cohort_meeting_url_placeholder")}
                 defaultValue={cohort?.meetingUrl ?? ""}
               />
@@ -1302,17 +1377,29 @@ function CohortSetupPanel({
           {/* 費用設定 */}
           <fieldset className="md:col-span-2">
             <legend className="text-sm font-medium">{t("cohort_fee_title")}</legend>
-            <div className="mt-2">
+            <div className="mt-2 flex flex-wrap items-start gap-3">
               <select
                 value={feeType}
                 onChange={(e) => setFeeType(e.target.value as "free" | "paid")}
                 className="rounded-lg border border-[#CDEBE8] bg-white px-3 py-2 text-sm"
+                aria-label={t("cohort_fee_title")}
               >
                 <option value="free">{t("cohort_fee_type_free")}</option>
                 <option value="paid">{t("cohort_fee_type_paid")}</option>
               </select>
+              {feeType === "free" && (
+                <select
+                  value={signupMethod}
+                  onChange={(e) => setSignupMethod(e.target.value as "island_form" | "external")}
+                  className="rounded-lg border border-[#CDEBE8] bg-white px-3 py-2 text-sm"
+                  aria-label={t("cohort_signup_method_label")}
+                >
+                  <option value="island_form">{t("cohort_signup_method_island_form")}</option>
+                  <option value="external">{t("cohort_signup_method_external")}</option>
+                </select>
+              )}
               {feeType === "paid" && (
-                <div className="mt-3 grid gap-3 md:grid-cols-2">
+                <div className="grid basis-full gap-3 md:grid-cols-2">
                   {/* biome-ignore lint/a11y/noLabelWithoutControl: Input wraps native input */}
                   <label className="grid gap-1.5 text-sm font-medium">
                     {t("cohort_fee_amount")} (NT$/人)
@@ -1337,26 +1424,15 @@ function CohortSetupPanel({
                   </label>
                 </div>
               )}
-              {feeType === "free" && (
-                <div className="mt-3 grid gap-2">
-                  <select
-                    value={signupMethod}
-                    onChange={(e) => setSignupMethod(e.target.value as "island_form" | "external")}
-                    className="rounded-lg border border-[#CDEBE8] bg-white px-3 py-2 text-sm"
-                  >
-                    <option value="island_form">{t("cohort_signup_method_island_form")}</option>
-                    <option value="external">{t("cohort_signup_method_external")}</option>
-                  </select>
-                  {signupMethod === "external" && (
-                    <Input
-                      name="externalSignupUrl"
-                      type="url"
-                      required
-                      placeholder="https://"
-                      defaultValue={cohort?.externalSignupUrl ?? ""}
-                    />
-                  )}
-                </div>
+              {feeType === "free" && signupMethod === "external" && (
+                <Input
+                  className="basis-full"
+                  name="externalSignupUrl"
+                  type="url"
+                  required
+                  placeholder="https://"
+                  defaultValue={cohort?.externalSignupUrl ?? ""}
+                />
               )}
             </div>
           </fieldset>
@@ -1545,23 +1621,19 @@ function CohortSetupPanel({
             },
             {
               label: t("cohort_checkin_default_private"),
-              hint: isPrivate
-                ? t("cohort_checkin_default_private_hint")
-                : t("cohort_privacy_disabled_hint"),
+              hint: t("cohort_checkin_default_private_hint"),
               checked: checkinPrivate,
               onChange: setCheckinPrivate,
-              disabled: !isPrivate,
-              dimmed: !isPrivate,
+              disabled: true,
+              dimmed: true,
             },
             {
               label: t("cohort_host_comment_default_private"),
-              hint: isPrivate
-                ? t("cohort_host_comment_default_private_hint")
-                : t("cohort_privacy_disabled_hint"),
+              hint: t("cohort_host_comment_default_private_hint"),
               checked: hostCommentPrivate,
               onChange: setHostCommentPrivate,
-              disabled: !isPrivate,
-              dimmed: !isPrivate,
+              disabled: true,
+              dimmed: true,
             },
             {
               label: t("cohort_visibility_public"),
@@ -1699,7 +1771,16 @@ function CohortSetupPanel({
       </div>
 
       {/* Bottom action bar */}
-      <div className="mt-5 flex items-center justify-end gap-2">
+      <div className="mt-5 flex flex-wrap items-center gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handlePreviewActivity}
+          className="mr-auto h-8 rounded-full border-[#CDEBE8] bg-white px-3 py-1.5 text-xs font-normal text-[#5A7B79] hover:bg-[#F0FBF9] hover:text-[#5A7B79]"
+        >
+          <ArrowUpRight className="size-3.5" aria-hidden="true" />
+          {t("cohort_preview_activity_button")}
+        </Button>
         <Button
           type="button"
           variant="outline"
@@ -1717,6 +1798,24 @@ function CohortSetupPanel({
           {mode === "create" ? t("cohort_create") : t("save")}
         </Button>
       </div>
+      <Dialog open={activityPreviewOpen} onOpenChange={setActivityPreviewOpen}>
+        <DialogContent
+          style={{ maxWidth: 1200 }}
+          className="max-h-[calc(100vh-2rem)] w-[calc(100vw-2rem)] max-w-[1200px] overflow-y-auto rounded-[18px] p-0"
+        >
+          <DialogHeader className="sr-only">
+            <DialogTitle>{t("cohort_preview_activity")}</DialogTitle>
+            <DialogDescription>{t("cohort_preview_banner")}</DialogDescription>
+          </DialogHeader>
+          {activityPreview && (
+            <ActivityDetailView
+              activity={activityPreview}
+              preview
+              className="max-w-none pt-16 min-[481px]:pt-16"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
       {mode === "edit" && (
         <ConfirmDialog
           open={pendingTab !== null || confirmClose}
@@ -1738,6 +1837,7 @@ interface CohortCardProps {
   programId: number;
   organizationId: number;
   cohort: LighthouseCohortType;
+  previewSource: CohortPreviewSource;
   templates?: CohortTemplateSummary[];
   refresh: () => Promise<unknown>;
   refreshTemplates: () => Promise<unknown>;
@@ -1749,6 +1849,7 @@ function CohortCard({
   programId,
   organizationId,
   cohort,
+  previewSource,
   templates,
   refresh,
   refreshTemplates,
@@ -1881,7 +1982,7 @@ function CohortCard({
         inviteMessage: String(formData.get("inviteMessage") ?? "").trim() || null,
         visibility: extras.visibility,
         interactionModes: extras.interactionModes as ("sync" | "async" | "physical")[],
-        meetingUrl: String(formData.get("meetingUrl") ?? "").trim() || null,
+        meetingUrl: normalizeMeetingUrl(formData.get("meetingUrl")),
         location: String(formData.get("location") ?? "").trim() || null,
         sessions: extras.sessions.map((s) => ({
           sessionDate: s.sessionDate,
@@ -1946,6 +2047,7 @@ function CohortCard({
       cohort={cohort}
       programId={programId}
       organizationId={organizationId}
+      previewSource={previewSource}
       templates={templates}
       onSubmit={async (formData, extras) => {
         const saved = await handleEditSubmit(formData, extras);
@@ -2159,6 +2261,18 @@ interface ProgramPanelProps {
 
 function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
   const t = useTranslations("lighthouse");
+  const { organization } = useLighthouseOrganization();
+  const currentOrganization = organization?.id === program.organizationId ? organization : null;
+  const previewSource: CohortPreviewSource = {
+    programName: program.name,
+    programDescription: program.description,
+    organization: {
+      name: currentOrganization?.name ?? "",
+      bio: currentOrganization?.bio ?? null,
+      externalLink: currentOrganization?.externalLink ?? null,
+    },
+    organizationId: program.organizationId,
+  };
   const apiErrorMessage = useLighthouseErrorMessage();
   const { errorMessage: serverErrorMessage } = useServerErrorMessage();
   const { cohorts, isLoading, mutate } = useLighthouseCohorts(program.id);
@@ -2289,7 +2403,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
         status: "draft",
         visibility: extras.visibility,
         interactionModes: extras.interactionModes as ("sync" | "async" | "physical")[],
-        meetingUrl: String(formData.get("meetingUrl") ?? "").trim() || undefined,
+        meetingUrl: normalizeMeetingUrl(formData.get("meetingUrl")) ?? undefined,
         location: String(formData.get("location") ?? "").trim() || undefined,
         sessions: extras.sessions.map((s) => ({
           sessionDate: s.sessionDate,
@@ -2476,6 +2590,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
               mode="create"
               programId={program.id}
               organizationId={program.organizationId}
+              previewSource={previewSource}
               templates={templates}
               onSubmit={handleCohortCreate}
               onClose={() => setCreatingCohort(false)}
@@ -2497,6 +2612,7 @@ function ProgramPanel({ program, refreshPrograms }: ProgramPanelProps) {
               programId={program.id}
               organizationId={program.organizationId}
               cohort={cohort}
+              previewSource={previewSource}
               templates={templates}
               refresh={mutate}
               refreshTemplates={templatesQuery.mutate}

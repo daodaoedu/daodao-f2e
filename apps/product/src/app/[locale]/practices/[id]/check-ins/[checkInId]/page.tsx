@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useAllPracticeCheckIns,
   useCurrentUser,
   usePracticeById,
   usePracticeCheckIns,
@@ -10,6 +11,7 @@ import {
 import { Deco4Svg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
 import { useParams } from "@daodao/i18n/navigation";
+import { Button } from "@daodao/ui/components/button";
 import { toast } from "@daodao/ui/components/sonner";
 import { addDays, format, isValid, parse } from "date-fns";
 import { useEffect, useMemo } from "react";
@@ -22,6 +24,8 @@ import {
 import type { ICheckInDisplayData, ICheckInFormData } from "@/components/check-in/types";
 import { PageHeader } from "@/components/layout";
 import { mapApiMoodToMoodType, mapMoodTypeToApiMood } from "@/constants/mood";
+
+import { useCohortViewQuery } from "@/lib/cohort-view-query";
 
 /**
  * 將 API 的 checkinDate 格式轉換為顯示格式
@@ -76,10 +80,13 @@ const generateFullDateRange = (
 
 export default function CheckInDetailPage() {
   const t = useTranslations("practice");
+  const cohortT = useTranslations("cohort");
   const params = useParams();
   const practiceId = params.id as string;
   const checkInId = params.checkInId as string;
-  const practiceDetailPath = `/practices/${practiceId}`;
+  const cohortViewQuery = useCohortViewQuery();
+  const isCohortAdminView = new URLSearchParams(cohortViewQuery).get("view") === "cohort-admin";
+  const practiceDetailPath = `/practices/${practiceId}${cohortViewQuery}`;
 
   // 獲取 practice 資料
   const { data: practiceData, isLoading: isLoadingPractice } = usePracticeById(practiceId);
@@ -97,10 +104,12 @@ export default function CheckInDetailPage() {
   // 更新打卡記錄
   const { updateCheckIn } = useUpdatePracticeCheckIn(practiceId, checkInId);
 
-  // 獲取所有 check-ins
-  const { data: checkInsData, isLoading: isLoadingCheckIns } = usePracticeCheckIns(practiceId, {
-    limit: 30,
-  });
+  // Cohort review links can target any check-in, including later pages. The mode
+  // only selects pagination; each request retains the API's own access checks.
+  const standardCheckIns = usePracticeCheckIns(practiceId, { limit: 30 }, !isCohortAdminView);
+  const allCheckIns = useAllPracticeCheckIns(practiceId, isCohortAdminView);
+  const checkInsQuery = isCohortAdminView ? allCheckIns : standardCheckIns;
+  const { data: checkInsData, isLoading: isLoadingCheckIns, error: checkInsError } = checkInsQuery;
 
   // 將 API 的 check-ins 轉換為 ICheckInDisplayData 格式
   const checkInsMap = useMemo(() => {
@@ -246,6 +255,29 @@ export default function CheckInDetailPage() {
     );
   }
 
+  // An incomplete/failed page is not evidence that the target check-in is absent.
+  if (checkInsError) {
+    return (
+      <div className="relative w-full min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
+        <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
+        <PageHeader title={t("checkin_title")} variant="light" rightActionTo={practiceDetailPath} />
+        <main className="max-w-[448px] mx-auto pt-[88px] md:pt-[72px] px-5 pb-40">
+          <div role="alert" className="text-center text-white">
+            <p>{t("load_failed")}</p>
+            <Button
+              variant="outline"
+              onClick={() => {
+                void checkInsQuery.mutate();
+              }}
+            >
+              {cohortT("retry")}
+            </Button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   // Error 或找不到 check-in 的狀態
   if (!checkInData || !practiceData?.data) {
     return (
@@ -267,6 +299,7 @@ export default function CheckInDetailPage() {
   // 判斷當前用戶是否為實踐的擁有者
   const isOwner =
     !!practiceData?.data?.user?.id && practiceData.data.user.id === currentUserData?.data?.id;
+  const canEditCheckIn = isOwner && !isCohortAdminView;
 
   const handleCheckInComplete = (data: unknown) => {
     // TODO: 處理打卡資料
@@ -314,7 +347,8 @@ export default function CheckInDetailPage() {
       <main className="max-w-[448px] mx-auto pt-[150px] md:pt-10 px-5 pb-52">
         <CheckInDetail
           checkInData={checkInData}
-          onEditComplete={isOwner ? handleEditComplete : undefined}
+          onEditComplete={canEditCheckIn ? handleEditComplete : undefined}
+          isOwner={isOwner}
           afterTitle={
             <SameDayCheckInNav
               sameDayCheckInIds={sameDayCheckInIds}
@@ -326,7 +360,7 @@ export default function CheckInDetailPage() {
         />
       </main>
 
-      {isOwner && (
+      {canEditCheckIn && (
         <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray z-20">
           {/* 打卡按鈕 */}
           <CheckInButton
