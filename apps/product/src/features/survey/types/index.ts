@@ -49,6 +49,8 @@ export interface SurveyWithQuestions extends Survey {
   cohortFeedback?: {
     state: "login_required" | "ineligible" | "ready" | "completed";
     privacyNotice: string;
+    organizationName?: string;
+    cohortName?: string;
   };
 }
 

@@ -159,6 +159,13 @@ function normalizeRedirectLocation(request: NextRequest, response: NextResponse)
 
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  if (pathname.toLowerCase() === "/zh-tw/survey/preview/session-feedback") {
+    const previewUrl = request.nextUrl.clone();
+    previewUrl.pathname = "/en/survey/preview/session-feedback";
+    previewUrl.searchParams.set("locale", "zh-TW");
+    return NextResponse.rewrite(previewUrl);
+  }
+
   // Remove the secret before rendering HTML, loading analytics, or constructing OAuth state.
   if (ORGANIZATION_INVITATION_PATH.test(pathname) && request.nextUrl.searchParams.has("token")) {
     const tokens = request.nextUrl.searchParams.getAll("token");

@@ -39,12 +39,19 @@ describe("public survey feedback mapping", () => {
   it("preserves server eligibility and privacy metadata so the page cannot use generic tracking", async () => {
     getPublicSurvey.mockResolvedValueOnce({
       ...rawSurvey,
-      cohort_feedback: { state: "login_required", privacy_notice: "僅記錄完成狀態" },
+      cohort_feedback: {
+        state: "login_required",
+        privacy_notice: "僅記錄完成狀態",
+        organization_name: "島島測試組織",
+        cohort_name: "春季測試班",
+      },
     });
     const result = await getSurveyByShareId("feedback-survey");
     expect(result.cohortFeedback).toEqual({
       state: "login_required",
       privacyNotice: "僅記錄完成狀態",
+      organizationName: "島島測試組織",
+      cohortName: "春季測試班",
     });
     expect(result.questions[0]).toMatchObject({
       id: "55",
@@ -59,6 +66,26 @@ describe("public survey feedback mapping", () => {
     const result = await getSurveyByShareId("feedback-survey");
     expect(result.cohortFeedback).toBeUndefined();
     expect(result.config.isAnonymous).toBe(false);
+    expect(result.title).toBe("活動回饋");
+  });
+
+  it.each([
+    {},
+    { organization_name: "", cohort_name: "" },
+    { organization_name: " \t ", cohort_name: "　 " },
+  ])("keeps the survey title fallback when display names are absent or blank: %j", async (names) => {
+    getPublicSurvey.mockResolvedValueOnce({
+      ...rawSurvey,
+      cohort_feedback: { state: "ready", privacy_notice: "僅記錄完成狀態", ...names },
+    });
+    const result = await getSurveyByShareId("feedback-survey");
+    expect(result.title).toBe("活動回饋");
+    expect(result.cohortFeedback).toEqual({
+      state: "ready",
+      privacyNotice: "僅記錄完成狀態",
+      organizationName: "",
+      cohortName: "",
+    });
   });
 
   it("serializes a new feedback rating and optional text without tracking data", async () => {
