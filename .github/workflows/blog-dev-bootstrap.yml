@@ -1,15 +1,17 @@
 name: Blog development bootstrap probe
+# The operation in the run title lets Website managed sync tell publications from probes.
+run-name: Blog development ${{ inputs.operation || 'probe' }}
 on:
   workflow_dispatch:
     inputs:
       operation:
-        description: 'Development operation; publication-test changes only the dev website'
+        description: 'Development operation; publication-test and frontend-refresh change only the dev website'
         type: choice
-        options: [probe, publication-test]
+        options: [probe, publication-test, frontend-refresh]
         default: probe
         required: true
       content_sha:
-        description: 'Optional full content commit for the DEV engineering test'
+        description: 'Full content commit; frontend-refresh requires the live marker content_sha (no default is applied)'
         type: string
         default: '0daa4231bb2072657c807813e960919b982f9d8e'
         required: false
@@ -64,7 +66,7 @@ jobs:
           retention-days: 7
 
   prepare:
-    if: github.repository == 'daodaoedu/daodao-f2e' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/dev' && inputs.operation == 'publication-test'
+    if: github.repository == 'daodaoedu/daodao-f2e' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/dev' && (inputs.operation == 'publication-test' || inputs.operation == 'frontend-refresh')
     permissions:
       contents: read
       actions: read
@@ -106,8 +108,14 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           CONTENT_SHA: ${{ inputs.content_sha }}
+          OPERATION: ${{ inputs.operation }}
         run: |
-          python3 .github/scripts/blog_bootstrap/prepare_publication.py --content-sha "${CONTENT_SHA:-0daa4231bb2072657c807813e960919b982f9d8e}"
+          if [ "$OPERATION" = "frontend-refresh" ]; then
+            # Live articles only: an empty input fails instead of using the fixture.
+            python3 .github/scripts/blog_bootstrap/prepare_publication.py --mode refresh --content-sha "$CONTENT_SHA"
+          else
+            python3 .github/scripts/blog_bootstrap/prepare_publication.py --content-sha "${CONTENT_SHA:-0daa4231bb2072657c807813e960919b982f9d8e}"
+          fi
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         id: upload
         with:
@@ -118,7 +126,7 @@ jobs:
 
   publish:
     needs: prepare
-    if: github.repository == 'daodaoedu/daodao-f2e' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/dev' && inputs.operation == 'publication-test' && needs.prepare.result == 'success' && vars.BLOG_DEV_RELEASE_MANAGED == 'true'
+    if: github.repository == 'daodaoedu/daodao-f2e' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/dev' && (inputs.operation == 'publication-test' || inputs.operation == 'frontend-refresh') && needs.prepare.result == 'success' && vars.BLOG_DEV_RELEASE_MANAGED == 'true'
     permissions:
       contents: read
       actions: read
@@ -171,8 +179,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           BLOG_DEV_RELEASE_MANAGED: ${{ vars.BLOG_DEV_RELEASE_MANAGED }}
           EXPECTED_PRODUCER_SHA: ${{ needs.prepare.outputs.producer_sha }}
+          PUBLICATION_MODE: ${{ inputs.operation == 'frontend-refresh' && 'refresh' || 'test' }}
         run: |
-          python3 .github/scripts/blog_bootstrap/publication_deploy.py --verify-only --data-dir "$RUNNER_TEMP/blog-development-publication-input" --producer-sha "$EXPECTED_PRODUCER_SHA"
+          python3 .github/scripts/blog_bootstrap/publication_deploy.py --verify-only --mode "$PUBLICATION_MODE" --data-dir "$RUNNER_TEMP/blog-development-publication-input" --producer-sha "$EXPECTED_PRODUCER_SHA"
       - name: Run development publication test
         id: publish
         env:
@@ -181,13 +190,14 @@ jobs:
           EXPECTED_PRODUCER_SHA: ${{ needs.prepare.outputs.producer_sha }}
           BLOG_SSH_HOST: ${{ secrets.LINODE_INSTANCE_IP }}
           BLOG_SSH_PRIVATE_KEY: ${{ secrets.LINODE_SSH_PRIVATE_KEY }}
+          PUBLICATION_MODE: ${{ inputs.operation == 'frontend-refresh' && 'refresh' || 'test' }}
         run: |
           identity=$(mktemp "$RUNNER_TEMP/blog-dev-key.XXXXXX")
           trap 'rm -f "$identity"' EXIT
           chmod 600 "$identity"
           printf '%s\n' "$BLOG_SSH_PRIVATE_KEY" > "$identity"
           unset BLOG_SSH_PRIVATE_KEY
-          BLOG_SSH_KEY_FILE="$identity" python3 .github/scripts/blog_bootstrap/publication_deploy.py --data-dir "$RUNNER_TEMP/blog-development-publication-input" --producer-sha "$EXPECTED_PRODUCER_SHA" > "$RUNNER_TEMP/blog-development-publication-proof.json"
+          BLOG_SSH_KEY_FILE="$identity" python3 .github/scripts/blog_bootstrap/publication_deploy.py --mode "$PUBLICATION_MODE" --data-dir "$RUNNER_TEMP/blog-development-publication-input" --producer-sha "$EXPECTED_PRODUCER_SHA" > "$RUNNER_TEMP/blog-development-publication-proof.json"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: ${{ always() && steps.publish.outcome == 'success' }}
         with:

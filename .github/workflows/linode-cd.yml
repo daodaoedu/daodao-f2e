@@ -56,6 +56,7 @@ jobs:
     outputs:
       build-website: ${{ steps.changes.outputs.website }}
       legacy-website: ${{ steps.ownership.outputs.website }}
+      managed-website: ${{ steps.ownership.outputs.managed }}
       build-product: ${{ steps.changes.outputs.product }}
     steps:
       - name: Checkout code
@@ -173,6 +174,19 @@ jobs:
             # Other channels retain their legacy ownership decision.
             printf 'website=%s\ndev=false\nmanaged=false\n' "$REQUESTED" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Explain managed website handoff
+        if: steps.changes.outputs.website == 'true' && steps.ownership.outputs.managed == 'true'
+        env:
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
+        run: |
+          # Legacy CD intentionally does not deploy this website (daodaoedu/daodao#563).
+          {
+            echo "### Website 交由 managed 發布"
+            echo ""
+            echo "這次有 website 變更，但 \`$BRANCH_NAME\` 的網站由 Blog managed release 管理，本 workflow 不會部署 website。"
+            echo "CD 結束後由 [Website managed sync](https://github.com/daodaoedu/daodao-f2e/actions/workflows/website-managed-sync.yml) 觸發 managed 發布；網站版本看 \`/blog-release.json\` 的 \`frontend_sha\`。"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   # ===== Docker 映像構建階段 - Website =====
   build-website:
@@ -998,6 +1012,8 @@ jobs:
           BUILD_PRODUCT_STATUS="${{ needs.build-product.result }}"
           DEV_CHANNEL="${{ needs.deploy.outputs.dev-branch }}"
           DEPLOY_WEBSITE_SELECTED="${{ needs.deploy.outputs.website }}"
+          WEBSITE_REQUESTED="${{ needs.detect-changes.outputs.build-website }}"
+          WEBSITE_MANAGED="${{ needs.detect-changes.outputs.managed-website }}"
           DEPLOY_STATUS="${{ needs.deploy.result }}"
           VERIFY_STATUS="${{ needs.verify.result || 'skipped' }}"
 
@@ -1038,6 +1054,15 @@ jobs:
               DEPLOYED_APPS="$DEPLOYED_APPS, Product"
             else
               DEPLOYED_APPS="Product"
+            fi
+          fi
+          if [ "$WEBSITE_REQUESTED" == "true" ] && [ "$WEBSITE_MANAGED" == "true" ]; then
+            # Not deployed here: Website managed sync dispatches it after this run.
+            HANDOFF="Website → managed 發布（Website managed sync）"
+            if [ -n "$DEPLOYED_APPS" ]; then
+              DEPLOYED_APPS="$DEPLOYED_APPS; $HANDOFF"
+            else
+              DEPLOYED_APPS="$HANDOFF"
             fi
           fi
 

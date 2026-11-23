@@ -39,7 +39,8 @@ class PublicationWorkflowTests(unittest.TestCase):
         events = self.workflow.get("on", self.workflow.get(True))
         inputs = (events["workflow_dispatch"] or {}).get("inputs", {})
         self.assertEqual(
-            inputs.get("operation", {}).get("options"), ["probe", "publication-test"]
+            inputs.get("operation", {}).get("options"),
+            ["probe", "publication-test", "frontend-refresh"],
         )
         self.assertEqual(inputs["operation"]["default"], "probe")
         self.assertEqual(
@@ -311,6 +312,103 @@ class PublicationWorkflowTests(unittest.TestCase):
                 for s in integration["steps"]
             )
         )
+
+
+class FrontendRefreshWorkflowTests(unittest.TestCase):
+    """daodao#563: automatic frontend refresh keeps every existing guard."""
+
+    def setUp(self):
+        self.jobs = yaml.safe_load(WORKFLOW.read_text())["jobs"]
+
+    def run_step(self, job, step_id, **env):
+        step = next(s for s in self.jobs[job]["steps"] if s.get("id") == step_id)
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            bin_dir = root / "bin"
+            bin_dir.mkdir()
+            record = root / "args.json"
+            python = bin_dir / "python3"
+            python.write_text(
+                "#!"
+                + sys.executable
+                + '\nimport json,os,sys\nopen(os.environ["ARG_RECORD"],"w").write(json.dumps(sys.argv[1:]))\n'
+            )
+            python.chmod(0o755)
+            result = subprocess.run(
+                ["bash", "-e", "-c", step["run"]],
+                env={
+                    **os.environ,
+                    "PATH": str(bin_dir) + os.pathsep + os.environ["PATH"],
+                    "ARG_RECORD": str(record),
+                    "RUNNER_TEMP": str(root),
+                    "BLOG_SSH_PRIVATE_KEY": "key",
+                    **env,
+                },
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            return json.loads(record.read_text())
+
+    def test_refresh_runs_under_the_same_dev_managed_guards(self):
+        refresh = {"inputs.operation": "frontend-refresh"}
+        for job in ["prepare", "publish"]:
+            with self.subTest(job=job):
+                self.assertTrue(
+                    workflow_condition(self.jobs[job]["if"], context(**refresh))
+                )
+                for changes in [
+                    {"github.ref": "refs/heads/prod"},
+                    {"github.event_name": "workflow_run"},
+                    {"github.repository": "fork/daodao-f2e"},
+                ]:
+                    self.assertFalse(
+                        workflow_condition(
+                            self.jobs[job]["if"], context(**refresh, **changes)
+                        )
+                    )
+        self.assertFalse(
+            workflow_condition(
+                self.jobs["publish"]["if"],
+                context(**refresh, **{"vars.BLOG_DEV_RELEASE_MANAGED": "false"}),
+            )
+        )
+        self.assertFalse(
+            workflow_condition(self.jobs["probe"]["if"], context(**refresh))
+        )
+
+    def test_refresh_prepares_live_content_without_fixture_fallback(self):
+        live = "5c4eee88b2e022229852846b07e073bef8b7c10d"
+        args = self.run_step(
+            "prepare", "prepare", OPERATION="frontend-refresh", CONTENT_SHA=live
+        )
+        self.assertEqual(args[1:], ["--mode", "refresh", "--content-sha", live])
+        empty = self.run_step(
+            "prepare", "prepare", OPERATION="frontend-refresh", CONTENT_SHA=""
+        )
+        self.assertNotIn("0daa4231bb2072657c807813e960919b982f9d8e", empty)
+        self.assertEqual(empty[-1], "")
+
+    def test_publication_test_keeps_its_fixture_default(self):
+        args = self.run_step(
+            "prepare", "prepare", OPERATION="publication-test", CONTENT_SHA=""
+        )
+        self.assertNotIn("--mode", args)
+        self.assertEqual(args[-1], "0daa4231bb2072657c807813e960919b982f9d8e")
+
+    def test_deploy_steps_pass_the_operation_mode(self):
+        for step_id in ["data-guard", "publish"]:
+            step = next(
+                s for s in self.jobs["publish"]["steps"] if s.get("id") == step_id
+            )
+            with self.subTest(step=step_id):
+                self.assertEqual(
+                    step["env"]["PUBLICATION_MODE"],
+                    "${{ inputs.operation == 'frontend-refresh' && 'refresh' || 'test' }}",
+                )
+                args = self.run_step("publish", step_id, PUBLICATION_MODE="refresh")
+                self.assertEqual(args[args.index("--mode") + 1], "refresh")
 
 
 if __name__ == "__main__":

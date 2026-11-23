@@ -1,0 +1,70 @@
+name: Website managed sync
+
+# Since the Blog managed release cutover, Linode CD skips the website for
+# managed channels. This workflow hands each website head to the channel's
+# managed publication workflow after Linode CD has finished, and fails (with a
+# Discord alert) when the public site keeps lagging. See daodaoedu/daodao#563.
+on:
+  workflow_run:
+    workflows:
+      - Linode CD
+      - Blog development bootstrap probe
+      - Blog production publication
+    types: [completed]
+    # No branch filter: Linode CD runs from the default branch, so its
+    # workflow_run head_branch is always dev even when it deployed prod or a
+    # feature branch. Each completion checks both channels; checks are idempotent.
+  schedule:
+    - cron: '17,47 * * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  sync:
+    if: github.repository == 'daodaoedu/daodao-f2e'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        channel: [dev, prod]
+    concurrency:
+      group: website-managed-sync-${{ matrix.channel }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Hand website head to managed publication
+        id: sync
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BLOG_DEV_RELEASE_MANAGED: ${{ vars.BLOG_DEV_RELEASE_MANAGED }}
+          BLOG_PROD_RELEASE_MANAGED: ${{ vars.BLOG_PROD_RELEASE_MANAGED }}
+          BLOG_PROD_CONTENT_SHA: ${{ vars.BLOG_PROD_CONTENT_SHA }}
+          BLOG_PROD_PUBLISHED_CONTENT_SHA: ${{ vars.BLOG_PROD_PUBLISHED_CONTENT_SHA }}
+        run: python3 .github/scripts/website_managed_sync.py --channel "${{ matrix.channel }}"
+      - name: Alert Discord when the public website lags
+        if: failure() && steps.sync.outcome == 'failure'
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          CHANNEL: ${{ matrix.channel }}
+          REASON: ${{ steps.sync.outputs.reason }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK_URL" ]; then
+            echo "::warning::DISCORD_WEBHOOK_URL is not set; alert only visible in Actions"
+            exit 0
+          fi
+          payload=$(jq -n --arg channel "$CHANNEL" --arg reason "${REASON:-sync step failed}" --arg url "$RUN_URL" '{
+            embeds: [{
+              title: ("⚠️ " + $channel + " 網站沒有跟上分支最新版本"),
+              description: ("原因：" + $reason + "\n" + $url),
+              color: 15158332
+            }]
+          }')
+          curl -fsS -H "Content-Type: application/json" -d "$payload" "$DISCORD_WEBHOOK_URL"

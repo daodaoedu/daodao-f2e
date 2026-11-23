@@ -445,6 +445,7 @@ class BlogCdOwnershipTests(unittest.TestCase):
                     "steps.changes.outputs.website": "true",
                     "steps.changes.outputs.product": "true",
                     "steps.ownership.outputs.website": selected["website"],
+                    "steps.ownership.outputs.managed": selected["managed"],
                 }
             )
             for key, expression in self.jobs["detect-changes"]["outputs"].items():
@@ -485,6 +486,60 @@ class BlogCdOwnershipTests(unittest.TestCase):
             )
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(result.stdout, expected)
+
+    def test_notification_names_managed_website_handoff(self):
+        # daodao#563: a skipped managed website must not look like "nothing to do".
+        step = self.jobs["notify"]["steps"][0]
+        script = step["run"]
+        start = script.index('DEPLOYED_APPS=""')
+        script = (
+            script[start : script.index("curl -X POST", start)]
+            + '\nprintf "%s" "$DEPLOYED_APPS"\n'
+        )
+        handoff = "Website → managed 發布（Website managed sync）"
+        for requested, managed, product, expected in [
+            ("true", "true", "success", "Product; " + handoff),
+            ("true", "true", "skipped", handoff),
+            ("false", "true", "success", "Product"),
+            ("true", "false", "success", "Product"),
+        ]:
+            with self.subTest(requested=requested, managed=managed, product=product):
+                result = subprocess.run(
+                    ["bash", "-e", "-c", script],
+                    env={
+                        **os.environ,
+                        "DEV_CHANNEL": "true",
+                        "DEPLOY_WEBSITE_SELECTED": "false",
+                        "BUILD_WEBSITE_STATUS": "skipped",
+                        "BUILD_PRODUCT_STATUS": product,
+                        "WEBSITE_REQUESTED": requested,
+                        "WEBSITE_MANAGED": managed,
+                    },
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(result.stdout, expected)
+
+    def test_managed_handoff_summary_only_when_website_changed_and_managed(self):
+        step = next(
+            s
+            for s in self.jobs["detect-changes"]["steps"]
+            if s.get("name") == "Explain managed website handoff"
+        )
+        for website, managed, expected in [
+            ("true", "true", True),
+            ("true", "false", False),
+            ("false", "true", False),
+        ]:
+            data = {
+                "steps.changes.outputs.website": website,
+                "steps.ownership.outputs.managed": managed,
+            }
+            with self.subTest(website=website, managed=managed):
+                self.assertEqual(workflow_condition(step["if"], data), expected)
+        self.assertIn("website-managed-sync.yml", step["run"])
 
     def test_product_only_dev_ref_may_advance_but_requested_web_cannot(self):
         data = context()

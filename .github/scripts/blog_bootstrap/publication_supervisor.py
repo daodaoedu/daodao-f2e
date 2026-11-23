@@ -151,7 +151,13 @@ def bounded_json(path):
 
 
 def phase(base, config, name, seeded=False, recovery=""):
-    if name not in {"seed", "import-only", "public-matrix", "recover"}:
+    if name not in {
+        "seed",
+        "import-only",
+        "public-matrix",
+        "public-refresh",
+        "recover",
+    }:
         raise ValueError("Unknown fixed development operation")
     for folder in ["client", "result"]:
         location = base / folder
@@ -190,6 +196,7 @@ def phase(base, config, name, seeded=False, recovery=""):
                 "seed": 180,
                 "import-only": 300,
                 "public-matrix": 660,
+                "public-refresh": 300,
                 "recover": 360,
             }[name]
         )
@@ -225,6 +232,7 @@ def phase(base, config, name, seeded=False, recovery=""):
         "public-a-all-files",
         "public-b-all-files",
         "public-a-rollback-all-files",
+        "public-refresh-all-files",
         "supervised-recovery-all-files",
     ]
     readbacks = {}
@@ -291,8 +299,21 @@ def recover_snapshot(adapter, base, config, snapshot, initial, mounting):
     )
 
 
+def publication_mode(base):
+    """Mode comes from the hash-verified producer, never from a separate flag."""
+    producer = bounded_json(base / "input/data/producer.json")
+    mode = producer.get("mode", "test")
+    if mode not in ("test", "refresh"):
+        raise ValueError("Unknown development publication mode")
+    return mode
+
+
 def execute_adapter(adapter, base, config):
     snapshot = {**adapter.inspect_container(), "ownedOperationParent": str(base.parent)}
+    mode = publication_mode(base)
+    if mode == "refresh" and not snapshot["managedMounts"]:
+        # A refresh never performs the first legacy-to-managed cutover.
+        raise ValueError("Frontend refresh requires an already-managed website")
     adoption = adapter.classify_adoption(snapshot)
     adapter.verify_base_compose(config["baseComposeSha256"])
     adapter.establish_store()
@@ -327,7 +348,10 @@ def execute_adapter(adapter, base, config):
             (base / "input/nginx.conf").read_bytes(),
         )
         actual = phase(
-            base, config, "public-matrix", seeded=not snapshot["managedMounts"]
+            base,
+            config,
+            "public-refresh" if mode == "refresh" else "public-matrix",
+            seeded=not snapshot["managedMounts"],
         )
         adapter.record_journal(snapshot, config["producerSha256"], "public-verified")
         return {

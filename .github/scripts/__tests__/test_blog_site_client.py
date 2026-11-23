@@ -288,5 +288,113 @@ class SiteClientTests(unittest.TestCase):
             CLIENT.wait_for_seeded_public_a("a")
 
 
+class FrontendRefreshClientTests(unittest.TestCase):
+    """daodao#563: refresh moves the live site to official A only."""
+
+    A = "a" * 64
+
+    def refresh_producer(self):
+        return {
+            "mode": "refresh",
+            "officialContentSha": "c" * 40,
+            "artifacts": [
+                {"id": self.A, "frontendSha": "f" * 40, "contentSha": "c" * 40}
+            ],
+        }
+
+    def run_refresh(self, marker_id):
+        operations = []
+
+        def invoke(name, operation, identifier, generation, **_kwargs):
+            operations.append((name, operation, identifier, generation))
+            return {"id": identifier}
+
+        with (
+            patch.object(CLIENT, "PRODUCER", self.refresh_producer()),
+            patch.object(CLIENT, "BASE", 1000),
+            patch.object(CLIENT, "invoke", invoke),
+            patch.object(CLIENT, "full", return_value={"files": {"index.html": "x"}}),
+            patch.object(CLIENT, "marker", return_value={"id": marker_id}),
+            patch.object(CLIENT, "request", return_value=(404, b"", POLICY)),
+        ):
+            return operations, CLIENT.public_refresh()
+
+    def test_refresh_activates_only_official_a_and_reads_it_back(self):
+        operations, result = self.run_refresh(self.A)
+        self.assertEqual(operations, [("public-refresh", "activate", self.A, 1010)])
+        self.assertEqual(result["finalId"], self.A)
+        self.assertEqual(result["contentSha"], "c" * 40)
+        self.assertNotIn("syntheticId", result)
+
+    def test_refresh_fails_when_public_marker_does_not_show_a(self):
+        with self.assertRaisesRegex(ValueError, "marker differs"):
+            self.run_refresh("e" * 64)
+
+    def preimage(self, live_content):
+        from types import SimpleNamespace
+
+        manifest = {
+            "id": self.A,
+            "frontend_sha": "b" * 40,
+            "content_sha": live_content,
+            "baseline_sha256": "d" * 64,
+        }
+        controller = SimpleNamespace(
+            stored_release=lambda store, identifier: manifest,
+            _active_state=lambda *args: {"id": self.A},
+            _check_active_pointer=lambda *args: None,
+        )
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "active.json").write_text(json.dumps({"id": self.A}))
+            (root / "releases" / self.A).mkdir(parents=True)
+            (root / "releases" / self.A / "release.json").write_text("{}")
+            with (
+                patch.object(CLIENT, "STORE", root),
+                patch.object(CLIENT, "PRODUCER", self.refresh_producer()),
+                patch.object(CLIENT, "BASE", 1000),
+                patch.object(CLIENT, "controller_module", return_value=controller),
+                patch.object(
+                    CLIENT,
+                    "request",
+                    return_value=(200, json.dumps(manifest).encode(), {}),
+                ),
+                patch.object(CLIENT, "full") as readback,
+            ):
+                try:
+                    return CLIENT.verified_preimage(), readback
+                except ValueError as error:
+                    error.readback = readback
+                    raise
+
+    def test_refresh_refuses_when_live_content_changed_since_dispatch(self):
+        with self.assertRaisesRegex(ValueError, "content changed") as caught:
+            self.preimage("9" * 40)
+        caught.exception.readback.assert_not_called()
+
+    def test_refresh_proceeds_when_live_content_matches(self):
+        result, readback = self.preimage("c" * 40)
+        self.assertEqual(result["previousContentSha"], "c" * 40)
+        readback.assert_called_once()
+
+    def test_phase_must_match_producer_mode(self):
+        for phase, producer in [
+            ("public-refresh", {"artifacts": [{"id": self.A}]}),
+            ("public-matrix", self.refresh_producer()),
+        ]:
+            with (
+                self.subTest(phase=phase),
+                patch.object(CLIENT, "PRODUCER", producer),
+                patch.object(CLIENT, "import_pair"),
+                patch.object(CLIENT, "public_permissions"),
+                patch.object(CLIENT, "public_refresh") as refresh,
+                patch.object(CLIENT, "public_matrix") as matrix,
+                self.assertRaisesRegex(ValueError, "producer mode"),
+            ):
+                CLIENT.perform_phase(phase)
+            refresh.assert_not_called()
+            matrix.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()

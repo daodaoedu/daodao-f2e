@@ -93,7 +93,28 @@ def validate_artifact_identity(item, index, source_sha, expected_content):
         raise ValueError("Artifact source pair differs from producer")
 
 
-def validate_producer(data, expected_sha, source_sha):
+def producer_mode(producer):
+    mode = producer.get("mode", "test")
+    if mode not in ("test", "refresh"):
+        raise ValueError("Unknown development publication mode")
+    return mode
+
+
+def validate_refresh_producer(producer, source_sha):
+    if "syntheticContentSha" in producer or not COMMIT.fullmatch(
+        producer.get("officialContentSha", "")
+    ):
+        raise ValueError("Frontend refresh carries only the official content source")
+    items = producer.get("artifacts", [])
+    if len(items) != 1:
+        raise ValueError("Frontend refresh requires exactly one official artifact")
+    validate_artifact_identity(
+        items[0], 0, source_sha, [producer["officialContentSha"]]
+    )
+    return producer
+
+
+def validate_producer(data, expected_sha, source_sha, mode="test"):
     if (
         not SHA.fullmatch(expected_sha)
         or hashlib.sha256(data).hexdigest() != expected_sha
@@ -106,6 +127,10 @@ def validate_producer(data, expected_sha, source_sha):
         or producer.get("officialBytesUnchanged") is not True
     ):
         raise ValueError("Preparation source/provenance differs")
+    if producer_mode(producer) != mode:
+        raise ValueError("Preparation mode differs from the requested operation")
+    if mode == "refresh":
+        return validate_refresh_producer(producer, source_sha)
     if not COMMIT.fullmatch(
         producer.get("officialContentSha", "")
     ) or not COMMIT.fullmatch(producer.get("syntheticContentSha", "")):
@@ -121,12 +146,13 @@ def validate_producer(data, expected_sha, source_sha):
     return producer
 
 
-def verify_transfer(data_root, expected_sha, source_sha):
+def verify_transfer(data_root, expected_sha, source_sha, mode="test"):
     observed = preflight_transfer(data_root)
     producer = validate_producer(
         regular_bytes(data_root / "producer.json", 1024 * 1024),
         expected_sha,
         source_sha,
+        mode,
     )
     expected = {"producer.json"}
     for item in producer["artifacts"]:
@@ -279,6 +305,7 @@ def main():
     parser.add_argument("--data-dir", required=True)
     parser.add_argument("--producer-sha", required=True)
     parser.add_argument("--verify-only", action="store_true")
+    parser.add_argument("--mode", choices=["test", "refresh"], default="test")
     args = parser.parse_args()
     guard = module("runner")
     guard.check_context(os.environ)
@@ -290,7 +317,7 @@ def main():
     )
     if Path(args.data_dir) != expected_root:
         raise ValueError("Only the fixed private downloaded data directory is accepted")
-    producer = verify_transfer(expected_root, args.producer_sha, source)
+    producer = verify_transfer(expected_root, args.producer_sha, source, args.mode)
     drain_existing_cd()
     if guard.check_source(os.environ) != source:
         raise ValueError("Trusted development source changed during deployment drain")
@@ -336,7 +363,10 @@ def main():
         json.dumps(
             {
                 "ok": True,
-                "scope": "actual DEV website engineering publication and rollback; not production/editorial",
+                "mode": args.mode,
+                "scope": "actual DEV website frontend refresh; not production/editorial"
+                if args.mode == "refresh"
+                else "actual DEV website engineering publication and rollback; not production/editorial",
                 "sourceSha": source,
                 "producerSha256": args.producer_sha,
                 "inputHashes": provenance["inputHashes"],

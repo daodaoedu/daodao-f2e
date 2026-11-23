@@ -21,6 +21,90 @@ SUPERVISOR = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(SUPERVISOR)
 
 
+def write_producer(base, mode=None):
+    # The real transfer always carries the hash-bound producer under data/.
+    producer = {"schema": 1} if mode is None else {"schema": 1, "mode": mode}
+    (base / "input/data").mkdir(parents=True)
+    (base / "input/data/producer.json").write_text(json.dumps(producer))
+
+
+def managed_adapter(managed=True):
+    return SimpleNamespace(
+        inspect_container=Mock(return_value={"managedMounts": managed}),
+        classify_adoption=Mock(return_value="managed" if managed else "legacy"),
+        verify_base_compose=Mock(),
+        establish_store=Mock(),
+        record_journal=Mock(),
+        prepare_configuration=lambda snapshot, source: snapshot,
+        apply_overlay=Mock(),
+        restore_previous=Mock(),
+    )
+
+
+CONFIG = {"baseComposeSha256": "b" * 64, "producerSha256": "c" * 64}
+
+
+class FrontendRefreshSupervisorTests(unittest.TestCase):
+    """daodao#563: refresh publishes only official A and reuses recovery."""
+
+    def run_refresh(self, phase, managed=True):
+        adapter = managed_adapter(managed)
+        with tempfile.TemporaryDirectory() as temporary:
+            base = Path(temporary)
+            (base / "input").mkdir()
+            (base / "input/nginx.conf").write_bytes(b"reviewed")
+            write_producer(base, "refresh")
+            with (
+                patch.object(SUPERVISOR, "phase", phase),
+                patch.object(SUPERVISOR.signal, "signal"),
+                patch.object(SUPERVISOR, "uid_processes", return_value=[]),
+            ):
+                return adapter, SUPERVISOR.execute_adapter(adapter, base, CONFIG)
+
+    def test_refresh_runs_single_public_refresh_instead_of_matrix(self):
+        calls = []
+
+        def phase(base, config, operation, **kwargs):
+            calls.append(operation)
+            if operation == "import-only":
+                return {"summary": {"previousId": "a" * 64}}
+            return {"summary": {"ok": True, "finalId": "d" * 64}}
+
+        _adapter, report = self.run_refresh(phase)
+        self.assertEqual(calls, ["import-only", "public-refresh"])
+        self.assertTrue(report["ok"])
+
+    def test_failed_refresh_recovers_verified_preimage(self):
+        calls = []
+
+        def phase(base, config, operation, **kwargs):
+            calls.append((operation, kwargs.get("recovery")))
+            if operation == "import-only":
+                return {"summary": {"previousId": "a" * 64}}
+            if operation == "public-refresh":
+                raise RuntimeError("public readback failed")
+            return {"summary": {"localRecoveryVerified": True}}
+
+        with self.assertRaises(RuntimeError):
+            self.run_refresh(phase)
+        self.assertEqual(calls[-1], ("recover", "a" * 64))
+        self.assertNotIn("public-matrix", [name for name, _ in calls])
+
+    def test_refresh_never_performs_initial_cutover(self):
+        phase = Mock()
+        with self.assertRaisesRegex(ValueError, "already-managed"):
+            self.run_refresh(phase, managed=False)
+        phase.assert_not_called()
+
+    def test_unknown_mode_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            base = Path(temporary)
+            (base / "input").mkdir()
+            write_producer(base, "matrix-lite")
+            with self.assertRaisesRegex(ValueError, "Unknown"):
+                SUPERVISOR.publication_mode(base)
+
+
 class PublicationSupervisorTests(unittest.TestCase):
     def managed_failure(self, failure):
         failure.diagnostic = {
@@ -61,6 +145,7 @@ class PublicationSupervisorTests(unittest.TestCase):
             base = Path(temporary)
             (base / "input").mkdir()
             (base / "input/nginx.conf").write_bytes(b"reviewed")
+            write_producer(base)
             with (
                 patch.object(SUPERVISOR, "phase", phase),
                 patch.object(SUPERVISOR.signal, "signal") as signals,
@@ -105,6 +190,7 @@ class PublicationSupervisorTests(unittest.TestCase):
             base = Path(temporary)
             (base / "input").mkdir()
             (base / "input/nginx.conf").write_bytes(b"reviewed")
+            write_producer(base)
             with (
                 patch.object(
                     SUPERVISOR,

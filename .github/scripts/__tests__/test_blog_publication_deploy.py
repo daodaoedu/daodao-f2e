@@ -506,5 +506,61 @@ class PublicationDeployTests(unittest.TestCase):
                 DEPLOY.drain_existing_cd(call=external, pause=lambda _seconds: None)
 
 
+class FrontendRefreshProducerTests(unittest.TestCase):
+    """daodao#563: a refresh transfer carries only the live official content."""
+
+    def producer(self):
+        return {
+            "schema": 1,
+            "mode": "refresh",
+            "frontendSha": SOURCE,
+            "officialContentSha": "b" * 40,
+            "officialBytesUnchanged": True,
+            "artifacts": [
+                {
+                    "id": "e" * 64,
+                    "manifestSha256": "f" * 64,
+                    "frontendSha": SOURCE,
+                    "contentSha": "b" * 40,
+                    "kind": "official-A",
+                }
+            ],
+        }
+
+    def validate(self, producer, mode):
+        raw = encoded(producer)
+        return DEPLOY.validate_producer(raw, sha(raw), SOURCE, mode)
+
+    def test_single_official_refresh_is_accepted_only_in_refresh_mode(self):
+        self.assertEqual(self.validate(self.producer(), "refresh")["mode"], "refresh")
+        with self.assertRaisesRegex(ValueError, "mode differs"):
+            self.validate(self.producer(), "test")
+
+    def test_test_producer_cannot_pass_as_refresh(self):
+        producer = self.producer()
+        del producer["mode"]
+        with self.assertRaisesRegex(ValueError, "mode differs"):
+            self.validate(producer, "refresh")
+
+    def test_refresh_rejects_synthetic_or_extra_artifacts(self):
+        changes = [
+            lambda p: p.update(syntheticContentSha="c" * 40),
+            lambda p: p["artifacts"].append(
+                {**p["artifacts"][0], "id": "d" * 64, "contentSha": "c" * 40}
+            ),
+            lambda p: p.update(artifacts=[]),
+            lambda p: p["artifacts"][0].update(kind="synthetic-TEST-ONLY-B"),
+            lambda p: p["artifacts"][0].update(contentSha="c" * 40),
+            lambda p: p["artifacts"][0].update(frontendSha="d" * 40),
+            lambda p: p.update(officialContentSha="short"),
+            lambda p: p.update(mode="partial"),
+        ]
+        for index, change in enumerate(changes):
+            producer = self.producer()
+            change(producer)
+            with self.subTest(change=index), self.assertRaises(ValueError):
+                self.validate(producer, "refresh")
+
+
 if __name__ == "__main__":
     unittest.main()
