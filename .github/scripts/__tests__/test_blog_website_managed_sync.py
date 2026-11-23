@@ -421,6 +421,104 @@ class ReviewRegressionTests(unittest.TestCase):
         self.assertEqual(sync.decide(result)["action"], "wait")
 
 
+class SpecAuditRegressionTests(unittest.TestCase):
+    """Independent spec audit findings for daodao#563 (AC-04, AC-05)."""
+
+    def failed_once(self):
+        return state(
+            managed_runs=[
+                {
+                    "id": 9,
+                    "head_sha": HEAD,
+                    "status": "completed",
+                    "conclusion": "failure",
+                }
+            ]
+        )
+
+    def run_main(self, decision_state, tmp):
+        import os
+        from unittest.mock import patch
+
+        env = {
+            "GITHUB_STEP_SUMMARY": str(tmp / "summary.md"),
+            "GITHUB_OUTPUT": str(tmp / "output.txt"),
+        }
+        with (
+            patch.object(sync, "collect", return_value=decision_state),
+            patch.object(sync, "dispatch") as dispatched,
+            patch.object(sync.sys, "argv", ["sync", "--channel", "dev"]),
+            patch.dict(os.environ, env),
+        ):
+            code = sync.main()
+        return code, dispatched, (tmp / "output.txt").read_text()
+
+    def test_first_failure_retries_and_still_fails_the_check(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as directory:
+            code, dispatched, output = self.run_main(
+                self.failed_once(), Path(directory)
+            )
+        self.assertEqual(code, 1)
+        dispatched.assert_called_once()
+        self.assertIn("retried once", output)
+
+    def test_first_publication_dispatch_keeps_the_check_green(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as directory:
+            code, dispatched, _output = self.run_main(state(), Path(directory))
+        self.assertEqual(code, 0)
+        dispatched.assert_called_once()
+
+    def test_publication_stuck_past_lag_window_alerts(self):
+        decision = sync.decide(
+            state(
+                managed_runs=[{"id": 9, "head_sha": HEAD, "status": "queued"}],
+                ci={
+                    "id": 111,
+                    "status": "completed",
+                    "conclusion": "success",
+                    "updated_at": "2026-11-23T10:30:00Z",
+                },
+            )
+        )
+        self.assertEqual(decision["action"], "alert")
+
+    def test_cancelled_runs_do_not_use_the_retry_budget(self):
+        cancelled = [
+            {
+                "id": n,
+                "head_sha": HEAD,
+                "status": "completed",
+                "conclusion": "cancelled",
+            }
+            for n in (9, 10)
+        ]
+        decision = sync.decide(state(managed_runs=cancelled))
+        self.assertEqual(decision["action"], "dispatch")
+        self.assertFalse(decision["retry"])
+
+    def test_managed_flag_matches_cd_ownership_rule(self):
+        api = CollectTests().api()
+        for value, managed in [
+            ("true", True),
+            ("TRUE", True),
+            ("1", True),
+            ("false", False),
+            ("", False),
+        ]:
+            with self.subTest(value=value):
+                result = sync.collect(
+                    "dev",
+                    {"BLOG_DEV_RELEASE_MANAGED": value},
+                    api,
+                    lambda _url: {"frontend_sha": HEAD, "content_sha": CONTENT},
+                )
+                self.assertEqual(result.managed, managed)
+
+
 class SyncWorkflowTests(unittest.TestCase):
     def setUp(self):
         import yaml

@@ -115,11 +115,18 @@ def decide(state):
 
     runs = [run for run in state.managed_runs if run.get("head_sha") == state.head_sha]
     if any(run.get("status") in ACTIVE for run in runs):
+        if lagging_too_long(state):
+            return result(
+                "alert",
+                "managed publication for head is still pending past the lag window",
+            )
         return result("wait", "managed publication for head is already running")
+    # A cancelled run was displaced in the shared queue; it is not a failed attempt.
     failed = [
         run
         for run in runs
-        if run.get("status") == "completed" and run.get("conclusion") != "success"
+        if run.get("status") == "completed"
+        and run.get("conclusion") not in ("success", "cancelled")
     ]
     succeeded = [
         run
@@ -250,7 +257,12 @@ def managed_runs(api, workflow, branch, titles=None):
 
 def collect(channel, environment, api=gh_api, marker_reader=read_marker):
     config = CHANNELS[channel]
-    managed = environment.get(config["managed_var"], "").strip().lower() == "true"
+    # Same rule as blog-cd-ownership.py: anything but empty/"false" is managed,
+    # otherwise CD would skip the website while sync treats it as legacy.
+    managed = environment.get(config["managed_var"], "").strip().lower() not in (
+        "",
+        "false",
+    )
     head = api(f"repos/{REPOSITORY}/git/ref/heads/{config['branch']}")["object"]["sha"]
     marker = marker_reader(config["marker"]) if managed else None
     files = None
@@ -315,6 +327,11 @@ def main():
     decision = decide(state)
     if decision["action"] == "dispatch" and not args.dry_run:
         dispatch(decision)
+    if decision["action"] == "dispatch" and decision.get("retry"):
+        decision = {
+            **decision,
+            "reason": "previous managed publication for head failed; retried once",
+        }
     output = {"channel": args.channel, "head": state.head_sha, **decision}
     print(json.dumps(output, sort_keys=True))
     summary = os.environ.get("GITHUB_STEP_SUMMARY")
@@ -328,7 +345,10 @@ def main():
         with open(github_output, "a", encoding="utf-8") as handle:
             handle.write(f"action={decision['action']}\n")
             handle.write("reason=" + decision["reason"].replace("\n", " ") + "\n")
-    return 1 if decision["action"] == "alert" else 0
+    # A retry still fails the check: the previous attempt failed and the site
+    # kept its old release, which someone should see (daodao#563 AC-04).
+    failed_attempt = decision["action"] == "dispatch" and decision.get("retry")
+    return 1 if decision["action"] == "alert" or failed_attempt else 0
 
 
 if __name__ == "__main__":

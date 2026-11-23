@@ -28,7 +28,7 @@ Frontend changes merged to `prod` no longer wait for a manual run (daodaoedu/dao
 - No legacy prod CD run is unfinished.
 - The live marker `content_sha`, `BLOG_PROD_PUBLISHED_CONTENT_SHA` and `BLOG_PROD_CONTENT_SHA` are identical.
 
-The last condition means automation only moves the frontend under the articles already live. A staged content release (new `BLOG_PROD_CONTENT_SHA` or approvals) is never published automatically; the sync waits, and after 60 minutes it fails with a Discord alert so an operator publishes it manually as below. The sync retries a failed run for the same head once, then alerts. All gates in this workflow still apply to the dispatched run.
+The last condition means automation only moves the frontend under the articles already live. A staged content release (new `BLOG_PROD_CONTENT_SHA` or approvals) is never published automatically; the sync waits, and after 60 minutes it fails with a Discord alert so an operator publishes it manually as below. A failed run for the same head is retried once, and both that sync run and a second failure fail the check with a Discord alert. All gates in this workflow still apply to the dispatched run.
 
 ## Invoke and verify
 
