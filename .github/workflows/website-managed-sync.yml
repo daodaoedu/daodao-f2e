@@ -11,7 +11,9 @@ on:
       - Blog development bootstrap probe
       - Blog production publication
     types: [completed]
-    branches: [dev, prod]
+    # No branch filter: Linode CD runs from the default branch, so its
+    # workflow_run head_branch is always dev even when it deployed prod or a
+    # feature branch. Each completion checks both channels; checks are idempotent.
   schedule:
     - cron: '17,47 * * * *'
   workflow_dispatch:
@@ -35,12 +37,10 @@ jobs:
       actions: write
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        if: github.event_name != 'workflow_run' || github.event.workflow_run.head_branch == matrix.channel
         with:
           persist-credentials: false
       - name: Hand website head to managed publication
         id: sync
-        if: github.event_name != 'workflow_run' || github.event.workflow_run.head_branch == matrix.channel
         env:
           GH_TOKEN: ${{ github.token }}
           BLOG_DEV_RELEASE_MANAGED: ${{ vars.BLOG_DEV_RELEASE_MANAGED }}

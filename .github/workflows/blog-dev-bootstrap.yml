@@ -1,4 +1,6 @@
 name: Blog development bootstrap probe
+# The operation in the run title lets Website managed sync tell publications from probes.
+run-name: Blog development ${{ inputs.operation || 'probe' }}
 on:
   workflow_dispatch:
     inputs:

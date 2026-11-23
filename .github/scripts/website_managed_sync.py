@@ -26,8 +26,14 @@ SHA = re.compile(r"[0-9a-f]{40}")
 # Same website trigger as linode-cd.yml detect-changes.
 WEBSITE_PATHS = re.compile(
     r"^(apps/website/|packages/|turbo.json|package.json|pnpm-lock.yaml"
-    r"|pnpm-workspace.yaml|docker/)"
+    r"|pnpm-workspace.yaml|docker/|\.dockerignore$|\.github/workflows/linode-cd\.yml$"
+    r"|\.github/scripts/blog-dev-preview\.py$)"
 )
+# blog-dev-bootstrap.yml run-name carries the operation; probes publish nothing.
+PUBLICATION_TITLES = {
+    "Blog development frontend-refresh",
+    "Blog development publication-test",
+}
 ACTIVE = {"queued", "in_progress", "waiting", "pending", "requested"}
 MAX_ATTEMPTS_PER_SHA = 2
 LAG_MINUTES = 60
@@ -39,6 +45,7 @@ CHANNELS = {
         "branch": "dev",
         "marker": "https://dev.daodao.so/blog-release.json",
         "workflow": "blog-dev-bootstrap.yml",
+        "publication_titles": PUBLICATION_TITLES,
         "managed_var": "BLOG_DEV_RELEASE_MANAGED",
         # dev drain waits for every unfinished legacy CD run on any branch.
         "cd_branch": None,
@@ -47,6 +54,8 @@ CHANNELS = {
         "branch": "prod",
         "marker": "https://daodao.so/blog-release.json",
         "workflow": "blog-prod-publish.yml",
+        # Every production run is a publication attempt.
+        "publication_titles": None,
         "managed_var": "BLOG_PROD_RELEASE_MANAGED",
         # prod gate rejects any unfinished legacy CD run on prod.
         "cd_branch": "prod",
@@ -227,7 +236,7 @@ def legacy_cd_idle(api, branch):
     return True
 
 
-def managed_runs(api, workflow, branch):
+def managed_runs(api, workflow, branch, titles=None):
     runs = api(
         f"repos/{REPOSITORY}/actions/workflows/{workflow}/runs"
         f"?branch={branch}&event=workflow_dispatch&per_page=50"
@@ -235,6 +244,7 @@ def managed_runs(api, workflow, branch):
     return [
         {key: run.get(key) for key in ("id", "head_sha", "status", "conclusion")}
         for run in runs
+        if titles is None or run.get("display_title") in titles
     ]
 
 
@@ -258,7 +268,9 @@ def collect(channel, environment, api=gh_api, marker_reader=read_marker):
         changed_files=files,
         ci=latest_ci(api, config["branch"], head) if managed else None,
         legacy_cd_idle=legacy_cd_idle(api, config["cd_branch"]) if managed else True,
-        managed_runs=managed_runs(api, config["workflow"], config["branch"])
+        managed_runs=managed_runs(
+            api, config["workflow"], config["branch"], config["publication_titles"]
+        )
         if managed
         else [],
         content_pins={

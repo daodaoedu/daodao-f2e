@@ -342,6 +342,117 @@ class CollectTests(unittest.TestCase):
         self.assertEqual(api.calls, [repo("git/ref/heads/dev")])
 
 
+class ReviewRegressionTests(unittest.TestCase):
+    """Findings from the four-engine review of daodao#563."""
+
+    def test_linode_cd_website_trigger_paths_also_hand_off(self):
+        # linode-cd.yml treats these as website changes and then skips them.
+        for name in [
+            ".dockerignore",
+            ".github/workflows/linode-cd.yml",
+            ".github/scripts/blog-dev-preview.py",
+        ]:
+            with self.subTest(name=name):
+                self.assertEqual(
+                    sync.decide(state(changed_files=[name]))["action"], "dispatch"
+                )
+
+    def test_paths_that_only_look_similar_are_not_website_changes(self):
+        for name in [".dockerignore.bak", ".github/workflows/linode-ci.yml"]:
+            with self.subTest(name=name):
+                self.assertEqual(
+                    sync.decide(state(changed_files=[name]))["action"],
+                    "no-website-change",
+                )
+
+    def test_dev_probe_runs_are_not_publication_attempts(self):
+        # A successful probe on head publishes nothing; it must not raise a
+        # "succeeded but marker unchanged" alert or block the refresh.
+        def run(identifier, title, conclusion):
+            return {
+                "id": identifier,
+                "head_sha": HEAD,
+                "status": "completed",
+                "conclusion": conclusion,
+                "display_title": title,
+            }
+
+        api = CollectTests().api(
+            **{
+                repo("actions/workflows/blog-dev-bootstrap.yml/runs"): {
+                    "workflow_runs": [
+                        run(7, "Blog development probe", "success"),
+                        run(8, "Blog development probe", "failure"),
+                        run(9, "Blog development probe", "failure"),
+                    ]
+                }
+            }
+        )
+        result = sync.collect(
+            "dev",
+            {"BLOG_DEV_RELEASE_MANAGED": "true"},
+            api,
+            lambda _url: {"frontend_sha": OLD, "content_sha": CONTENT},
+        )
+        self.assertEqual(result.managed_runs, [])
+        self.assertEqual(sync.decide(result)["action"], "dispatch")
+
+    def test_dev_publication_runs_still_count(self):
+        api = CollectTests().api(
+            **{
+                repo("actions/workflows/blog-dev-bootstrap.yml/runs"): {
+                    "workflow_runs": [
+                        {
+                            "id": 9,
+                            "head_sha": HEAD,
+                            "status": "in_progress",
+                            "display_title": "Blog development frontend-refresh",
+                        }
+                    ]
+                }
+            }
+        )
+        result = sync.collect(
+            "dev",
+            {"BLOG_DEV_RELEASE_MANAGED": "true"},
+            api,
+            lambda _url: {"frontend_sha": OLD, "content_sha": CONTENT},
+        )
+        self.assertEqual(sync.decide(result)["action"], "wait")
+
+
+class SyncWorkflowTests(unittest.TestCase):
+    def setUp(self):
+        import yaml
+
+        self.yaml = yaml
+        self.workflow = yaml.safe_load(
+            (ROOT / ".github/workflows/website-managed-sync.yml").read_text()
+        )
+
+    def test_cd_completion_is_not_filtered_by_head_branch(self):
+        # Linode CD runs from the default branch: its workflow_run head_branch
+        # is dev even when it deployed prod, so a branch filter drops prod.
+        events = self.workflow.get("on", self.workflow.get(True))
+        self.assertNotIn("branches", events["workflow_run"])
+        self.assertIn("Linode CD", events["workflow_run"]["workflows"])
+        for step in self.workflow["jobs"]["sync"]["steps"][:2]:
+            self.assertNotIn("head_branch", str(step.get("if", "")))
+
+    def test_dev_run_title_names_the_operation(self):
+        dev = self.yaml.safe_load(
+            (ROOT / ".github/workflows/blog-dev-bootstrap.yml").read_text()
+        )
+        self.assertEqual(
+            dev["run-name"], "Blog development ${{ inputs.operation || 'probe' }}"
+        )
+        options = dev.get("on", dev.get(True))["workflow_dispatch"]["inputs"][
+            "operation"
+        ]["options"]
+        expected = {"Blog development " + name for name in options}
+        self.assertEqual(sync.PUBLICATION_TITLES, expected - {"Blog development probe"})
+
+
 class FakeResponse:
     def __init__(self, status, body):
         self.status = status
