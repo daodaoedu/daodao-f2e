@@ -1,6 +1,6 @@
 # Publish approved Blog content to production
 
-This manual entry updates Website only, after checking successful CI for the exact current `prod` frontend. It does not merge the held full-publisher PR1199 or content migration PR9, and does not enable cross-repository automatic publishing.
+This entry updates Website only, after checking successful CI for the exact current `prod` frontend. Frontend-only releases are dispatched automatically (see "Automatic frontend releases"); content releases stay manual. It does not merge the held content migration PR9, and does not enable cross-repository automatic publishing.
 
 ## Install before first use
 
@@ -19,6 +19,16 @@ As a separately authorized operator step, set `BLOG_PROD_PUBLISHED_CONTENT_SHA` 
 After a successful release, the next run must use that newly published content SHA as `BLOG_PROD_PUBLISHED_CONTENT_SHA`; stale baselines are rejected by the host. Updating this setting is an explicit operator action, not a token-backed automatic write. The first migration from the legacy site has no valid marker: only the explicit `legacy_bootstrap=true` workflow input and the previously verified original content SHA `0daa4231bb2072657c807813e960919b982f9d8e` are accepted. Keep this input false for ordinary releases. It cannot bypass CI, approval or a present marker's baseline match.
 
 The workflow freezes the inputs once, checks a matching successful CI attempt, stages content with the existing shared publish validator, and builds `@daodao/website`. It records frontend/content identities and pretty-route byte hashes, then builds only the Docker `website` target with a release-specific tag and deploys the registry digest. Product is not built or recreated.
+
+## Automatic frontend releases
+
+Frontend changes merged to `prod` no longer wait for a manual run (daodaoedu/daodao#563). After each Linode CD run finishes, and every 30 minutes, `Website managed sync` compares the public marker's `frontend_sha` with the `prod` head. It dispatches this workflow with that head's successful push Linode CI run only when all of the following hold:
+
+- The head carries website changes.
+- No legacy prod CD run is unfinished.
+- The live marker `content_sha`, `BLOG_PROD_PUBLISHED_CONTENT_SHA` and `BLOG_PROD_CONTENT_SHA` are identical.
+
+The last condition means automation only moves the frontend under the articles already live. A staged content release (new `BLOG_PROD_CONTENT_SHA` or approvals) is never published automatically; the sync waits, and after 60 minutes it fails with a Discord alert so an operator publishes it manually as below. The sync retries a failed run for the same head once, then alerts. All gates in this workflow still apply to the dispatched run.
 
 ## Invoke and verify
 

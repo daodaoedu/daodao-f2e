@@ -301,6 +301,38 @@ def prepare_pair(workspace, content_sha, frontend_sha, actor, run_url):
     }
 
 
+def prepare_official(workspace, content_sha, frontend_sha, actor, run_url):
+    """Frontend refresh: rebuild only the live official content on a new frontend.
+
+    No synthetic fixture and no rollback matrix; the site moves from its
+    current release to official A and the supervisor recovers on failure.
+    """
+    if not SHA.fullmatch(content_sha) or not SHA.fullmatch(frontend_sha):
+        raise ValueError("Full immutable official content/frontend SHAs required")
+    workspace.mkdir(mode=0o700)
+    private = workspace / "private"
+    private.mkdir(mode=0o700)
+    source_a = workspace / "official-content"
+    tool = controller()
+    tool.checkout(
+        CONTENT_REPOSITORY, content_sha, source_a, private / "source-fetch.log"
+    )
+    store = workspace / "prepared-store"
+    build = DevelopmentBuild(frontend_sha, private, store, actor, run_url)
+    a = prepare_one(
+        "official-a", CONTENT_REPOSITORY, content_sha, build, draft_source=source_a
+    )
+    return {
+        "schema": 1,
+        "mode": "refresh",
+        "scope": "DEV frontend refresh; official A only; not editorial/production",
+        "frontendSha": frontend_sha,
+        "officialContentSha": content_sha,
+        "officialBytesUnchanged": True,
+        "artifacts": [a],
+    }
+
+
 def export_transfer(workspace, prepared):
     tool = controller()
     transfer = workspace / "transfer"
@@ -339,7 +371,7 @@ def export_transfer(workspace, prepared):
                 "kind": "official-A" if index == 0 else "synthetic-TEST-ONLY-B",
             }
         )
-    controller()  # Recheck unchanged controller after both package-script builds.
+    controller()  # Recheck unchanged controller after every package-script build.
     producer = {**prepared, "artifacts": descriptions}
     data = json.dumps(producer, sort_keys=True, separators=(",", ":")).encode()
     (transfer / "producer.json").write_bytes(data)
@@ -348,8 +380,15 @@ def export_transfer(workspace, prepared):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--content-sha", default=DEFAULT_CONTENT)
+    parser.add_argument("--content-sha")
+    parser.add_argument("--mode", choices=["test", "refresh"], default="test")
     args = parser.parse_args()
+    if args.content_sha is None:
+        if args.mode == "refresh":
+            # Never fall back to the fixture content: that would replace the
+            # live articles with the engineering test snapshot.
+            raise ValueError("Frontend refresh requires the live content SHA")
+        args.content_sha = DEFAULT_CONTENT
     spec = importlib.util.spec_from_file_location(
         "bootstrap_guard", ROOT / ".github/scripts/blog_bootstrap/runner.py"
     )
@@ -358,7 +397,7 @@ def main():
     guard.check_context(os.environ)
     frontend = guard.check_source(os.environ)
     workspace = Path(os.environ["RUNNER_TEMP"]) / "blog-development-publication"
-    result = prepare_pair(
+    result = (prepare_official if args.mode == "refresh" else prepare_pair)(
         workspace,
         args.content_sha,
         frontend,
@@ -373,6 +412,7 @@ def main():
         json.dumps(
             {
                 "ok": True,
+                "mode": args.mode,
                 "producerSha256": producer_sha,
                 "officialContentSha": args.content_sha,
                 "frontendSha": frontend,

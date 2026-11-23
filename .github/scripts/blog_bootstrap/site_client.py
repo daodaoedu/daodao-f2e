@@ -282,6 +282,49 @@ def loopback_operation(identifier, operation, generation):
         thread.join()
 
 
+def verify_private_state():
+    for path in [
+        "/active.json",
+        "/generation.json",
+        "/pending.json",
+        "/release.json",
+        "/.release.lock",
+        "/input/provenance.json",
+    ]:
+        status, _body, headers = request(path)
+        if status != 404:
+            raise ValueError("Private state route is visible")
+        noindex_headers(headers)
+
+
+def public_refresh():
+    """Move the managed site to official A on the new frontend, then read it back.
+
+    Failure leaves recovery to the supervisor, which rolls back to the
+    verified preimage recorded before this phase.
+    """
+    (item,) = PRODUCER["artifacts"]
+    identifier = item["id"]
+    if invoke("public-refresh", "activate", identifier, BASE + 10)["id"] != identifier:
+        raise ValueError("Official A was not activated by the frontend refresh")
+    after = full(identifier, "public-refresh-all-files")
+    if marker()["id"] != identifier:
+        raise ValueError("Public development marker differs after the frontend refresh")
+    verify_private_state()
+    return {
+        "ok": True,
+        "phase": "public-refresh",
+        "origin": DEV_ORIGIN,
+        "officialId": identifier,
+        "finalId": identifier,
+        "frontendSha": item["frontendSha"],
+        "contentSha": item["contentSha"],
+        "officialFiles": len(after["files"]),
+        "private404": True,
+        "scope": "actual public DEV website frontend refresh; not production/editorial approval",
+    }
+
+
 def verify_removed_and_private(before, after):
     removed = sorted(
         path
@@ -457,6 +500,13 @@ def verified_preimage():
     }
     if status != 200 or json.loads(body) != expected:
         raise ValueError("Public marker and trusted active preimage differ; unchanged")
+    if (
+        PRODUCER.get("mode") == "refresh"
+        and manifest["content_sha"] != PRODUCER["officialContentSha"]
+    ):
+        raise ValueError(
+            "Public development content changed since dispatch; refresh refused unchanged"
+        )
     full(previous, "verified-managed-preimage")
     manifest_sha = hashlib.sha256(
         (STORE / "releases" / previous / "release.json").read_bytes()
@@ -528,7 +578,13 @@ def perform_phase(phase):
     elif phase == "recover":
         previous = os.environ["DEV_RECOVERY_ID"]
         result = recover_previous(previous)
+    elif phase == "public-refresh":
+        if PRODUCER.get("mode") != "refresh":
+            raise ValueError("Development controller phase differs from producer mode")
+        result = public_refresh()
     else:
+        if PRODUCER.get("mode", "test") != "test":
+            raise ValueError("Development controller phase differs from producer mode")
         result = public_matrix()
     return result
 

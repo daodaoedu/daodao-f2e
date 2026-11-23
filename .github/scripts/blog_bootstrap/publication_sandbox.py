@@ -96,7 +96,7 @@ import socket
 LOCAL_CERT_NAME = "local-cert.pem"
 LOCAL_KEY_NAME = "local-key.pem"
 
-PHASES = {"seed", "import-only", "public-matrix", "recover"}
+PHASES = {"seed", "import-only", "public-matrix", "public-refresh", "recover"}
 
 
 def validate_base(base):

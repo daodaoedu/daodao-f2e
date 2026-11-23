@@ -3,6 +3,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[3]
 SPEC = importlib.util.spec_from_file_location(
@@ -86,6 +87,44 @@ class DevelopmentPrepareTests(unittest.TestCase):
         self.assertEqual(
             environment["NEXT_PUBLIC_BLOG_SOURCE_CONTEXT_COOKIE"],
             "daodao_blog_context_dev",
+        )
+
+
+class FrontendRefreshPrepareTests(unittest.TestCase):
+    """daodao#563: refresh must rebuild the live content, never the fixture."""
+
+    def test_refresh_without_live_content_sha_is_refused_before_any_build(self):
+        argv = ["prepare_publication.py", "--mode", "refresh"]
+        with (
+            patch.object(PREPARE.sys, "argv", argv),
+            patch.object(PREPARE, "prepare_official") as official,
+            patch.object(PREPARE, "prepare_pair") as pair,
+            self.assertRaisesRegex(ValueError, "live content SHA"),
+        ):
+            PREPARE.main()
+        official.assert_not_called()
+        pair.assert_not_called()
+
+    def test_refresh_rejects_partial_shas(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            for content, frontend in [("abc", "f" * 40), ("c" * 40, "HEAD")]:
+                with self.subTest(content=content), self.assertRaises(ValueError):
+                    PREPARE.prepare_official(
+                        Path(temporary) / content,
+                        content,
+                        frontend,
+                        "github-actions[bot]",
+                        "https://github.com/daodaoedu/daodao-f2e/actions/runs/1",
+                    )
+
+    def test_bot_actor_is_accepted_for_automatic_refresh_receipts(self):
+        receipt = PREPARE.engineering_receipt(
+            {"official-article": "a" * 64},
+            "github-actions[bot]",
+            "https://github.com/daodaoedu/daodao-f2e/actions/runs/123",
+        )
+        self.assertEqual(
+            receipt[0]["reviewer"], "development-engineering:github-actions[bot]"
         )
 
 
