@@ -60,8 +60,10 @@ export const CohortParticipantNav = ({
   return (
     // The page wrapper is an overflow container, so `sticky` would never engage; use fixed + spacer.
     <nav aria-label={navLabel} className="h-14">
-      <div className="fixed inset-x-0 top-0 z-50 h-14 border-b border-[#E4EAE9] bg-gray-100/95 backdrop-blur">
-        <div className="mx-auto flex h-full w-full max-w-[1440px] items-center gap-2 px-2 md:px-8">
+      {/* The page wrapper's z-10 stacking context keeps this bar under the desktop sidebar (z-30), so start after it. */}
+      <div className="fixed inset-x-0 top-0 z-50 h-14 border-b border-[#E4EAE9] bg-gray-100/95 backdrop-blur transition-[left] duration-300 md:left-[var(--sidebar-width,0px)]">
+        {/* Below md the mobile sidebar's floating logo (fixed top-5 left-5, 40px) sits on top of this bar too. */}
+        <div className="mx-auto flex h-full w-full max-w-[1440px] items-center gap-2 pl-16 pr-2 md:px-8">
           <div className="flex min-w-0 flex-1 justify-start">
             <Link
               href={backHref}
