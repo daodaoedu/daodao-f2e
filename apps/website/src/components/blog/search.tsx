@@ -20,11 +20,9 @@ type BlogSearchArticle = {
 };
 
 export function BlogSearch({
-  title,
   locale,
   articles,
 }: {
-  title: string;
   locale: BlogLocaleType;
   articles: BlogSearchArticle[];
 }) {
@@ -63,9 +61,6 @@ export function BlogSearch({
 
   return (
     <section className="blog-intro" aria-label={locale === "en" ? "Articles" : "文章"}>
-      <div className="blog-intro-heading">
-        <h1>{title}</h1>
-      </div>
       <div className="blog-list-controls">
         {allTags.length > 0 && (
           <nav className="blog-tag-filters" aria-label={locale === "en" ? "Filter by tag" : "依標籤篩選文章"}>
