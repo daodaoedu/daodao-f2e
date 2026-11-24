@@ -16,6 +16,7 @@ type BlogSearchArticle = {
   minutes: number;
   cover?: string;
   coverAlt?: string;
+  tags: string[];
 };
 
 export function BlogSearch({
@@ -29,6 +30,7 @@ export function BlogSearch({
 }) {
   const [expanded, setExpanded] = useState(false);
   const [query, setQuery] = useState("");
+  const [activeTag, setActiveTag] = useState<string | null>(null);
   const placeholder = locale === "en" ? "Search articles" : "搜尋文章標題或內容";
   const closeLabel = locale === "en" ? "Close search" : "關閉搜尋";
   const noResults =
@@ -36,22 +38,50 @@ export function BlogSearch({
       ? "No matching articles. Try another keyword."
       : "沒有找到符合的文章，試試其他關鍵字。";
   const normalizedQuery = query.trim().toLocaleLowerCase(locale);
-
+  const allTags = useMemo(
+    () =>
+      [...new Set(articles.flatMap((article) => article.tags))].sort((a, b) =>
+        a.localeCompare(b, locale)
+      ),
+    [articles, locale]
+  );
+  const hasFilters = Boolean(normalizedQuery || activeTag);
   const results = useMemo(
     () =>
-      articles.filter((article) =>
-        [article.title, article.description, article.body]
+      articles.filter((article) => {
+        const searchableText = [article.title, article.description, article.body, ...article.tags]
           .join(" ")
-          .toLocaleLowerCase(locale)
-          .includes(normalizedQuery)
-      ),
-    [articles, locale, normalizedQuery]
+          .toLocaleLowerCase(locale);
+        const matchesQuery = !normalizedQuery || searchableText.includes(normalizedQuery);
+        const matchesTag = !activeTag || article.tags.includes(activeTag);
+        return matchesQuery && matchesTag;
+      }),
+    [articles, activeTag, locale, normalizedQuery]
   );
+  const toggleTag = (tag: string) =>
+    setActiveTag((current) => (current === tag ? null : tag));
 
   return (
     <section className="blog-intro" aria-label={locale === "en" ? "Articles" : "文章"}>
       <div className="blog-intro-heading">
         <h1>{title}</h1>
+      </div>
+      <div className="blog-list-controls">
+        {allTags.length > 0 && (
+          <nav className="blog-tag-filters" aria-label={locale === "en" ? "Filter by tag" : "依標籤篩選文章"}>
+            {allTags.map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                className="blog-tag-chip"
+                aria-pressed={activeTag === tag}
+                onClick={() => toggleTag(tag)}
+              >
+                {tag}
+              </button>
+            ))}
+          </nav>
+        )}
         <div className={`blog-search${expanded ? " is-expanded" : ""}`}>
           {expanded ? (
             <search className="blog-search-expanded">
@@ -91,12 +121,12 @@ export function BlogSearch({
           )}
         </div>
       </div>
-      {query.trim() && (
+      {hasFilters && (
         <p className="blog-search-status" aria-live="polite">
           {results.length === 0 ? noResults : locale === "en" ? `${results.length} results` : `找到 ${results.length} 篇文章`}
         </p>
       )}
-      {results.length === 0 && !query.trim() ? (
+      {results.length === 0 && !hasFilters ? (
         <p className="blog-empty">{locale === "en" ? "No articles yet." : "目前沒有文章。"}</p>
       ) : results.length === 0 ? null : (
         results.map((article) => (
@@ -107,6 +137,21 @@ export function BlogSearch({
                 <a href={article.href}>{article.title}</a>
               </h2>
               <p>{article.description}</p>
+              {article.tags.length > 0 && (
+                <div className="blog-post-tags">
+                  {article.tags.map((tag) => (
+                    <button
+                      key={tag}
+                      type="button"
+                      className="blog-tag-chip"
+                      aria-pressed={activeTag === tag}
+                      onClick={() => toggleTag(tag)}
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              )}
               <div className="blog-meta">
                 <time dateTime={article.publishedAt}>{article.date}</time>
                 <span>
