@@ -32,11 +32,11 @@ export function BlogShell({
         {t.skip}
       </a>
       <header className="blog-header">
-        <nav aria-label="Journal">
+        <nav aria-label="Blog">
           <a
             href={blogPath(locale)}
             className="blog-brand"
-            aria-label={locale === "en" ? "DaoDao Journal" : "島島阿學 Journal"}
+            aria-label={locale === "en" ? "DaoDao Blog" : "島島阿學部落格"}
           >
             <Image
               src={`/assets/blog/${locale === "en" ? "en" : "zh"}-${dark ? "dark" : "light"}.svg`}
@@ -44,7 +44,6 @@ export function BlogShell({
               height={32}
               alt={locale === "en" ? "DaoDao" : "島島阿學"}
             />
-            <span>Journal</span>
           </a>
           <div className="blog-controls">
             <a
