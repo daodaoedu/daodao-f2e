@@ -118,6 +118,16 @@ export const Footer = ({
           <div className="space-y-4">
             <p className="text-lg text-primary-lighter">{t("footer_resources_title")}</p>
             <div className="space-y-2">
+              {logoLocale && (
+                <div>
+                  <CustomLink
+                    href={logoLocale === "en" ? "/en/blog" : "/blog"}
+                    className="text-white/70 transition-colors hover:text-primary-base"
+                  >
+                    {logoLocale === "en" ? "Blog" : "部落格"}
+                  </CustomLink>
+                </div>
+              )}
               <div>
                 <CustomLink
                   href={`${process.env.NEXT_PUBLIC_APP_URL}/resource`}
