@@ -24,6 +24,22 @@ CONTENT = "5c4eee88b2e022229852846b07e073bef8b7c10d"
 NOW = dt.datetime(2026, 11, 23, 12, 0, tzinfo=dt.UTC)
 
 
+class _FrozenDatetime(dt.datetime):
+    @classmethod
+    def now(cls, tz=None):
+        return NOW
+
+
+def setUpModule():
+    # collect() stamps State.now with the wall clock; fixtures date from 2026-11-23,
+    # so without a fixed clock lag-window cases turn into "alert" an hour later.
+    sync.dt = type("FrozenDt", (), {**vars(dt), "datetime": _FrozenDatetime})
+
+
+def tearDownModule():
+    sync.dt = dt
+
+
 def state(**overrides):
     values = {
         "channel": "dev",
