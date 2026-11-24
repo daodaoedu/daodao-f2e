@@ -7,6 +7,7 @@ import type { BlogLocaleType } from "./copy";
 type BlogSearchArticle = {
   id: string;
   href: string;
+  title: string;
   description: string;
   body: string;
   author: string;
@@ -22,7 +23,6 @@ export function BlogSearch({
   locale,
   articles,
 }: {
-  title: string;
   locale: BlogLocaleType;
   articles: BlogSearchArticle[];
 }) {
