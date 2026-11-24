@@ -5,6 +5,7 @@ import { type BlogArticleType, loadBlog } from "./content";
 import { type BlogLocaleType, blogCopy, blogPath } from "./copy";
 import { articleOutline, readingMinutes } from "./helpers";
 import { BlogMarkdown } from "./markdown";
+import { BlogSearch } from "./search";
 import { BlogShell, ShareArticle } from "./shell";
 import { BlogTelemetry } from "./telemetry";
 export function dateLabel(date: string, locale: BlogLocaleType) {
@@ -22,78 +23,29 @@ export async function BlogList({ locale, topic }: { locale: BlogLocaleType; topi
     <BlogShell locale={locale} preview={data.preview}>
       <BlogTelemetry locale={locale} />
       <main className="blog-list" id="blog-main" tabIndex={-1}>
-        <div className="blog-intro">
-          <h1>{t.title}</h1>
-          <p>{t.intro}</p>
-        </div>
-        <nav className="blog-topics" aria-label={locale === "en" ? "Topics" : "文章主題"}>
-          <a href={blogPath(locale)} aria-current={!topic ? "page" : undefined}>
-            {t.all}
-          </a>
-          {data.topics.map((item) => (
-            <a
-              key={item.id}
-              href={`${blogPath(locale)}/topic/${item.id}`}
-              aria-current={topic === item.id ? "page" : undefined}
-            >
-              {item.name[locale]}
-            </a>
-          ))}
-        </nav>
-        {entries.length === 0 ? (
-          <p className="blog-empty">{t.empty}</p>
-        ) : (
-          entries.map((article) => (
-            <PostSummary
-              key={article.metadata.id}
-              article={article}
-              locale={locale}
-              author={
-                data.authors.find((author) => author.id === article.metadata.author_id)?.name[
-                  locale
-                ] || ""
-              }
-            />
-          ))
-        )}
+        <BlogSearch
+          title={t.title}
+          locale={locale}
+          articles={entries.map((article) => {
+            const m = article.metadata;
+            return {
+              id: m.id,
+              href: blogPath(locale, m.slug),
+              title: m.title,
+              description: m.description,
+              body: article.body,
+              author:
+                data.authors.find((author) => author.id === m.author_id)?.name[locale] || "",
+              date: dateLabel(m.published_at, locale),
+              publishedAt: m.published_at,
+              minutes: readingMinutes(article.body),
+              cover: m.cover ? article.assets[m.cover.path] : undefined,
+              coverAlt: m.cover?.alt,
+            };
+          })}
+        />
       </main>
     </BlogShell>
-  );
-}
-function PostSummary({
-  article,
-  locale,
-  author,
-}: {
-  article: BlogArticleType;
-  locale: BlogLocaleType;
-  author: string;
-}) {
-  const m = article.metadata;
-  return (
-    <article className={`blog-post ${m.cover ? "blog-post-cover" : ""}`}>
-      <div>
-        <p className="blog-by">{author}</p>
-        <h2>
-          <a href={blogPath(locale, m.slug)}>{m.title}</a>
-        </h2>
-        <p>{m.description}</p>
-        <div className="blog-meta">
-          <time dateTime={m.published_at}>{dateLabel(m.published_at, locale)}</time>
-          <span>
-            {readingMinutes(article.body)} {blogCopy[locale].minutes}
-          </span>
-        </div>
-      </div>
-      {m.cover && (
-        <Image
-          src={article.assets[m.cover.path] || ""}
-          alt={m.cover.alt}
-          width={156}
-          height={126}
-        />
-      )}
-    </article>
   );
 }
 export async function BlogArticle({
