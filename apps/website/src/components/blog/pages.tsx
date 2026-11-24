@@ -32,11 +32,11 @@ export async function BlogList({ locale, topic }: { locale: BlogLocaleType; topi
               title: m.title,
               description: m.description,
               body: article.body,
-              author:
-                data.authors.find((author) => author.id === m.author_id)?.name[locale] || "",
+              author: data.authors.find((author) => author.id === m.author_id)?.name[locale] || "",
               date: dateLabel(m.published_at, locale),
               publishedAt: m.published_at,
               minutes: readingMinutes(article.body),
+              tags: m.tags,
               cover: m.cover ? article.assets[m.cover.path] : undefined,
               coverAlt: m.cover?.alt,
             };
@@ -82,6 +82,18 @@ export async function BlogArticle({
           <header>
             <h1>{m.title}</h1>
             <p className="blog-dek">{m.description}</p>
+            {m.tags.length > 0 && (
+              <ul
+                className="blog-post-tags blog-article-tags"
+                aria-label={locale === "en" ? "Article tags" : "文章標籤"}
+              >
+                {m.tags.map((tag) => (
+                  <li key={tag} className="blog-article-tag">
+                    {tag}
+                  </li>
+                ))}
+              </ul>
+            )}
             <div className="blog-author">
               <p>{author?.name[locale]}</p>
               <div className="blog-meta">
