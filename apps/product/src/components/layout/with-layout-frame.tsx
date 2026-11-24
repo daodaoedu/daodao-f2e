@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
 import { cn } from "@daodao/ui/lib/utils";
+import { type CSSProperties, useState } from "react";
 import { Sidebar } from "./sidebar";
 
 export function WithLayoutFrame({
@@ -22,6 +22,8 @@ export function WithLayoutFrame({
         style={
           {
             "--sidebar-center-offset": isSidebarCollapsed ? "34px" : "72px",
+            // Fixed bars inside the frame start after the desktop sidebar (md+) instead of under it.
+            "--sidebar-width": isSidebarCollapsed ? "68px" : "144px",
           } as CSSProperties
         }
         className={cn(
