@@ -138,7 +138,7 @@ export function BlogSearch({
               </h2>
               <p>{article.description}</p>
               {article.tags.length > 0 && (
-                <div className="blog-post-tags" role="group" aria-label={locale === "en" ? "Article tags" : "文章標籤"}>
+                <div className="blog-post-tags">
                   {article.tags.map((tag) => (
                     <button
                       key={tag}
