@@ -15,7 +15,6 @@ export function dateLabel(date: string, locale: BlogLocaleType) {
 }
 export async function BlogList({ locale, topic }: { locale: BlogLocaleType; topic?: string }) {
   const data = await loadBlog();
-  const t = blogCopy[locale];
   const entries = data.articles
     .filter((a) => a.metadata.lang === locale && (!topic || a.metadata.topic === topic))
     .sort((a, b) => b.metadata.published_at.localeCompare(a.metadata.published_at));
@@ -24,7 +23,6 @@ export async function BlogList({ locale, topic }: { locale: BlogLocaleType; topi
       <BlogTelemetry locale={locale} />
       <main className="blog-list" id="blog-main" tabIndex={-1}>
         <BlogSearch
-          title={t.title}
           locale={locale}
           articles={entries.map((article) => {
             const m = article.metadata;
