@@ -39,6 +39,7 @@ export async function BlogList({ locale, topic }: { locale: BlogLocaleType; topi
               date: dateLabel(m.published_at, locale),
               publishedAt: m.published_at,
               minutes: readingMinutes(article.body),
+              tags: m.tags,
               cover: m.cover ? article.assets[m.cover.path] : undefined,
               coverAlt: m.cover?.alt,
             };

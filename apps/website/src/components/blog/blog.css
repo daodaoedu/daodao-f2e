@@ -583,3 +583,56 @@ html[lang="en"] .blog-brand img {
     width: 100%;
   }
 }
+
+.blog-list-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+}
+.blog-tag-filters,
+.blog-post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.blog-tag-filters {
+  min-width: 0;
+}
+.blog-list-controls .blog-search {
+  flex: 0 0 auto;
+}
+.blog-tag-chip {
+  border: 1px solid var(--blog-line);
+  border-radius: 999px;
+  padding: 5px 11px;
+  color: var(--blog-ink);
+  background: var(--blog-soft);
+  font: inherit;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+.blog-tag-chip:hover,
+.blog-tag-chip[aria-pressed="true"] {
+  border-color: var(--blog-ink);
+  color: var(--blog-bg);
+  background: var(--blog-ink);
+}
+.blog-post-tags {
+  margin: 0 0 14px;
+}
+@media (max-width: 650px) {
+  .blog-list-controls {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .blog-list-controls .blog-search.is-expanded {
+    flex: 1 1 100%;
+  }
+  .blog-list-controls .blog-search-expanded {
+    width: 100%;
+  }
+}
