@@ -19,11 +19,9 @@ type BlogSearchArticle = {
 };
 
 export function BlogSearch({
-  title,
   locale,
   articles,
 }: {
-  title: string;
   locale: BlogLocaleType;
   articles: BlogSearchArticle[];
 }) {
@@ -50,8 +48,6 @@ export function BlogSearch({
 
   return (
     <section className="blog-intro" aria-label={locale === "en" ? "Articles" : "文章"}>
-      <div className="blog-intro-heading">
-        <h1>{title}</h1>
         <div className={`blog-search${expanded ? " is-expanded" : ""}`}>
           {expanded ? (
             <search className="blog-search-expanded">
@@ -90,7 +86,6 @@ export function BlogSearch({
             </button>
           )}
         </div>
-      </div>
       {query.trim() && (
         <p className="blog-search-status" aria-live="polite">
           {results.length === 0 ? noResults : locale === "en" ? `${results.length} results` : `找到 ${results.length} 篇文章`}
