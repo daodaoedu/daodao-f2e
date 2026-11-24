@@ -485,16 +485,6 @@ html[lang="en"] .blog-brand img {
   }
 }
 
-.blog-intro-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-}
-.blog-intro-heading h1 {
-  min-width: 0;
-  margin-bottom: 0;
-}
 .blog-search {
   flex: 0 0 auto;
 }
