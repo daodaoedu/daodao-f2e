@@ -54,7 +54,7 @@ export function BlogSearch({
         <h1>{title}</h1>
         <div className={`blog-search${expanded ? " is-expanded" : ""}`}>
           {expanded ? (
-            <div className="blog-search-expanded" role="search">
+            <search className="blog-search-expanded">
               <Search aria-hidden="true" />
               <input
                 id="article-search"
@@ -77,7 +77,7 @@ export function BlogSearch({
               >
                 <X aria-hidden="true" />
               </button>
-            </div>
+            </search>
           ) : (
             <button
               type="button"
