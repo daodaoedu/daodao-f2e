@@ -8,10 +8,12 @@ import { cn } from "@daodao/ui/lib/utils";
 import { differenceInMilliseconds, format, startOfTomorrow } from "date-fns";
 import { ChevronDown, ChevronRight, ChevronUp, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { CheckInButton } from "@/components/check-in";
 import { CohortQueryScope } from "@/components/cohort/cohort-query-scope";
+import { TaskStatus } from "@/constants/task-status";
 import { isCohortQuickAccessVisible } from "@/utils/cohort-meeting-calendar";
 import { isPracticeVisibleByDate } from "@/utils/practice-card";
-import { resolvePracticeDurationDays } from "@/utils/practice-period";
+import { practiceEndDateString, resolvePracticeDurationDays } from "@/utils/practice-period";
 
 function getGreetingKey(): "greeting_morning" | "greeting_afternoon" | "greeting_evening" {
   const hour = new Date().getHours();
@@ -27,6 +29,25 @@ interface PracticeCard {
   currentDays: number;
   totalDays: number;
   lastCheckInDate: string | null;
+  startDate: string | null;
+  endDate: string | null;
+}
+
+interface PracticeDateSource {
+  cohortId?: number;
+  cohortStartDate?: string;
+  cohortEndDate?: string;
+  isChallenge?: boolean;
+}
+
+function isMoreCurrentPractice(
+  candidate: PracticeDateSource & { startDate?: string; createdAt?: string },
+  current: PracticeDateSource & { startDate?: string; createdAt?: string }
+): boolean {
+  const candidateStart = candidate.startDate ?? "";
+  const currentStart = current.startDate ?? "";
+  if (candidateStart !== currentStart) return candidateStart > currentStart;
+  return (candidate.createdAt ?? "") > (current.createdAt ?? "");
 }
 
 export function YourToday() {
@@ -39,6 +60,7 @@ export function YourToday() {
 
 function YourTodayContent() {
   const t = useTranslations("dashboard");
+  const tCheckIn = useTranslations("check_in");
   const { user } = useAuth();
   const [isExpanded, setIsExpanded] = useState(true);
   const [today, setToday] = useState(() => format(new Date(), "yyyy-MM-dd"));
@@ -55,6 +77,7 @@ function YourTodayContent() {
     };
   }, [today]);
   const { data: practicesData } = useMyPractices({ limit: 20 });
+  type ApiPractice = NonNullable<typeof practicesData>["data"][number];
   const {
     data: cohortsData,
     error: cohortsError,
@@ -65,25 +88,49 @@ function YourTodayContent() {
   ).filter((cohort) => isCohortQuickAccessVisible(cohort));
 
   const cards = useMemo<PracticeCard[]>(() => {
-    const practices = practicesData?.data ?? [];
-    return practices
-      .filter(
-        (p) =>
-          p.status === "active" &&
-          isPracticeVisibleByDate(p.startDate, p.endDate, new Date(`${today}T00:00:00`))
-      )
-      .map((p) => {
-        // 總天數含頭尾，與實踐頁同一規則（daodao#277）
-        const totalDays = resolvePracticeDurationDays(p) ?? 1;
-        return {
-          id: p.id,
-          title: p.title,
-          type: "personal" as "personal" | "challenge",
-          currentDays: p.checkInCount ?? 0,
-          totalDays,
-          lastCheckInDate: p.lastCheckinAt ?? null,
-        };
-      });
+    const practices = (practicesData?.data ?? []) as (ApiPractice & PracticeDateSource)[];
+    const visiblePractices = practices.filter((practice) => {
+      const isCohortPractice = practice.cohortId !== undefined && !practice.isChallenge;
+      const startDate = isCohortPractice ? practice.cohortStartDate : practice.startDate;
+      const endDate = isCohortPractice
+        ? practice.cohortEndDate
+        : practice.endDate || practiceEndDateString(practice.startDate, practice.durationDays);
+      return (
+        practice.status === "active" &&
+        isPracticeVisibleByDate(startDate, endDate, new Date(`${today}T00:00:00`))
+      );
+    });
+
+    // Use one check-in action per cohort, targeting its most recently started practice.
+    const cohortPractices = new Map<number, (typeof visiblePractices)[number]>();
+    const practicesForCards = visiblePractices.filter((practice) => {
+      if (practice.cohortId === undefined || practice.isChallenge) return true;
+
+      const current = cohortPractices.get(practice.cohortId);
+      if (!current || isMoreCurrentPractice(practice, current)) {
+        cohortPractices.set(practice.cohortId, practice);
+      }
+      return false;
+    });
+    practicesForCards.push(...cohortPractices.values());
+
+    return practicesForCards.map((practice) => {
+      const isCohortPractice = practice.cohortId !== undefined && !practice.isChallenge;
+      // 總天數含頭尾，與實踐頁同一規則（daodao#277）
+      const totalDays = resolvePracticeDurationDays(practice) ?? 1;
+      return {
+        id: practice.id,
+        title: practice.title,
+        type: practice.isChallenge ? ("challenge" as const) : ("personal" as const),
+        currentDays: practice.checkInCount ?? 0,
+        totalDays,
+        lastCheckInDate: practice.lastCheckinAt ?? null,
+        startDate: (isCohortPractice ? practice.cohortStartDate : practice.startDate) ?? null,
+        endDate: isCohortPractice
+          ? (practice.cohortEndDate ?? null)
+          : practice.endDate || practiceEndDateString(practice.startDate, practice.durationDays),
+      };
+    });
   }, [practicesData, today]);
 
   const displayName = user?.name ?? "";
@@ -133,10 +180,9 @@ function YourTodayContent() {
                 </CustomLink>
               ))}
               {cards.map((card) => (
-                <CustomLink
+                <div
                   key={card.id}
-                  href={`/practices/${card.id}`}
-                  className="flex min-w-0 max-w-full items-center gap-3 px-4 py-[14px] rounded-[18px] hover:bg-white/50 transition-colors group"
+                  className="flex min-w-0 max-w-full items-center gap-3 rounded-[18px] px-4 py-[10px] transition-colors hover:bg-white/50"
                 >
                   <span
                     className={cn(
@@ -176,19 +222,37 @@ function YourTodayContent() {
                       </svg>
                     )}
                   </span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-text-dark truncate">{card.title}</p>
-                    <p className="text-[11px] text-text-dark/40">
-                      {card.lastCheckInDate
-                        ? t("your_today_days_progress", {
-                            current: card.currentDays,
-                            total: card.totalDays,
-                          })
-                        : t("your_today_first_checkin")}
-                    </p>
-                  </div>
-                  <ChevronRight className="size-[18px] text-text-dark/20 group-hover:text-text-dark/40 transition-colors" />
-                </CustomLink>
+                  <CustomLink
+                    href={`/practices/${card.id}`}
+                    className="group flex min-w-0 flex-1 items-center gap-2"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-text-dark">{card.title}</p>
+                      <p className="text-[11px] text-text-dark/40">
+                        {card.lastCheckInDate
+                          ? t("your_today_days_progress", {
+                              current: card.currentDays,
+                              total: card.totalDays,
+                            })
+                          : t("your_today_first_checkin")}
+                      </p>
+                    </div>
+                    <ChevronRight className="size-[18px] shrink-0 text-text-dark/20 transition-colors group-hover:text-text-dark/40" />
+                  </CustomLink>
+                  <CheckInButton
+                    variant="ctaPrimary"
+                    practiceId={card.id}
+                    practiceStatus={TaskStatus.inProgress}
+                    isChallenge={card.type === "challenge"}
+                    lastCheckInDate={card.lastCheckInDate}
+                    startDate={card.startDate}
+                    endDate={card.endDate}
+                    taskTitle={card.title}
+                    labelOverride={tCheckIn("button_check_in")}
+                    showIcon
+                    className="h-8 min-w-16 shrink-0 self-center gap-1 rounded-full px-2.5 text-[11px] font-semibold shadow-[0_2px_6px_rgba(22,185,179,0.22)] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(22,185,179,0.28)] active:translate-y-0 active:shadow-sm focus-visible:ring-2 focus-visible:ring-logo-cyan focus-visible:ring-offset-2 [&>svg]:size-3 [&_svg]:!text-white hover:[&_svg]:!text-primary-base"
+                  />
+                </div>
               ))}
             </div>
           ) : (
