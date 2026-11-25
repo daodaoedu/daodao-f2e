@@ -98,5 +98,7 @@
   "filter_group_status": "Status",
   "filter_group_fee": "Fee",
   "filter_trigger_aria_label": "Filter: {label}",
-  "filter_menu_aria_label": "Filter activities"
+  "filter_status_menu_aria_label": "Filter activities by status",
+  "filter_fee_menu_aria_label": "Filter activities by fee",
+  "filter_clear": "Clear filters"
 }

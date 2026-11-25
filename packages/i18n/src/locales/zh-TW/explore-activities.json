@@ -98,5 +98,7 @@
   "filter_group_status": "狀態",
   "filter_group_fee": "費用",
   "filter_trigger_aria_label": "篩選：{label}",
-  "filter_menu_aria_label": "篩選活動課程"
+  "filter_status_menu_aria_label": "依狀態篩選活動課程",
+  "filter_fee_menu_aria_label": "依費用篩選活動課程",
+  "filter_clear": "清除篩選"
 }

@@ -28,7 +28,7 @@ export function ExploreToolbar({
         placeholder={searchPlaceholder}
         clearLabel={searchClearLabel}
       />
-      <div className="flex min-w-0 items-center gap-2">
+      <div className="flex min-w-0 flex-wrap items-center gap-2">
         <span aria-hidden="true" className="h-4 w-px bg-[oklch(0.891_0_89.9)]" />
         {children}
       </div>

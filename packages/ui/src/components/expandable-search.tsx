@@ -19,14 +19,17 @@ interface ExpandableSearchProps {
   onSubmit?: (value: string) => void;
   placeholder: string;
   clearLabel: string;
-  /** 展開時顯示在輸入框下方的內容（例如搜尋建議） */
+  /** 聚焦時顯示在輸入框下方的內容（例如搜尋建議） */
   renderDropdown?: (state: ExpandableSearchDropdownState) => ReactNode;
   className?: string;
 }
 
 /**
- * 可展開的圓形搜尋列（首頁、探索頁共用）：
- * 收合時是放大鏡圓鈕，點了展開成輸入框並佔滿所在列的剩餘寬度；有輸入值時保持展開。
+ * 搜尋列（首頁、探索頁共用）：
+ * - md 以上一律顯示輸入框（NN/g 不建議桌機只放放大鏡：不顯眼、要多點一次，daodao#567）
+ * - 手機收合成放大鏡圓鈕，點了展開並佔滿所在列的剩餘寬度；有輸入值時保持展開
+ *
+ * 輸入框固定在同一個 DOM 位置，桌機聚焦時不會因重新掛載而失去焦點。
  */
 export function ExpandableSearch({
   value,
@@ -40,6 +43,7 @@ export function ExpandableSearch({
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // 手機版是否展開；md 以上由 CSS 一律展開
   const expanded = focused || !!value;
 
   const expand = () => {
@@ -60,68 +64,59 @@ export function ExpandableSearch({
     inputRef.current?.blur();
   };
 
-  const searchBarClassName = cn(
-    "flex items-center bg-white border rounded-full overflow-hidden transition-all duration-300 ease-in-out",
-    expanded
-      ? "w-full border-[#9fb5b8] px-4 h-10"
-      : "w-8 h-8 border-[#e4eae9] cursor-pointer justify-center"
-  );
-
-  const searchBarContent = (
-    <>
-      <Search
-        className={cn(
-          "shrink-0 transition-all duration-200",
-          expanded ? "size-4 text-text-dark/40 mr-2" : "size-4 text-text-dark/60"
-        )}
-      />
-      <Input
-        ref={inputRef}
-        type="text"
-        value={value}
-        placeholder={placeholder}
-        tabIndex={expanded ? 0 : -1}
-        className={cn(
-          "h-auto rounded-none border-0 bg-transparent px-0 py-0 text-sm text-text-dark outline-none placeholder:text-text-dark/40 hover:border-0 focus-visible:border-0 focus-visible:px-0 focus-visible:py-0 focus-visible:ring-0 transition-all duration-300",
-          expanded ? "flex-1 opacity-100" : "w-0 opacity-0 pointer-events-none"
-        )}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setTimeout(() => setFocused(false), 150)}
-        onChange={(e) => onChange(e.target.value)}
-        onKeyDown={handleKeyDown}
-      />
-    </>
-  );
-
   return (
-    // 展開時在「搜尋 + 篩選」列中佔滿剩餘寬度
-    <div className={cn("relative", expanded && "min-w-0 flex-1", className)}>
-      {expanded ? (
-        <div className={searchBarClassName}>
-          {searchBarContent}
-          {value && (
-            <button
-              type="button"
-              onClick={handleClear}
-              className="ml-1 text-text-dark/40 hover:text-text-dark/70 transition-colors"
-              aria-label={clearLabel}
-            >
-              <X className="size-4" />
-            </button>
-          )}
-        </div>
-      ) : (
+    // 展開時在「搜尋 + 篩選」列中佔滿剩餘寬度；手機展開時獨佔一列，篩選換到下一列，
+    // 避免篩選條件多時輸入框被擠到 0（daodao#567）
+    <div
+      className={cn(
+        "relative",
+        expanded ? "min-w-0 flex-1 basis-full md:min-w-48 md:basis-0" : "md:min-w-48 md:flex-1",
+        className
+      )}
+    >
+      {!expanded && (
         <button
           type="button"
-          className={searchBarClassName}
+          className="flex size-8 cursor-pointer items-center justify-center rounded-full border border-[#e4eae9] bg-white md:hidden"
           onClick={expand}
           aria-label={placeholder}
         >
-          {searchBarContent}
+          <Search className="size-4 text-text-dark/60" />
         </button>
       )}
 
-      {expanded && renderDropdown?.({ focused, close: () => setFocused(false) })}
+      <div
+        className={cn(
+          "h-10 w-full items-center overflow-hidden rounded-full border border-[#9fb5b8] bg-white px-4",
+          expanded ? "flex" : "hidden md:flex"
+        )}
+      >
+        <Search className="mr-2 size-4 shrink-0 text-text-dark/40" />
+        <Input
+          ref={inputRef}
+          type="text"
+          value={value}
+          placeholder={placeholder}
+          aria-label={placeholder}
+          className="h-auto flex-1 rounded-none border-0 bg-transparent px-0 py-0 text-sm text-text-dark outline-none placeholder:text-text-dark/40 hover:border-0 focus-visible:border-0 focus-visible:px-0 focus-visible:py-0 focus-visible:ring-0"
+          onFocus={() => setFocused(true)}
+          onBlur={() => setTimeout(() => setFocused(false), 150)}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+        {value && (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="ml-1 text-text-dark/40 transition-colors hover:text-text-dark/70"
+            aria-label={clearLabel}
+          >
+            <X className="size-4" />
+          </button>
+        )}
+      </div>
+
+      {focused && renderDropdown?.({ focused, close: () => setFocused(false) })}
     </div>
   );
 }

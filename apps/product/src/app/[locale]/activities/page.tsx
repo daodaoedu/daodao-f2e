@@ -4,12 +4,8 @@ import { type ActivitySummaryType, useActivities, useLighthouseOrganizations } f
 import { useAuthContext } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { Link } from "@daodao/i18n/navigation";
-import {
-  FilterMenu,
-  FilterMenuItem,
-  FilterMenuLabel,
-  FilterMenuSeparator,
-} from "@daodao/ui/components/filter-menu";
+import { Button } from "@daodao/ui/components/button";
+import { FilterMenu, FilterMenuItem } from "@daodao/ui/components/filter-menu";
 import { Spinner } from "@daodao/ui/components/spinner";
 import { useCallback, useMemo, useState } from "react";
 import { ActivityCard } from "@/components/activity/activity-card";
@@ -163,6 +159,10 @@ export default function ExploreActivitiesPage() {
   );
 }
 
+/**
+ * 狀態、費用各一個下拉（Meetup 做法：一個面向一個篩選），有套用時出現「清除篩選」（daodao#567）。
+ * 已套用的條件直接寫在觸發鈕上，關掉選單也看得到（Baymard：已套用的篩選要保持可見）。
+ */
 function ActivityFilterMenu({
   t,
   statusFilter,
@@ -176,39 +176,66 @@ function ActivityFilterMenu({
   onStatusChange: (f: ActivityStatusFilter) => void;
   onFeeChange: (f: ActivityFeeFilter) => void;
 }) {
-  const labelParts = [
-    statusFilter === "all" ? null : t(`filter_${statusFilter}`),
-    feeFilter === null ? null : t(`filter_${feeFilter}`),
-  ].filter((part): part is string => part !== null);
-  const triggerLabel = labelParts.length > 0 ? labelParts.join("・") : t("filter_all");
+  const statusLabel = t(`filter_${statusFilter}`);
+  const feeLabel = feeFilter === null ? t("filter_group_fee") : t(`filter_${feeFilter}`);
+  const isFiltered = statusFilter !== "all" || feeFilter !== null;
 
   return (
-    <FilterMenu
-      label={triggerLabel}
-      active={labelParts.length > 0}
-      triggerAriaLabel={t("filter_trigger_aria_label", { label: triggerLabel })}
-      menuAriaLabel={t("filter_menu_aria_label")}
-    >
-      <FilterMenuLabel>{t("filter_group_status")}</FilterMenuLabel>
-      {ACTIVITY_STATUS_FILTERS.map((key) => (
+    <>
+      <FilterMenu
+        label={statusLabel}
+        active={statusFilter !== "all"}
+        triggerAriaLabel={t("filter_trigger_aria_label", {
+          label: `${t("filter_group_status")}：${statusLabel}`,
+        })}
+        menuAriaLabel={t("filter_status_menu_aria_label")}
+      >
+        {ACTIVITY_STATUS_FILTERS.map((key) => (
+          <FilterMenuItem
+            key={key}
+            label={t(`filter_${key}`)}
+            checked={statusFilter === key}
+            onToggle={() => onStatusChange(key)}
+          />
+        ))}
+      </FilterMenu>
+      <FilterMenu
+        label={feeLabel}
+        active={feeFilter !== null}
+        triggerAriaLabel={t("filter_trigger_aria_label", {
+          label: `${t("filter_group_fee")}：${feeFilter === null ? t("filter_all") : feeLabel}`,
+        })}
+        menuAriaLabel={t("filter_fee_menu_aria_label")}
+      >
         <FilterMenuItem
-          key={key}
-          label={t(`filter_${key}`)}
-          checked={statusFilter === key}
-          onToggle={() => onStatusChange(key)}
+          label={t("filter_all")}
+          checked={feeFilter === null}
+          onToggle={() => onFeeChange(null)}
         />
-      ))}
-      <FilterMenuSeparator />
-      <FilterMenuLabel>{t("filter_group_fee")}</FilterMenuLabel>
-      {FEE_OPTIONS.map((key) => (
-        <FilterMenuItem
-          key={key}
-          label={t(`filter_${key}`)}
-          checked={feeFilter === key}
-          onToggle={() => onFeeChange(feeFilter === key ? null : key)}
-        />
-      ))}
-    </FilterMenu>
+        {FEE_OPTIONS.map((key) => (
+          <FilterMenuItem
+            key={key}
+            label={t(`filter_${key}`)}
+            checked={feeFilter === key}
+            onToggle={() => onFeeChange(feeFilter === key ? null : key)}
+          />
+        ))}
+      </FilterMenu>
+      {isFiltered && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-8 shrink-0 rounded-full px-2.5 text-sm text-text-dark/60 hover:text-text-dark"
+          onClick={() => {
+            onStatusChange("all");
+            onFeeChange(null);
+          }}
+        >
+          {t("filter_clear")}
+        </Button>
+      )}
+    </>
   );
 }
 
