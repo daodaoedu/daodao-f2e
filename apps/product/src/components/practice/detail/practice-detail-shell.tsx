@@ -25,6 +25,7 @@ import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
 import { toast } from "@daodao/ui/components/sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@daodao/ui/components/tabs";
 import { cn } from "@daodao/ui/lib/utils";
 import {
   Archive,
@@ -919,88 +920,96 @@ export function PracticeDetailShell({
           </div>
         </section>
 
-        <main className="min-w-0 lg:pt-12">
-          <div
-            ref={commentsRef}
-            className={cn(
-              "sticky z-20 flex bg-gray-100 lg:ml-12 lg:mr-0",
-              hasTopBar ? "top-14 scroll-mt-14" : "top-0"
-            )}
-          >
-            {(() => {
-              const countMap: Record<TabType, number> = {
-                comments: checkInCommentTotal,
-                checkins: checkInsData?.pagination?.totalItems ?? checkInsData?.data?.length ?? 0,
-                resources: practice?.resources?.length ?? 0,
-              };
-              const visibleTabs = readOnly ? TABS : TABS.filter(({ id }) => id !== "comments");
-              return visibleTabs.map(({ id, labelKey, Icon }) => {
-                const count = countMap[id];
-                const countPending = id === "comments" && commentCountsPending;
-                const label = id === "comments" ? t("checkin_comments_heading") : t(labelKey);
-                const accessibleLabel = countPending
-                  ? `${label} (${t("comments_loading")})`
-                  : `${label}${count > 0 ? ` (${count})` : ""}`;
-                return (
-                  <div key={id} className="flex flex-1 items-center justify-center">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      onClick={() => setActiveTab(id)}
-                      aria-label={accessibleLabel}
-                      title={label}
-                      className={cn(
-                        "h-auto gap-1.5 rounded-none border-b-2 border-transparent px-1 py-3 text-xs font-medium transition-colors cursor-pointer",
-                        activeTab === id
-                          ? "border-logo-cyan text-logo-cyan"
-                          : "text-[#9FB5B8] hover:text-text-dark/60"
-                      )}
-                    >
-                      <Icon aria-hidden="true" className="size-5" />
-                      <span>{label}</span>
-                      {countPending ? (
-                        <span className="text-xs">…</span>
-                      ) : (
-                        count > 0 && <span className="text-xs">{count}</span>
-                      )}
-                    </Button>
-                    {id === "resources" && isOwner && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        aria-label={t("edit_resources")}
-                        title={t("edit_resources")}
-                        onClick={() =>
-                          router.push(`/practices/${practiceId}/edit#practice-resources`)
-                        }
-                        className="shrink-0 size-6 text-logo-cyan"
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => {
+            if (value === "comments" || value === "checkins" || value === "resources") {
+              setActiveTab(value);
+            }
+          }}
+          asChild
+        >
+          <main className="min-w-0 lg:pt-12">
+            <div
+              ref={commentsRef}
+              className={cn(
+                "sticky z-20 flex bg-gray-100 lg:ml-12 lg:mr-0",
+                hasTopBar ? "top-14 scroll-mt-14" : "top-0"
+              )}
+            >
+              <TabsList
+                aria-label={practice.title}
+                className="min-w-0 flex-1 justify-start gap-0 overflow-x-auto px-0 md:px-0 lg:px-0"
+              >
+                {(readOnly ? TABS : TABS.filter(({ id }) => id !== "comments")).map(
+                  ({ id, labelKey, Icon }) => {
+                    const countMap: Record<TabType, number> = {
+                      comments: checkInCommentTotal,
+                      checkins:
+                        checkInsData?.pagination?.totalItems ?? checkInsData?.data?.length ?? 0,
+                      resources: practice.resources.length,
+                    };
+                    const count = countMap[id];
+                    const countPending = id === "comments" && commentCountsPending;
+                    const label = id === "comments" ? t("checkin_comments_heading") : t(labelKey);
+                    const accessibleLabel = countPending
+                      ? `${label} (${t("comments_loading")})`
+                      : `${label}${count > 0 ? ` (${count})` : ""}`;
+                    return (
+                      <TabsTrigger
+                        key={id}
+                        value={id}
+                        aria-label={accessibleLabel}
+                        title={label}
+                        className="min-h-11 min-w-max flex-1 gap-1.5 px-3 pt-3 pb-2 text-sm font-medium text-text-dark hover:bg-bg-gray/50 data-[state=active]:border-b-logo-cyan data-[state=active]:text-text-dark focus-visible:ring-inset focus-visible:ring-text-dark"
                       >
-                        <Pencil className="size-3" aria-hidden="true" />
-                      </Button>
-                    )}
-                  </div>
-                );
-              });
-            })()}
-          </div>
-
-          {/* 保持掛載（分頁非留言時隱藏），留言分頁的總數才能在一進頁面就包含打卡留言 */}
-          {readOnly && (
-            <div className={cn(activeTab !== "comments" && "hidden")}>
-              <CheckInCommentGroups
-                practiceId={practiceId}
-                checkInsData={checkInsData}
-                onCountChange={handleCheckInCommentCount}
-                currentUserName={currentUserName}
-                currentUserId={currentUserId}
-                currentUserPhotoURL={currentUserPhotoURL}
-              />
+                        <Icon aria-hidden="true" className="size-5" />
+                        <span>{label}</span>
+                        {countPending ? (
+                          <span className="text-xs">…</span>
+                        ) : (
+                          count > 0 && <span className="text-xs">{count}</span>
+                        )}
+                      </TabsTrigger>
+                    );
+                  }
+                )}
+              </TabsList>
+              {isOwner && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  aria-label={t("edit_resources")}
+                  title={t("edit_resources")}
+                  onClick={() => router.push(`/practices/${practiceId}/edit#practice-resources`)}
+                  className="size-11 shrink-0 self-center text-text-dark hover:bg-bg-gray/50 hover:text-text-dark focus-visible:ring-2 focus-visible:ring-text-dark"
+                >
+                  <Pencil className="size-4" aria-hidden="true" />
+                </Button>
+              )}
             </div>
-          )}
 
-          {activeTab === "checkins" && (
-            <div className="pt-4 md:pt-1">
+            {/* 保持掛載（分頁非留言時隱藏），留言分頁的總數才能在一進頁面就包含打卡留言 */}
+            {readOnly && (
+              <TabsContent
+                value="comments"
+                forceMount
+                hidden={activeTab !== "comments"}
+                className="p-0 md:p-0 lg:p-0"
+              >
+                <CheckInCommentGroups
+                  practiceId={practiceId}
+                  checkInsData={checkInsData}
+                  onCountChange={handleCheckInCommentCount}
+                  currentUserName={currentUserName}
+                  currentUserId={currentUserId}
+                  currentUserPhotoURL={currentUserPhotoURL}
+                />
+              </TabsContent>
+            )}
+
+            <TabsContent value="checkins" className="p-0 pt-4 md:p-0 md:pt-1 lg:p-0 lg:pt-1">
               {checkInsError && (
                 <div role="alert" className="p-4 text-sm">
                   <p>{t("load_failed")}</p>
@@ -1051,11 +1060,12 @@ export function PracticeDetailShell({
                   </div>
                 </>
               )}
-            </div>
-          )}
+            </TabsContent>
 
-          {activeTab === "resources" && (
-            <div className="pt-4 flex flex-col gap-3 pb-4 lg:pl-12 lg:pr-0">
+            <TabsContent
+              value="resources"
+              className="flex flex-col gap-3 p-0 pt-4 pb-4 md:p-0 md:pt-4 md:pb-4 lg:p-0 lg:pt-4 lg:pb-4 lg:pl-12"
+            >
               {practice.resources.length > 0 ? (
                 // 有指定使用日的資源依天數排前面，沒指定的（整段期間皆可用）排最後
                 [...practice.resources]
@@ -1075,11 +1085,11 @@ export function PracticeDetailShell({
               ) : (
                 <div className="pl-14 py-4 text-sm text-[#9FB5B8] lg:pl-0">{t("no_resources")}</div>
               )}
-            </div>
-          )}
+            </TabsContent>
 
-          {footer}
-        </main>
+            {footer}
+          </main>
+        </Tabs>
       </div>
     </div>
   );
