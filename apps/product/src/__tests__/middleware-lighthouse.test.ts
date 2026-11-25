@@ -63,6 +63,27 @@ describe("Lighthouse middleware backend routing", () => {
     );
   });
 
+  it("on an environment with its own cookie name, ignores the other environment's session", async () => {
+    vi.stubEnv("AUTH_COOKIE_NAME", "auth_token_dev");
+    try {
+      const response = await middleware(request("prod-session"));
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(response.headers.get("location")).toContain("/en/auth/login?");
+
+      await middleware(
+        new NextRequest("https://product.example.test/en/lighthouse/o/1/programs", {
+          headers: { cookie: "auth_token=prod-session; auth_token_dev=dev-session" },
+        })
+      );
+      expect(fetchMock.mock.calls[0]?.[1]).toEqual({
+        headers: { Cookie: "auth_token_dev=dev-session" },
+        cache: "no-store",
+      });
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
   it("keeps the public URL fallback when internal routing is unset", async () => {
     await middleware(request());
     expect(fetchMock.mock.calls[0]?.[0]).toBe(
