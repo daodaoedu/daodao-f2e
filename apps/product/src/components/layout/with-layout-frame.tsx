@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@daodao/ui/lib/utils";
-import { type CSSProperties, useState } from "react";
+import { useState } from "react";
 import { Sidebar } from "./sidebar";
 
 export function WithLayoutFrame({
@@ -21,18 +21,12 @@ export function WithLayoutFrame({
     <div className="group/frame">
       <div
         data-sidebar-collapsed={isSidebarCollapsed}
-        style={
-          {
-            "--sidebar-center-offset": isSidebarCollapsed ? "34px" : "72px",
-            // Fixed bars inside the frame start after the desktop sidebar (md+) instead of under it.
-            "--sidebar-width": isSidebarCollapsed ? "68px" : "144px",
-          } as CSSProperties
-        }
         className={cn(
-          "transition-[padding-left] duration-300",
+          // 側欄寬度與置中偏移給框內 fixed 元素用（md: 才吃）；沒有側欄時都是 0，否則 fixed 元素會偏右
+          "transition-[padding-left] duration-300 [--sidebar-center-offset:0px] [--sidebar-width:0px]",
           isSidebarCollapsed
-            ? "md:group-has-[[data-frame-sidebar]>*]/frame:pl-[68px]"
-            : "md:group-has-[[data-frame-sidebar]>*]/frame:pl-[144px]",
+            ? "group-has-[[data-frame-sidebar]>*]/frame:[--sidebar-center-offset:34px] group-has-[[data-frame-sidebar]>*]/frame:[--sidebar-width:68px] md:group-has-[[data-frame-sidebar]>*]/frame:pl-[68px]"
+            : "group-has-[[data-frame-sidebar]>*]/frame:[--sidebar-center-offset:72px] group-has-[[data-frame-sidebar]>*]/frame:[--sidebar-width:144px] md:group-has-[[data-frame-sidebar]>*]/frame:pl-[144px]",
           className
         )}
       >
