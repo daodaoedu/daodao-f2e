@@ -309,7 +309,7 @@
   "cohort_create_failed": "無法建立場次，請檢查資料後再試",
   "cohort_select_templates": "連結實踐模板",
   "cohort_select_templates_hint": "從模板庫挑選這個場次要使用的實踐；已連結 {count} 個",
-  "cohort_templates_locked": "場次已開始，無法變更模板連結",
+  "cohort_templates_locked": "場次已開始：已連結的模板無法移除或修改開始日，仍可新增模板",
   "cohort_template_binding_failed": "模板連結失敗，場次設定尚未儲存：{reason}",
   "cohort_template_unbind_confirm": "確定要解除 {count} 個模板的連結嗎？已產生的實踐草稿不會刪除。",
   "cohort_saved_templates_only": "模板連結已儲存，但場次設定儲存失敗：{reason}",

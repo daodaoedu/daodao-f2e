@@ -23,7 +23,8 @@ import {
   type FilterStatus as FilterStatusType,
   mapPracticeStatusToTaskStatus,
 } from "@/constants/task-status";
-import { applyMineFilter, buildMineFilterCounts } from "@/utils/mine-filter";
+import { useActivateCohortDraft } from "@/hooks/use-activate-cohort-draft";
+import { applyMineFilter, buildMineFilterCounts, minePracticeStatus } from "@/utils/mine-filter";
 
 const filterOptions = [
   { value: FilterStatus.all, labelKey: "filter_all" },
@@ -39,7 +40,12 @@ export default function MyPage() {
   const { isAuthenticated, isLoading: isAuthLoading, login } = useAuth();
   const [filterStatus, setFilterStatus] = useState<FilterStatusType>(FilterStatus.all);
 
-  const { data: allPracticesData, isLoading: isMyLoading } = useMyPractices({ limit: 16 });
+  const {
+    data: allPracticesData,
+    isLoading: isMyLoading,
+    mutate: mutateMyPractices,
+  } = useMyPractices({ limit: 16 });
+  const activateCohortDraft = useActivateCohortDraft(mutateMyPractices);
   const { data: statsData } = useMyPracticeStats();
   const { data: myCohortsData } = useMyCohorts();
   const myCohorts = myCohortsData?.data;
@@ -50,6 +56,7 @@ export default function MyPage() {
 
     practices.forEach((practice) => {
       const lastCheckInDate = practice.lastCheckinAt ?? null;
+      const listStatus = minePracticeStatus(practice);
       inProgressTasksData.push({
         id: practice.id,
         title: practice.title,
@@ -59,15 +66,19 @@ export default function MyPage() {
         messagesCount: 0,
         isUnreadMessages: false,
         theme: practice.themeColor || "#FCDD84",
-        status: mapPracticeStatusToTaskStatus(practice.status),
+        status: mapPracticeStatusToTaskStatus(listStatus.status ?? practice.status),
         lastCheckInDate,
         startDate: practice.startDate || null,
         endDate: practice.endDate || null,
+        lockBeforeStartDate: listStatus.lockBeforeStartDate,
+        onBeforeCheckIn: listStatus.needsActivation
+          ? () => activateCohortDraft(practice.id)
+          : undefined,
       });
     });
 
     return { inProgressTasks: inProgressTasksData };
-  }, [allPracticesData, t]);
+  }, [allPracticesData, activateCohortDraft]);
 
   const filteredInProgressTasks = useMemo(
     () => applyMineFilter(inProgressTasks, filterStatus),

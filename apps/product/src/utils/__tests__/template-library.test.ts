@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { parseLocalDate, practiceEndDate } from "../practice-period";
 import {
   addDays,
+  bindingDefaultStartDate,
   deriveTemplateName,
   diffTemplateBindings,
   formatFrequency,
@@ -17,6 +18,7 @@ import {
   templateStartDateOverride,
   todayInTaipei,
   validateResourceUrl,
+  withoutLockedTemplates,
 } from "../template-library";
 
 describe("deriveTemplateName", () => {
@@ -226,5 +228,65 @@ describe("newBindingStartDate", () => {
 
   it("sends the date the user picked", () => {
     expect(newBindingStartDate(new Map([[35, "2026-10-15"]]), 35)).toBe("2026-10-15");
+  });
+});
+
+describe("started cohort keeps existing bindings but can add templates (daodao#544)", () => {
+  const templates = [
+    { id: 1, boundCohortIds: [] },
+    { id: 2, boundCohortIds: [10], bindings: [{ cohortId: 10, startDate: "2026-11-24" }] },
+  ];
+  const locked = new Set([2]);
+
+  it("binds a newly added template with its own start date", () => {
+    const selection = resolveTemplateSelection(
+      [2],
+      withoutLockedTemplates(new Map([[1, true]]), locked)
+    );
+    const startDates = withoutLockedTemplates(new Map([[1, "2026-12-01"]]), locked);
+    expect(diffTemplateBindings(templates, 10, selection, startDates)).toEqual({
+      bind: [1],
+      unbind: [],
+      update: [],
+    });
+    expect(startDates.get(1)).toBe("2026-12-01");
+  });
+
+  it("never unbinds or reschedules an existing binding", () => {
+    const selection = resolveTemplateSelection(
+      [2],
+      withoutLockedTemplates(new Map([[2, false]]), locked)
+    );
+    const startDates = withoutLockedTemplates(new Map([[2, "2026-12-15"]]), locked);
+    expect(diffTemplateBindings(templates, 10, selection, startDates)).toEqual({
+      bind: [],
+      unbind: [],
+      update: [],
+    });
+  });
+});
+
+describe("bindingDefaultStartDate（daodao#544）", () => {
+  const now = new Date("2026-11-25T04:00:00Z");
+
+  it("已開始場次新加的模板預設從今天（台北）開始", () => {
+    expect(bindingDefaultStartDate("2026-11-01", { cohortStarted: true, locked: false }, now)).toBe(
+      "2026-11-25"
+    );
+  });
+
+  it("已連結的模板與未開始場次沿用場次開始日", () => {
+    expect(bindingDefaultStartDate("2026-11-01", { cohortStarted: true, locked: true }, now)).toBe(
+      "2026-11-01"
+    );
+    expect(
+      bindingDefaultStartDate("2026-12-01", { cohortStarted: false, locked: false }, now)
+    ).toBe("2026-12-01");
+  });
+
+  it("保留今天的預設值時送 null，由 server 補成今天；改成其他日期才送該日", () => {
+    const base = bindingDefaultStartDate("2026-11-01", { cohortStarted: true, locked: false }, now);
+    expect(templateStartDateOverride("2026-11-25", base, null)).toBeNull();
+    expect(templateStartDateOverride("2026-11-01", base, null)).toBe("2026-11-01");
   });
 });

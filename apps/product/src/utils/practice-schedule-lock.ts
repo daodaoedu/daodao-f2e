@@ -1,4 +1,6 @@
+import { differenceInCalendarDays } from "date-fns";
 import { PracticeStatus } from "../constants/practice-status";
+import { isPracticeEnded, parseLocalDate } from "./practice-period";
 
 interface PracticeScheduleLockInput {
   status?: string;
@@ -41,11 +43,21 @@ export function getEditScheduleLocks(practice: EditScheduleLockInput | undefined
 }
 
 /** Lighthouse cohort assignments are available to check in only after they leave draft. */
+/**
+ * 燈塔場次實踐在學員打卡前 DB 仍是草稿（daodao#544 產品決策），畫面不顯示「草稿」：
+ * 依這個實踐自己的起訖日（不是場次期間）顯示未開始／進行中／已完成。
+ */
 export function getCohortPracticeDisplayStatus(
   status: PracticeStatus | undefined,
-  isCohortPractice: boolean
+  isCohortPractice: boolean,
+  period: { startDate?: string | null; endDate?: string | null } = {},
+  now: Date = new Date()
 ): PracticeStatus | undefined {
-  return isCohortPractice && status === PracticeStatus.draft ? PracticeStatus.notStarted : status;
+  if (!isCohortPractice || status !== PracticeStatus.draft) return status;
+  if (isPracticeEnded(period.endDate, now)) return PracticeStatus.completed;
+  const start = period.startDate ? parseLocalDate(period.startDate) : null;
+  if (start && differenceInCalendarDays(now, start) >= 0) return PracticeStatus.active;
+  return PracticeStatus.notStarted;
 }
 
 /** Avoid submitting unchanged schedule fields for Lighthouse-controlled assignments. */

@@ -21,6 +21,7 @@ import {
   TaskStatus,
   type TaskStatus as TaskStatusType,
 } from "@/constants/task-status";
+import { minePracticeStatus } from "@/utils/mine-filter";
 import { RandomPracticesSection } from "../shared/random-practices-section";
 
 type TabType = "practices" | "plans" | "ideas" | "persona";
@@ -82,7 +83,11 @@ export function PracticeSection({ userId }: PracticeSectionProps) {
 
     return practicesData.data.map((practice) => ({
       id: practice.id,
-      status: mapPracticeStatusToTaskStatus(practice.status as PracticeStatus),
+      // 燈塔場次實踐依自身期間顯示，不顯示草稿（daodao#544）
+      status: mapPracticeStatusToTaskStatus(
+        (minePracticeStatus({ ...practice, status: practice.status as PracticeStatus }).status ??
+          practice.status) as PracticeStatus
+      ),
       title: practice.title,
       description: practice.practiceAction || "",
       tags: practice.tags || [],
