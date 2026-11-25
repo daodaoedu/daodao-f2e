@@ -53,5 +53,15 @@
   "draw_close": "關閉",
   "draw_today_action": "今天的行動",
   "draw_again": "再抽一張",
-  "draw_switcher_label": "今天抽到的卡"
+  "draw_switcher_label": "今天抽到的卡",
+  "search_placeholder": "搜尋挑戰名稱或介紹",
+  "search_clear": "清除搜尋",
+  "filter_all": "全部",
+  "filter_upcoming": "即將開始",
+  "filter_ongoing": "進行中",
+  "filter_ended": "已結束",
+  "filter_trigger_aria_label": "篩選：{label}",
+  "filter_menu_aria_label": "篩選共同挑戰",
+  "empty_filtered_title": "找不到符合的共同挑戰",
+  "empty_filtered_hint": "換個關鍵字，或把篩選條件放寬一點看看。"
 }

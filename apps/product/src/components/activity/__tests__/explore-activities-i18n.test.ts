@@ -19,9 +19,7 @@ const SOURCES = [
   "app/[locale]/activities/[cohortId]/page.tsx",
   "components/activity/activity-card.tsx",
   "components/activity/activity-detail-view.tsx",
-  "components/activity/explore-filters.tsx",
   "components/activity/explore-guest-header.tsx",
-  "components/activity/explore-search.tsx",
   "components/activity/host-preview-dialog.tsx",
 ];
 
@@ -36,7 +34,8 @@ const usedKeys = (): Set<string> => {
   }
   for (const k of Object.values(ACTIVITY_UNAVAILABLE_REASON_KEY)) keys.add(k);
   for (const s of ["upcoming", "ongoing", "ended"]) keys.add(`status_${s}`);
-  for (const s of ["all", "open", "ongoing", "ended"]) keys.add(`section_title_${s}`);
+  for (const s of ["all", "open", "ongoing", "ended", "upcoming"]) keys.add(`section_title_${s}`);
+  for (const f of ["all", "open", "ongoing", "ended", "free", "paid"]) keys.add(`filter_${f}`);
   for (const m of ["sync", "async", "physical"]) keys.add(`detail_mode_${m}`);
   return keys;
 };

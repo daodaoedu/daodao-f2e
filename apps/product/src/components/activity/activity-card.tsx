@@ -7,9 +7,20 @@ import { Link } from "@daodao/i18n/navigation";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid, parseISO } from "date-fns";
 import { Calendar, ChevronRight, Globe, MapPin } from "lucide-react";
+import {
+  type ExploreBadgeTone,
+  ExploreStatusBadge,
+} from "@/components/explore/explore-status-badge";
 import { resolveActivityCardHref } from "@/constants/activity-card-href";
 import { activityColorKey } from "@/constants/activity-color";
 import { PracticeTheme, practiceThemeSvgMap } from "@/constants/practice-theme";
+
+/** 狀態標籤色調與探索共同挑戰卡一致（daodao#567） */
+const STATUS_TONE: Record<ActivitySummaryType["runStatus"], ExploreBadgeTone> = {
+  upcoming: "neutral",
+  ongoing: "active",
+  ended: "muted",
+};
 
 interface ActivityCardProps {
   activity: ActivitySummaryType;
@@ -64,16 +75,12 @@ export const ActivityCard = ({ activity, onHostClick }: ActivityCardProps) => {
             {t("template_count", { count: activity.templateCount })}
           </span>
         )}
-        {isOngoing && (
-          <span className="absolute left-3 top-1.5 inline-flex items-center rounded-full bg-white/90 px-2 py-0.5 text-[11px] font-medium text-logo-cyan">
-            {t("badge_ongoing")}
-          </span>
-        )}
-        {isEnded && (
-          <span className="absolute left-3 top-1.5 inline-flex items-center rounded-full bg-white/90 px-2 py-0.5 text-[11px] font-medium text-text-dark/60">
-            {t("badge_ended")}
-          </span>
-        )}
+        <span className="absolute left-3 top-1.5">
+          <ExploreStatusBadge
+            label={t(`status_${activity.runStatus}`)}
+            tone={STATUS_TONE[activity.runStatus]}
+          />
+        </span>
       </div>
 
       {/* Card body */}

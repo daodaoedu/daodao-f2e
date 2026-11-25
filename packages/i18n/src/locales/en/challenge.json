@@ -53,5 +53,15 @@
   "draw_close": "Close",
   "draw_today_action": "Today's action",
   "draw_again": "Draw another",
-  "draw_switcher_label": "Today's drawn cards"
+  "draw_switcher_label": "Today's drawn cards",
+  "search_placeholder": "Search challenge names or descriptions",
+  "search_clear": "Clear search",
+  "filter_all": "All",
+  "filter_upcoming": "Starting soon",
+  "filter_ongoing": "In progress",
+  "filter_ended": "Ended",
+  "filter_trigger_aria_label": "Filter: {label}",
+  "filter_menu_aria_label": "Filter challenges",
+  "empty_filtered_title": "No matching challenges",
+  "empty_filtered_hint": "Try another keyword or loosen the filters."
 }
