@@ -15,6 +15,7 @@ import {
   Settings,
 } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
+import { useLighthouseNavEntry } from "@/hooks/use-lighthouse-nav-entry";
 import { useLogoutAndRedirect } from "@/hooks/use-logout-redirect";
 import { LighthouseIcon } from "./constant";
 import { LanguagePillToggle } from "./language-pill-toggle";
@@ -29,6 +30,7 @@ export function MobileBottomSheet({ identifier, isOpen, onClose }: MobileBottomS
   const t = useTranslations("app_product");
   const { user } = useAuthContext();
   const logout = useLogoutAndRedirect();
+  const lighthouseHref = useLighthouseNavEntry();
   const startY = useRef(0);
 
   useEffect(() => {
@@ -114,10 +116,12 @@ export function MobileBottomSheet({ identifier, isOpen, onClose }: MobileBottomS
             {t("nav_my_island")}
           </CustomLink>
 
-          <CustomLink href="/lighthouse" className={itemClass} onClick={onClose}>
-            <LighthouseIcon className="size-[18px] shrink-0 opacity-50" />
-            {t("nav_manage")}
-          </CustomLink>
+          {lighthouseHref && (
+            <CustomLink href={lighthouseHref} className={itemClass} onClick={onClose}>
+              <LighthouseIcon className="size-[18px] shrink-0 opacity-50" />
+              {t("nav_manage")}
+            </CustomLink>
+          )}
 
           <CustomLink href="/settings/follow-hub" className={itemClass} onClick={onClose}>
             <HeartHandshake className="size-[18px] shrink-0 opacity-50" />
