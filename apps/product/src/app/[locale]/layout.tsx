@@ -5,6 +5,7 @@ import { getMessages, getTranslations, setRequestLocale } from "@daodao/i18n/ser
 import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
+import { hasAuthSessionCookie } from "@/lib/auth/auth-cookie";
 import { detectDevice } from "@/lib/device-detection";
 import GlobalProvider from "../global-provider";
 
@@ -54,7 +55,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
 
   const device = await detectDevice();
   // 只看登入 cookie 在不在，給共用外框決定第一次畫面要不要留側欄空位（daodao#567）；不驗證、不解碼
-  const hasSessionCookie = Boolean((await cookies()).get("auth_token")?.value);
+  const cookieStore = await cookies();
+  const hasSessionCookie = hasAuthSessionCookie((name) => cookieStore.get(name)?.value);
 
   return (
     <GlobalProvider
