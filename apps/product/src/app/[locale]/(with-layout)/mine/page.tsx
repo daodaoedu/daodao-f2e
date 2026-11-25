@@ -1,14 +1,13 @@
 "use client";
 
-import { updatePractice, useMyCohorts, useMyPracticeStats, useMyPractices } from "@daodao/api";
+import { useMyCohorts, useMyPracticeStats, useMyPractices } from "@daodao/api";
 import { MessagesSvg } from "@daodao/assets";
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
-import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { CheckCircle2, Users } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   AddTaskFAB,
   DashboardHeader,
@@ -24,7 +23,7 @@ import {
   type FilterStatus as FilterStatusType,
   mapPracticeStatusToTaskStatus,
 } from "@/constants/task-status";
-import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
+import { useActivateCohortDraft } from "@/hooks/use-activate-cohort-draft";
 import { applyMineFilter, buildMineFilterCounts, minePracticeStatus } from "@/utils/mine-filter";
 
 const filterOptions = [
@@ -46,31 +45,7 @@ export default function MyPage() {
     isLoading: isMyLoading,
     mutate: mutateMyPractices,
   } = useMyPractices({ limit: 16 });
-  const tCohort = useTranslations("cohort");
-  const { errorMessage } = useServerErrorMessage();
-
-  // 燈塔場次實踐在 DB 仍是 draft，與場次頁、詳情頁一樣打卡前先啟用（daodao#544）
-  const activateCohortDraft = useCallback(
-    async (practiceId: string): Promise<boolean> => {
-      try {
-        const response = await updatePractice(practiceId, { status: "active", isDraft: false });
-        if (response.error) {
-          toast.error(
-            errorMessage(response.error, tCohort("activate_failed"), {
-              status: response.response.status,
-            })
-          );
-          return false;
-        }
-        await mutateMyPractices();
-        return true;
-      } catch {
-        toast.error(tCohort("activate_failed"));
-        return false;
-      }
-    },
-    [errorMessage, mutateMyPractices, tCohort]
-  );
+  const activateCohortDraft = useActivateCohortDraft(mutateMyPractices);
   const { data: statsData } = useMyPracticeStats();
   const { data: myCohortsData } = useMyCohorts();
   const myCohorts = myCohortsData?.data;
