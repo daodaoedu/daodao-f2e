@@ -14,6 +14,18 @@ type LighthouseAccessProbePath =
 // useMutate()(["/api/v1/lighthouse/organizations"]) 不帶 init，仍會刷新這裡。
 const ACCESS_PROBE_INIT = Object.freeze({ accessProbe: true });
 
+/** Fetch one access check, resolving HTTP errors to their status instead of throwing. */
+export async function probeLighthouseAccess(
+  path: LighthouseAccessProbePath
+): Promise<LighthouseAccessProbe> {
+  const res = await client.GET(path);
+  const list = (res.data as { data?: unknown } | undefined)?.data;
+  return {
+    status: res.response.status,
+    count: res.error === undefined && Array.isArray(list) ? list.length : null,
+  };
+}
+
 /**
  * Lighthouse access check that keeps the HTTP status (daodao#568).
  *
@@ -29,13 +41,6 @@ export const useLighthouseAccessProbe = (
 ) =>
   useSWR<LighthouseAccessProbe>(
     enabled ? [PREFIX, path, ACCESS_PROBE_INIT] : null,
-    async () => {
-      const res = await client.GET(path);
-      const list = (res.data as { data?: unknown } | undefined)?.data;
-      return {
-        status: res.response.status,
-        count: res.error === undefined && Array.isArray(list) ? list.length : null,
-      };
-    },
+    () => probeLighthouseAccess(path),
     config
   );
