@@ -1,18 +1,43 @@
 import { describe, expect, it } from "vitest";
-import { type LighthouseAccessCheck, resolveLighthouseNavEntry } from "../lighthouse-nav-entry";
+import {
+  classifyLighthouseAccess,
+  type LighthouseAccessCheck,
+  resolveLighthouseNavEntry,
+} from "../lighthouse-nav-entry";
 
 const loading: LighthouseAccessCheck = { state: "loading" };
+const denied: LighthouseAccessCheck = { state: "denied" };
+const unavailable: LighthouseAccessCheck = { state: "unavailable" };
 const loaded = (count: number): LighthouseAccessCheck => ({ state: "loaded", count });
-// API 對未登入與非成員都回 APP_ERROR（2026-11-25 dev 實測）
-const denied: LighthouseAccessCheck = {
-  state: "error",
-  error: { success: false, error: { code: "APP_ERROR", message: "尚未開通燈塔組織成員資格" } },
-};
-const outage: LighthouseAccessCheck = {
-  state: "error",
-  error: { success: false, error: { code: "SERVICE_UNAVAILABLE" } },
-};
-const network: LighthouseAccessCheck = { state: "error", error: new TypeError("Failed to fetch") };
+
+describe("classifyLighthouseAccess", () => {
+  it("treats only 401 and 403 as no access", () => {
+    expect(classifyLighthouseAccess({ data: { status: 403, count: null } })).toEqual(denied);
+    expect(classifyLighthouseAccess({ data: { status: 401, count: null } })).toEqual(denied);
+  });
+
+  // server 對 403、429、500 都回 code APP_ERROR，只能靠狀態碼分辨（daodao#568 spec audit）
+  it("treats rate limits, server errors and gateway failures as outages", () => {
+    for (const status of [404, 408, 429, 500, 502, 504]) {
+      expect(classifyLighthouseAccess({ data: { status, count: null } })).toEqual(unavailable);
+    }
+  });
+
+  it("treats a 200 without a list as an outage, like the middleware", () => {
+    expect(classifyLighthouseAccess({ data: { status: 200, count: null } })).toEqual(unavailable);
+  });
+
+  it("treats network failures as outages", () => {
+    expect(classifyLighthouseAccess({ error: new TypeError("Failed to fetch") })).toEqual(
+      unavailable
+    );
+  });
+
+  it("reports the list length on success and loading before a response", () => {
+    expect(classifyLighthouseAccess({ data: { status: 200, count: 2 } })).toEqual(loaded(2));
+    expect(classifyLighthouseAccess({})).toEqual(loading);
+  });
+});
 
 describe("resolveLighthouseNavEntry", () => {
   it("links organization members to the lighthouse (AC-1)", () => {
@@ -34,9 +59,8 @@ describe("resolveLighthouseNavEntry", () => {
     expect(resolveLighthouseNavEntry(denied, loading)).toBeNull();
   });
 
-  it("keeps the entry on transient failures so members are not locked out (AC-4)", () => {
-    expect(resolveLighthouseNavEntry(outage, loading)).toBe("/lighthouse");
-    expect(resolveLighthouseNavEntry(network, loading)).toBe("/lighthouse");
-    expect(resolveLighthouseNavEntry(denied, outage)).toBe("/lighthouse/templates");
+  it("keeps the entry during outages so members are not locked out (AC-4)", () => {
+    expect(resolveLighthouseNavEntry(unavailable, loading)).toBe("/lighthouse");
+    expect(resolveLighthouseNavEntry(denied, unavailable)).toBe("/lighthouse/templates");
   });
 });
