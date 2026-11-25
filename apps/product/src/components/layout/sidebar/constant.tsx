@@ -33,6 +33,8 @@ export type MenuItem = {
   hidden?: boolean;
   isMatch: (pathname: string, identifier: string) => boolean;
   badge?: "breathing-dot" | "unread-count";
+  /** 只對有燈塔權限的人顯示，href 由權限決定（daodao#568） */
+  requiresLighthouseAccess?: boolean;
 };
 
 export const menuItems: MenuItem[] = [
@@ -67,6 +69,7 @@ export const menuItems: MenuItem[] = [
     icon: LighthouseIcon,
     labelKey: "nav_manage",
     href: "/lighthouse",
+    requiresLighthouseAccess: true,
     isMatch: (pathname: string) =>
       pathname.startsWith("/lighthouse") || pathname.startsWith("/manage"),
   },

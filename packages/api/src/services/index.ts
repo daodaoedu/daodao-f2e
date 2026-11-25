@@ -46,6 +46,7 @@ export * from "./future-letter";
 export * from "./future-letter-hooks";
 // Image Service
 export * from "./image";
+export * from "./lighthouse-access-hooks";
 // Location Service
 export * from "./location-hooks";
 // Notification Service
