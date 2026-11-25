@@ -8,10 +8,21 @@ import {
 } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { usePathname, useRouter } from "@daodao/i18n/navigation";
+import { FilterMenu, FilterMenuItem } from "@daodao/ui/components/filter-menu";
 import { Spinner } from "@daodao/ui/components/spinner";
-import { Box, Flag, Star } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ChallengeCard, InspirationDrawDialog, JoinChallengeDialog } from "@/components/challenge";
+import { ExploreEmpty } from "@/components/explore/explore-empty";
+import { ExplorePageShell } from "@/components/explore/explore-page-shell";
+import { ExploreSection } from "@/components/explore/explore-section";
+import { ExploreToolbar } from "@/components/explore/explore-toolbar";
+import { groupByRunStatus, type RunStatus } from "@/components/explore/group-by-run-status";
+import { RUN_STATUS_SECTION } from "@/components/explore/section-icons";
+import {
+  CHALLENGE_STATUS_FILTERS,
+  type ChallengeStatusFilter,
+  searchChallenges,
+} from "@/constants/challenge-filter";
 import { buildPracticeIdMap, pruneJustJoined } from "@/utils/challenge-card";
 
 /**
@@ -20,7 +31,18 @@ import { buildPracticeIdMap, pruneJustJoined } from "@/utils/challenge-card";
  * 公開頁：未登入可瀏覽；點「現在加入」才要求登入。
  * 依運行狀態分三區：即將開始／進行中／已結束（版面依 POC 探索共同挑戰-standalone）。
  * 放在 (with-layout) 下，與其他頁共用側邊導覽（POC 左側 nav，daodao#181）。
+ * 外框、搜尋篩選、分區與探索活動課程共用（daodao#567）。
  */
+/** 分區副標：進行中沒有副標 */
+const SECTION_SUBTITLE_KEY: Record<
+  RunStatus,
+  "section_upcoming_subtitle" | "section_ended_subtitle" | null
+> = {
+  upcoming: "section_upcoming_subtitle",
+  ongoing: null,
+  ended: "section_ended_subtitle",
+};
+
 export default function ChallengesPage() {
   const t = useTranslations("challenge");
   const router = useRouter();
@@ -31,6 +53,8 @@ export default function ChallengesPage() {
   const { data: mineData, mutate: mutateMine } = useMyChallenges(Boolean(currentUser));
   const [joinTarget, setJoinTarget] = useState<ChallengeSummaryType | null>(null);
   const [drawTarget, setDrawTarget] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<ChallengeStatusFilter>("all");
   // 剛加入的挑戰：先用 join API 回傳的 practiceId，避免「已加入但 /me/challenges 尚未更新」時卡片沒有連結
   const [justJoinedPracticeIds, setJustJoinedPracticeIds] = useState<Record<number, string | null>>(
     {}
@@ -46,36 +70,11 @@ export default function ChallengesPage() {
     if (!mineData) return;
     setJustJoinedPracticeIds((prev) => pruneJustJoined(prev, mineData.data));
   }, [mineData]);
-  const sections = useMemo(
-    () =>
-      [
-        {
-          key: "upcoming" as const,
-          title: t("section_upcoming"),
-          subtitle: t("section_upcoming_subtitle"),
-          Icon: Star,
-          iconClassName: "text-logo-cyan",
-          items: challenges.filter((challenge) => challenge.runStatus === "upcoming"),
-        },
-        {
-          key: "ongoing" as const,
-          title: t("section_ongoing"),
-          subtitle: null,
-          Icon: Flag,
-          iconClassName: "text-logo-cyan",
-          items: challenges.filter((challenge) => challenge.runStatus === "ongoing"),
-        },
-        {
-          key: "ended" as const,
-          title: t("section_ended"),
-          subtitle: t("section_ended_subtitle"),
-          Icon: Box,
-          iconClassName: "text-text-dark/55",
-          items: challenges.filter((challenge) => challenge.runStatus === "ended"),
-        },
-      ].filter((section) => section.items.length > 0),
-    [challenges, t]
+  const filtered = useMemo(
+    () => searchChallenges(challenges, searchQuery, statusFilter),
+    [challenges, searchQuery, statusFilter]
   );
+  const sections = useMemo(() => groupByRunStatus(filtered), [filtered]);
 
   const handleJoinClick = (challenge: ChallengeSummaryType) => {
     if (!currentUser) {
@@ -85,15 +84,42 @@ export default function ChallengesPage() {
     setJoinTarget(challenge);
   };
 
+  const sectionSubtitle = (status: RunStatus) => {
+    const key = SECTION_SUBTITLE_KEY[status];
+    return key ? t(key) : null;
+  };
+
+  const isFiltered = statusFilter !== "all" || searchQuery.trim() !== "";
+  const triggerLabel = t(`filter_${statusFilter}`);
+
   return (
-    <main className="mx-auto flex w-full max-w-[640px] flex-col gap-10 px-4 pt-[68px] pb-18 md:pt-8">
-      <header className="flex flex-col gap-2">
-        <h1 className="flex items-center gap-2 text-2xl font-bold text-bg-dark">
-          <Flag className="size-6 text-logo-cyan" />
-          {t("page_title")}
-        </h1>
-        <p className="text-sm text-text-dark">{t("page_subtitle")}</p>
-      </header>
+    <ExplorePageShell
+      title={t("page_title")}
+      subtitle={t("page_subtitle")}
+      guestRedirect={pathname}
+    >
+      <ExploreToolbar
+        searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder={t("search_placeholder")}
+        searchClearLabel={t("search_clear")}
+      >
+        <FilterMenu
+          label={triggerLabel}
+          active={statusFilter !== "all"}
+          triggerAriaLabel={t("filter_trigger_aria_label", { label: triggerLabel })}
+          menuAriaLabel={t("filter_menu_aria_label")}
+        >
+          {CHALLENGE_STATUS_FILTERS.map((key) => (
+            <FilterMenuItem
+              key={key}
+              label={t(`filter_${key}`)}
+              checked={statusFilter === key}
+              onToggle={() => setStatusFilter(key)}
+            />
+          ))}
+        </FilterMenu>
+      </ExploreToolbar>
 
       {isLoading && (
         <div className="flex justify-center py-16">
@@ -102,32 +128,36 @@ export default function ChallengesPage() {
       )}
 
       {!isLoading && sections.length === 0 && (
-        <p className="py-16 text-center text-sm text-text-dark">{t("empty")}</p>
+        <ExploreEmpty
+          title={isFiltered ? t("empty_filtered_title") : t("empty")}
+          hint={isFiltered ? t("empty_filtered_hint") : null}
+        />
       )}
 
-      {sections.map((section) => (
-        <section key={section.key}>
-          <div className="flex items-center gap-2">
-            <section.Icon className={`size-4.5 ${section.iconClassName}`} />
-            <h2 className="m-0 text-lg font-bold text-bg-dark">{section.title}</h2>
-            <span className="text-sm text-text-dark/40">· {section.items.length}</span>
-          </div>
-          {section.subtitle && (
-            <p className="mt-1.5 ml-6.5 text-sm text-text-dark/70">{section.subtitle}</p>
-          )}
-          <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {section.items.map((challenge) => (
-              <ChallengeCard
-                key={challenge.id}
-                challenge={challenge}
-                onJoinClick={handleJoinClick}
-                onDrawClick={(target) => setDrawTarget(target.id)}
-                practiceId={practiceIdByChallenge.get(challenge.id)}
-              />
-            ))}
-          </div>
-        </section>
-      ))}
+      {sections.length > 0 && (
+        <div className="flex flex-col gap-10">
+          {sections.map((section) => (
+            <ExploreSection
+              key={section.status}
+              title={t(`section_${section.status}`)}
+              subtitle={sectionSubtitle(section.status)}
+              count={section.items.length}
+              Icon={RUN_STATUS_SECTION[section.status].Icon}
+              muted={RUN_STATUS_SECTION[section.status].muted}
+            >
+              {section.items.map((challenge) => (
+                <ChallengeCard
+                  key={challenge.id}
+                  challenge={challenge}
+                  onJoinClick={handleJoinClick}
+                  onDrawClick={(target) => setDrawTarget(target.id)}
+                  practiceId={practiceIdByChallenge.get(challenge.id)}
+                />
+              ))}
+            </ExploreSection>
+          ))}
+        </div>
+      )}
 
       <JoinChallengeDialog
         challenge={joinTarget}
@@ -147,6 +177,6 @@ export default function ChallengesPage() {
           if (!open) setDrawTarget(null);
         }}
       />
-    </main>
+    </ExplorePageShell>
   );
 }

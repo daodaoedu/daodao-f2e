@@ -5,22 +5,23 @@ import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { IslandError, IslandPageClient } from "@/components/island";
+import { authCookieHeader, getAuthCookieName } from "@/lib/auth/auth-cookie";
 
 /**
  * 3D 島嶼頁（openspec change: island-3d, task 4.1）
  *
  * 全螢幕、位於 (with-layout) 之外（無 Sidebar/Footer）。
- * Server component 於 SSR 撈 islandData（手動轉發 auth_token cookie
+ * Server component 於 SSR 撈 islandData（手動轉發登入 cookie
  * 以計算 viewerRelation 與隱私過濾），three.js 引擎由 client 殼
  * dynamic import（ssr: false）——不進主站 bundle。
  */
 
-// SSR 需手動轉發 auth_token cookie，否則訪客/島主判斷會失效
+// SSR 需手動轉發登入 cookie，否則訪客/島主判斷會失效
 const getCachedUserIsland = cache(async (identifier: string, authToken: string) => {
   try {
     return await getUserIsland(
       identifier,
-      authToken ? { Cookie: `auth_token=${authToken}` } : undefined
+      authToken ? { Cookie: authCookieHeader(authToken) } : undefined
     );
   } catch (error) {
     console.error("[island] getUserIsland failed", { identifier, error });
@@ -35,7 +36,7 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "island" });
 
   const cookieStore = await cookies();
-  const authToken = cookieStore.get("auth_token")?.value ?? "";
+  const authToken = cookieStore.get(getAuthCookieName())?.value ?? "";
   const response = await getCachedUserIsland(identifier, authToken);
   const name = response?.data?.data?.profile?.name;
 
@@ -49,7 +50,7 @@ export default async function IslandPage({ params }: PageProps<"/[locale]/island
   setRequestLocale(locale);
 
   const cookieStore = await cookies();
-  const authToken = cookieStore.get("auth_token")?.value ?? "";
+  const authToken = cookieStore.get(getAuthCookieName())?.value ?? "";
   const response = await getCachedUserIsland(identifier, authToken);
 
   if (response?.response?.status === 404) {
