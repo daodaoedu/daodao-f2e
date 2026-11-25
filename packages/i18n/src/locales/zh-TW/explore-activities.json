@@ -93,5 +93,12 @@
   "detail_program_description": "靈感來自 Anne-Laure Le Cunff《Tiny Experiments》，透過小行動探索並從經驗中學習。微小實驗是出於好奇，選一個小而可行的行動，在限定時間內親自嘗試。重點不是達成目標或養成習慣，而是觀察過程、從結果中學習，再決定是否繼續、調整或停止。",
   "detail_host_profile": "查看 {name} 的個人檔案",
   "detail_info_label": "活動資訊",
-  "detail_about_label": "活動介紹"
+  "detail_about_label": "活動介紹",
+  "section_title_upcoming": "即將開始",
+  "filter_group_status": "狀態",
+  "filter_group_fee": "費用",
+  "filter_trigger_aria_label": "篩選：{label}",
+  "filter_status_menu_aria_label": "依狀態篩選活動課程",
+  "filter_fee_menu_aria_label": "依費用篩選活動課程",
+  "filter_clear": "清除篩選"
 }

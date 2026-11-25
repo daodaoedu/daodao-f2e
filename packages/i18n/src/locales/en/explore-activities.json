@@ -93,5 +93,12 @@
   "detail_program_description": "Inspired by Anne-Laure Le Cunff's Tiny Experiments: explore and learn from experience through small actions. A tiny experiment starts from curiosity: pick a small, doable action and try it yourself within a set time. The point is not to hit a goal or build a habit, but to observe the process, learn from the result, and then decide whether to continue, adjust, or stop.",
   "detail_host_profile": "View {name}'s profile",
   "detail_info_label": "Activity info",
-  "detail_about_label": "About the activity"
+  "detail_about_label": "About the activity",
+  "section_title_upcoming": "Starting soon",
+  "filter_group_status": "Status",
+  "filter_group_fee": "Fee",
+  "filter_trigger_aria_label": "Filter: {label}",
+  "filter_status_menu_aria_label": "Filter activities by status",
+  "filter_fee_menu_aria_label": "Filter activities by fee",
+  "filter_clear": "Clear filters"
 }

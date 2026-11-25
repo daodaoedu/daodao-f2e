@@ -5,16 +5,31 @@ import { ArrowRightOutlineSvg, DefaultAvatarSvg } from "@daodao/assets";
 import { useTranslations } from "@daodao/i18n";
 import { Link } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
+import { cn } from "@daodao/ui/lib/utils";
 import { Calendar, CalendarCheck, Check, Timer, Users } from "lucide-react";
 import {
   ChallengeFlagIcon,
   ChallengeProgressBar,
-  ChallengeStatusBadge,
   getChallengeThemeSvg,
   InspirationDeckIcon,
 } from "@/components/challenge/challenge-visual";
-import { getChallengeCardAction, isChallengeActionMuted } from "@/utils/challenge-card";
+import {
+  type ExploreBadgeTone,
+  ExploreStatusBadge,
+} from "@/components/explore/explore-status-badge";
+import {
+  getChallengeCardAction,
+  getChallengeStatusKey,
+  isChallengeActionMuted,
+} from "@/utils/challenge-card";
 import { calculateDaysProgress, formatCardDate } from "@/utils/practice-card";
+
+/** 狀態標籤色調與探索活動課程卡一致（daodao#567） */
+const STATUS_TONE: Record<ChallengeSummaryType["runStatus"], ExploreBadgeTone> = {
+  upcoming: "neutral",
+  ongoing: "active",
+  ended: "muted",
+};
 
 interface ChallengeCardProps {
   challenge: ChallengeSummaryType;
@@ -60,9 +75,19 @@ export const ChallengeCard = ({
   const isMuted = isChallengeActionMuted(action);
 
   return (
-    <div className="group/card relative w-full h-[239px] rounded-[12px] overflow-hidden text-left">
+    <div
+      className={cn(
+        // 外框（圓角、邊框、hover）與探索活動課程卡一致（daodao#567）
+        "group/card relative h-[239px] w-full overflow-hidden rounded-[20px] border border-[#E4EAE9] text-left transition-all duration-160",
+        isLinked &&
+          "hover:-translate-y-[3px] hover:border-logo-cyan/50 hover:shadow-[0_12px_26px_rgba(15,48,54,0.09)]"
+      )}
+    >
       <Theme
-        className="absolute inset-0 w-full h-full rounded-[12px]"
+        className={cn(
+          "absolute inset-0 h-full w-full",
+          challenge.runStatus === "ended" && "saturate-[.3] opacity-65"
+        )}
         preserveAspectRatio="xMidYMid slice"
       />
 
@@ -72,16 +97,25 @@ export const ChallengeCard = ({
         <Link
           href={action.href}
           aria-label={t("card_link_label", { action: actionLabel, title: challenge.displayName })}
-          className="absolute inset-0 z-[5] rounded-[12px] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-logo-cyan"
+          className="absolute inset-0 z-[5] rounded-[20px] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-logo-cyan"
         />
       )}
 
       <div
         className={`absolute inset-0 p-5 pb-6 z-10 flex flex-col ${isLinked ? "pointer-events-none" : ""}`}
       >
-        <div className="flex-1 min-h-0 flex flex-col gap-1.5">
+        {/* 已結束：文字變淡，與探索活動課程卡一致（daodao#567） */}
+        <div
+          className={cn(
+            "flex-1 min-h-0 flex flex-col gap-1.5",
+            challenge.runStatus === "ended" && "opacity-75"
+          )}
+        >
           <div className="flex items-center gap-1.5">
-            <ChallengeStatusBadge runStatus={challenge.runStatus} isJoined={challenge.isJoined} />
+            <ExploreStatusBadge
+              label={t(getChallengeStatusKey(challenge.runStatus, challenge.isJoined))}
+              tone={STATUS_TONE[challenge.runStatus]}
+            />
             <ChallengeFlagIcon />
           </div>
 
