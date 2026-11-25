@@ -259,7 +259,7 @@ flowchart TD
 ### Cookie 設定
 
 ```
-name:     auth_token
+name:     process.env.AUTH_COOKIE_NAME（預設 auth_token；dev／feat 為 auth_token_dev）
 httpOnly: true
 secure:   true
 sameSite: none
