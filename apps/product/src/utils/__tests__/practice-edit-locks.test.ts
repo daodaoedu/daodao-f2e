@@ -76,6 +76,38 @@ describe("Lighthouse cohort participant controls", () => {
     expect(getCohortPracticeDisplayStatus("draft", false)).toBe("draft");
     expect(getCohortPracticeDisplayStatus("active", true)).toBe("active");
   });
+
+  describe("cohort draft follows its own period, never shows draft (daodao#544 AC-04)", () => {
+    const period = { startDate: "2026-12-06", endDate: "2026-12-19" };
+    const at = (ymd: string) => new Date(`${ymd}T12:00:00`);
+
+    it("is not started before its start date", () => {
+      expect(getCohortPracticeDisplayStatus("draft", true, period, at("2026-12-05"))).toBe(
+        "not_started"
+      );
+    });
+
+    it("is in progress from its start date through its end date", () => {
+      expect(getCohortPracticeDisplayStatus("draft", true, period, at("2026-12-06"))).toBe(
+        "active"
+      );
+      expect(getCohortPracticeDisplayStatus("draft", true, period, at("2026-12-19"))).toBe(
+        "active"
+      );
+    });
+
+    it("is completed after its own end date even if the cohort runs longer", () => {
+      expect(getCohortPracticeDisplayStatus("draft", true, period, at("2026-12-20"))).toBe(
+        "completed"
+      );
+    });
+
+    it("keeps personal drafts as drafts", () => {
+      expect(getCohortPracticeDisplayStatus("draft", false, period, at("2026-12-10"))).toBe(
+        "draft"
+      );
+    });
+  });
 });
 
 describe("共同挑戰編輯頁說明（edit_challenge_locked）", () => {
