@@ -57,14 +57,18 @@ function useValidatedResponse<TQuery extends { data?: unknown }, TSchema extends
   };
 }
 
-export const useLighthouseOrganizations = () => {
-  const query = useQuery("/api/v1/lighthouse/organizations", EMPTY_QUERY_INIT);
+export const useLighthouseOrganizations = (enabled = true) => {
+  const query = useQuery("/api/v1/lighthouse/organizations", enabled ? EMPTY_QUERY_INIT : null);
   const validated = useValidatedResponse(query, lighthouseOrganizationListResponseSchema);
   return {
     ...validated,
     organizations: validated.data?.data,
   };
 };
+
+/** Cohort leaders' template bindings; non-members can read it (they may open lighthouse templates). */
+export const useCoachResourceBindings = (enabled = true) =>
+  useQuery("/api/v1/lighthouse/my-cohort-resource-bindings", enabled ? EMPTY_QUERY_INIT : null);
 
 export const useLighthousePrograms = (organizationId?: number) => {
   const query = useQuery(

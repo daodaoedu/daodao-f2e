@@ -10,6 +10,7 @@ import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { useEffect, useRef } from "react";
 import { NotificationBell } from "@/components/notifications/notification-bell";
+import { useLighthouseNavEntry } from "@/hooks/use-lighthouse-nav-entry";
 import { AccountMenu } from "./account-menu";
 import { BreathingDot } from "./breathing-dot";
 import { ChatUnreadBadge } from "./chat-unread-badge";
@@ -23,6 +24,7 @@ export const DesktopSidebar = ({
 }: SidebarProps & DesktopSidebarState) => {
   const pathname = usePathname();
   const t = useTranslations("app_product");
+  const lighthouseHref = useLighthouseNavEntry();
 
   // 讓版面跟著收合：layout 的 md:pl-[144px] 是固定值，需要貼齊導覽列的頁面（聊天室）讀這個屬性（daodao#555）
   useEffect(() => {
@@ -85,6 +87,12 @@ export const DesktopSidebar = ({
       {/* Nav items */}
       <ul className="flex flex-col gap-[10px] flex-1">
         {menuItems.map((item) => {
+          const href = item.requiresLighthouseAccess
+            ? lighthouseHref
+            : typeof item.href === "function"
+              ? item.href(identifier)
+              : item.href;
+          if (!href) return null;
           const isActive = item.isMatch(pathname, identifier);
           const Icon = isActive ? item.activeIcon : item.icon;
           const label = t(item.labelKey);
@@ -93,7 +101,7 @@ export const DesktopSidebar = ({
           return (
             <li key={item.labelKey}>
               <CustomLink
-                href={typeof item.href === "function" ? item.href(identifier) : item.href}
+                href={href}
                 className={cn(
                   "flex items-center gap-2 px-4 py-[9px] text-text-dark cursor-pointer transition-all duration-200",
                   isCollapsed && "justify-center px-0"
