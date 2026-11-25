@@ -1,7 +1,8 @@
 "use client";
 
+import { useAuthContext } from "@daodao/auth";
 import { cn } from "@daodao/ui/lib/utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Sidebar } from "./sidebar";
 
 export function WithLayoutFrame({
@@ -14,31 +15,37 @@ export function WithLayoutFrame({
   showSidebarForGuests?: boolean;
 }) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const { isAuthenticated, isLoading } = useAuthContext();
+  // 確定是訪客（看不到側邊導覽）才拿掉側欄空位，避免左側留 144px 空白（daodao#567）。
+  // 預設保留空位、mount 後才依登入結果更新：SSR 與 client 首次渲染一致不會 hydration mismatch，
+  // 登入使用者也不會在側欄出現時被往右推。
+  const [isConfirmedGuest, setIsConfirmedGuest] = useState(false);
+  useEffect(() => {
+    setIsConfirmedGuest(!isLoading && !isAuthenticated && !showSidebarForGuests);
+  }, [isLoading, isAuthenticated, showSidebarForGuests]);
 
   return (
-    // 側欄空位只在側邊導覽真的有畫出東西時才留（:has 判斷），訪客看不到側欄時不留 144px 空白（daodao#567）。
-    // 用 CSS 判斷而不是讀登入狀態，避免 SSR 與 client 首次渲染不一致造成 hydration mismatch。
-    <div className="group/frame">
+    <>
       <div
         data-sidebar-collapsed={isSidebarCollapsed}
         className={cn(
-          // 側欄寬度與置中偏移給框內 fixed 元素用（md: 才吃）；沒有側欄時都是 0，否則 fixed 元素會偏右
-          "transition-[padding-left] duration-300 [--sidebar-center-offset:0px] [--sidebar-width:0px]",
-          isSidebarCollapsed
-            ? "group-has-[[data-frame-sidebar]>*]/frame:[--sidebar-center-offset:34px] group-has-[[data-frame-sidebar]>*]/frame:[--sidebar-width:68px] md:group-has-[[data-frame-sidebar]>*]/frame:pl-[68px]"
-            : "group-has-[[data-frame-sidebar]>*]/frame:[--sidebar-center-offset:72px] group-has-[[data-frame-sidebar]>*]/frame:[--sidebar-width:144px] md:group-has-[[data-frame-sidebar]>*]/frame:pl-[144px]",
+          "transition-[padding-left] duration-300",
+          // 側欄寬度與置中偏移給框內 fixed 元素用（md: 才吃）；訪客沒有側欄時為 0，否則 fixed 元素會偏右
+          isConfirmedGuest && "[--sidebar-center-offset:0px] [--sidebar-width:0px]",
+          !isConfirmedGuest &&
+            (isSidebarCollapsed
+              ? "[--sidebar-center-offset:34px] [--sidebar-width:68px] md:pl-[68px]"
+              : "[--sidebar-center-offset:72px] [--sidebar-width:144px] md:pl-[144px]"),
           className
         )}
       >
         {children}
       </div>
-      <div data-frame-sidebar className="contents">
-        <Sidebar
-          isCollapsed={isSidebarCollapsed}
-          onToggleSidebar={() => setIsSidebarCollapsed((collapsed) => !collapsed)}
-          showForGuests={showSidebarForGuests}
-        />
-      </div>
-    </div>
+      <Sidebar
+        isCollapsed={isSidebarCollapsed}
+        onToggleSidebar={() => setIsSidebarCollapsed((collapsed) => !collapsed)}
+        showForGuests={showSidebarForGuests}
+      />
+    </>
   );
 }

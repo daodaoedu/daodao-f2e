@@ -104,7 +104,13 @@ export const ChallengeCard = ({
       <div
         className={`absolute inset-0 p-5 pb-6 z-10 flex flex-col ${isLinked ? "pointer-events-none" : ""}`}
       >
-        <div className="flex-1 min-h-0 flex flex-col gap-1.5">
+        {/* 已結束：文字變淡，與探索活動課程卡一致（daodao#567） */}
+        <div
+          className={cn(
+            "flex-1 min-h-0 flex flex-col gap-1.5",
+            challenge.runStatus === "ended" && "opacity-75"
+          )}
+        >
           <div className="flex items-center gap-1.5">
             <ExploreStatusBadge
               label={t(getChallengeStatusKey(challenge.runStatus, challenge.isJoined))}

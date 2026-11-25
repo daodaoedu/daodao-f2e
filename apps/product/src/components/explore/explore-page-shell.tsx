@@ -1,7 +1,7 @@
 "use client";
 
 import { Flag } from "lucide-react";
-import type { ReactNode } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { ExploreGuestHeader } from "@/components/activity/explore-guest-header";
 
 interface ExplorePageShellProps {
@@ -25,13 +25,18 @@ export function ExplorePageShell({
   guestRedirect,
   children,
 }: ExplorePageShellProps) {
+  // 登入狀態在 SSR 與 client hydration 時不一定一致，訪客頁首等 mount 後才顯示，避免 hydration mismatch
+  const [hasMounted, setHasMounted] = useState(false);
+  useEffect(() => setHasMounted(true), []);
+  const showGuestHeader = hasMounted && isGuest;
+
   return (
     <div className="min-h-screen bg-very-light-gray">
-      {isGuest && <ExploreGuestHeader redirect={guestRedirect} />}
+      {showGuestHeader && <ExploreGuestHeader redirect={guestRedirect} />}
       <main
         className={
           // 登入時手機版左上有固定 logo（側邊導覽 mobile），內容要讓開
-          isGuest
+          showGuestHeader
             ? "mx-auto flex w-full max-w-[760px] flex-col gap-6 px-4 pt-8 pb-18"
             : "mx-auto flex w-full max-w-[760px] flex-col gap-6 px-4 pt-[68px] pb-18 md:pt-8"
         }
