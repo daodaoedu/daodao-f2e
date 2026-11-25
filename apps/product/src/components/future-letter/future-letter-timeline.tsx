@@ -22,6 +22,7 @@ import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { format, parseISO } from "date-fns";
 import { Mail, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FUTURE_LETTER_ENTRY_ENABLED } from "@/constants/future-letter";
 import { getLetterDetailScrollKey, isFootprintTimelineSettled } from "./future-letter-utils";
 import { LetterDetailCard } from "./letter-detail-card";
 import { buildFootprintTimeline } from "./timeline-model";
@@ -58,7 +59,10 @@ export function FutureLetterTimeline({
   const timelineQuery = useAllMyTimeline();
   const lettersQuery = useAllMyFutureLetters();
   const timelineEntries = useMemo(
-    () => timelineQuery.data?.flatMap((page) => page.data) ?? [],
+    () =>
+      (timelineQuery.data?.flatMap((page) => page.data) ?? []).filter(
+        (entry) => FUTURE_LETTER_ENTRY_ENABLED || entry.type !== "letter"
+      ),
     [timelineQuery.data]
   );
   const letters = useMemo(
@@ -66,7 +70,12 @@ export function FutureLetterTimeline({
     [lettersQuery.data]
   );
   const { futureLetters, pastGroups } = useMemo(
-    () => buildFootprintTimeline(timelineEntries, letters, new Date()),
+    () =>
+      buildFootprintTimeline(
+        timelineEntries,
+        FUTURE_LETTER_ENTRY_ENABLED ? letters : [],
+        new Date()
+      ),
     [letters, timelineEntries]
   );
   const selectedLetterId =

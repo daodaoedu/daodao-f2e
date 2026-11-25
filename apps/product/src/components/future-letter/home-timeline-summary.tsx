@@ -3,6 +3,7 @@
 import { useAllMyTimeline } from "@daodao/api";
 import { useRouter } from "@daodao/i18n/navigation";
 import { useMemo } from "react";
+import { FUTURE_LETTER_ENTRY_ENABLED } from "@/constants/future-letter";
 import { CompactTimelineStrip } from "./compact-timeline-strip";
 import {
   buildTimelineCoordinates,
@@ -14,7 +15,10 @@ export function HomeTimelineSummary() {
   const router = useRouter();
   const timelineQuery = useAllMyTimeline();
   const timelineEntries = useMemo(
-    () => timelineQuery.data?.flatMap((page) => page.data) ?? [],
+    () =>
+      (timelineQuery.data?.flatMap((page) => page.data) ?? []).filter(
+        (entry) => FUTURE_LETTER_ENTRY_ENABLED || entry.type !== "letter"
+      ),
     [timelineQuery.data]
   );
   const coordinates = useMemo(

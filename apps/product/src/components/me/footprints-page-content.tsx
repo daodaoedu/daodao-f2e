@@ -3,8 +3,16 @@
 import { useMyFutureLetters } from "@daodao/api";
 import { useState } from "react";
 import { FutureLetterDialog, FutureLetterTimeline } from "@/components/future-letter";
+import { FUTURE_LETTER_ENTRY_ENABLED } from "@/constants/future-letter";
 
 export function FootprintsPageContent() {
+  if (!FUTURE_LETTER_ENTRY_ENABLED) {
+    return <FutureLetterTimeline onWriteLetter={() => {}} />;
+  }
+  return <FootprintsWithLetterComposition />;
+}
+
+function FootprintsWithLetterComposition() {
   const [isLetterDialogOpen, setIsLetterDialogOpen] = useState(false);
   const [timelineVersion, setTimelineVersion] = useState(0);
   const draftsQuery = useMyFutureLetters({ status: "draft", limit: 1 });
