@@ -3,6 +3,7 @@
 import {
   acceptOrganizationInvitation,
   type OrganizationInvitationAcceptResultType,
+  useMutate,
 } from "@daodao/api";
 import { useAuth } from "@daodao/auth";
 import { useLocale, useTranslations } from "@daodao/i18n";
@@ -40,6 +41,7 @@ function InvitationContent({ token }: { token: string }) {
   const returnPath = `${locale === "en" ? "/en" : ""}/organization-invitation`;
 
   const logoutAndRedirect = useLogoutAndRedirect(returnPath);
+  const mutate = useMutate();
 
   async function accept() {
     if (submitting.current || !isAuthenticated || isTemporary || !token) return;
@@ -54,6 +56,8 @@ function InvitationContent({ token }: { token: string }) {
         return;
       }
       setResult(response.data.data);
+      // 剛成為組織成員：讓側欄的燈塔入口立即出現（daodao#568）
+      void mutate(["/api/v1/lighthouse/organizations"]);
     } catch (caught) {
       if (parseServerError(caught).status === 401) setNeedsLogin(true);
       setError(errorMessage(caught, t("error")));
