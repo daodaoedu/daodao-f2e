@@ -35,7 +35,7 @@ ai-backend ──SQLAlchemy──────▶ 同一個 PostgreSQL（不做 D
 ```
 
 認證邊界：
-- JWT 由 **daodao-server 簽發**（HS256）；ai-backend 用共享 secret（`JWT_SECURITY`）驗證，並 fallback 讀共用 HttpOnly cookie `auth_token`。
+- JWT 由 **daodao-server 簽發**（HS256）；ai-backend 用共享 secret（`JWT_SECURITY`）驗證，並 fallback 讀 HttpOnly 登入 cookie（名稱由各服務的 `AUTH_COOKIE_NAME` 決定：正式站 `auth_token`、dev／feat `auth_token_dev`，三個服務必須一致，見 daodaoedu/daodao#526）。
 - worker 的 JWT authMiddleware **已定義但從未掛載**（截至盤點日），入向只靠 CORS + IP rate limit。
 - worker → server 用自訂 header `X-Internal-API-Key`（非 JWT）。
 - admin-ui 用 localStorage `daodao_admin_token` Bearer + cookie，角色白名單 admin/superadmin。

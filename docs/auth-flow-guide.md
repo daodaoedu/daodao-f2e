@@ -668,7 +668,7 @@
 | Token 類型 | JWT (JSON Web Token) |
 | 過期時間 | 7 天 |
 | 儲存方式 | HTTP-only Cookie（優先）或 Authorization header |
-| Cookie 名稱 | `auth_token` |
+| Cookie 名稱 | `AUTH_COOKIE_NAME`（預設 `auth_token`；dev／feat 為 `auth_token_dev`，見 daodaoedu/daodao#526） |
 | Cookie 選項 | `httpOnly: true`, `secure: true`, `sameSite: 'none'` |
 
 #### Token 刷新機制
