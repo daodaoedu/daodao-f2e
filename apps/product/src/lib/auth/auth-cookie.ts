@@ -30,3 +30,13 @@ export function getRawAuthTokenCookie(cookieHeader: string | null): string | und
   }
   return undefined;
 }
+
+/**
+ * 版面樂觀判斷用：本環境的登入 cookie 是否存在且非空（不驗證、不解碼）。
+ * 名稱必須跟 API 一致，dev 是 auth_token_dev（#526），不能寫死 auth_token（daodao#567）。
+ */
+export function hasAuthSessionCookie(
+  getCookieValue: (name: string) => string | undefined
+): boolean {
+  return Boolean(getCookieValue(getAuthCookieName()));
+}
