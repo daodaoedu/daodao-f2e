@@ -21,6 +21,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { type CSSProperties, useLayoutEffect, useRef, useState } from "react";
+import { FUTURE_LETTER_ENTRY_ENABLED } from "@/constants/future-letter";
 import type {
   FootprintEventCard,
   FootprintLetterCard,
@@ -393,40 +394,17 @@ export function VerticalTimeline({
     >
       <style>{KEYFRAMES}</style>
 
-      {draft && <DraftRow draft={draft} onClick={onWriteLetter} />}
+      {FUTURE_LETTER_ENTRY_ENABLED && draft && <DraftRow draft={draft} onClick={onWriteLetter} />}
 
-      {futureLetters.length === 0 ? (
-        <Row
-          label={t("label_future")}
-          dot={
-            <span
-              className="size-[15px] shrink-0 rounded-full border-2 border-dashed border-[#E0B90B]"
-              style={{ animation: "breathe 2.4s ease-in-out infinite" }}
-            />
-          }
-          line="dashed"
-        >
-          <button
-            type="button"
-            disabled={isWriteLetterDisabled}
-            onClick={onWriteLetter}
-            className="w-full rounded-2xl border-[1.5px] border-dashed border-[#DCE9EB] bg-white p-5 text-center transition-[border-color,transform] duration-[220ms] hover:-translate-y-[2px] hover:border-[#E0B90B]"
-          >
-            <p className="text-[13px] leading-[1.75] text-[#536166]">
-              {t("cta_title")}
-              <br />
-              {t("cta_description")}
-            </p>
-            <span className="mt-[14px] inline-flex items-center gap-2 rounded-full bg-[#F9E41E] px-5 py-[10px] text-sm font-medium text-[#0D3036]">
-              {t("cta_button")}
-            </span>
-          </button>
-        </Row>
-      ) : (
-        <>
+      {FUTURE_LETTER_ENTRY_ENABLED &&
+        (futureLetters.length === 0 ? (
           <Row
+            label={t("label_future")}
             dot={
-              <span className="size-[14px] shrink-0 rounded-full border-[1.5px] border-dashed border-[#C9D6D8]" />
+              <span
+                className="size-[15px] shrink-0 rounded-full border-2 border-dashed border-[#E0B90B]"
+                style={{ animation: "breathe 2.4s ease-in-out infinite" }}
+              />
             }
             line="dashed"
           >
@@ -434,31 +412,55 @@ export function VerticalTimeline({
               type="button"
               disabled={isWriteLetterDisabled}
               onClick={onWriteLetter}
-              className="flex h-11 w-full items-center justify-center gap-2 rounded-full border-[1.5px] border-dashed border-[#DCE9EB] bg-white text-sm text-[#536166] transition-colors hover:border-[#16B9B3] hover:text-[#16B9B3]"
+              className="w-full rounded-2xl border-[1.5px] border-dashed border-[#DCE9EB] bg-white p-5 text-center transition-[border-color,transform] duration-[220ms] hover:-translate-y-[2px] hover:border-[#E0B90B]"
             >
-              <Plus className="size-4" />
-              {t("write_another")}
+              <p className="text-[13px] leading-[1.75] text-[#536166]">
+                {t("cta_title")}
+                <br />
+                {t("cta_description")}
+              </p>
+              <span className="mt-[14px] inline-flex items-center gap-2 rounded-full bg-[#F9E41E] px-5 py-[10px] text-sm font-medium text-[#0D3036]">
+                {t("cta_button")}
+              </span>
             </button>
           </Row>
-          {futureLetters.map((letter) => (
+        ) : (
+          <>
             <Row
-              key={letter.id}
-              label={format(parseISO(letter.date), "yyyy / MM")}
-              labelStyle={MONO}
               dot={
-                <span className="size-[15px] shrink-0 rounded-full border-2 border-dashed border-[#E0B90B] bg-[#FFFDF0]" />
+                <span className="size-[14px] shrink-0 rounded-full border-[1.5px] border-dashed border-[#C9D6D8]" />
               }
               line="dashed"
             >
-              <ScheduledLetterCard
-                letter={letter}
-                onClick={() => onLetterClick(letter.letterId, letter.date)}
-                onDelete={() => onDeleteLetter(letter.letterId)}
-              />
+              <button
+                type="button"
+                disabled={isWriteLetterDisabled}
+                onClick={onWriteLetter}
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-full border-[1.5px] border-dashed border-[#DCE9EB] bg-white text-sm text-[#536166] transition-colors hover:border-[#16B9B3] hover:text-[#16B9B3]"
+              >
+                <Plus className="size-4" />
+                {t("write_another")}
+              </button>
             </Row>
-          ))}
-        </>
-      )}
+            {futureLetters.map((letter) => (
+              <Row
+                key={letter.id}
+                label={format(parseISO(letter.date), "yyyy / MM")}
+                labelStyle={MONO}
+                dot={
+                  <span className="size-[15px] shrink-0 rounded-full border-2 border-dashed border-[#E0B90B] bg-[#FFFDF0]" />
+                }
+                line="dashed"
+              >
+                <ScheduledLetterCard
+                  letter={letter}
+                  onClick={() => onLetterClick(letter.letterId, letter.date)}
+                  onDelete={() => onDeleteLetter(letter.letterId)}
+                />
+              </Row>
+            ))}
+          </>
+        ))}
 
       <div className="flex items-center gap-4 pb-5">
         <div className="w-14 shrink-0 text-right text-xs font-medium text-[#16B9B3]">

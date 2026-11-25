@@ -3,6 +3,7 @@
 import { useLocale } from "@daodao/i18n";
 import { ChevronRight } from "lucide-react";
 import { type CSSProperties, Fragment, useMemo, useState } from "react";
+import { FUTURE_LETTER_ENTRY_ENABLED } from "@/constants/future-letter";
 import type { TimelineCoordinate } from "./timeline-model";
 
 interface CompactTimelineStripProps {
@@ -199,60 +200,70 @@ export function CompactTimelineStrip({
               </Fragment>
             );
           })}
-          <span
-            aria-hidden="true"
-            style={{ flex: "1 1 0%", minWidth: 0, height: 1, background: DOTTED_LINE }}
-          />
-          {futureNodes.map((node, index) => {
-            const prev = index > 0 ? futureNodes[index - 1] : undefined;
-            return (
-              <Fragment key={node.id}>
-                {prev && (
-                  <span
-                    aria-hidden="true"
-                    style={{
-                      ...shrinkableWidth(connectorWidth(prev.date, node.date)),
-                      height: 1,
-                      background: DOTTED_LINE,
-                    }}
-                  />
-                )}
-                {renderNodeButton(
-                  node,
-                  {
-                    width: 13,
-                    height: 13,
+          {FUTURE_LETTER_ENTRY_ENABLED && (
+            <>
+              <span
+                aria-hidden="true"
+                style={{ flex: "1 1 0%", minWidth: 0, height: 1, background: DOTTED_LINE }}
+              />
+              {futureNodes.map((node, index) => {
+                const prev = index > 0 ? futureNodes[index - 1] : undefined;
+                return (
+                  <Fragment key={node.id}>
+                    {prev && (
+                      <span
+                        aria-hidden="true"
+                        style={{
+                          ...shrinkableWidth(connectorWidth(prev.date, node.date)),
+                          height: 1,
+                          background: DOTTED_LINE,
+                        }}
+                      />
+                    )}
+                    {renderNodeButton(
+                      node,
+                      {
+                        width: 13,
+                        height: 13,
+                        borderRadius: 999,
+                        background: "#F9E41E",
+                        boxShadow: "inset 0 0 0 1.5px #C79E0A",
+                      },
+                      "#A87A22",
+                      { hint: true }
+                    )}
+                  </Fragment>
+                );
+              })}
+              {futureNodes.length === 0 && (
+                <span
+                  aria-hidden="true"
+                  onMouseEnter={() => setHintOpen(true)}
+                  onMouseLeave={() => setHintOpen(false)}
+                  style={{
+                    // Prototype is content-box: 13px + 2px dashed border = 17px outer.
+                    width: 17,
+                    height: 17,
+                    flex: "none",
                     borderRadius: 999,
-                    background: "#F9E41E",
-                    boxShadow: "inset 0 0 0 1.5px #C79E0A",
-                  },
-                  "#A87A22",
-                  { hint: true }
-                )}
-              </Fragment>
-            );
-          })}
-          {futureNodes.length === 0 && (
+                    border: "2px dashed #C79E0A",
+                    background: "#FFFDF0",
+                    animation: "breathe 2.4s ease-in-out infinite",
+                  }}
+                />
+              )}
+              <span
+                aria-hidden="true"
+                style={{ ...shrinkableWidth(96, 20), height: 1, background: DOTTED_LINE }}
+              />
+            </>
+          )}
+          {!FUTURE_LETTER_ENTRY_ENABLED && (
             <span
               aria-hidden="true"
-              onMouseEnter={() => setHintOpen(true)}
-              onMouseLeave={() => setHintOpen(false)}
-              style={{
-                // Prototype is content-box: 13px + 2px dashed border = 17px outer.
-                width: 17,
-                height: 17,
-                flex: "none",
-                borderRadius: 999,
-                border: "2px dashed #C79E0A",
-                background: "#FFFDF0",
-                animation: "breathe 2.4s ease-in-out infinite",
-              }}
+              style={{ flex: "1 1 0%", height: 1, background: SOLID_LINE }}
             />
           )}
-          <span
-            aria-hidden="true"
-            style={{ ...shrinkableWidth(96, 20), height: 1, background: DOTTED_LINE }}
-          />
         </span>
         <span
           aria-hidden="true"
@@ -263,7 +274,7 @@ export function CompactTimelineStrip({
           <ChevronRight className="size-[18px]" />
         </span>
       </div>
-      {hintOpen && (
+      {FUTURE_LETTER_ENTRY_ENABLED && hintOpen && (
         <div
           style={{
             position: "absolute",
