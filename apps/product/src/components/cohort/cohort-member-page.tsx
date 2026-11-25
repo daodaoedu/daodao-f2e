@@ -26,6 +26,7 @@ import { CohortErrorState } from "@/components/lighthouse/cohort-error-state";
 import { HOME_TAB_PATHS } from "@/constants/home-navigation";
 import { mapPracticeStatusToTaskStatus } from "@/constants/task-status";
 import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
+import { isPracticeVisibleByDate } from "@/utils/practice-card";
 import { CohortMeetingCalendar } from "./cohort-meeting-calendar";
 import { CohortQueryScope } from "./cohort-query-scope";
 
@@ -57,6 +58,9 @@ function CohortMemberContent({ cohortId }: { cohortId: number }) {
   const { errorMessage } = useServerErrorMessage();
   const homeQuery = useCohortMemberHome(cohortId);
   const home = homeQuery.data?.data;
+  const cohortPractices = isPracticeVisibleByDate(home?.startDate, home?.endDate)
+    ? (home?.practices ?? [])
+    : [];
   const notMember = isNotMemberError(homeQuery.error);
   const [pendingConsent, setPendingConsent] = useState<boolean | null>(null);
   const [privacySettingsOpen, setPrivacySettingsOpen] = useState(false);
@@ -201,16 +205,16 @@ function CohortMemberContent({ cohortId }: { cohortId: number }) {
                 {t("export_consent_nudge")}
               </Button>
             )}
-            {!home?.practices.length && (
+            {!cohortPractices.length && (
               <Empty className="rounded-xl bg-white shadow-sm">
                 <EmptyDescription>{t("no_practices")}</EmptyDescription>
               </Empty>
             )}
-            {home?.practices.some((practice) => practice.status === "draft") && (
+            {cohortPractices.some((practice) => practice.status === "draft") && (
               <p className="text-xs text-text-dark/45">{t("draft_editable_hint")}</p>
             )}
             <div className="grid gap-4 md:grid-cols-2">
-              {home?.practices.map((practice) => (
+              {cohortPractices.map((practice) => (
                 <InProgressTaskCard
                   key={practice.id}
                   id={practice.id}
@@ -225,8 +229,8 @@ function CohortMemberContent({ cohortId }: { cohortId: number }) {
                   presentation="cohort"
                   cohortId={cohortId}
                   lastCheckInDate={practice.lastCheckinAt ?? null}
-                  startDate={practice.startDate ?? null}
-                  endDate={practice.endDate ?? null}
+                  startDate={home?.startDate ?? null}
+                  endDate={home?.endDate ?? null}
                   onBeforeCheckIn={() => activate(practice.id)}
                 />
               ))}

@@ -1,14 +1,16 @@
 import { differenceInCalendarDays, format, isValid, parseISO } from "date-fns";
-import { parseLocalDate } from "./practice-period";
+import { parseLocalDate, practiceEndDateString } from "./practice-period";
 
-// Legacy practices may omit either boundary; only supplied dates restrict visibility.
+// Prefer the stored end date; derive it from startDate + durationDays when omitted.
 export function isPracticeVisibleByDate(
   startDate: string | null | undefined,
   endDate: string | null | undefined,
-  now = new Date()
+  now = new Date(),
+  durationDays?: number | null
 ): boolean {
   const start = startDate ? parseLocalDate(startDate) : null;
-  const end = endDate ? parseLocalDate(endDate) : null;
+  const effectiveEndDate = endDate || practiceEndDateString(startDate, durationDays);
+  const end = effectiveEndDate ? parseLocalDate(effectiveEndDate) : null;
   if ((startDate && !start) || (endDate && !end)) return false;
   return (
     (!start || differenceInCalendarDays(now, start) >= 0) &&
