@@ -1,8 +1,8 @@
 "use client";
 
-import { useAuthContext } from "@daodao/auth";
 import { cn } from "@daodao/ui/lib/utils";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useLayoutGuest } from "./session-hint";
 import { Sidebar } from "./sidebar";
 
 export function WithLayoutFrame({
@@ -15,14 +15,9 @@ export function WithLayoutFrame({
   showSidebarForGuests?: boolean;
 }) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const { isAuthenticated, isLoading } = useAuthContext();
-  // 確定是訪客（看不到側邊導覽）才拿掉側欄空位，避免左側留 144px 空白（daodao#567）。
-  // 預設保留空位、mount 後才依登入結果更新：SSR 與 client 首次渲染一致不會 hydration mismatch，
-  // 登入使用者也不會在側欄出現時被往右推。
-  const [isConfirmedGuest, setIsConfirmedGuest] = useState(false);
-  useEffect(() => {
-    setIsConfirmedGuest(!isLoading && !isAuthenticated && !showSidebarForGuests);
-  }, [isLoading, isAuthenticated, showSidebarForGuests]);
+  // 確定是訪客時不留側欄空位（daodao#567）；判斷方式見 useLayoutGuest
+  const isGuest = useLayoutGuest();
+  const reserveSidebar = showSidebarForGuests || !isGuest;
 
   return (
     <>
@@ -31,8 +26,8 @@ export function WithLayoutFrame({
         className={cn(
           "transition-[padding-left] duration-300",
           // 側欄寬度與置中偏移給框內 fixed 元素用（md: 才吃）；訪客沒有側欄時為 0，否則 fixed 元素會偏右
-          isConfirmedGuest && "[--sidebar-center-offset:0px] [--sidebar-width:0px]",
-          !isConfirmedGuest &&
+          !reserveSidebar && "[--sidebar-center-offset:0px] [--sidebar-width:0px]",
+          reserveSidebar &&
             (isSidebarCollapsed
               ? "[--sidebar-center-offset:34px] [--sidebar-width:68px] md:pl-[68px]"
               : "[--sidebar-center-offset:72px] [--sidebar-width:144px] md:pl-[144px]"),

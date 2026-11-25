@@ -102,7 +102,6 @@ export default function ExploreActivitiesPage() {
     <ExplorePageShell
       title={t("page_title")}
       subtitle={t("page_subtitle")}
-      isGuest={!isAuthenticated}
       guestRedirect="/activities"
     >
       <ExploreToolbar

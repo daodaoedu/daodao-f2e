@@ -6,7 +6,6 @@ import {
   useCurrentUser,
   useMyChallenges,
 } from "@daodao/api";
-import { useAuthContext } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { usePathname, useRouter } from "@daodao/i18n/navigation";
 import { FilterMenu, FilterMenuItem } from "@daodao/ui/components/filter-menu";
@@ -49,9 +48,6 @@ export default function ChallengesPage() {
   const router = useRouter();
   const pathname = usePathname();
   const { data: currentUser } = useCurrentUser();
-  // 訪客頁首依登入檢查結果決定：SSR 與 client 首次渲染都是「檢查中」，不會 hydration mismatch
-  const { isAuthenticated, isLoading: authLoading } = useAuthContext();
-  const isGuest = !authLoading && !isAuthenticated;
   const { data, isLoading, mutate } = useChallenges();
   // 探索列表不含自動複製的實踐 id；登入時從「我參加的挑戰」補上，讓已加入的卡片能點進實踐頁打卡
   const { data: mineData, mutate: mutateMine } = useMyChallenges(Boolean(currentUser));
@@ -100,7 +96,6 @@ export default function ChallengesPage() {
     <ExplorePageShell
       title={t("page_title")}
       subtitle={t("page_subtitle")}
-      isGuest={isGuest}
       guestRedirect={pathname}
     >
       <ExploreToolbar

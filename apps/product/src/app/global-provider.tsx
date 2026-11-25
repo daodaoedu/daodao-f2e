@@ -4,6 +4,7 @@ import { AnalyticsScripts } from "@daodao/analytics";
 import { AuthProvider, getOrganizationInvitationOnboardingUrl } from "@daodao/auth";
 import { type Locale, type Messages, NextIntlClientProvider } from "@daodao/i18n";
 import { type DeviceInfo, DeviceProvider, detectDeviceClient } from "@daodao/shared";
+import { SessionHintProvider } from "@/components/layout/session-hint";
 import "@daodao/ui/globals.css";
 import { SwrConfigProvider } from "@daodao/api";
 import { DialogManagerProvider } from "@daodao/ui/components/animate-ui/components/radix/dialog";
@@ -30,6 +31,8 @@ interface GlobalProviderProps {
   children: React.ReactNode;
   messages: Messages;
   initialDevice?: DeviceInfo;
+  /** 伺服器端讀到的登入 cookie 是否存在，給版面做樂觀判斷 */
+  hasSessionCookie?: boolean | null;
 }
 
 function GlobalProvider({
@@ -38,6 +41,7 @@ function GlobalProvider({
   children,
   messages,
   initialDevice = detectDeviceClient(),
+  hasSessionCookie = null,
 }: GlobalProviderProps) {
   const router = useRouter();
   const isInvitationPage = ORGANIZATION_INVITATION_PATH.test(usePathname());
@@ -55,63 +59,65 @@ function GlobalProvider({
         <RegisterServiceWorker />
         {!isInvitationPage && <AnalyticsScripts />}
         <NextIntlClientProvider messages={messages} locale={locale} timeZone="Asia/Taipei">
-          <DeviceProvider initialDevice={initialDevice}>
-            <NavigationBlockerProvider>
-              <SwrConfigProvider>
-                <DialogManagerProvider>
-                  <AuthProvider
-                    defaultProtected
-                    publicPattern={[
-                      // auth flows
-                      "^/auth/",
-                      // content pages (no login required)
-                      "^/$",
-                      "^/users/",
-                      "^/practices/[^/]+$",
-                      "^/practices/[^/]+/check-ins/",
-                      "^/challenges(/.*)?$",
-                      "^/activities(/.*)?$",
-                      "^/roadmap(/.*)?$",
-                      "^/organization-invitation$",
-                      "^/resource(/.*)?$",
-                      "^/persona(/.*)?$",
-                      "^/mine(/.*)?$",
-                      "^/survey/r/",
-                      // 空間公開連結（訪客視角，免登入）
-                      "^/spaces/public/",
-                      // misc
-                      "^/dev/",
-                      "^/ux-mockup/",
-                    ]}
-                    onAuthRequired={(currentPath) => {
-                      router.push(`/auth/login?redirect=${encodeURIComponent(currentPath)}`);
-                    }}
-                    onboardingPath="/auth/onboarding"
-                    onTemporaryUser={() => {
-                      // The OAuth callback validates state and retains invitation destinations itself.
-                      if (/^\/(?:(?:en|zh-TW)\/)?auth\/callback$/.test(window.location.pathname))
-                        return;
-                      router.push(
-                        getOrganizationInvitationOnboardingUrl(
-                          window.location.pathname + window.location.search
-                        )
-                      );
-                    }}
-                    emailVerificationPath="/auth/verify-email"
-                    onEmailUnverified={() => {
-                      router.push("/auth/verify-email/pending");
-                    }}
-                  >
-                    <SheetManagerProvider>
-                      <Toaster />
-                      {children}
-                      <PwaInstallPrompt />
-                    </SheetManagerProvider>
-                  </AuthProvider>
-                </DialogManagerProvider>
-              </SwrConfigProvider>
-            </NavigationBlockerProvider>
-          </DeviceProvider>
+          <SessionHintProvider hasSessionCookie={hasSessionCookie}>
+            <DeviceProvider initialDevice={initialDevice}>
+              <NavigationBlockerProvider>
+                <SwrConfigProvider>
+                  <DialogManagerProvider>
+                    <AuthProvider
+                      defaultProtected
+                      publicPattern={[
+                        // auth flows
+                        "^/auth/",
+                        // content pages (no login required)
+                        "^/$",
+                        "^/users/",
+                        "^/practices/[^/]+$",
+                        "^/practices/[^/]+/check-ins/",
+                        "^/challenges(/.*)?$",
+                        "^/activities(/.*)?$",
+                        "^/roadmap(/.*)?$",
+                        "^/organization-invitation$",
+                        "^/resource(/.*)?$",
+                        "^/persona(/.*)?$",
+                        "^/mine(/.*)?$",
+                        "^/survey/r/",
+                        // 空間公開連結（訪客視角，免登入）
+                        "^/spaces/public/",
+                        // misc
+                        "^/dev/",
+                        "^/ux-mockup/",
+                      ]}
+                      onAuthRequired={(currentPath) => {
+                        router.push(`/auth/login?redirect=${encodeURIComponent(currentPath)}`);
+                      }}
+                      onboardingPath="/auth/onboarding"
+                      onTemporaryUser={() => {
+                        // The OAuth callback validates state and retains invitation destinations itself.
+                        if (/^\/(?:(?:en|zh-TW)\/)?auth\/callback$/.test(window.location.pathname))
+                          return;
+                        router.push(
+                          getOrganizationInvitationOnboardingUrl(
+                            window.location.pathname + window.location.search
+                          )
+                        );
+                      }}
+                      emailVerificationPath="/auth/verify-email"
+                      onEmailUnverified={() => {
+                        router.push("/auth/verify-email/pending");
+                      }}
+                    >
+                      <SheetManagerProvider>
+                        <Toaster />
+                        {children}
+                        <PwaInstallPrompt />
+                      </SheetManagerProvider>
+                    </AuthProvider>
+                  </DialogManagerProvider>
+                </SwrConfigProvider>
+              </NavigationBlockerProvider>
+            </DeviceProvider>
+          </SessionHintProvider>
         </NextIntlClientProvider>
       </body>
     </html>

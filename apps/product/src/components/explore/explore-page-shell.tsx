@@ -1,14 +1,13 @@
 "use client";
 
 import { Flag } from "lucide-react";
-import { type ReactNode, useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import { ExploreGuestHeader } from "@/components/activity/explore-guest-header";
+import { useLayoutGuest } from "@/components/layout/session-hint";
 
 interface ExplorePageShellProps {
   title: string;
   subtitle: string;
-  /** 未登入時顯示訪客頁首（登入／免費加入），登入後由側邊導覽取代 */
-  isGuest: boolean;
   /** 訪客登入後要回到的頁面 */
   guestRedirect: string;
   children: ReactNode;
@@ -21,14 +20,11 @@ interface ExplorePageShellProps {
 export function ExplorePageShell({
   title,
   subtitle,
-  isGuest,
   guestRedirect,
   children,
 }: ExplorePageShellProps) {
-  // 登入狀態在 SSR 與 client hydration 時不一定一致，訪客頁首等 mount 後才顯示，避免 hydration mismatch
-  const [hasMounted, setHasMounted] = useState(false);
-  useEffect(() => setHasMounted(true), []);
-  const showGuestHeader = hasMounted && isGuest;
+  // 未登入時顯示訪客頁首（登入／免費加入），登入後由側邊導覽取代；判斷與側欄空位同步（useLayoutGuest）
+  const showGuestHeader = useLayoutGuest();
 
   return (
     <div className="min-h-screen bg-very-light-gray">
