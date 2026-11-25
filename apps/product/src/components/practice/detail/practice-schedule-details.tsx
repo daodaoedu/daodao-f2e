@@ -32,7 +32,7 @@ export function PracticeScheduleDetails({
         aria-expanded={expanded}
         aria-controls={contentId}
         onClick={() => setExpanded((value) => !value)}
-        className="w-full h-auto justify-between px-0 text-sm text-[#9FB5B8] py-1 mb-2 cursor-pointer hover:bg-transparent"
+        className="mb-2 h-auto min-h-11 w-full justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-text-dark hover:bg-very-light-gray hover:text-text-dark active:bg-bg-gray focus-visible:ring-2 focus-visible:ring-text-dark"
       >
         {t("more_info")}
         {expanded ? (
