@@ -6,6 +6,7 @@ import { notFound, redirect } from "next/navigation";
 import { cache } from "react";
 import { PageShell } from "@/components/layout";
 import { IslandHeader, UserInfoCard, UserProfileTabs } from "@/components/user";
+import { authCookieHeader, getAuthCookieName } from "@/lib/auth/auth-cookie";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -21,12 +22,12 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 // 使用 React.cache() 避免在 generateMetadata 和 page 中重複請求
 const getCachedUserByIdentifier = cache(getUserByIdentifier);
 
-// SSR 需手動轉發 auth_token cookie，否則 fetch 不會帶入認證資訊
+// SSR 需手動轉發登入 cookie，否則 fetch 不會帶入認證資訊
 const fetchCurrentUserSSR = cache(async (authToken: string) => {
   try {
     const baseUrl = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
     const response = await fetch(`${baseUrl}/api/v1/users/me`, {
-      headers: { Cookie: `auth_token=${authToken}` },
+      headers: { Cookie: authCookieHeader(authToken) },
       cache: "no-store",
     });
     if (!response.ok) return null;
@@ -104,9 +105,9 @@ export default async function UserProfilePage({
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "user_profile" });
 
-  // 取得 auth_token cookie（需在 Server Component 內呼叫，不可放在 module-level cache 內）
+  // 取得登入 cookie（需在 Server Component 內呼叫，不可放在 module-level cache 內）
   const cookieStore = await cookies();
-  const authToken = cookieStore.get("auth_token")?.value ?? "";
+  const authToken = cookieStore.get(getAuthCookieName())?.value ?? "";
 
   // 並行取得：個人檔案資料、舊版用戶資料（用於 metadata / fallback）、當前登入用戶
   const [userResponse, profileResponse, currentUserResponse] = await Promise.all([

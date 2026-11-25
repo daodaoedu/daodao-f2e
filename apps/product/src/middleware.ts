@@ -2,7 +2,7 @@ import { getEnv } from "@daodao/config";
 import createMiddleware from "@daodao/i18n/middleware";
 import { routing } from "@daodao/i18n/routing";
 import { type NextRequest, NextResponse } from "next/server";
-import { getRawAuthTokenCookie } from "./lib/auth/auth-cookie";
+import { authCookieHeader, getRawAuthTokenCookie } from "./lib/auth/auth-cookie";
 import { checkPrivateSession, isPrivateSpacePath } from "./lib/auth/private-access";
 import {
   isOrganizationInvitationToken,
@@ -39,7 +39,7 @@ async function hasLighthouseAccess(request: NextRequest): Promise<LighthouseAcce
     // Middleware runs on the Edge runtime; openapi-fetch currently uses a Node API,
     // so this boundary performs the same typed endpoint call with native fetch.
     const response = await fetch(`${apiBaseUrl}/api/v1/lighthouse/organizations`, {
-      headers: { Cookie: `auth_token=${authToken}` },
+      headers: { Cookie: authCookieHeader(authToken) },
       cache: "no-store",
     });
     if (response.status === 401) return { status: "unauthorized" };
@@ -66,7 +66,7 @@ async function hasLighthouseAccess(request: NextRequest): Promise<LighthouseAcce
     const bindingsResponse = await fetch(
       `${apiBaseUrl}/api/v1/lighthouse/my-cohort-resource-bindings`,
       {
-        headers: { Cookie: `auth_token=${authToken}` },
+        headers: { Cookie: authCookieHeader(authToken) },
         cache: "no-store",
       }
     );
@@ -247,7 +247,7 @@ export default async function middleware(request: NextRequest) {
           )?.replace(/\/$/, "");
           const preferenceResponse = await fetch(`${apiBaseUrl}/api/v1/lighthouse/preferences`, {
             headers: {
-              Cookie: `auth_token=${getRawAuthTokenCookie(request.headers.get("cookie"))}`,
+              Cookie: authCookieHeader(getRawAuthTokenCookie(request.headers.get("cookie"))),
             },
             cache: "no-store",
           });

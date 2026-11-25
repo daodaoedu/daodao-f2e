@@ -119,6 +119,8 @@ services:
       - PORT=3001
       - HOSTNAME=0.0.0.0
       - APP_NAME=product
+      # dev／feat 共用 server-dev，與正式站共用 .daodao.so；Auth Cookie 名稱要跟 server dev_app 一致（daodaoedu/daodao#526）
+      - AUTH_COOKIE_NAME=auth_token_dev
     expose:
       - "3001"
     networks:
@@ -192,6 +194,8 @@ services:
       - PORT=3001
       - HOSTNAME=0.0.0.0
       - APP_NAME=product
+      # dev／feat 共用 server-dev，與正式站共用 .daodao.so；Auth Cookie 名稱要跟 server dev_app 一致（daodaoedu/daodao#526）
+      - AUTH_COOKIE_NAME=auth_token_dev
     expose:
       - "3001"
     networks:

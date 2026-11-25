@@ -1,3 +1,5 @@
+import { authCookieHeader } from "./auth-cookie";
+
 export type PrivateSessionAccess = "allowed" | "unauthorized" | "unavailable";
 
 /** Private space pages require login; published token links retain anonymous access. */
@@ -15,7 +17,7 @@ export async function checkPrivateSession(
   if (!authToken) return "unauthorized";
   try {
     const response = await request(`${apiBaseUrl.replace(/\/$/, "")}/api/v1/auth/me`, {
-      headers: { Cookie: `auth_token=${authToken}` },
+      headers: { Cookie: authCookieHeader(authToken) },
       cache: "no-store",
       signal: AbortSignal.timeout(5000),
     });
