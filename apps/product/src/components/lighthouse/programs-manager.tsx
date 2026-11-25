@@ -82,6 +82,7 @@ import {
   updateSessionGroup as updateSessionEntries,
 } from "@/utils/cohort-sessions";
 import {
+  bindingDefaultStartDate,
   diffTemplateBindings,
   formatSlashDate,
   isCohortStarted,
@@ -333,12 +334,23 @@ function CohortSetupPanel({
     const binding = cohort ? tpl.bindings.find((b) => b.cohortId === cohort.id) : undefined;
     return binding?.startDate?.slice(0, 10) ?? null;
   }
+  function defaultStartDate(tpl: CohortTemplateSummary): string {
+    return bindingDefaultStartDate(cohortStartDate, {
+      cohortStarted: templatesLocked,
+      locked: lockedTemplateIds.has(tpl.id),
+    });
+  }
   function templateStartDate(tpl: CohortTemplateSummary): string {
-    if (startDateOverrides.has(tpl.id)) return startDateOverrides.get(tpl.id) ?? cohortStartDate;
-    return savedTemplateStartDate(tpl) ?? cohortStartDate;
+    if (startDateOverrides.has(tpl.id))
+      return startDateOverrides.get(tpl.id) ?? defaultStartDate(tpl);
+    return savedTemplateStartDate(tpl) ?? defaultStartDate(tpl);
   }
   function setTemplateStartDate(tpl: CohortTemplateSummary, value: string) {
-    const next = templateStartDateOverride(value, cohortStartDate, savedTemplateStartDate(tpl));
+    const next = templateStartDateOverride(
+      value,
+      defaultStartDate(tpl),
+      savedTemplateStartDate(tpl)
+    );
     setStartDateOverrides((prev) => new Map(prev).set(tpl.id, next));
   }
 

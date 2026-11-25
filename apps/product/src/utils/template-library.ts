@@ -281,3 +281,15 @@ export function withoutLockedTemplates<T>(
 ): Map<number, T> {
   return new Map([...overrides].filter(([templateId]) => !lockedTemplateIds.has(templateId)));
 }
+
+/**
+ * 模板列沒有指定開始日時顯示的預設值：已開始場次新加的模板從今天開始（與 server 相同，daodao#544），
+ * 其餘沿用場次開始日。
+ */
+export function bindingDefaultStartDate(
+  cohortStartDate: string,
+  { cohortStarted, locked }: { cohortStarted: boolean; locked: boolean },
+  now = new Date()
+): string {
+  return cohortStarted && !locked ? todayInTaipei(now) : cohortStartDate;
+}

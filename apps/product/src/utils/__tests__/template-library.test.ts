@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { parseLocalDate, practiceEndDate } from "../practice-period";
 import {
   addDays,
+  bindingDefaultStartDate,
   deriveTemplateName,
   diffTemplateBindings,
   formatFrequency,
@@ -262,5 +263,30 @@ describe("started cohort keeps existing bindings but can add templates (daodao#5
       unbind: [],
       update: [],
     });
+  });
+});
+
+describe("bindingDefaultStartDate（daodao#544）", () => {
+  const now = new Date("2026-11-25T04:00:00Z");
+
+  it("已開始場次新加的模板預設從今天（台北）開始", () => {
+    expect(bindingDefaultStartDate("2026-11-01", { cohortStarted: true, locked: false }, now)).toBe(
+      "2026-11-25"
+    );
+  });
+
+  it("已連結的模板與未開始場次沿用場次開始日", () => {
+    expect(bindingDefaultStartDate("2026-11-01", { cohortStarted: true, locked: true }, now)).toBe(
+      "2026-11-01"
+    );
+    expect(
+      bindingDefaultStartDate("2026-12-01", { cohortStarted: false, locked: false }, now)
+    ).toBe("2026-12-01");
+  });
+
+  it("保留今天的預設值時送 null，由 server 補成今天；改成其他日期才送該日", () => {
+    const base = bindingDefaultStartDate("2026-11-01", { cohortStarted: true, locked: false }, now);
+    expect(templateStartDateOverride("2026-11-25", base, null)).toBeNull();
+    expect(templateStartDateOverride("2026-11-01", base, null)).toBe("2026-11-01");
   });
 });

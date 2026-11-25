@@ -1,13 +1,14 @@
 "use client";
 
-import { useMyCohorts, useMyPracticeStats, useMyPractices } from "@daodao/api";
+import { updatePractice, useMyCohorts, useMyPracticeStats, useMyPractices } from "@daodao/api";
 import { MessagesSvg } from "@daodao/assets";
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
+import { toast } from "@daodao/ui/components/sonner";
 import { cn } from "@daodao/ui/lib/utils";
 import { CheckCircle2, Users } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   AddTaskFAB,
   DashboardHeader,
@@ -23,7 +24,8 @@ import {
   type FilterStatus as FilterStatusType,
   mapPracticeStatusToTaskStatus,
 } from "@/constants/task-status";
-import { applyMineFilter, buildMineFilterCounts } from "@/utils/mine-filter";
+import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
+import { applyMineFilter, buildMineFilterCounts, minePracticeStatus } from "@/utils/mine-filter";
 
 const filterOptions = [
   { value: FilterStatus.all, labelKey: "filter_all" },
@@ -39,7 +41,36 @@ export default function MyPage() {
   const { isAuthenticated, isLoading: isAuthLoading, login } = useAuth();
   const [filterStatus, setFilterStatus] = useState<FilterStatusType>(FilterStatus.all);
 
-  const { data: allPracticesData, isLoading: isMyLoading } = useMyPractices({ limit: 16 });
+  const {
+    data: allPracticesData,
+    isLoading: isMyLoading,
+    mutate: mutateMyPractices,
+  } = useMyPractices({ limit: 16 });
+  const tCohort = useTranslations("cohort");
+  const { errorMessage } = useServerErrorMessage();
+
+  // 燈塔場次實踐在 DB 仍是 draft，與場次頁、詳情頁一樣打卡前先啟用（daodao#544）
+  const activateCohortDraft = useCallback(
+    async (practiceId: string): Promise<boolean> => {
+      try {
+        const response = await updatePractice(practiceId, { status: "active", isDraft: false });
+        if (response.error) {
+          toast.error(
+            errorMessage(response.error, tCohort("activate_failed"), {
+              status: response.response.status,
+            })
+          );
+          return false;
+        }
+        await mutateMyPractices();
+        return true;
+      } catch {
+        toast.error(tCohort("activate_failed"));
+        return false;
+      }
+    },
+    [errorMessage, mutateMyPractices, tCohort]
+  );
   const { data: statsData } = useMyPracticeStats();
   const { data: myCohortsData } = useMyCohorts();
   const myCohorts = myCohortsData?.data;
@@ -50,6 +81,7 @@ export default function MyPage() {
 
     practices.forEach((practice) => {
       const lastCheckInDate = practice.lastCheckinAt ?? null;
+      const listStatus = minePracticeStatus(practice);
       inProgressTasksData.push({
         id: practice.id,
         title: practice.title,
@@ -59,15 +91,19 @@ export default function MyPage() {
         messagesCount: 0,
         isUnreadMessages: false,
         theme: practice.themeColor || "#FCDD84",
-        status: mapPracticeStatusToTaskStatus(practice.status),
+        status: mapPracticeStatusToTaskStatus(listStatus.status ?? practice.status),
         lastCheckInDate,
         startDate: practice.startDate || null,
         endDate: practice.endDate || null,
+        lockBeforeStartDate: listStatus.lockBeforeStartDate,
+        onBeforeCheckIn: listStatus.needsActivation
+          ? () => activateCohortDraft(practice.id)
+          : undefined,
       });
     });
 
     return { inProgressTasks: inProgressTasksData };
-  }, [allPracticesData, t]);
+  }, [allPracticesData, activateCohortDraft]);
 
   const filteredInProgressTasks = useMemo(
     () => applyMineFilter(inProgressTasks, filterStatus),

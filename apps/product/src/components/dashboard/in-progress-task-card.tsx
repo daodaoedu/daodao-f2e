@@ -45,6 +45,8 @@ interface InProgressTaskCardProps {
   presentation?: "default" | "personal-space" | "cohort";
   cohortId?: number;
   onBeforeCheckIn?: () => Promise<boolean>;
+  /** 非場次頁的燈塔場次實踐（如「我的」列表）：開始日前停用打卡（daodao#544） */
+  lockBeforeStartDate?: boolean;
 }
 
 export const InProgressTaskCard = ({
@@ -65,6 +67,7 @@ export const InProgressTaskCard = ({
   presentation = "default",
   cohortId,
   onBeforeCheckIn,
+  lockBeforeStartDate = false,
 }: InProgressTaskCardProps) => {
   const t = useTranslations("dashboard");
   const tCheckIn = useTranslations("check_in");
@@ -232,8 +235,8 @@ export const InProgressTaskCard = ({
               endDate={endDate ?? null}
               taskTitle={title}
               labelOverride={isCohort ? tCheckIn("button_check_in") : undefined}
-              beforeCheckIn={isCohort && isDraft ? onBeforeCheckIn : undefined}
-              disableBeforeStartDate={isCohort}
+              beforeCheckIn={isCohort ? (isDraft ? onBeforeCheckIn : undefined) : onBeforeCheckIn}
+              disableBeforeStartDate={isCohort || lockBeforeStartDate}
               showIcon
               progressPercentage={progress}
             />
