@@ -43,7 +43,7 @@ const COLUMNS: Column[] = [
   { key: "nickname", labelKey: "col_participant", sort: "nickname" },
   { key: "email", labelKey: "col_email" },
   { key: "practice", labelKey: "col_practice" },
-  { key: "startDate", labelKey: "col_start_date", sort: "startDate" },
+  { key: "startDate", labelKey: "col_first_checkin", sort: "startDate" },
   { key: "checkinCount", labelKey: "col_checkins", sort: "checkinCount" },
   { key: "commentCount", labelKey: "col_comments", sort: "commentCount" },
   { key: "reactionCount", labelKey: "col_reactions", sort: "reactionCount" },

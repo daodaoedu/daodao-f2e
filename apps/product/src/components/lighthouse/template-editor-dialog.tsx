@@ -280,6 +280,7 @@ export function TemplateEditorDialog({
   return (
     <Dialog open={open} onOpenChange={(next) => !busy && onOpenChange(next)}>
       <DialogContent
+        showCloseButton={false}
         overlayClassName="bg-[#0F3036]/30"
         className={cn(
           "flex max-h-[calc(100vh-48px)] w-[min(680px,94vw)] sm:max-w-none flex-col gap-0 overflow-hidden rounded-3xl border-0 bg-white p-0",

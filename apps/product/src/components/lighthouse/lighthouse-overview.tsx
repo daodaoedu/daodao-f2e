@@ -76,21 +76,6 @@ function CohortCard({ cohort }: { cohort: LighthouseOrganizationCohortType }) {
           <ArrowUpRight className="size-4" aria-hidden="true" />
         </CustomLink>
       </div>
-
-      <div className="pointer-events-none relative mt-4 grid grid-cols-2 gap-2 sm:gap-3">
-        <div className="rounded-xl bg-[#EDF8F6] p-3 sm:p-4">
-          <span className="text-xl font-semibold text-[#0D7773] sm:text-2xl">
-            {cohort.celebrateCount}
-          </span>
-          <span className="mt-1 block text-xs text-[#456B68]">{t("overview_stat_celebrate")}</span>
-        </div>
-        <div className="rounded-xl bg-[#FFF4E5] p-3 sm:p-4">
-          <span className="text-xl font-semibold text-[#A95D00] sm:text-2xl">
-            {cohort.encourageCount}
-          </span>
-          <span className="mt-1 block text-xs text-[#456B68]">{t("overview_stat_encourage")}</span>
-        </div>
-      </div>
     </article>
   );
 }
