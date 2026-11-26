@@ -42,6 +42,11 @@ interface ChallengeCardProps {
    * （POC：點卡片進實踐頁打卡）；未知時卡片不可點。
    */
   practiceId?: string | null;
+  /**
+   * 整張卡的連結（探索共同挑戰頁傳介紹頁，daodao#570）。不傳時沿用動作連結：
+   * 已加入且進行中／已結束才連到實踐頁（「我參加的挑戰」頁）。
+   */
+  href?: string;
 }
 
 /**
@@ -55,6 +60,7 @@ export const ChallengeCard = ({
   onJoinClick,
   onDrawClick,
   practiceId,
+  href,
 }: ChallengeCardProps) => {
   const t = useTranslations("challenge");
   const Theme = getChallengeThemeSvg(challenge.id);
@@ -70,7 +76,8 @@ export const ChallengeCard = ({
 
   const action = getChallengeCardAction(challenge, practiceId);
   const actionLabel = action.kind === "none" ? null : t(action.labelKey);
-  const isLinked = action.href !== null;
+  const cardHref = href ?? action.href;
+  const isLinked = cardHref !== null;
   // 未開始、或不知道實踐 id 而沒有連結：膠囊用不可點樣式，避免「看起來可點、點了沒反應」
   const isMuted = isChallengeActionMuted(action);
 
@@ -91,12 +98,16 @@ export const ChallengeCard = ({
         preserveAspectRatio="xMidYMid slice"
       />
 
-      {/* 整張卡連到實踐頁（stretched link）：內容層 pointer-events-none 讓點擊落到連結，
-          抽卡鈕另外 pointer-events-auto，避免 <button> 巢狀在 <a> 裡 */}
-      {action.href !== null && actionLabel !== null && (
+      {/* 整張卡連到介紹頁或實踐頁（stretched link）：內容層 pointer-events-none 讓點擊落到連結，
+          加入鈕、抽卡鈕另外 pointer-events-auto，避免 <button> 巢狀在 <a> 裡 */}
+      {cardHref !== null && (href !== undefined || actionLabel !== null) && (
         <Link
-          href={action.href}
-          aria-label={t("card_link_label", { action: actionLabel, title: challenge.displayName })}
+          href={cardHref}
+          aria-label={
+            href !== undefined || actionLabel === null
+              ? t("card_detail_link_label", { title: challenge.displayName })
+              : t("card_link_label", { action: actionLabel, title: challenge.displayName })
+          }
           className="absolute inset-0 z-[5] rounded-[20px] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-logo-cyan"
         />
       )}
@@ -181,6 +192,7 @@ export const ChallengeCard = ({
         {action.kind === "join" ? (
           <span className="mt-2 shrink-0 flex justify-end">
             <Button
+              className="pointer-events-auto"
               variant="secondary"
               size="sm"
               disabled={action.disabled}
