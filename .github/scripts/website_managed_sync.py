@@ -75,6 +75,8 @@ class State:
     managed_runs: list = field(default_factory=list)
     # prod only: operator content pins (BLOG_PROD_CONTENT_SHA, *_PUBLISHED_*).
     content_pins: dict = field(default_factory=dict)
+    publication_schedule: str = ""
+    publication_check: bool = False
     now: dt.datetime = field(default_factory=lambda: dt.datetime.now(dt.UTC))
 
 
@@ -101,13 +103,95 @@ def result(action, reason, **extra):
     return {"action": action, "reason": reason, **extra}
 
 
+def scheduled_publication(state):
+    """Only release the exact prepared content pair after its offset-aware time."""
+    raw = state.publication_schedule
+    if not raw.strip():
+        return None
+    try:
+        schedule = json.loads(raw)
+        if not isinstance(schedule, dict) or set(schedule) != {
+            "publish_at", "content_sha", "baseline_content_sha"
+        }:
+            raise ValueError("Invalid schedule fields")
+        content = schedule["content_sha"]
+        baseline = schedule["baseline_content_sha"]
+        if not all(isinstance(sha, str) and SHA.fullmatch(sha) for sha in (content, baseline)):
+            raise ValueError("Invalid content revisions")
+        if content == baseline or not isinstance(schedule["publish_at"], str):
+            raise ValueError("Schedule requires a new content revision")
+        due = parse_time(schedule["publish_at"])
+        if due.tzinfo is None or due.utcoffset() is None:
+            raise ValueError("Schedule requires an explicit UTC offset")
+    except (TypeError, ValueError):
+        return result("alert", "publication schedule is invalid; use an ISO time with UTC offset and full content/baseline SHAs")
+
+    live = state.marker.get("content_sha")
+    if live == content:
+        if state.publication_check or state.marker["frontend_sha"] == state.head_sha:
+            return result("up-to-date", "scheduled content is already live")
+        return None
+    if state.content_pins != {"content": content, "published": baseline}:
+        return result("alert", "publication schedule no longer matches the prepared content pins")
+    if live != baseline:
+        return result("alert", "live content changed after scheduling; review the baseline before publishing")
+    if state.now < due:
+        return result("wait", "scheduled publication is not due yet")
+    if not state.publication_check:
+        return result("wait", "scheduled publication waits for the daily GitHub check")
+
+    def wait(reason):
+        action = "alert" if state.now - due > dt.timedelta(minutes=LAG_MINUTES) else "wait"
+        return result(action, reason)
+
+    # Content-only releases can reuse a frontend SHA that already published.
+    # Earlier runs are not attempts at this schedule; every active prod run
+    # still owns the shared publication queue, including runs for older heads.
+    if any(run.get("status") in ACTIVE for run in state.managed_runs):
+        return wait("a production publication is already pending")
+    attempts = []
+    try:
+        for run in state.managed_runs:
+            created = parse_time(run.get("created_at", ""))
+            if created.tzinfo is None:
+                raise ValueError("Unknown attempt timestamp")
+            if created >= due and run.get("conclusion") != "cancelled":
+                attempts.append(run)
+    except (TypeError, ValueError, AttributeError):
+        return result("alert", "cannot establish scheduled publication attempt history")
+    if any(run.get("conclusion") == "success" for run in attempts):
+        return result("alert", "publication succeeded after the scheduled time but the intended content is not live")
+    failed = [run for run in attempts if run.get("status") == "completed"]
+    if len(failed) >= MAX_ATTEMPTS_PER_SHA:
+        return result("alert", "scheduled publication failed repeatedly; inspect the existing runs", runs=[run.get("id") for run in failed])
+    ci = state.ci or {}
+    if ci.get("status") != "completed":
+        return wait("Linode CI for the current production head has not completed")
+    if ci.get("conclusion") != "success" or type(ci.get("id")) is not int or ci["id"] <= 0:
+        return result("alert", "scheduled publication requires successful current production CI")
+    if not state.legacy_cd_idle:
+        return wait("legacy production CD is still running")
+    return result(
+        "dispatch", "approved content publication is due",
+        workflow=CHANNELS["prod"]["workflow"], ref="prod",
+        inputs={"ci_run_id": str(ci["id"]), "expected_content_sha": content},
+        retry=bool(failed), scheduled=True,
+    )
+
+
 def decide(state):
     """Return what to do for one channel; pure so every branch is testable."""
     if not state.managed:
+        if state.publication_check and state.publication_schedule.strip():
+            return result("alert", "scheduled publication requires the managed production publisher")
         return result("legacy", "channel is not managed; Linode CD owns the website")
     marker = state.marker
     if not marker or not SHA.fullmatch(str(marker.get("frontend_sha", ""))):
         return result("alert", "public release marker is unreadable")
+    if state.channel == "prod":
+        scheduled = scheduled_publication(state)
+        if scheduled is not None:
+            return scheduled
     if marker["frontend_sha"] == state.head_sha:
         return result("up-to-date", "marker frontend_sha equals branch head")
     if not website_changed(state.changed_files):
@@ -175,7 +259,7 @@ def decide(state):
                     "prod content release is staged; publish it manually to ship the frontend",
                 )
             return result("wait", "prod content pins differ from the live content")
-        inputs = {"ci_run_id": str(ci["id"])}
+        inputs = {"ci_run_id": str(ci["id"]), "expected_content_sha": live}
     return result(
         "dispatch",
         "head carries website changes not on the public site",
@@ -249,13 +333,13 @@ def managed_runs(api, workflow, branch, titles=None):
         f"?branch={branch}&event=workflow_dispatch&per_page=50"
     ).get("workflow_runs", [])
     return [
-        {key: run.get(key) for key in ("id", "head_sha", "status", "conclusion")}
+        {key: run.get(key) for key in ("id", "head_sha", "status", "conclusion", "created_at")}
         for run in runs
         if titles is None or run.get("display_title") in titles
     ]
 
 
-def collect(channel, environment, api=gh_api, marker_reader=read_marker):
+def collect(channel, environment, api=gh_api, marker_reader=read_marker, publication_check=False):
     config = CHANNELS[channel]
     # Same rule as blog-cd-ownership.py: anything but empty/"false" is managed,
     # otherwise CD would skip the website while sync treats it as legacy.
@@ -291,6 +375,9 @@ def collect(channel, environment, api=gh_api, marker_reader=read_marker):
         }
         if channel == "prod"
         else {},
+        publication_schedule=environment.get("BLOG_PROD_PUBLICATION_SCHEDULE", "")
+        if channel == "prod" else "",
+        publication_check=publication_check,
     )
 
 
@@ -322,15 +409,22 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--channel", choices=sorted(CHANNELS), required=True)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--scheduled-only", action="store_true")
     args = parser.parse_args()
-    state = collect(args.channel, os.environ)
-    decision = decide(state)
+    if args.scheduled_only and args.channel != "prod":
+        parser.error("--scheduled-only requires --channel prod")
+    state = collect(args.channel, os.environ, publication_check=args.scheduled_only)
+    if args.scheduled_only and not state.publication_schedule.strip():
+        decision = result("no-schedule", "no scheduled publication is configured")
+    else:
+        decision = decide(state)
     if decision["action"] == "dispatch" and not args.dry_run:
         dispatch(decision)
     if decision["action"] == "dispatch" and decision.get("retry"):
         decision = {
             **decision,
-            "reason": "previous managed publication for head failed; retried once",
+            "reason": "previous scheduled publication failed; retried once"
+            if decision.get("scheduled") else "previous managed publication for head failed; retried once",
         }
     output = {"channel": args.channel, "head": state.head_sha, **decision}
     print(json.dumps(output, sort_keys=True))
@@ -353,3 +447,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
