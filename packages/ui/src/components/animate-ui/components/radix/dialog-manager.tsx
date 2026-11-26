@@ -58,6 +58,7 @@ interface DialogItem {
 
 interface DialogManagerContextType {
   open: (config: DialogConfig) => { id: string; close: () => void };
+  update: (id: string, config: Partial<DialogConfig>) => void;
   close: (id?: string) => void;
 }
 
@@ -102,6 +103,16 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
     };
 
     return { id, close };
+  }, []);
+
+  const update = useCallback((id: string, config: Partial<DialogConfig>) => {
+    setDialogs((prev) => {
+      const updated = prev.map((dialog) =>
+        dialog.id === id ? { ...dialog, config: { ...dialog.config, ...config } } : dialog
+      );
+      dialogsRef.current = updated;
+      return updated;
+    });
   }, []);
 
   const close = useCallback((id?: string) => {
@@ -269,7 +280,7 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
   };
 
   return (
-    <DialogManagerContext.Provider value={{ open, close }}>
+    <DialogManagerContext.Provider value={{ open, update, close }}>
       {children}
       {dialogs.map((dialog, index) => renderDialog(dialog, index))}
     </DialogManagerContext.Provider>

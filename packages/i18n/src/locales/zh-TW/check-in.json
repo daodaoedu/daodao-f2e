@@ -65,6 +65,7 @@
   "description_next_step_placeholder": "想到什麼就簡單記下來",
   "description_word_count": "{count}/{max} 字詞",
   "mood_question": "心情如何?",
+  "mood_follow_up_title": "紀錄你的心情",
   "moods": {
     "hopeless": "想放棄",
     "frustrated": "受挫",
@@ -84,6 +85,7 @@
   "add_tag": "加入標籤",
   "add": "加入",
   "reflection_toggle": "顯示反思問題",
+  "reflection_title": "反思問題",
   "reflection_refresh": "換一題",
   "reflection_questions": {
     "0": "今天做了什麼讓你有點小得意的事？",
