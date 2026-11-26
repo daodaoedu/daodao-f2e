@@ -338,7 +338,9 @@ export default function CheckInDetailPage() {
 
   // 判斷當前用戶是否為實踐的擁有者
   const isOwner =
-    !!practiceData?.data?.user?.id && practiceData.data.user.id === currentUserData?.data?.id;
+    view !== "visitor" &&
+    !!practiceData?.data?.user?.id &&
+    practiceData.data.user.id === currentUserData?.data?.id;
   const canEditCheckIn = isOwner && !isCohortAdminView;
 
   const handleCheckInComplete = (data: unknown) => {

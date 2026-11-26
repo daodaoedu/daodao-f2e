@@ -15,6 +15,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Plus, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { NotificationBell } from "@/components/notifications/notification-bell";
+import { isPracticeDetailPath } from "@/lib/practice-detail-path";
 import { BreathingDot } from "./breathing-dot";
 import { ChatUnreadBadge } from "./chat-unread-badge";
 import { MobileBottomSheet } from "./mobile-bottom-sheet";
@@ -36,6 +37,8 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
   const initial = displayName.charAt(0).toUpperCase();
 
   const isHomePage = pathname === "/" || pathname === "/en" || pathname === "/zh-TW";
+  // Practice detail lets the logo scroll away so it never covers the page content.
+  const isPracticeDetailPage = isPracticeDetailPath(pathname);
 
   useEffect(() => {
     const logoElement = logoRef.current;
@@ -85,7 +88,10 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
 
   return (
     <>
-      <div ref={logoRef} className="fixed top-5 left-5 z-20">
+      <div
+        ref={logoRef}
+        className={cn("top-5 left-5 z-20", isPracticeDetailPage ? "absolute" : "fixed")}
+      >
         <CustomLink href="/" aria-label={t("back_to_website")}>
           <Image src={favicon256Png.src} alt="daodao logo" width={40} height={40} />
         </CustomLink>
