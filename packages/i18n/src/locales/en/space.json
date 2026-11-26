@@ -112,5 +112,10 @@
   "challenge_filter_empty": "No challenges match this filter",
   "challenge_login_required": "Log in to see the challenges you have joined",
   "challenge_login_action": "Log in",
-  "challenge_load_error": "We couldn't load your challenges right now. Please try again later."
+  "challenge_load_error": "We couldn't load your challenges right now. Please try again later.",
+  "list_subtitle": "Your practices, shared challenges and courses · {count}",
+  "personal_section_title": "My practices",
+  "filter_trigger_aria_label": "Filter: {label}",
+  "practice_filter_menu_aria_label": "Filter practices",
+  "challenge_filter_menu_aria_label": "Filter shared challenges"
 }

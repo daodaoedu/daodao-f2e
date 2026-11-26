@@ -68,6 +68,16 @@ export const isChallengeActionMuted = (action: ChallengeCardAction): boolean =>
   ((action.kind === "checkin" || action.kind === "summary") && action.href === null);
 
 /**
+ * 我的共同挑戰頁是否要在卡片外另給「打開實踐」連結（daodao#572）。
+ * 卡片本身已連到實踐（進行中、已結束）時不重複；只有已加入、未開始這種
+ * 卡片不可點、卻已有實踐的情況，外部連結才是唯一入口。
+ */
+export const needsSeparatePracticeLink = (
+  challenge: ChallengeCardInput,
+  practiceId: string | null | undefined
+): boolean => Boolean(practiceId) && getChallengeCardAction(challenge, practiceId).href === null;
+
+/**
  * 卡片用的「挑戰 id → 自動複製實踐 id」對照：以 `/me/challenges` 為主，
  * 剛加入（join API 已回傳 practiceId、但列表尚未 revalidate）的挑戰以回傳值補上，
  * 讓加入後的卡片立即可點。

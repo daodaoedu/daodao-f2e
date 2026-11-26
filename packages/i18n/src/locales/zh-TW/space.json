@@ -112,5 +112,10 @@
   "challenge_filter_empty": "沒有符合篩選條件的挑戰",
   "challenge_login_required": "登入後就能看到你參加的共同挑戰",
   "challenge_login_action": "登入",
-  "challenge_load_error": "暫時無法載入你的共同挑戰，請稍後再試"
+  "challenge_load_error": "暫時無法載入你的共同挑戰，請稍後再試",
+  "list_subtitle": "個人實踐、共同挑戰和你參加的活動課程 · {count} 個",
+  "personal_section_title": "我的實踐",
+  "filter_trigger_aria_label": "篩選：{label}",
+  "practice_filter_menu_aria_label": "篩選實踐",
+  "challenge_filter_menu_aria_label": "篩選共同挑戰"
 }

@@ -6,38 +6,26 @@ import { Link } from "@daodao/i18n/navigation";
 import { cn } from "@daodao/ui/lib/utils";
 import { ChevronRight } from "lucide-react";
 import { spaceHref } from "@/lib/spaces/space-href";
-
-/** Card tint/accent pairs per space kind, matching the POC palette. */
-const KIND_STYLES = {
-  personal: { tint: "bg-[oklch(0.93_0.012_210)]", accent: "bg-basic-600" },
-  challenge: { tint: "bg-[oklch(0.945_0.045_195)]", accent: "bg-primary-base" },
-  event_course: { tint: "bg-[oklch(0.95_0.045_80)]", accent: "bg-logo-orange" },
-} as const;
+import { SPACE_KIND_STYLES, SpaceKindIcon } from "./space-kind-icon";
 
 interface SpaceCardProps {
   space: SpaceListItemType;
 }
 
-/** One row on the space list (FR-2.x): icon, name/host, state or member stack. */
+/** One row on the space list (FR-2.x): icon, name/host, state or member stack.
+ * 外框（圓角、邊框、hover）與探索頁卡片一致（daodao#572） */
 export const SpaceCard = ({ space }: SpaceCardProps) => {
   const t = useTranslations("space");
-  const styles = KIND_STYLES[space.kind];
+  const styles = SPACE_KIND_STYLES[space.kind];
   const href = spaceHref(space);
 
   return (
     <li>
       <Link
         href={href}
-        className="flex items-center gap-3.5 rounded-[18px] border border-[#DCEBEA] bg-white px-4 py-3.5 shadow-[0_2px_6px_rgba(15,48,54,0.04)] transition-all hover:border-primary-base/55 hover:shadow-[0_8px_20px_rgba(15,48,54,0.09)]"
+        className="flex items-center gap-3.5 rounded-[20px] border border-[#E4EAE9] bg-white px-4 py-3.5 transition-all duration-160 hover:-translate-y-[3px] hover:border-logo-cyan/50 hover:shadow-[0_12px_26px_rgba(15,48,54,0.09)]"
       >
-        <span
-          className={cn(
-            "flex size-11 shrink-0 items-end justify-center rounded-[14px]",
-            styles.tint
-          )}
-        >
-          <span className={cn("mb-[11px] block h-[13px] w-[26px] rounded-t-full", styles.accent)} />
-        </span>
+        <SpaceKindIcon kind={space.kind} />
         <span className="flex min-w-0 flex-1 flex-col gap-[3px]">
           <span className="truncate text-[17px] font-semibold text-basic-600">{space.name}</span>
           <span className="text-[13px] text-text-dark">{space.host}</span>

@@ -5,7 +5,7 @@ import { useTranslations } from "@daodao/i18n";
 import { Spinner } from "@daodao/ui/components/spinner";
 import { useMemo } from "react";
 import type { InProgressTask } from "@/components/dashboard";
-import { SpacePracticeSection, SpaceSubpageHeader } from "@/components/spaces";
+import { SpacePageShell, SpacePracticeSection } from "@/components/spaces";
 import { mapPracticeStatusToTaskStatus } from "@/constants/task-status";
 
 /** 個人實踐子頁 (FRD 4): the viewer's own practices behind the space filter row. */
@@ -33,15 +33,18 @@ export default function PersonalSpacePage() {
   );
 
   return (
-    <div className="mx-auto min-h-screen max-w-[640px] px-4 pb-[72px] pt-[68px] md:pt-6">
-      <SpaceSubpageHeader title={t("personal_name")} variant="banner" />
+    <SpacePageShell kind="personal" title={t("personal_name")} subtitle={t("personal_host")}>
       {isLoading ? (
         <div className="flex justify-center py-16">
           <Spinner aria-label={t("loading")} />
         </div>
       ) : (
-        <SpacePracticeSection tasks={tasks} presentation="personal-space" />
+        <SpacePracticeSection
+          tasks={tasks}
+          presentation="personal-space"
+          sectionTitle={t("personal_section_title")}
+        />
       )}
-    </div>
+    </SpacePageShell>
   );
 }

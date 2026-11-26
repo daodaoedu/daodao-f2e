@@ -66,6 +66,7 @@ export const InProgressTaskCard = ({
   const Theme = practiceThemeSvgMap[themeName] ?? practiceThemeSvgMap[PracticeTheme.yellow];
   const isDraft = status === TaskStatus.draft;
   const isCohort = presentation === "cohort";
+  const cardRadius = presentation === "personal-space" ? "rounded-[20px]" : "rounded-[12px]";
   const displayStatus = isCohort && isDraft ? TaskStatus.notStarted : status;
   const statusInfo = getStatusConfig(displayStatus);
   const parsedStartDate = startDate ? parseLocalDate(startDate) : null;
@@ -89,10 +90,14 @@ export const InProgressTaskCard = ({
           ? `/practices/${id}?view=cohort-member${cohortId ? `&cohortId=${cohortId}` : ""}`
           : `/practices/${id}`
       }
-      className="relative block w-[294px] h-[239px] md:w-full rounded-[12px] overflow-hidden cursor-pointer text-left hover:scale-[1.02] hover:shadow-md transition-all duration-200"
+      className={cn(
+        "relative block w-[294px] h-[239px] md:w-full overflow-hidden cursor-pointer text-left hover:scale-[1.02] hover:shadow-md transition-all duration-200",
+        // 空間頁卡片圓角與共同挑戰卡、探索卡一致（daodao#572）；首頁維持原樣
+        cardRadius
+      )}
     >
       <Theme
-        className="absolute inset-0 w-full h-full rounded-[12px]"
+        className={cn("absolute inset-0 w-full h-full", cardRadius)}
         preserveAspectRatio="xMidYMid slice"
       />
 
