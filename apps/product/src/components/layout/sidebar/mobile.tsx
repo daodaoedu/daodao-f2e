@@ -36,6 +36,7 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
   const initial = displayName.charAt(0).toUpperCase();
 
   const isHomePage = pathname === "/" || pathname === "/en" || pathname === "/zh-TW";
+  const isPracticeDetailPage = /^(?:\/(?:en|zh-TW))?\/practices\/[^/]+\/?$/.test(pathname);
 
   useEffect(() => {
     const logoElement = logoRef.current;
@@ -85,7 +86,10 @@ export const MobileSidebar = ({ identifier }: SidebarProps) => {
 
   return (
     <>
-      <div ref={logoRef} className="fixed top-5 left-5 z-20">
+      <div
+        ref={logoRef}
+        className={cn("top-5 left-5 z-20", isPracticeDetailPage ? "absolute" : "fixed")}
+      >
         <CustomLink href="/" aria-label={t("back_to_website")}>
           <Image src={favicon256Png.src} alt="daodao logo" width={40} height={40} />
         </CustomLink>

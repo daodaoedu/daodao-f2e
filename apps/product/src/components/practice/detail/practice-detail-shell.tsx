@@ -13,6 +13,7 @@ import {
 import {
   BookSvg,
   ChartColumnIncreasingSvg,
+  DefaultAvatarSvg,
   DialogOutlineSvg,
   FlagOutlineSvg,
   TelescopeSvg,
@@ -21,6 +22,7 @@ import type { MentionCandidate } from "@daodao/features-mention";
 import { useTranslations } from "@daodao/i18n";
 import { usePathname, useRouter, useSearchParams } from "@daodao/i18n/navigation";
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
+import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
@@ -242,16 +244,10 @@ function PracticeResourceListCard({ startDate, resource }: IPracticeResourceList
       </div>
 
       <div className="flex-1 min-w-0 py-1 overflow-hidden whitespace-normal">
-        {(!resource.isLocked || resource.dayNumber != null) && (
+        {resource.dayNumber != null && (
           <span className="inline-block mb-1 rounded-full bg-[#E7FAF7] px-2 py-0.5 text-[11px] font-semibold text-[#0D7773]">
-            {resource.dayNumber == null ? (
-              t("resource_usage_all")
-            ) : (
-              <>
-                {getResourceDate(startDate || "", resource.dayNumber)?.replaceAll("-", "/")} (
-                {t("resource_day_badge", { day: resource.dayNumber })})
-              </>
-            )}
+            {getResourceDate(startDate || "", resource.dayNumber)?.replaceAll("-", "/")} (
+            {t("resource_day_badge", { day: resource.dayNumber })})
           </span>
         )}
         <p className="text-sm font-semibold text-[#295E5C] leading-snug line-clamp-2">
@@ -315,9 +311,7 @@ export function PracticeDetailShell({
   const { copyPractice } = useCopyPractice();
   const [isCopying, setIsCopying] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("checkins");
-  const [checkInView, setCheckInView] = useState<CheckInViewType>(
-    readOnly ? CheckInView.list : CheckInView.bubbles
-  );
+  const [checkInView, setCheckInView] = useState<CheckInViewType>(CheckInView.list);
   // 各打卡的留言數（由 CheckInCommentGroups 回報），用於留言分頁的總數
   const [checkInCommentCounts, setCheckInCommentCounts] = useState<Record<string, number | null>>(
     {}
@@ -346,9 +340,9 @@ export function PracticeDetailShell({
         (checkIn) => checkInCommentCounts[String(checkIn.id)] == null
       ));
   const practiceCommentCount = commentCount ?? comments.length;
-  // 進行中的實踐：手機版先看到打卡，實踐資訊卡預設收合（桌機版兩欄並排，不受影響）
+  // Active practice details can collapse on compact screens; desktop stays expanded.
   const isOverviewCollapsible = practice.status === PracticeStatus.active;
-  const [overviewOpenOnMobile, setOverviewOpenOnMobile] = useState(false);
+  const [overviewOpenOnMobile, setOverviewOpenOnMobile] = useState(true);
   const [practiceMenuOpen, setPracticeMenuOpen] = useState(false);
   const [isFollowingPractice, setIsFollowingPractice] = useState(false);
   const commentsRef = useRef<HTMLDivElement>(null);
@@ -689,33 +683,38 @@ export function PracticeDetailShell({
             nextLabel={nextLabel}
           />
 
-          {isOverviewCollapsible && (
+          {isOverviewCollapsible && !overviewOpenOnMobile && (
             <div className="-mt-3 mb-3 flex w-full items-center gap-2 rounded-lg bg-white px-4 py-3 shadow-sm md:hidden">
               <Button
                 type="button"
                 variant="ghost"
                 aria-expanded={overviewOpenOnMobile}
                 aria-controls="practice-overview-card"
-                onClick={() => setOverviewOpenOnMobile((value) => !value)}
+                aria-label={t("show_practice_details")}
+                onClick={() => setOverviewOpenOnMobile(true)}
                 className="flex h-auto min-w-0 flex-1 items-center justify-between gap-3 rounded-lg p-0 text-left cursor-pointer hover:bg-white"
               >
+                {practice.creator && (
+                  <Avatar className="size-8 shrink-0">
+                    {practice.creator.photoURL && (
+                      <AvatarImage src={practice.creator.photoURL} alt={practice.creator.name} />
+                    )}
+                    <AvatarFallback>
+                      <DefaultAvatarSvg aria-hidden="true" />
+                    </AvatarFallback>
+                  </Avatar>
+                )}
                 <span className="min-w-0 flex-1">
                   <span className="block text-xs font-medium text-[#6B8789]">
-                    {overviewOpenOnMobile
-                      ? t("hide_practice_details")
-                      : (practice.creator?.name ?? t("show_practice_details"))}
+                    {practice.creator?.name ?? t("show_practice_details")}
                   </span>
-                  {!overviewOpenOnMobile && practice.actionDescription && (
+                  {practice.actionDescription && (
                     <span className="mt-0.5 block truncate text-sm font-normal text-text-dark">
                       {practice.actionDescription}
                     </span>
                   )}
                 </span>
-                {overviewOpenOnMobile ? (
-                  <ChevronUp aria-hidden="true" className="size-4 shrink-0 text-[#9FB5B8]" />
-                ) : (
-                  <ChevronDown aria-hidden="true" className="size-4 shrink-0 text-[#9FB5B8]" />
-                )}
+                <ChevronDown aria-hidden="true" className="size-4 shrink-0 text-[#9FB5B8]" />
               </Button>
               {!overviewOpenOnMobile && (
                 <div className="w-28 shrink-0">
@@ -737,10 +736,24 @@ export function PracticeDetailShell({
           <div
             id="practice-overview-card"
             className={cn(
-              "bg-white rounded-lg shadow-sm mb-4",
+              "relative bg-white rounded-lg shadow-sm mb-4",
               isOverviewCollapsible && !overviewOpenOnMobile && "hidden md:block"
             )}
           >
+            {isOverviewCollapsible && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                aria-label={t("hide_practice_details")}
+                aria-expanded={overviewOpenOnMobile}
+                aria-controls="practice-overview-card"
+                onClick={() => setOverviewOpenOnMobile(false)}
+                className="absolute right-2 top-2 z-10 text-light-gray md:hidden"
+              >
+                <ChevronUp aria-hidden="true" className="size-4" />
+              </Button>
+            )}
             <PracticeOverviewCard
               actionDescription={practice.actionDescription}
               frequency={practice.frequency}
@@ -1021,7 +1034,7 @@ export function PracticeDetailShell({
               <div className="lg:pl-12 lg:pr-0">
                 <CheckInRecordCard checkInsData={checkInsData} isLoading={isLoadingCheckIns} />
               </div>
-              {readOnly && (checkInsData?.data?.length ?? 0) > 0 && (
+              {(checkInsData?.data?.length ?? 0) > 0 && (
                 <fieldset className="mx-4 mt-4 hidden justify-end md:flex">
                   <legend className="sr-only">{t("checkin_view_label")}</legend>
                   <div className="flex rounded-full bg-[#E4EAE9] p-0.5">
