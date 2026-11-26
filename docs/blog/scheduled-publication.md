@@ -28,7 +28,7 @@ The publisher skill resolves these technical values; the user only needs to iden
 
 ## Check, change or cancel
 
-Run `Scheduled Blog publication` manually with `dry_run=true` to inspect the decision without starting a publication. Scheduled cron runs use the real dispatch path. The normal website sync still runs at its original cadence; it holds pending scheduled content and cannot publish it between daily checks.
+Run `Scheduled Blog publication` manually with `dry_run=true` to inspect the decision without starting a publication. Updates to the scheduler on `dev` also run this read-only check automatically; they cannot dispatch a release. Scheduled cron runs use the real dispatch path. The normal website sync still runs at its original cadence; it holds pending scheduled content and cannot publish it between daily checks.
 
 To change the date, replace the schedule variable after checking that no publication is already pending. To cancel future checks for this release, delete the variable:
 

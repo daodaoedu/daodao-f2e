@@ -1,6 +1,11 @@
 name: Scheduled Blog publication
 
 on:
+  push:
+    branches: [dev]
+    paths:
+      - '.github/workflows/blog-scheduled-publish.yml'
+      - '.github/scripts/website_managed_sync.py'
   schedule:
     # Once every 24 hours, 09:00 Asia/Taipei (UTC+08:00).
     - cron: '0 1 * * *'
@@ -37,7 +42,7 @@ jobs:
           BLOG_PROD_CONTENT_SHA: ${{ vars.BLOG_PROD_CONTENT_SHA }}
           BLOG_PROD_PUBLISHED_CONTENT_SHA: ${{ vars.BLOG_PROD_PUBLISHED_CONTENT_SHA }}
           BLOG_PROD_PUBLICATION_SCHEDULE: ${{ vars.BLOG_PROD_PUBLICATION_SCHEDULE }}
-          DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
+          DRY_RUN: ${{ (github.event_name == 'push' || inputs.dry_run) && 'true' || 'false' }}
         shell: bash
         run: |
           args=(--channel prod --scheduled-only)
