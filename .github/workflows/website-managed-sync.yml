@@ -47,6 +47,7 @@ jobs:
           BLOG_PROD_RELEASE_MANAGED: ${{ vars.BLOG_PROD_RELEASE_MANAGED }}
           BLOG_PROD_CONTENT_SHA: ${{ vars.BLOG_PROD_CONTENT_SHA }}
           BLOG_PROD_PUBLISHED_CONTENT_SHA: ${{ vars.BLOG_PROD_PUBLISHED_CONTENT_SHA }}
+          BLOG_PROD_PUBLICATION_SCHEDULE: ${{ vars.BLOG_PROD_PUBLICATION_SCHEDULE }}
         run: python3 .github/scripts/website_managed_sync.py --channel "${{ matrix.channel }}"
       - name: Alert Discord when the public website lags
         if: failure() && steps.sync.outcome == 'failure'
@@ -68,3 +69,4 @@ jobs:
             }]
           }')
           curl -fsS -H "Content-Type: application/json" -d "$payload" "$DISCORD_WEBHOOK_URL"
+
