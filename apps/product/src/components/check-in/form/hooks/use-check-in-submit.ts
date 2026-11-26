@@ -81,7 +81,6 @@ export const useCheckInSubmit = ({
           progressPercentage,
           newProgressPercentage,
           encouragement,
-          null,
           (mood) => {
             selectedMoodRef.current = mood;
           }

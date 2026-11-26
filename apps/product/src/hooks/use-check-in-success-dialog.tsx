@@ -215,15 +215,9 @@ function Step2Animation({ encouragement }: Step2AnimationProps) {
   );
 }
 
-function MoodFollowUp({
-  initialMood,
-  onMoodChange,
-}: {
-  initialMood: MoodTypeValue | null;
-  onMoodChange?: (mood: MoodTypeValue) => void;
-}) {
+function MoodFollowUp({ onMoodChange }: { onMoodChange?: (mood: MoodTypeValue) => void }) {
   const t = useTranslations("check_in");
-  const [mood, setMood] = useState<MoodTypeValue | null>(initialMood);
+  const [mood, setMood] = useState<MoodTypeValue | null>(null);
 
   return (
     <section className="mt-3 rounded-2xl border border-logo-cyan/25 bg-logo-cyan/5 px-3 py-3 shadow-sm">
@@ -276,7 +270,6 @@ interface CheckInSuccessContentProps {
   from: number;
   to: number;
   encouragement?: string;
-  initialMood: MoodTypeValue | null;
   onMoodChange?: (mood: MoodTypeValue) => void;
 }
 
@@ -284,14 +277,13 @@ function CheckInSuccessContent({
   from,
   to,
   encouragement,
-  initialMood,
   onMoodChange,
 }: CheckInSuccessContentProps) {
   return (
     <>
       <Step1Animation from={from} to={to} />
       <Step2Animation encouragement={encouragement} />
-      <MoodFollowUp initialMood={initialMood} onMoodChange={onMoodChange} />
+      <MoodFollowUp onMoodChange={onMoodChange} />
     </>
   );
 }
@@ -319,7 +311,6 @@ export function useCheckInSuccessDialog({ from = 0, to = 100 }: UseCheckInSucces
       dynamicFrom?: number,
       dynamicTo?: number,
       encouragement?: string,
-      initialMood: MoodTypeValue | null = null,
       onMoodChange?: (mood: MoodTypeValue) => void
     ): Promise<{ value: "complete" | "close"; index: number }> => {
       const finalFrom = dynamicFrom !== undefined ? dynamicFrom : from;
@@ -335,7 +326,6 @@ export function useCheckInSuccessDialog({ from = 0, to = 100 }: UseCheckInSucces
                 from={finalFrom}
                 to={finalTo}
                 encouragement={encouragement}
-                initialMood={initialMood}
                 onMoodChange={(mood) => {
                   onMoodChange?.(mood);
                   update(dialogId, {

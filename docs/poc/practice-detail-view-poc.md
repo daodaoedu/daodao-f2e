@@ -46,11 +46,13 @@ Original POC verification (from the earlier commit):
 
 Follow-up verification for the interaction refinements in this handoff:
 
-- Biome lint on the six changed TSX files: passed. `git diff --check`: passed.
-- Biome formatting was applied to the changed success-dialog hook. The formatter still reports pre-existing formatting differences in the larger practice detail shell; that file was left otherwise untouched to avoid unrelated reformatting.
-- The product typecheck could not be completed in this environment: direct `tsc --noEmit` produced no result and had to be interrupted. Corepack could not acquire the pinned pnpm version because access to the npm registry failed, so the normal pnpm checks were unavailable.
+- Direct review covered the latest interaction changes, their callers, shared dialog action updates, and mood persistence. Removed the success dialog's initial-mood parameter so each opening requires an explicit selection. Updated stale persistence tests that expected closing the dialog to save a changed mood. Multiple review engines were not run, at the user's request.
+- Focused Vitest run: 2 files, 11 tests passed. The success-dialog tests render the real RadioGroup and Button, checking five initially unchecked moods, the native disabled attribute, enabling after each mood (including neutral), completion results, and resetting on reopening. The manager is mocked and selection is invoked through its callback; these are component/hook checks, not a browser end-to-end check. Submission tests cover completion, cancellation, unchanged neutral selection, and persistence failure.
+- Biome lint on the eight touched TSX source/test files: passed. Formatting checks on the four review-fix source/test files: passed. `git diff --check`: passed. The larger practice detail shell retains pre-existing formatting differences.
+- `pnpm run typecheck --concurrency=2`: passed, 18/18 tasks. Initial sandbox attempts could not run pnpm; an unrestricted run worked. The first full-concurrency attempt was interrupted due to resource pressure before the successful bounded run. Generated asset/cache output is not part of the handoff.
+- `pnpm run lint`: attempted; failed on unchanged `packages/blog-content` CRLF formatting, consistent with the original POC limitation above. Those files were not reformatted.
 - The isolated runtime and browser smoke were not repeated for these follow-up changes. The earlier port `3002` attempt failed before rendering, as noted above.
-- GitHub browser account verification was attempted in the Codex in-app browser but timed out. Confirm the browser session and Git credential both use `peggy1213-create` before pushing.
+- GitHub account verified in the Codex in-app browser as `peggy1213-create`; Git Credential Manager also lists that account. The existing remote POC branch was fetched and confirmed to be an ancestor of the local changes before publication.
 
 No production deployment or acceptance result is implied.
 

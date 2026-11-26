@@ -8,7 +8,7 @@ const state = vi.hoisted(() => ({
   update: vi.fn(),
   toastError: vi.fn(),
   selected: "happy",
-  result: "close",
+  result: "complete",
 }));
 vi.mock("@daodao/api", () => ({
   useCreatePracticeCheckIn: () => ({ createCheckIn: state.create }),
@@ -27,7 +27,6 @@ vi.mock("@/hooks/use-check-in-success-dialog", () => ({
       _from: number,
       _to: number,
       _enc: string,
-      _initial: string,
       onMood: (mood: string) => void
     ) => {
       onMood(state.selected);
@@ -52,20 +51,23 @@ beforeEach(() => {
   state.create.mockResolvedValue({ data: { id: 42 } });
   state.update.mockResolvedValue({ data: {} });
   state.selected = "happy";
-  state.result = "close";
+  state.result = "complete";
 });
 
 describe("post-create selected mood persistence", () => {
-  it.each([
-    "complete",
-    "close",
-  ])("persists the last selected mood exactly once on %s", async (result) => {
-    state.result = result;
+  it("persists the last selected mood exactly once on complete", async () => {
     const { submit, onComplete } = setup();
     await submit();
     expect(state.create).toHaveBeenCalledTimes(1);
     expect(state.update).toHaveBeenCalledExactlyOnceWith({ mood: "happy" }, "42");
     expect(onComplete).toHaveBeenCalledExactlyOnceWith({ ...form, mood: "happy" });
+  });
+  it("does not save a changed mood when the dialog is closed", async () => {
+    state.result = "close";
+    const { submit, onComplete } = setup();
+    await submit();
+    expect(state.update).not.toHaveBeenCalled();
+    expect(onComplete).toHaveBeenCalledExactlyOnceWith(form);
   });
   it("does not patch an unchanged selection", async () => {
     state.selected = "neutral";
