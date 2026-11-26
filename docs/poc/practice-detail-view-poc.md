@@ -66,6 +66,14 @@ After restarting the isolated preview with `--hostname localhost`, `/zh-TW/pract
 
 Publication checks for the preview startup fix: Biome format/lint on `apps/product/package.json`, installed Next CLI option validation, and `git diff --check` passed. The workspace lint rerun still failed on unchanged `packages/blog-content` CRLF formatting. The workspace typecheck rerun (`pnpm run typecheck --concurrency=2`) was stopped under memory pressure (less than 500 MB available); it did not produce a final pass. The earlier 18/18 result above remains historical evidence. This publication changes only a startup script and this note; no TypeScript application logic changed, and the browser flow was not run again for publication. Generated assets restored by the check cache were excluded.
 
+## PR #1269 feedback follow-up (2026-11-26)
+
+[Draft PR #1269](https://github.com/daodaoedu/daodao-f2e/pull/1269) targets `dev`. Its initial head `9e70fd4b` passed Linode CI, including 125 product test files / 1,292 product tests and 18/18 workspace typecheck tasks, plus Sonar Quality Gate and Vercel. Mobile CI filtered out its check steps; EAS Build Check and core journeys were skipped, so those workflows do not establish mobile or end-to-end coverage. No human review or inline review threads were present when feedback was collected.
+
+Sonar reported three applicable suggestions: read-only props for `AlwaysOpenTooltip` and `MoodFollowUp`, and a stable DialogManager Context value. This follow-up uses `Readonly` for the two props types and memoizes the provider value with the existing stable `open`, `update`, and `close` callbacks. The two changed source files pass Biome checks, and the existing two mood/submission test files pass all 11 tests. No new review engines were run. The explicit mood requirement, cancellation behavior, and pending real-API mood-persistence acceptance remain as documented above.
+
+This follow-up's local workspace typecheck (`pnpm run typecheck --concurrency=1`) passed all 18 tasks. The local workspace lint rerun still failed on the 10 unchanged `packages/blog-content` CRLF format errors. Generated asset changes from the check cache were excluded. Browser flows were not repeated for these props-type and provider-value changes; the focused tests remain component/hook evidence. Remote checks for the follow-up commit must be read from the current PR head.
+
 ## Known limits
 
 - Review needs a running API, valid session and accessible practice data; this branch includes no seeded records or local login bypass.

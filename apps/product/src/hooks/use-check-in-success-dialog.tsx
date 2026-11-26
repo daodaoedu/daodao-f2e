@@ -7,8 +7,8 @@ import {
   TooltipTrigger,
 } from "@daodao/ui/components/animate-ui/components/base/tooltip";
 import { useDialogManager } from "@daodao/ui/components/animate-ui/components/radix/dialog";
-import { cn } from "@daodao/ui/lib/utils";
 import { RadioGroup, RadioGroupItem } from "@daodao/ui/components/radio-group";
+import { cn } from "@daodao/ui/lib/utils";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { CHECK_IN_MOOD_OPTIONS, type MoodType as MoodTypeValue } from "@/constants/mood";
 import { getProgressAnimationAction } from "./check-in-progress-animation";
@@ -110,7 +110,11 @@ interface AlwaysOpenTooltipProps {
 /**
  * 始終保持開啟的 Tooltip 組件
  */
-function AlwaysOpenTooltip({ from, to, shouldStartAnimation = true }: AlwaysOpenTooltipProps) {
+function AlwaysOpenTooltip({
+  from,
+  to,
+  shouldStartAnimation = true,
+}: Readonly<AlwaysOpenTooltipProps>) {
   const [percentage, setPercentage] = useState(from);
   const [isAnimated, setIsAnimated] = useState(false);
   const [showFireworks, setShowFireworks] = useState(false);
@@ -215,7 +219,9 @@ function Step2Animation({ encouragement }: Step2AnimationProps) {
   );
 }
 
-function MoodFollowUp({ onMoodChange }: { onMoodChange?: (mood: MoodTypeValue) => void }) {
+function MoodFollowUp({
+  onMoodChange,
+}: Readonly<{ onMoodChange?: (mood: MoodTypeValue) => void }>) {
   const t = useTranslations("check_in");
   const [mood, setMood] = useState<MoodTypeValue | null>(null);
 

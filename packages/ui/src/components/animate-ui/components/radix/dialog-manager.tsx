@@ -1,7 +1,7 @@
 "use client";
 
 import { useIsMobile } from "@daodao/shared";
-import { createContext, useCallback, useContext, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
 import { cn } from "../../../../lib/utils";
 import { Button, type ButtonProps } from "../../../button";
 import type { DialogFlipDirection } from "../../primitives/radix/dialog";
@@ -279,8 +279,10 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
     );
   };
 
+  const contextValue = useMemo(() => ({ open, update, close }), [open, update, close]);
+
   return (
-    <DialogManagerContext.Provider value={{ open, update, close }}>
+    <DialogManagerContext.Provider value={contextValue}>
       {children}
       {dialogs.map((dialog, index) => renderDialog(dialog, index))}
     </DialogManagerContext.Provider>
