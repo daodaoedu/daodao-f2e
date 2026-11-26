@@ -50,7 +50,7 @@ class ProductionWorkflowTests(unittest.TestCase):
         self.assertEqual(set(events), {"workflow_dispatch"})
         self.assertEqual(
             set(events["workflow_dispatch"]["inputs"]),
-            {"ci_run_id", "legacy_bootstrap"},
+            {"ci_run_id", "legacy_bootstrap", "expected_content_sha"},
         )
         self.assertTrue(events["workflow_dispatch"]["inputs"]["ci_run_id"]["required"])
         bootstrap = events["workflow_dispatch"]["inputs"]["legacy_bootstrap"]
