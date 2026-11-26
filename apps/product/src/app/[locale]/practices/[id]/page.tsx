@@ -229,7 +229,11 @@ export default function PracticeDetailPage() {
     targetId: practiceId,
   });
 
-  const isOwner = practiceData?.data?.user?.id === currentUserData?.data?.id;
+  // Visitor preview only removes owner controls; API permissions remain unchanged.
+  const isOwner =
+    searchParams.get("view") !== "visitor" &&
+    !!currentUserData?.data?.id &&
+    practiceData?.data?.user?.id === currentUserData.data.id;
   const isCohortPractice =
     practiceData?.data?.isCohortPractice === true && practiceData?.data?.isChallenge !== true;
   const practiceStatus = getCohortPracticeDisplayStatus(

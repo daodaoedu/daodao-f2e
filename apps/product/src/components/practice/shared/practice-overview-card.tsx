@@ -5,6 +5,8 @@ import { useTranslations } from "@daodao/i18n";
 import { Link } from "@daodao/i18n/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@daodao/ui/components/avatar";
 import { Badge } from "@daodao/ui/components/badge";
+import { cn } from "@daodao/ui/lib/utils";
+import type { ReactNode } from "react";
 import { ReactionSection } from "@/components/social";
 import type { ManualPracticeFormValues } from "../create/manual/schema";
 import { CircularProgress } from "./circular-progress";
@@ -29,6 +31,10 @@ interface PracticeOverviewCardProps {
   creator?: CreatorInfo;
   // 快速反應 + 留言（提供 practiceId 時顯示）
   practiceId?: string;
+  // 卡片右上角的操作（例如行動版收合箭頭），與建立者資訊同列，不疊在進度環上
+  headerAction?: ReactNode;
+  // headerAction 只在行動版出現時，沒有建立者的桌機版不保留空白列
+  headerActionMobileOnly?: boolean;
 }
 
 export const PracticeOverviewCard = ({
@@ -40,28 +46,40 @@ export const PracticeOverviewCard = ({
   showProgress = false,
   creator,
   practiceId,
+  headerAction,
+  headerActionMobileOnly = false,
 }: PracticeOverviewCardProps) => {
   const t = useTranslations("practice");
   return (
     <div className="relative bg-white pt-4 px-4 pb-4 mb-4 rounded-xl">
       {/* 建立者資訊 - 僅在公開頁面顯示 */}
-      {creator && (
-        <div className="flex items-center gap-2 mb-3">
-          <Link href={`/users/${creator.customId ?? creator.id}`}>
-            <Avatar className="size-8">
-              {creator.photoURL && <AvatarImage src={creator.photoURL} />}
-              <AvatarFallback>
-                <DefaultAvatarSvg />
-              </AvatarFallback>
-            </Avatar>
-          </Link>
-          <Link
-            href={`/users/${creator.customId ?? creator.id}`}
-            className="text-sm font-medium text-text-dark hover:underline"
-          >
-            {creator.name}
-          </Link>
-          {creator.date && <span className="text-sm text-text-dark/60">{creator.date}</span>}
+      {(creator || headerAction) && (
+        <div
+          className={cn(
+            "flex items-center gap-2 mb-3",
+            !creator && headerActionMobileOnly && "md:hidden"
+          )}
+        >
+          {creator && (
+            <>
+              <Link href={`/users/${creator.customId ?? creator.id}`}>
+                <Avatar className="size-8">
+                  {creator.photoURL && <AvatarImage src={creator.photoURL} />}
+                  <AvatarFallback>
+                    <DefaultAvatarSvg />
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
+              <Link
+                href={`/users/${creator.customId ?? creator.id}`}
+                className="text-sm font-medium text-text-dark hover:underline"
+              >
+                {creator.name}
+              </Link>
+              {creator.date && <span className="text-sm text-text-dark/60">{creator.date}</span>}
+            </>
+          )}
+          {headerAction && <div className="ml-auto -my-2 -mr-2 shrink-0">{headerAction}</div>}
         </div>
       )}
       <div className="relative flex items-start gap-4">
