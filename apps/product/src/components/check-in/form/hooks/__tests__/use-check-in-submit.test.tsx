@@ -36,7 +36,8 @@ vi.mock("@/hooks/use-check-in-success-dialog", () => ({
 }));
 
 const form: ICheckInFormData = { mood: "neutral", tags: [], description: "完成練習", media: [] };
-function setup() {
+const moodlessForm: ICheckInFormData = { ...form, mood: null };
+function setup(data: ICheckInFormData = form) {
   const onComplete = vi.fn();
   let submit: ReturnType<typeof useCheckInSubmit>["submitCheckIn"];
   function Probe() {
@@ -44,7 +45,7 @@ function setup() {
     return null;
   }
   renderToStaticMarkup(<Probe />);
-  return { submit: () => submit(form), onComplete };
+  return { submit: () => submit(data), onComplete };
 }
 beforeEach(() => {
   vi.clearAllMocks();
@@ -83,5 +84,29 @@ describe("post-create selected mood persistence", () => {
     expect(state.update).toHaveBeenCalledTimes(1);
     expect(state.toastError).toHaveBeenCalledWith("mood_update_failed");
     expect(onComplete).toHaveBeenCalledWith(form);
+  });
+});
+
+describe("mood chosen only in the success dialog", () => {
+  it("creates the check-in without a mood", async () => {
+    const { submit } = setup(moodlessForm);
+    await submit();
+    expect(state.create).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ mood: undefined })
+    );
+  });
+  it("keeps the mood empty when the dialog is closed", async () => {
+    state.result = "close";
+    const { submit, onComplete } = setup(moodlessForm);
+    await submit();
+    expect(state.update).not.toHaveBeenCalled();
+    expect(onComplete).toHaveBeenCalledExactlyOnceWith(moodlessForm);
+  });
+  it("saves neutral when the user picks it and completes", async () => {
+    state.selected = "neutral";
+    const { submit, onComplete } = setup(moodlessForm);
+    await submit();
+    expect(state.update).toHaveBeenCalledExactlyOnceWith({ mood: "neutral" }, "42");
+    expect(onComplete).toHaveBeenCalledExactlyOnceWith({ ...moodlessForm, mood: "neutral" });
   });
 });

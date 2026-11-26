@@ -65,7 +65,7 @@ export const CheckInSheetContent = ({
   const form = useForm<CheckInFormValuesType>({
     resolver: zodResolver(createCheckInFormSchema(t, locale, { isEditing })),
     defaultValues: {
-      mood: initialValues?.mood ?? (moodSelectionPosition === "after" ? "neutral" : null),
+      mood: initialValues?.mood ?? null,
       tags: initialValues?.tags ?? [],
       actionObservation: initialDescriptionAnswers.actionObservation,
       nextStep: initialDescriptionAnswers.nextStep,
