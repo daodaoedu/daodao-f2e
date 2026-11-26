@@ -24,6 +24,7 @@ import {
   searchChallenges,
 } from "@/constants/challenge-filter";
 import { buildPracticeIdMap, pruneJustJoined } from "@/utils/challenge-card";
+import { getExploreChallengeCardHref } from "@/utils/challenge-detail";
 
 /**
  * 探索共同挑戰 standalone 頁（openspec: challenge-discovery）
@@ -32,6 +33,7 @@ import { buildPracticeIdMap, pruneJustJoined } from "@/utils/challenge-card";
  * 依運行狀態分三區：即將開始／進行中／已結束（版面依 POC 探索共同挑戰-standalone）。
  * 放在 (with-layout) 下，與其他頁共用側邊導覽（POC 左側 nav，daodao#181）。
  * 外框、搜尋篩選、分區與探索活動課程共用（daodao#567）。
+ * 每張卡都連到挑戰介紹頁（daodao#570）。
  */
 /** 分區副標：進行中沒有副標 */
 const SECTION_SUBTITLE_KEY: Record<
@@ -152,6 +154,10 @@ export default function ChallengesPage() {
                   onJoinClick={handleJoinClick}
                   onDrawClick={(target) => setDrawTarget(target.id)}
                   practiceId={practiceIdByChallenge.get(challenge.id)}
+                  href={getExploreChallengeCardHref(
+                    challenge,
+                    practiceIdByChallenge.get(challenge.id)
+                  )}
                 />
               ))}
             </ExploreSection>
