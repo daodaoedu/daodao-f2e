@@ -63,7 +63,8 @@ function YourTodayContent() {
       window.removeEventListener("focus", refreshDay);
     };
   }, [today]);
-  const { data: practicesData } = useMyPractices({ limit: 20 });
+  // 只撈進行中的實踐，避免舊的草稿／完成實踐佔掉分頁名額（daodao#569）
+  const { data: practicesData } = useMyPractices({ limit: 20, status: "active" });
   const {
     data: cohortsData,
     error: cohortsError,
