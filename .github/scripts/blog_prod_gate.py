@@ -59,6 +59,9 @@ def context(environment):
         raise ValueError(
             "Only the official managed production manual workflow is allowed"
         )
+    expected_content = environment.get("BLOG_PROD_EXPECTED_CONTENT_SHA", "")
+    if expected_content and full_sha(expected_content) != environment.get("BLOG_PROD_CONTENT_SHA"):
+        raise ValueError("Prepared content differs from the scheduled revision")
     return (
         full_sha(environment.get("GITHUB_SHA")),
         full_sha(environment.get("BLOG_PROD_CONTENT_SHA")),
@@ -435,3 +438,4 @@ if __name__ == "__main__":
         # Never echo approvals, request payloads or API response bodies to logs.
         print("Production release gate rejected the request", file=sys.stderr)
         sys.exit(1)
+
