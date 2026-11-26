@@ -1,5 +1,16 @@
 import { randomUUID } from "node:crypto";
+import type { Page } from "@playwright/test";
 import { cleanup, expect, test } from "./fixtures";
+
+/** 個人實踐頁篩選是下拉選單（daodao#572），預設「進行中」；新實踐要切到「全部」才看得到 */
+async function showAllPractices(page: Page) {
+  await page.getByRole("button", { name: "篩選：進行中", exact: true }).click();
+  await page
+    .getByRole("dialog", { name: "篩選實踐" })
+    .getByRole("checkbox", { name: "全部", exact: true })
+    .click();
+  await expect(page.getByRole("button", { name: "篩選：全部", exact: true })).toBeVisible();
+}
 
 test("practice creation validates empty input and appears in personal space", async ({
   page,
@@ -34,10 +45,10 @@ test("practice creation validates empty input and appears in personal space", as
     id = body.data.id;
     expect(id).toBeTruthy();
     await page.goto("/zh-TW/spaces/personal");
-    await page.getByRole("tab", { name: "全部", exact: true }).click();
+    await showAllPractices(page);
     await expect(page.getByText(name, { exact: true }).first()).toBeVisible();
     await page.reload();
-    await page.getByRole("tab", { name: "全部", exact: true }).click();
+    await showAllPractices(page);
     await expect(page.getByText(name, { exact: true }).first()).toBeVisible();
   } finally {
     if (id) await cleanup(request, learnerToken, `/api/v1/practices/${id}`);
