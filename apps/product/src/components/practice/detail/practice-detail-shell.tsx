@@ -342,6 +342,12 @@ export function PracticeDetailShell({
   const practiceCommentCount = commentCount ?? comments.length;
   // Active practice details can collapse on compact screens; desktop stays expanded.
   const isOverviewCollapsible = practice.status === PracticeStatus.active;
+  // 收合摘要要能辨識建立者：訪客看 creator，擁有者本人看自己的名稱與頭像
+  const summaryCreator =
+    practice.creator ??
+    (isOwner && currentUserName
+      ? { name: currentUserName, photoURL: currentUserPhotoURL }
+      : undefined);
   const [overviewOpenOnMobile, setOverviewOpenOnMobile] = useState(true);
   const [practiceMenuOpen, setPracticeMenuOpen] = useState(false);
   const [isFollowingPractice, setIsFollowingPractice] = useState(false);
@@ -694,10 +700,10 @@ export function PracticeDetailShell({
                 onClick={() => setOverviewOpenOnMobile(true)}
                 className="flex h-auto min-w-0 flex-1 items-center justify-between gap-3 rounded-lg p-0 text-left cursor-pointer hover:bg-white"
               >
-                {practice.creator && (
+                {summaryCreator && (
                   <Avatar className="size-8 shrink-0">
-                    {practice.creator.photoURL && (
-                      <AvatarImage src={practice.creator.photoURL} alt={practice.creator.name} />
+                    {summaryCreator.photoURL && (
+                      <AvatarImage src={summaryCreator.photoURL} alt={summaryCreator.name} />
                     )}
                     <AvatarFallback>
                       <DefaultAvatarSvg aria-hidden="true" />
@@ -706,7 +712,7 @@ export function PracticeDetailShell({
                 )}
                 <span className="min-w-0 flex-1">
                   <span className="block text-xs font-medium text-[#6B8789]">
-                    {practice.creator?.name ?? t("show_practice_details")}
+                    {summaryCreator?.name ?? t("show_practice_details")}
                   </span>
                   {practice.actionDescription && (
                     <span className="mt-0.5 block truncate text-sm font-normal text-text-dark">
