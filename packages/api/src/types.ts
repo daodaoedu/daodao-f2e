@@ -11213,6 +11213,8 @@ export interface paths {
                                     /** @enum {string} */
                                     status: "draft" | "not_started" | "active" | "completed" | "archived";
                                     creationSource: string | null;
+                                    /** @description 來源實踐模板 ID；共用打卡連結以 cohortId＋templateId 找出登入者自己的實踐 */
+                                    templateId: number | null;
                                     /** Format: date-time */
                                     startDate: string | null;
                                     /** Format: date-time */
@@ -54208,6 +54210,16 @@ export interface components {
                 /** @enum {string} */
                 state: "login_required" | "ineligible" | "ready" | "completed";
                 privacy_notice: string;
+                /**
+                 * @description 問卷所屬組織顯示名稱
+                 * @example 島島阿學
+                 */
+                organization_name: string;
+                /**
+                 * @description 問卷所屬場次顯示名稱
+                 * @example 閱讀同行場次
+                 */
+                cohort_name: string;
             };
         };
         QuestionResponse: {
@@ -56994,6 +57006,11 @@ export interface components {
              */
             id: string;
             /**
+             * @description 由燈塔場次模板產生且仍屬於場次的實踐；前端據此不顯示草稿、打卡前先啟用（daodao#544）
+             * @example false
+             */
+            isCohortPractice?: boolean;
+            /**
              * @description 實踐項目標題
              * @example 學習React Hooks
              */
@@ -57115,6 +57132,26 @@ export interface components {
              * @example 3
              */
             commentCount: number;
+            /**
+             * @description 所屬 cohort（燈塔場次或共同挑戰）ID；個人實踐為 null（daodao#569）
+             * @example 12
+             */
+            cohortId: number | null;
+            /**
+             * @description 所屬 cohort 開始日（YYYY-MM-DD）；個人實踐為 null
+             * @example 2024-01-15
+             */
+            cohortStartDate: string | null;
+            /**
+             * @description 所屬 cohort 結束日（YYYY-MM-DD）；個人實踐為 null
+             * @example 2024-02-15
+             */
+            cohortEndDate: string | null;
+            /**
+             * @description 所屬 cohort 是否為共同挑戰；首頁據此改用實踐自身日期判斷顯示期間
+             * @example false
+             */
+            isChallenge: boolean;
         };
         /** @description 學習足跡項目 */
         MyLearningFootprintItem: {
