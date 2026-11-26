@@ -27,9 +27,9 @@ vi.mock("@/hooks/use-check-in-success-dialog", () => ({
       _from: number,
       _to: number,
       _enc: string,
-      onMood: (mood: string) => void
+      onMood: (mood: string) => Promise<boolean>
     ) => {
-      onMood(state.selected);
+      if (state.result === "complete") await onMood(state.selected);
       return { value: state.result, index: state.result === "complete" ? 0 : -1 };
     },
   }),

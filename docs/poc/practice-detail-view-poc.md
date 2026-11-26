@@ -1,5 +1,7 @@
 # Practice detail view POC
 
+Latest follow-up: [2026-11-26 browser/API verification report](practice-detail-verification-2026-11-26.md) records actual five-mood API/DB persistence, cancellation, write retry, read retry, Chinese/English and owner/real-visitor responsive navigation. It supersedes the earlier persistence-outage and unverified-journey limitations below for the explicitly tested local synthetic environment. The PR remains draft; deployed-dev compatibility and formal acceptance are separate.
+
 Engineering review reference, based on `dev` at `22d30ef8` (2026-11-26).
 
 Related work: [#574 practice detail POC](https://github.com/daodaoedu/daodao/issues/574) and [#575 check-in interaction follow-up](https://github.com/daodaoedu/daodao/issues/575). The [check-in FRD v1.2](https://docs.google.com/document/d/1QkBiPzXn_5W4TMAG1qa__25AyiCpSzOvjMlMRMJoPMA/edit) is background; #575 records the updated reflection and mood-completion rules that supersede the relevant older FRD behavior.

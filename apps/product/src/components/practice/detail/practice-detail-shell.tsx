@@ -352,10 +352,10 @@ export function PracticeDetailShell({
   useEffect(() => {
     if (!practice.id) return;
     setActiveTab("checkins");
-    setCheckInView(readOnly ? CheckInView.list : CheckInView.bubbles);
-    setOverviewOpenOnMobile(false);
+    setCheckInView(CheckInView.list);
+    setOverviewOpenOnMobile(true);
     setPracticeMenuOpen(false);
-  }, [practice.id, readOnly]);
+  }, [practice.id]);
 
   useEffect(() => {
     if (!practiceMenuOpen) return;
@@ -1032,9 +1032,11 @@ export function PracticeDetailShell({
                   </Button>
                 </div>
               )}
-              <div className="lg:pl-12 lg:pr-0">
-                <CheckInRecordCard checkInsData={checkInsData} isLoading={isLoadingCheckIns} />
-              </div>
+              {!checkInsError && (
+                <div className="lg:pl-12 lg:pr-0">
+                  <CheckInRecordCard checkInsData={checkInsData} isLoading={isLoadingCheckIns} />
+                </div>
+              )}
               {(checkInsData?.data?.length ?? 0) > 0 && (
                 <fieldset className="mx-4 mt-4 hidden justify-end md:flex">
                   <legend className="sr-only">{t("checkin_view_label")}</legend>

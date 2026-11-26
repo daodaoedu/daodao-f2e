@@ -657,9 +657,9 @@ export default function PracticeDetailPage() {
           readOnly={isReadOnlyCohortView}
           checkInsData={checkInsData}
           isLoadingCheckIns={isLoadingCheckIns}
-          checkInsError={isReadOnlyCohortView && Boolean(allCheckIns.error)}
+          checkInsError={Boolean(checkInsQuery.error)}
           onRetryCheckIns={() => {
-            void allCheckIns.mutate();
+            void checkInsQuery.mutate();
           }}
           isLoadingComments={isLoadingComments}
           commentsError={Boolean(commentsError)}

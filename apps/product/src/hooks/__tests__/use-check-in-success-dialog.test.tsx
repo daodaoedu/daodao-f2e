@@ -36,7 +36,7 @@ function setup() {
     return null;
   }
   renderToStaticMarkup(<Probe />);
-  const onMoodChange = vi.fn();
+  const onMoodChange = vi.fn().mockResolvedValue(true);
   const result = openSuccessDialog(25, 50, undefined, onMoodChange);
   const markup = renderToStaticMarkup(state.config?.content);
   return { result, markup, onMoodChange };
@@ -82,10 +82,11 @@ describe("check-in success mood requirement", () => {
     const { result, onMoodChange } = setup();
     expect(state.selectMood).toBeTypeOf("function");
     state.selectMood?.(mood);
-    expect(onMoodChange).toHaveBeenCalledExactlyOnceWith(mood);
+    expect(onMoodChange).not.toHaveBeenCalled();
     expect(state.config?.actions?.[0]?.disabled).toBe(false);
     expect(renderCompleteButton()).not.toContain('disabled=""');
     await state.config?.actions?.[0]?.onClick();
+    expect(onMoodChange).toHaveBeenCalledExactlyOnceWith(mood);
     state.config?.onClose?.();
     await expect(result).resolves.toEqual({ value: "complete", index: 0 });
   });
@@ -100,5 +101,41 @@ describe("check-in success mood requirement", () => {
     expect(renderCompleteButton()).toContain('disabled=""');
     state.config?.onClose?.();
     await second.result;
+  });
+
+  it("keeps the dialog open on save failure and retries without creating another check-in", async () => {
+    const { result, onMoodChange } = setup();
+    onMoodChange.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+    state.selectMood?.("fine");
+    const action = state.config?.actions?.[0];
+    expect(await action?.onClick()).toBe(false);
+    expect(state.config?.actions?.[0]?.disabled).toBe(false);
+    expect(await state.config?.actions?.[0]?.onClick()).not.toBe(false);
+    await expect(result).resolves.toEqual({ value: "complete", index: 0 });
+    expect(onMoodChange).toHaveBeenNthCalledWith(1, "fine");
+    expect(onMoodChange).toHaveBeenNthCalledWith(2, "fine");
+  });
+
+  it("blocks duplicate submission and dismissal while the mood write is pending", async () => {
+    const { result, onMoodChange } = setup();
+    let finish!: (success: boolean) => void;
+    onMoodChange.mockImplementation(
+      () =>
+        new Promise<boolean>((resolve) => {
+          finish = resolve;
+        })
+    );
+    state.selectMood?.("happy");
+    const action = state.config?.actions?.[0];
+    const pending = action?.onClick();
+    expect(state.config?.actions?.[0]?.disabled).toBe(true);
+    expect(state.config?.closeOnEscape).toBe(false);
+    expect(state.config?.dismissible).toBe(false);
+    expect(state.config?.showCloseButton).toBe(false);
+    expect(await action?.onClick()).toBe(false);
+    expect(onMoodChange).toHaveBeenCalledTimes(1);
+    finish(true);
+    await pending;
+    await expect(result).resolves.toEqual({ value: "complete", index: 0 });
   });
 });

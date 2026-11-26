@@ -25,8 +25,8 @@ import {
 export interface DialogAction extends Omit<ButtonProps, "children"> {
   /** 按鈕文字 */
   label: string;
-  /** 點擊回調 */
-  onClick: () => void | Promise<void>;
+  /** Return false to keep the dialog open after a recoverable failure. */
+  onClick: () => void | boolean | Promise<void> | Promise<boolean | undefined>;
 }
 
 export interface DialogConfig {
@@ -171,8 +171,9 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
 
   const handleActionClick = useCallback(
     (dialogId: string) => async (action: DialogAction) => {
-      await action.onClick();
-      close(dialogId);
+      if ((await action.onClick()) !== false) {
+        close(dialogId);
+      }
     },
     [close]
   );

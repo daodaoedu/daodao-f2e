@@ -221,7 +221,8 @@ function Step2Animation({ encouragement }: Step2AnimationProps) {
 
 function MoodFollowUp({
   onMoodChange,
-}: Readonly<{ onMoodChange?: (mood: MoodTypeValue) => void }>) {
+  disabled,
+}: Readonly<{ onMoodChange?: (mood: MoodTypeValue) => void; disabled?: boolean }>) {
   const t = useTranslations("check_in");
   const [mood, setMood] = useState<MoodTypeValue | null>(null);
 
@@ -229,6 +230,7 @@ function MoodFollowUp({
     <section className="mt-3 rounded-2xl border border-logo-cyan/25 bg-logo-cyan/5 px-3 py-3 shadow-sm">
       <p className="mb-2 text-base font-semibold text-text-dark">{t("mood_follow_up_title")}</p>
       <RadioGroup
+        disabled={disabled}
         value={mood ?? ""}
         onValueChange={(value) => {
           const nextMood = value as MoodTypeValue;
@@ -277,6 +279,7 @@ interface CheckInSuccessContentProps {
   to: number;
   encouragement?: string;
   onMoodChange?: (mood: MoodTypeValue) => void;
+  disabled?: boolean;
 }
 
 function CheckInSuccessContent({
@@ -284,12 +287,13 @@ function CheckInSuccessContent({
   to,
   encouragement,
   onMoodChange,
+  disabled,
 }: CheckInSuccessContentProps) {
   return (
     <>
       <Step1Animation from={from} to={to} />
       <Step2Animation encouragement={encouragement} />
-      <MoodFollowUp onMoodChange={onMoodChange} />
+      <MoodFollowUp onMoodChange={onMoodChange} disabled={disabled} />
     </>
   );
 }
@@ -317,45 +321,65 @@ export function useCheckInSuccessDialog({ from = 0, to = 100 }: UseCheckInSucces
       dynamicFrom?: number,
       dynamicTo?: number,
       encouragement?: string,
-      onMoodChange?: (mood: MoodTypeValue) => void
+      onConfirmMood?: (mood: MoodTypeValue) => Promise<boolean>
     ): Promise<{ value: "complete" | "close"; index: number }> => {
       const finalFrom = dynamicFrom !== undefined ? dynamicFrom : from;
       const finalTo = dynamicTo !== undefined ? dynamicTo : to;
       return new Promise((resolve) => {
-        const complete = () => resolve({ value: "complete", index: 0 });
         let dialogId = "";
+        let selectedMood: MoodTypeValue | null = null;
+        let saving = false;
+        const actions = () => [
+          {
+            label: t("success_complete"),
+            variant: "orange" as const,
+            disabled: selectedMood === null || saving,
+            onClick: complete,
+          },
+        ];
+        const content = () => (
+          <div className="p-4 text-text-dark" aria-busy={saving}>
+            <CheckInSuccessContent
+              from={finalFrom}
+              to={finalTo}
+              encouragement={encouragement}
+              disabled={saving}
+              onMoodChange={(mood) => {
+                if (saving) return;
+                selectedMood = mood;
+                update(dialogId, { actions: actions() });
+              }}
+            />
+          </div>
+        );
+        async function complete() {
+          if (selectedMood === null || saving) return false;
+          saving = true;
+          update(dialogId, {
+            actions: actions(),
+            content: content(),
+            dismissible: false,
+            closeOnEscape: false,
+            showCloseButton: false,
+          });
+          try {
+            if (onConfirmMood && !(await onConfirmMood(selectedMood))) return false;
+            resolve({ value: "complete", index: 0 });
+          } finally {
+            saving = false;
+            update(dialogId, {
+              actions: actions(),
+              content: content(),
+              dismissible: true,
+              closeOnEscape: true,
+              showCloseButton: true,
+            });
+          }
+        }
         const { id } = open({
           title: t("success_title"),
-          content: (
-            <div className="p-4 text-text-dark">
-              <CheckInSuccessContent
-                from={finalFrom}
-                to={finalTo}
-                encouragement={encouragement}
-                onMoodChange={(mood) => {
-                  onMoodChange?.(mood);
-                  update(dialogId, {
-                    actions: [
-                      {
-                        label: t("success_complete"),
-                        variant: "orange",
-                        disabled: false,
-                        onClick: complete,
-                      },
-                    ],
-                  });
-                }}
-              />
-            </div>
-          ),
-          actions: [
-            {
-              label: t("success_complete"),
-              variant: "orange",
-              disabled: true,
-              onClick: complete,
-            },
-          ],
+          content: content(),
+          actions: actions(),
           dismissible: true,
           closeOnEscape: true,
           showCloseButton: true,
