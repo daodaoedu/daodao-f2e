@@ -270,3 +270,26 @@ export function resolveTemplateSelection(
   }
   return selected;
 }
+
+/**
+ * 已開始場次的既有綁定不能解綁或改開始日（FR-TPL-05），但仍可新增模板（daodao#544）：
+ * 濾掉使用者對鎖定模板的勾選／開始日變更，只保留新加入模板的設定。
+ */
+export function withoutLockedTemplates<T>(
+  overrides: ReadonlyMap<number, T>,
+  lockedTemplateIds: ReadonlySet<number>
+): Map<number, T> {
+  return new Map([...overrides].filter(([templateId]) => !lockedTemplateIds.has(templateId)));
+}
+
+/**
+ * 模板列沒有指定開始日時顯示的預設值：已開始場次新加的模板從今天開始（與 server 相同，daodao#544），
+ * 其餘沿用場次開始日。
+ */
+export function bindingDefaultStartDate(
+  cohortStartDate: string,
+  { cohortStarted, locked }: { cohortStarted: boolean; locked: boolean },
+  now = new Date()
+): string {
+  return cohortStarted && !locked ? todayInTaipei(now) : cohortStartDate;
+}

@@ -17,6 +17,10 @@ export interface InProgressTask {
   lastCheckInDate?: string | null;
   startDate?: string | null;
   endDate?: string | null;
+  /** 燈塔場次實踐：開始日前停用打卡（daodao#544） */
+  lockBeforeStartDate?: boolean;
+  /** DB 仍是 draft 的燈塔場次實踐，打卡前先啟用 */
+  onBeforeCheckIn?: () => Promise<boolean>;
 }
 
 interface InProgressSectionProps {
@@ -51,6 +55,8 @@ export const InProgressSection = ({ tasks }: InProgressSectionProps) => {
             lastCheckInDate={task.lastCheckInDate}
             startDate={task.startDate}
             endDate={task.endDate}
+            lockBeforeStartDate={task.lockBeforeStartDate}
+            onBeforeCheckIn={task.onBeforeCheckIn}
           />
         ))}
       </div>

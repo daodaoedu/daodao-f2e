@@ -234,7 +234,11 @@ export default function PracticeDetailPage() {
     practiceData?.data?.isCohortPractice === true && practiceData?.data?.isChallenge !== true;
   const practiceStatus = getCohortPracticeDisplayStatus(
     practiceData?.data?.status,
-    isCohortPractice
+    isCohortPractice,
+    {
+      startDate: practiceData?.data?.startDate,
+      endDate: practiceData?.data?.endDate,
+    }
   );
   const tCohort = useTranslations("cohort");
   // 場次實踐在 DB 仍是草稿：比照場次卡片，打卡前先啟用（daodao#544）

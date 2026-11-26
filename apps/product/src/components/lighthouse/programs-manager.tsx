@@ -82,6 +82,7 @@ import {
   updateSessionGroup as updateSessionEntries,
 } from "@/utils/cohort-sessions";
 import {
+  bindingDefaultStartDate,
   diffTemplateBindings,
   formatSlashDate,
   isCohortStarted,
@@ -89,6 +90,7 @@ import {
   resolveTemplateSelection,
   templateBindingEndDate,
   templateStartDateOverride,
+  withoutLockedTemplates,
 } from "@/utils/template-library";
 import { DEFAULT_COHORT_TIMEZONE, TIME_ZONE_OPTIONS } from "@/utils/timezones";
 import { ConfirmDialog } from "./confirm-dialog";
@@ -302,19 +304,19 @@ function CohortSetupPanel({
   useLighthouseOrganizationGuard(mode === "create" || hasChanges, busy);
   const [pendingTab, setPendingTab] = useState<SetupTab | null>(null);
   const [confirmClose, setConfirmClose] = useState(false);
-  // 已開始的場次 server 會拒絕變更綁定（FR-TPL-05），直接鎖住勾選
+  // 已開始的場次：既有綁定不能解綁或改開始日（FR-TPL-05），但仍可新增模板（daodao#544）
   const templatesLocked = mode === "edit" && !!cohort && isCohortStarted(cohort.startDate);
   // 只記使用者動過的模板，其餘跟著最新的既有綁定走：templates 可能比面板晚載入，
   // 也不會把別人剛綁上的模板當成「取消勾選」解綁掉。
   // 新增場次預設不綁任何模板：建立時模板分頁是 disabled，不能讓使用者看不到就被綁上全部（#273）
   const [templateOverrides, setTemplateOverrides] = useState<Map<number, boolean>>(() => new Map());
+  const boundTemplateIds = cohort
+    ? (templates ?? []).filter((tpl) => tpl.boundCohortIds.includes(cohort.id)).map((tpl) => tpl.id)
+    : [];
+  const lockedTemplateIds: ReadonlySet<number> = new Set(templatesLocked ? boundTemplateIds : []);
   const selectedTemplateIds = resolveTemplateSelection(
-    cohort
-      ? (templates ?? [])
-          .filter((tpl) => tpl.boundCohortIds.includes(cohort.id))
-          .map((tpl) => tpl.id)
-      : [],
-    templatesLocked ? new Map() : templateOverrides
+    boundTemplateIds,
+    withoutLockedTemplates(templateOverrides, lockedTemplateIds)
   );
 
   function toggleTemplate(templateId: number, checked: boolean) {
@@ -332,12 +334,23 @@ function CohortSetupPanel({
     const binding = cohort ? tpl.bindings.find((b) => b.cohortId === cohort.id) : undefined;
     return binding?.startDate?.slice(0, 10) ?? null;
   }
+  function defaultStartDate(tpl: CohortTemplateSummary): string {
+    return bindingDefaultStartDate(cohortStartDate, {
+      cohortStarted: templatesLocked,
+      locked: lockedTemplateIds.has(tpl.id),
+    });
+  }
   function templateStartDate(tpl: CohortTemplateSummary): string {
-    if (startDateOverrides.has(tpl.id)) return startDateOverrides.get(tpl.id) ?? cohortStartDate;
-    return savedTemplateStartDate(tpl) ?? cohortStartDate;
+    if (startDateOverrides.has(tpl.id))
+      return startDateOverrides.get(tpl.id) ?? defaultStartDate(tpl);
+    return savedTemplateStartDate(tpl) ?? defaultStartDate(tpl);
   }
   function setTemplateStartDate(tpl: CohortTemplateSummary, value: string) {
-    const next = templateStartDateOverride(value, cohortStartDate, savedTemplateStartDate(tpl));
+    const next = templateStartDateOverride(
+      value,
+      defaultStartDate(tpl),
+      savedTemplateStartDate(tpl)
+    );
     setStartDateOverrides((prev) => new Map(prev).set(tpl.id, next));
   }
 
@@ -685,7 +698,7 @@ function CohortSetupPanel({
       hostCommentDefaultPrivate: hostCommentPrivate,
       visibility,
       selectedTemplateIds: Array.from(selectedTemplateIds),
-      templateStartDates: templatesLocked ? new Map() : startDateOverrides,
+      templateStartDates: withoutLockedTemplates(startDateOverrides, lockedTemplateIds),
     });
     if (saved && mode === "edit") {
       setSessions(submission.sessions);
@@ -1454,14 +1467,13 @@ function CohortSetupPanel({
         )}
         {templates && templates.length > 0 ? (
           <>
-            <Popover open={templateDropOpen && !templatesLocked} onOpenChange={setTemplateDropOpen}>
+            <Popover open={templateDropOpen} onOpenChange={setTemplateDropOpen}>
               <PopoverAnchor asChild>
                 <div className="relative mt-3" data-template-search>
                   <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#78928F]" />
                   <Input
                     placeholder={t("cohort_template_search_placeholder")}
                     value={templateSearch}
-                    disabled={templatesLocked}
                     onChange={(e) => {
                       setTemplateSearch(e.target.value);
                       setTemplateDropOpen(true);
@@ -1473,7 +1485,6 @@ function CohortSetupPanel({
                     type="button"
                     variant="ghost"
                     size="icon"
-                    disabled={templatesLocked}
                     onClick={() => setTemplateDropOpen((open) => !open)}
                     aria-label={t("cohort_templates_expand")}
                     title={t("cohort_templates_expand")}
@@ -1497,13 +1508,15 @@ function CohortSetupPanel({
                 {filteredTemplates.length > 0 ? (
                   filteredTemplates.map((tpl) => {
                     const picked = selectedTemplateIds.has(tpl.id);
+                    const locked = lockedTemplateIds.has(tpl.id);
                     return (
                       <button
                         key={tpl.id}
                         type="button"
                         aria-pressed={picked}
+                        disabled={locked}
                         onClick={() => toggleTemplate(tpl.id, !picked)}
-                        className={`flex items-center gap-2.5 rounded-[8px] px-2.5 py-[9px] text-left hover:bg-[#F1F8F7] ${
+                        className={`flex items-center gap-2.5 rounded-[8px] px-2.5 py-[9px] text-left hover:bg-[#F1F8F7] disabled:cursor-not-allowed disabled:opacity-60 ${
                           picked ? "bg-[#F7FCFB]" : "bg-white"
                         }`}
                       >
@@ -1555,7 +1568,7 @@ function CohortSetupPanel({
                           <input
                             type="date"
                             value={start}
-                            disabled={templatesLocked}
+                            disabled={lockedTemplateIds.has(tpl.id)}
                             onChange={(e) => setTemplateStartDate(tpl, e.target.value)}
                             className="h-[30px] rounded-[8px] border border-[#CDEBE8] bg-white px-2 py-1 font-mono text-xs text-[#0D3036] disabled:cursor-not-allowed disabled:bg-[#F6F9F9] disabled:text-[#78928F]"
                           />
@@ -1569,7 +1582,7 @@ function CohortSetupPanel({
                           type="button"
                           variant="ghost"
                           size="icon"
-                          disabled={templatesLocked}
+                          disabled={lockedTemplateIds.has(tpl.id)}
                           onClick={() => toggleTemplate(tpl.id, false)}
                           aria-label={t("cohort_templates_remove", { title: tpl.title })}
                           className="size-6 shrink-0 rounded-full text-[#5A7B79] hover:bg-[#DCEEEB]"

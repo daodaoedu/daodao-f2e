@@ -7,29 +7,39 @@ import { useMemo } from "react";
 import type { InProgressTask } from "@/components/dashboard";
 import { SpacePageShell, SpacePracticeSection } from "@/components/spaces";
 import { mapPracticeStatusToTaskStatus } from "@/constants/task-status";
+import { useActivateCohortDraft } from "@/hooks/use-activate-cohort-draft";
+import { minePracticeStatus } from "@/utils/mine-filter";
 
 /** 個人實踐子頁 (FRD 4): the viewer's own practices behind the space filter row. */
 export default function PersonalSpacePage() {
   const t = useTranslations("space");
-  const { data, isLoading } = useMyPractices({ limit: 100 });
+  const { data, isLoading, mutate } = useMyPractices({ limit: 100 });
+  const activateCohortDraft = useActivateCohortDraft(mutate);
 
   const tasks = useMemo<InProgressTask[]>(
     () =>
-      (data?.data || []).map((practice) => ({
-        id: practice.id,
-        title: practice.title,
-        description: practice.practiceAction || "",
-        checkInCount: practice.checkInCount,
-        progress: practice.progressPercentage ?? 0,
-        messagesCount: 0,
-        isUnreadMessages: false,
-        theme: practice.themeColor || "#FCDD84",
-        status: mapPracticeStatusToTaskStatus(practice.status),
-        lastCheckInDate: practice.lastCheckinAt ?? null,
-        startDate: practice.startDate || null,
-        endDate: practice.endDate || null,
-      })),
-    [data]
+      (data?.data || []).map((practice) => {
+        const listStatus = minePracticeStatus(practice);
+        return {
+          id: practice.id,
+          title: practice.title,
+          description: practice.practiceAction || "",
+          checkInCount: practice.checkInCount,
+          progress: practice.progressPercentage ?? 0,
+          messagesCount: 0,
+          isUnreadMessages: false,
+          theme: practice.themeColor || "#FCDD84",
+          status: mapPracticeStatusToTaskStatus(listStatus.status ?? practice.status),
+          lastCheckInDate: practice.lastCheckinAt ?? null,
+          startDate: practice.startDate || null,
+          endDate: practice.endDate || null,
+          lockBeforeStartDate: listStatus.lockBeforeStartDate,
+          onBeforeCheckIn: listStatus.needsActivation
+            ? () => activateCohortDraft(practice.id)
+            : undefined,
+        };
+      }),
+    [data, activateCohortDraft]
   );
 
   return (

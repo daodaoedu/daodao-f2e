@@ -10,14 +10,20 @@ import { cn } from "@daodao/ui/lib/utils";
 import { isBefore, startOfDay } from "date-fns";
 import { Calendar, CalendarCheck, PenLine, Timer, Users } from "lucide-react";
 import { CheckInButton } from "@/components/check-in";
+import { PracticeStatus } from "@/constants/practice-status";
 import {
   getThemeNameFromColor,
   PracticeTheme,
   practiceThemeSvgMap,
 } from "@/constants/practice-theme";
-import { getStatusConfig, TaskStatus } from "@/constants/task-status";
+import {
+  getStatusConfig,
+  mapPracticeStatusToTaskStatus,
+  TaskStatus,
+} from "@/constants/task-status";
 import { calculateDaysProgress, formatCardDate } from "@/utils/practice-card";
 import { parseLocalDate } from "@/utils/practice-period";
+import { getCohortPracticeDisplayStatus } from "@/utils/practice-schedule-lock";
 
 interface InProgressTaskCardProps {
   id: string;
@@ -39,6 +45,8 @@ interface InProgressTaskCardProps {
   presentation?: "default" | "personal-space" | "cohort";
   cohortId?: number;
   onBeforeCheckIn?: () => Promise<boolean>;
+  /** 非場次頁的燈塔場次實踐（如「我的」列表）：開始日前停用打卡（daodao#544） */
+  lockBeforeStartDate?: boolean;
 }
 
 export const InProgressTaskCard = ({
@@ -59,6 +67,7 @@ export const InProgressTaskCard = ({
   presentation = "default",
   cohortId,
   onBeforeCheckIn,
+  lockBeforeStartDate = false,
 }: InProgressTaskCardProps) => {
   const t = useTranslations("dashboard");
   const tCheckIn = useTranslations("check_in");
@@ -67,7 +76,14 @@ export const InProgressTaskCard = ({
   const isDraft = status === TaskStatus.draft;
   const isCohort = presentation === "cohort";
   const cardRadius = presentation === "personal-space" ? "rounded-[20px]" : "rounded-[12px]";
-  const displayStatus = isCohort && isDraft ? TaskStatus.notStarted : status;
+  // 燈塔場次 draft 依實踐自身起訖日顯示，與詳情頁一致（daodao#544）
+  const displayStatus =
+    isCohort && isDraft
+      ? mapPracticeStatusToTaskStatus(
+          getCohortPracticeDisplayStatus(PracticeStatus.draft, true, { startDate, endDate }) ??
+            PracticeStatus.notStarted
+        )
+      : status;
   const statusInfo = getStatusConfig(displayStatus);
   const parsedStartDate = startDate ? parseLocalDate(startDate) : null;
   const isBeforeStartDate =
@@ -218,14 +234,14 @@ export const InProgressTaskCard = ({
                   : "w-full sm:max-w-[288px]"
               )}
               practiceId={id}
-              practiceStatus={isCohort && isDraft ? TaskStatus.notStarted : status}
+              practiceStatus={displayStatus}
               lastCheckInDate={lastCheckInDate ?? null}
               startDate={startDate ?? null}
               endDate={endDate ?? null}
               taskTitle={title}
               labelOverride={isCohort ? tCheckIn("button_check_in") : undefined}
-              beforeCheckIn={isCohort && isDraft ? onBeforeCheckIn : undefined}
-              disableBeforeStartDate={isCohort}
+              beforeCheckIn={isCohort ? (isDraft ? onBeforeCheckIn : undefined) : onBeforeCheckIn}
+              disableBeforeStartDate={isCohort || lockBeforeStartDate}
               showIcon
               progressPercentage={progress}
             />
