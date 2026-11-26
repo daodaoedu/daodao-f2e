@@ -6,15 +6,11 @@ import {
   TooltipPanel,
   TooltipTrigger,
 } from "@daodao/ui/components/animate-ui/components/base/tooltip";
-import { useDialog } from "@daodao/ui/hooks/use-dialog";
+import { useDialogManager } from "@daodao/ui/components/animate-ui/components/radix/dialog";
 import { cn } from "@daodao/ui/lib/utils";
 import { RadioGroup, RadioGroupItem } from "@daodao/ui/components/radio-group";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
-import {
-  CHECK_IN_MOOD_OPTIONS,
-  MoodType,
-  type MoodType as MoodTypeValue,
-} from "@/constants/mood";
+import { CHECK_IN_MOOD_OPTIONS, type MoodType as MoodTypeValue } from "@/constants/mood";
 import { getProgressAnimationAction } from "./check-in-progress-animation";
 
 interface UseCheckInSuccessDialogOptions {
@@ -114,11 +110,7 @@ interface AlwaysOpenTooltipProps {
 /**
  * 始終保持開啟的 Tooltip 組件
  */
-function AlwaysOpenTooltip({
-  from,
-  to,
-  shouldStartAnimation = true,
-}: AlwaysOpenTooltipProps) {
+function AlwaysOpenTooltip({ from, to, shouldStartAnimation = true }: AlwaysOpenTooltipProps) {
   const [percentage, setPercentage] = useState(from);
   const [isAnimated, setIsAnimated] = useState(false);
   const [showFireworks, setShowFireworks] = useState(false);
@@ -227,17 +219,17 @@ function MoodFollowUp({
   initialMood,
   onMoodChange,
 }: {
-  initialMood: MoodTypeValue;
+  initialMood: MoodTypeValue | null;
   onMoodChange?: (mood: MoodTypeValue) => void;
 }) {
   const t = useTranslations("check_in");
-  const [mood, setMood] = useState<MoodTypeValue>(initialMood);
+  const [mood, setMood] = useState<MoodTypeValue | null>(initialMood);
 
   return (
     <section className="mt-3 rounded-2xl border border-logo-cyan/25 bg-logo-cyan/5 px-3 py-3 shadow-sm">
-      <p className="mb-2 text-base font-semibold text-text-dark">{t("mood_question")}</p>
+      <p className="mb-2 text-base font-semibold text-text-dark">{t("mood_follow_up_title")}</p>
       <RadioGroup
-        value={mood}
+        value={mood ?? ""}
         onValueChange={(value) => {
           const nextMood = value as MoodTypeValue;
           setMood(nextMood);
@@ -254,9 +246,7 @@ function MoodFollowUp({
               htmlFor={inputId}
               className={cn(
                 "flex min-w-0 cursor-pointer flex-col items-center gap-1 rounded-xl border border-transparent px-1 py-2 text-center transition-colors hover:bg-white focus-within:ring-2 focus-within:ring-logo-cyan/50",
-                mood === id
-                  ? "border-logo-cyan/40 bg-white shadow-sm"
-                  : "bg-white/55"
+                mood === id ? "border-logo-cyan/40 bg-white shadow-sm" : "bg-white/55"
               )}
             >
               <RadioGroupItem
@@ -266,7 +256,12 @@ function MoodFollowUp({
                 aria-label={translatedLabel}
               />
               <Emoji className="size-8" aria-hidden="true" />
-              <span className={cn("text-[10px] leading-tight", mood === id ? "font-semibold text-text-dark" : "text-gray-600")}>
+              <span
+                className={cn(
+                  "text-[10px] leading-tight",
+                  mood === id ? "font-semibold text-text-dark" : "text-gray-600"
+                )}
+              >
                 {translatedLabel || label}
               </span>
             </label>
@@ -281,7 +276,7 @@ interface CheckInSuccessContentProps {
   from: number;
   to: number;
   encouragement?: string;
-  initialMood: MoodTypeValue;
+  initialMood: MoodTypeValue | null;
   onMoodChange?: (mood: MoodTypeValue) => void;
 }
 
@@ -315,41 +310,65 @@ function CheckInSuccessContent({
  * }
  * ```
  */
-export function useCheckInSuccessDialog({
-  from = 0,
-  to = 100,
-}: UseCheckInSuccessDialogOptions) {
+export function useCheckInSuccessDialog({ from = 0, to = 100 }: UseCheckInSuccessDialogOptions) {
   const t = useTranslations("check_in");
-  const { openSuccessDialog: openSuccess } = useDialog();
+  const { open, update } = useDialogManager();
 
   const openSuccessDialog = useCallback(
     (
       dynamicFrom?: number,
       dynamicTo?: number,
       encouragement?: string,
-      initialMood: MoodTypeValue = MoodType.neutral,
+      initialMood: MoodTypeValue | null = null,
       onMoodChange?: (mood: MoodTypeValue) => void
-    ) => {
+    ): Promise<{ value: "complete" | "close"; index: number }> => {
       const finalFrom = dynamicFrom !== undefined ? dynamicFrom : from;
       const finalTo = dynamicTo !== undefined ? dynamicTo : to;
-      return openSuccess({
-        title: t("success_title"),
-        content: (
-          <div className="p-4 text-text-dark">
-            <CheckInSuccessContent
-              from={finalFrom}
-              to={finalTo}
-              encouragement={encouragement}
-              initialMood={initialMood}
-              onMoodChange={onMoodChange}
-            />
-          </div>
-        ),
-        textAlign: "left",
-        buttons: [{ label: t("success_complete"), value: "complete", variant: "orange" }],
+      return new Promise((resolve) => {
+        const complete = () => resolve({ value: "complete", index: 0 });
+        let dialogId = "";
+        const { id } = open({
+          title: t("success_title"),
+          content: (
+            <div className="p-4 text-text-dark">
+              <CheckInSuccessContent
+                from={finalFrom}
+                to={finalTo}
+                encouragement={encouragement}
+                initialMood={initialMood}
+                onMoodChange={(mood) => {
+                  onMoodChange?.(mood);
+                  update(dialogId, {
+                    actions: [
+                      {
+                        label: t("success_complete"),
+                        variant: "orange",
+                        disabled: false,
+                        onClick: complete,
+                      },
+                    ],
+                  });
+                }}
+              />
+            </div>
+          ),
+          actions: [
+            {
+              label: t("success_complete"),
+              variant: "orange",
+              disabled: true,
+              onClick: complete,
+            },
+          ],
+          dismissible: true,
+          closeOnEscape: true,
+          showCloseButton: true,
+          onClose: () => resolve({ value: "close", index: -1 }),
+        });
+        dialogId = id;
       });
     },
-    [openSuccess, from, to, t]
+    [open, update, from, to, t]
   );
 
   return { openSuccessDialog };

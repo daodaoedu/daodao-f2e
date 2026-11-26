@@ -77,18 +77,18 @@ export const useCheckInSubmit = ({
             : undefined;
 
         // 顯示成功對話框
-        await openSuccessDialog(
+        const successResult = await openSuccessDialog(
           progressPercentage,
           newProgressPercentage,
           encouragement,
-          initialMood,
+          null,
           (mood) => {
             selectedMoodRef.current = mood;
           }
         );
         let savedMood = initialMood;
         const selectedMood = selectedMoodRef.current;
-        if (selectedMood !== initialMood) {
+        if (successResult.value === "complete" && selectedMood !== initialMood) {
           try {
             await updateCheckIn(
               { mood: mapMoodTypeToApiMood(selectedMood) },

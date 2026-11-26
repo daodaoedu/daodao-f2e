@@ -341,7 +341,7 @@ export function PracticeDetailShell({
       ));
   const practiceCommentCount = commentCount ?? comments.length;
   // Active practice details can collapse on compact screens; desktop stays expanded.
-  const isOverviewCollapsible = practice.status === PracticeStatus.active;
+  const isOverviewCollapsible = practice.status === PracticeStatus.active || isOwner;
   const [overviewOpenOnMobile, setOverviewOpenOnMobile] = useState(true);
   const [practiceMenuOpen, setPracticeMenuOpen] = useState(false);
   const [isFollowingPractice, setIsFollowingPractice] = useState(false);
@@ -737,6 +737,7 @@ export function PracticeDetailShell({
             id="practice-overview-card"
             className={cn(
               "relative bg-white rounded-lg shadow-sm mb-4",
+              isOverviewCollapsible && !practice.creator && "pt-10 md:pt-4",
               isOverviewCollapsible && !overviewOpenOnMobile && "hidden md:block"
             )}
           >
