@@ -7,7 +7,6 @@ import type {
   LighthouseActivityQuery,
   LighthouseArchiveType,
   LighthouseDashboardQuery,
-  LighthouseMessageCategory,
   LighthouseParticipantsQuery,
 } from "./cohort";
 import {
@@ -198,15 +197,10 @@ export const useLighthouseParticipantMessages = (
 };
 
 /** 組織的訊息範本（FR-TF-06） */
-export const useLighthouseMessageTemplates = (
-  organizationId?: number,
-  category?: LighthouseMessageCategory
-) => {
+export const useLighthouseMessageTemplates = (organizationId?: number) => {
   const query = useQuery(
     "/api/v1/lighthouse/organizations/{organizationId}/message-templates",
-    organizationId
-      ? { params: { path: { organizationId }, query: category ? { category } : {} } }
-      : null
+    organizationId ? { params: { path: { organizationId } } } : null
   );
   const validated = useValidatedResponse(query, lighthouseMessageTemplateListResponseSchema);
   return { ...validated, templates: validated.data?.data };

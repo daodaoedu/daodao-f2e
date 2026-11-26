@@ -301,6 +301,7 @@ export const lighthouseFocusResponseSchema = apiSuccessSchema(
     ),
     celebrations: z.array(
       lighthouseFocusPersonSchema.extend({
+        checkinId: z.number().int().positive().optional(),
         moment: z.enum(["first_checkin", "return_after_break", "month_milestone"]),
         momentDescription: z.string(),
         occurredAt: z.string().datetime(),
@@ -346,8 +347,6 @@ export const lighthouseParticipantCheckinsResponseSchema = apiSuccessSchema(
     ),
   })
 );
-export const lighthouseMessageCategorySchema = z.enum(["encourage", "celebrate"]);
-export type LighthouseMessageCategory = z.infer<typeof lighthouseMessageCategorySchema>;
 export const lighthouseMessageSchema = z.object({
   id: z.number().int(),
   cohortId: z.number().int(),
@@ -357,7 +356,6 @@ export const lighthouseMessageSchema = z.object({
   practiceId: z.number().int().nullable(),
   practiceTitle: z.string().nullable(),
   templateId: z.number().int().nullable(),
-  category: lighthouseMessageCategorySchema,
   body: z.string(),
   sentAt: z.string().datetime(),
 });
@@ -366,7 +364,13 @@ export const lighthouseMessageListResponseSchema = apiSuccessSchema(
   z.object({
     participant: lighthouseParticipantSchema,
     total: z.number().int().nonnegative(),
-    items: z.array(lighthouseMessageSchema),
+    items: z.array(
+      lighthouseMessageSchema.extend({
+        source: z.enum(["practice", "checkin", "lighthouse"]),
+        sentAt: z.string().datetime().nullable(),
+        checkinId: z.number().int().nullable().optional(),
+      })
+    ),
   })
 );
 export const lighthouseMessageResponseSchema = apiSuccessSchema(lighthouseMessageSchema);
@@ -374,7 +378,6 @@ export const lighthouseMessageTemplateSchema = z.object({
   id: z.number().int(),
   organizationId: z.number().int(),
   createdBy: z.number().int().nullable(),
-  category: lighthouseMessageCategorySchema,
   title: z.string(),
   body: z.string(),
   createdAt: z.string().datetime(),
@@ -659,14 +662,17 @@ export const resumeLighthouseJoining = async (programId: number, cohortId: numbe
     params: { path: { programId, cohortId } },
   });
 
-type SendCohortMessageBody = NonNullable<
+type LegacySendCohortMessageBody = NonNullable<
   paths["/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/participants/{userId}/messages"]["post"]["requestBody"]
 >["content"]["application/json"];
+/** POC contract: requires server support for checkinId and category-free comments. */
+type SendCohortMessageBody = Omit<LegacySendCohortMessageBody, "category"> & { checkinId?: number };
+
 type CreateMessageTemplateBody = NonNullable<
   paths["/api/v1/lighthouse/organizations/{organizationId}/message-templates"]["post"]["requestBody"]
 >["content"]["application/json"];
 
-/** 送出鼓勵／慶祝訊息給參與者（FR-TF-06） */
+/** 送出留言給參與者；目標為實踐或指定打卡。 */
 export const sendLighthouseMessage = async (
   programId: number,
   cohortId: number,
@@ -675,7 +681,8 @@ export const sendLighthouseMessage = async (
 ) =>
   client.POST(
     "/api/v1/lighthouse/programs/{programId}/cohorts/{cohortId}/participants/{userId}/messages",
-    { params: { path: { programId, cohortId, userId } }, body }
+    // Temporary boundary until the server OpenAPI schema is regenerated.
+    { params: { path: { programId, cohortId, userId } }, body: body as LegacySendCohortMessageBody }
   );
 
 export const createLighthouseMessageTemplate = async (

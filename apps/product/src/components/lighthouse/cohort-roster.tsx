@@ -524,25 +524,27 @@ export function CohortRoster({ programId, cohortId }: CohortRosterProps) {
                   <p className="mt-1 text-xs text-[#78928F]">
                     {[
                       enrollment.email,
-                      enrollment.joinedAt
-                        ? t("joined_on", {
-                            date: format(new Date(enrollment.joinedAt), "yyyy/MM/dd"),
-                          })
-                        : null,
                       enrollment.role !== "member" ? t(`enrollment_role_${enrollment.role}`) : null,
                     ]
                       .filter(Boolean)
                       .join(" · ")}
                   </p>
                 </div>
-                <span
-                  className={cn(
-                    "w-fit rounded-full px-3 py-1 text-xs font-semibold",
-                    ENROLLMENT_STATUS_STYLES[enrollment.status]
+                <div className="flex items-center gap-2">
+                  {enrollment.joinedAt && (
+                    <span className="text-xs text-[#78928F]">
+                      {format(new Date(enrollment.joinedAt), "yyyy/MM/dd")}
+                    </span>
                   )}
-                >
-                  {t(`enrollment_status_${enrollment.status}`)}
-                </span>
+                  <span
+                    className={cn(
+                      "w-fit rounded-full px-3 py-1 text-xs font-semibold",
+                      ENROLLMENT_STATUS_STYLES[enrollment.status]
+                    )}
+                  >
+                    {t(`enrollment_status_${enrollment.status}`)}
+                  </span>
+                </div>
                 {enrollment.status === "invited" && (
                   <Button
                     size="sm"

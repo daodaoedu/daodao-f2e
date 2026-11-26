@@ -1,54 +1,44 @@
 "use client";
 
-import {
-  type LighthouseFocusCelebrationType,
-  type LighthouseFocusEncouragementType,
-  type LighthouseMessageCategory,
-  useLighthouseFocus,
-} from "@daodao/api";
+import { useLighthouseFocus } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
-import {
-  Tooltip,
-  TooltipPanel,
-  TooltipTrigger,
-} from "@daodao/ui/components/animate-ui/components/base/tooltip";
 import { Button } from "@daodao/ui/components/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@daodao/ui/components/popover";
-import { cn } from "@daodao/ui/lib/utils";
-import { format, parseISO } from "date-fns";
-import { Info, MessageCircle, MessageSquareText } from "lucide-react";
+import { format, isAfter, parseISO } from "date-fns";
+import { Info, MessageCircle } from "lucide-react";
 import { useState } from "react";
-import { CohortCheckinDrawer } from "./cohort-checkin-drawer";
 import { CohortErrorState } from "./cohort-error-state";
-import { CohortMessageComposeDialog, CohortMessageHistoryDialog } from "./cohort-message-dialogs";
-import { useLighthouseOrganization } from "./lighthouse-organization-context";
+import {
+  CohortFocusDetailDrawer,
+  type CohortFocusDetailTarget,
+} from "./cohort-focus-detail-drawer";
+import { CohortMessageComposeDialog } from "./cohort-message-dialogs";
 
 interface CohortFocusProps {
   programId: number;
   cohortId: number;
 }
 
-type Tab = "encourage" | "celebrate";
 type Person = {
   userId: number;
   nickname: string | null;
   practiceId: number;
   practiceTitle: string;
 };
+type FocusReason = { label: string; detail: string };
+type FocusRow = Person & {
+  messageCount: number;
+  reasons: FocusReason[];
+  celebration?: { checkinId?: number; occurredAt: string };
+};
 const day = (value: string): string => format(parseISO(value), "yyyy/MM/dd");
 
-/** FRD 3.5 今日焦點：鼓勵／慶祝兩張表，實踐欄開抽屜、訊息紀錄與送出訊息開 modal */
+/** FRD 3.5 今日焦點：以參與者 × 實踐整合打卡焦點與留言操作 */
 export function CohortFocus({ programId, cohortId }: CohortFocusProps) {
   const t = useTranslations("lighthouse");
-  const [tab, setTab] = useState<Tab>("encourage");
-  const [drawer, setDrawer] = useState<Person | null>(null);
-  const [history, setHistory] = useState<Person | null>(null);
-  const [compose, setCompose] = useState<(Person & { category: LighthouseMessageCategory }) | null>(
-    null
-  );
+  const [detail, setDetail] = useState<CohortFocusDetailTarget | null>(null);
+  const [compose, setCompose] = useState<CohortFocusDetailTarget | null>(null);
   const query = useLighthouseFocus(programId, cohortId);
-  const { organization } = useLighthouseOrganization();
-  const organizationId = organization?.id;
   const data = query.data?.data;
 
   if (query.isLoading) return <p className="px-10 py-12 text-sm text-[#5A7B79]">{t("loading")}</p>;
@@ -61,126 +51,87 @@ export function CohortFocus({ programId, cohortId }: CohortFocusProps) {
       />
     );
 
+  const rowsByPractice = new Map<string, FocusRow>();
+  const getFocusRow = (person: Person, messageCount: number): FocusRow => {
+    const key = `${person.userId}-${person.practiceId}`;
+    let row = rowsByPractice.get(key);
+    if (!row) {
+      row = { ...person, messageCount, reasons: [] };
+      rowsByPractice.set(key, row);
+    }
+    return row;
+  };
+
+  for (const item of data?.needsEncouragement ?? []) {
+    const row = getFocusRow(item, item.messageCount);
+    row.reasons.push({
+      label: t("focus_reason_inactive"),
+      detail: t("focus_reason_inactive_detail", {
+        days: t("days_count", { count: item.interruptedDays }),
+        date: day(item.lastCheckinDate),
+      }),
+    });
+  }
+
+  for (const item of data?.celebrations ?? []) {
+    // Inactivity takes priority over an old first-check-in milestone.
+    if (
+      data?.needsEncouragement.some(
+        (inactive) => inactive.practiceId === item.practiceId && inactive.userId === item.userId
+      )
+    )
+      continue;
+    const row = getFocusRow(item, item.messageCount);
+    row.reasons.push({
+      label: item.momentDescription,
+      detail: t("first_checkin_date_label", { date: day(item.firstCheckinAt) }),
+    });
+    if (
+      !row.celebration ||
+      isAfter(parseISO(item.occurredAt), parseISO(row.celebration.occurredAt))
+    ) {
+      row.celebration = { checkinId: item.checkinId, occurredAt: item.occurredAt };
+    }
+  }
+  const focusRows = Array.from(rowsByPractice.values());
+
   const name = (person: { nickname: string | null }) => person.nickname || t("learner");
-  const practiceHeader = (
-    <span className="inline-flex items-center gap-1">
-      {t("col_practice")}
-      <Tooltip>
-        <TooltipTrigger
-          render={
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="size-5 rounded-full hover:bg-transparent"
-              aria-label={t("practice_column_hint")}
-            >
-              <Info className="size-3.5" aria-hidden="true" />
-            </Button>
-          }
-        />
-        <TooltipPanel
-          side="top"
-          className="max-w-[240px] rounded-lg bg-[#0D3036] px-3 py-2 text-xs text-white"
-        >
-          {t("practice_column_hint")}
-        </TooltipPanel>
-      </Tooltip>
-    </span>
-  );
-  const messageCell = (person: Person, count: number) => (
-    <Button
-      type="button"
-      variant="outline"
-      size="sm"
-      className="h-8 rounded-full border-[#CDEBE8] px-3 text-xs"
-      aria-label={t("message_history_open", { name: name(person) })}
-      onClick={() => setHistory(person)}
-    >
-      <MessageSquareText className="size-3.5" aria-hidden="true" />
-      {count > 0 ? count : t("messages_none")}
-    </Button>
-  );
-  const sendCell = (person: Person, category: LighthouseMessageCategory) => (
+  const commentCell = (person: Person, count: number, checkinId?: number) => (
     <Button
       type="button"
       variant="outline"
       size="icon"
-      className="size-9 rounded-full border-[#CDEBE8] bg-[#F0FBF9] text-[#0D7773]"
-      aria-label={t("message_open_compose", { name: name(person) })}
-      title={t("message_open_compose", { name: name(person) })}
-      onClick={() => setCompose({ ...person, category })}
+      className="relative size-9 rounded-full border-[#CDEBE8] bg-[#F0FBF9] text-[#0D7773]"
+      aria-label={t("focus_detail_open", { name: name(person) })}
+      title={t("focus_detail_open", { name: name(person) })}
+      onClick={() => setDetail({ ...person, checkinId })}
     >
       <MessageCircle className="size-4" aria-hidden="true" />
+      {count > 0 && (
+        <span className="absolute -right-1 -top-1 min-w-4 rounded-full bg-[#0D3036] px-1 text-[10px] leading-4 text-white">
+          {count}
+        </span>
+      )}
     </Button>
   );
   const practiceCell = (person: Person) => (
-    <Button
-      type="button"
-      variant="link"
-      className="h-auto px-0 text-sm font-medium text-[#0D7773]"
-      aria-label={t("open_checkin_records", { name: name(person) })}
-      onClick={() => setDrawer(person)}
-    >
-      {person.practiceTitle}
-    </Button>
+    <span className="text-sm font-medium text-[#0D7773]">{person.practiceTitle}</span>
   );
 
   return (
     <div className="mx-auto w-full max-w-6xl px-5 py-8 md:px-10">
-      <p className="text-[#5A7B79]">{t("focus_description")}</p>
-
-      {/* FR-TF-01 子頁籤 */}
-      <div
-        className="mt-6 flex gap-2 rounded-full bg-[#E7FAF7] p-1.5"
-        role="tablist"
-        aria-label={t("cohort_nav_focus")}
-      >
-        {(["encourage", "celebrate"] as const).map((key) => {
-          const count =
-            key === "encourage" ? data?.needsEncouragement.length : data?.celebrations.length;
-          const active = tab === key;
-          return (
-            <Button
-              key={key}
-              type="button"
-              role="tab"
-              id={`focus-tab-${key}`}
-              aria-selected={active}
-              aria-controls={`focus-panel-${key}`}
-              data-chip={active ? "true" : undefined}
-              variant="ghost"
-              onClick={() => setTab(key)}
-              className={cn(
-                "h-10 flex-1 rounded-full text-sm font-semibold text-[#456B68] hover:bg-transparent hover:text-[#0D3036]",
-                active && "bg-[#0D3036] text-white hover:bg-[#0D3036] hover:text-white"
-              )}
-            >
-              {t(`focus_tab_${key}`)} · {count ?? 0}
-            </Button>
-          );
-        })}
-      </div>
-
-      {/* FR-TF-02 鼓勵 */}
-      <section
-        id="focus-panel-encourage"
-        role="tabpanel"
-        aria-labelledby="focus-tab-encourage"
-        hidden={tab !== "encourage"}
-        className="mt-5 rounded-3xl border border-[#CDEBE8] bg-white p-4 md:p-6"
-      >
+      <section className="mt-5 rounded-3xl border border-[#CDEBE8] bg-white p-4 md:p-6">
         <div className="mb-3 flex justify-end">
           <FocusCriteriaInfo
-            label={t("focus_criteria_encourage_label")}
-            content={t("focus_criteria_encourage")}
+            label={t("focus_criteria_label")}
+            content={`${t("focus_criteria_inactive_heading")}\n${t("focus_criteria_inactive")}\n\n${t("focus_criteria_milestone_heading")}\n${t("focus_criteria_milestone")}`}
           />
         </div>
-        {!data?.needsEncouragement.length ? (
+        {!focusRows.length ? (
           <EmptyState />
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-[800px] w-full border-separate border-spacing-y-2 text-sm">
+            <table className="min-w-[640px] w-full border-separate border-spacing-y-2 text-sm">
               <thead>
                 <tr className="text-left text-xs text-[#78928F]">
                   <th
@@ -190,133 +141,61 @@ export function CohortFocus({ programId, cohortId }: CohortFocusProps) {
                     {t("col_participant")}
                   </th>
                   <th scope="col" className="px-3 py-1 font-medium">
-                    {practiceHeader}
+                    {t("col_practice")}
                   </th>
                   <th scope="col" className="px-3 py-1 font-medium">
-                    {t("col_last_checkin")}
+                    {t("col_focus_reason")}
                   </th>
                   <th scope="col" className="px-3 py-1 font-medium">
-                    {t("col_days_since")}
-                  </th>
-                  <th scope="col" className="px-3 py-1 font-medium">
-                    {t("col_messages")}
-                  </th>
-                  <th scope="col" className="px-3 py-1 font-medium">
-                    {t("col_send_encouragement")}
+                    {t("col_focus_comments")}
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {data.needsEncouragement.map((item: LighthouseFocusEncouragementType) => (
-                  <tr
-                    key={`${item.userId}-${item.practiceId}`}
-                    className="bg-white shadow-[0_0_0_1px_#DDEFED]"
-                  >
-                    <td className="sticky left-0 z-20 rounded-l-2xl bg-white px-3 py-3 font-semibold shadow-[4px_0_6px_-5px_rgba(13,48,54,0.45)]">
-                      {name(item)}
-                    </td>
-                    <td className="px-3 py-3">{practiceCell(item)}</td>
-                    <td className="px-3 py-3 font-mono text-xs text-[#456B68]">
-                      {day(item.lastCheckinDate)}
-                    </td>
-                    {/* TP-AG-03：純天數、中性橘色，不用警示色 */}
-                    <td className="px-3 py-3 font-semibold text-[#A95D00]">
-                      {t("days_count", { count: item.interruptedDays })}
-                    </td>
-                    <td className="px-3 py-3">{messageCell(item, item.messageCount)}</td>
-                    <td className="rounded-r-2xl px-3 py-3">{sendCell(item, "encourage")}</td>
-                  </tr>
-                ))}
+                {focusRows.map((row) => {
+                  return (
+                    <tr
+                      key={`${row.userId}-${row.practiceId}`}
+                      className="bg-white shadow-[0_0_0_1px_#DDEFED]"
+                    >
+                      <td className="sticky left-0 z-20 rounded-l-2xl bg-white px-3 py-3 font-semibold shadow-[4px_0_6px_-5px_rgba(13,48,54,0.45)]">
+                        {name(row)}
+                      </td>
+                      <td className="px-3 py-3">{practiceCell(row)}</td>
+                      <td className="px-3 py-3 text-[#0D5B59]">
+                        <div className="flex flex-col gap-2">
+                          {row.reasons.map((reason, index) => (
+                            <div key={`${reason.label}-${index}`} className="flex flex-col gap-0.5">
+                              <span className="font-medium">{reason.label}</span>
+                              <span className="font-mono text-xs text-[#456B68]">
+                                {reason.detail}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="rounded-r-2xl px-3 py-3">
+                        {commentCell(row, row.messageCount, row.celebration?.checkinId)}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         )}
       </section>
 
-      {/* FR-TF-03 慶祝 */}
-      <section
-        id="focus-panel-celebrate"
-        role="tabpanel"
-        aria-labelledby="focus-tab-celebrate"
-        hidden={tab !== "celebrate"}
-        className="mt-5 rounded-3xl border border-[#CDEBE8] bg-white p-4 md:p-6"
-      >
-        <div className="mb-3 flex justify-end">
-          <FocusCriteriaInfo
-            label={t("focus_criteria_celebrate_label")}
-            content={t("focus_criteria_celebrate")}
-          />
-        </div>
-        {!data?.celebrations.length ? (
-          <EmptyState />
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-[840px] w-full border-separate border-spacing-y-2 text-sm">
-              <thead>
-                <tr className="text-left text-xs text-[#78928F]">
-                  <th
-                    scope="col"
-                    className="sticky left-0 z-30 bg-white px-3 py-1 font-medium shadow-[4px_0_6px_-5px_rgba(13,48,54,0.45)]"
-                  >
-                    {t("col_participant")}
-                  </th>
-                  <th scope="col" className="px-3 py-1 font-medium">
-                    {practiceHeader}
-                  </th>
-                  <th scope="col" className="px-3 py-1 font-medium">
-                    {t("col_first_checkin")}
-                  </th>
-                  <th scope="col" className="px-3 py-1 font-medium">
-                    {t("col_moment")}
-                  </th>
-                  <th scope="col" className="px-3 py-1 font-medium">
-                    {t("col_messages")}
-                  </th>
-                  <th scope="col" className="px-3 py-1 font-medium">
-                    {t("col_send_message")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.celebrations.map((item: LighthouseFocusCelebrationType) => (
-                  <tr
-                    key={`${item.userId}-${item.practiceId}-${item.moment}`}
-                    className="bg-white shadow-[0_0_0_1px_#DDEFED]"
-                  >
-                    <td className="sticky left-0 z-20 rounded-l-2xl bg-white px-3 py-3 font-semibold shadow-[4px_0_6px_-5px_rgba(13,48,54,0.45)]">
-                      {name(item)}
-                    </td>
-                    <td className="px-3 py-3">{practiceCell(item)}</td>
-                    <td className="px-3 py-3 font-mono text-xs text-[#456B68]">
-                      {day(item.firstCheckinAt)}
-                    </td>
-                    <td className="px-3 py-3 text-[#0D5B59]">{item.momentDescription}</td>
-                    <td className="px-3 py-3">{messageCell(item, item.messageCount)}</td>
-                    <td className="rounded-r-2xl px-3 py-3">{sendCell(item, "celebrate")}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
-
-      <CohortCheckinDrawer
+      <CohortFocusDetailDrawer
         programId={programId}
         cohortId={cohortId}
-        person={drawer}
-        onClose={() => setDrawer(null)}
-      />
-      <CohortMessageHistoryDialog
-        programId={programId}
-        cohortId={cohortId}
-        person={history}
-        onClose={() => setHistory(null)}
+        target={detail}
+        onClose={() => setDetail(null)}
+        onCompose={setCompose}
       />
       <CohortMessageComposeDialog
         programId={programId}
         cohortId={cohortId}
-        organizationId={organizationId}
         target={compose}
         onClose={() => setCompose(null)}
         onSent={() => void query.mutate()}
