@@ -1,0 +1,45 @@
+{
+  "practiceId": "d8aef5b1-3084-418a-a75d-e06095b50cb8",
+  "checkins": {
+    "success": true,
+    "data": [
+      {
+        "id": 1193,
+        "practiceId": 76,
+        "userId": 58,
+        "checkinDate": "2026-11-27",
+        "mood": "happy",
+        "note": "PR1269 完整版型驗證：確認日期、8/21 天、剩下 13 天與並排執行時機後，完成一次中文心情回歸。",
+        "imageUrls": [],
+        "ogImageUrl": null,
+        "tags": [
+          "發現"
+        ],
+        "viewCount": 0,
+        "createdAt": "2026-11-27T12:47:54.022Z",
+        "updatedAt": "2026-11-27T12:48:10.494Z"
+      }
+    ],
+    "pagination": {
+      "currentPage": 1,
+      "totalPages": 1,
+      "totalItems": 1,
+      "itemsPerPage": 20,
+      "hasNext": false,
+      "hasPrev": false
+    },
+    "timestamp": "2026-11-27T12:49:33.818Z",
+    "meta": {
+      "filters": {},
+      "requestId": "req_1795783773765_fzsa0kle5",
+      "processingTime": 51
+    }
+  },
+  "db": [
+    {
+      "id": 1193,
+      "mood": "happy",
+      "note": "PR1269 完整版型驗證：確認日期、8/21 天、剩下 13 天與並排執行時機後，完成一次中文心情回歸。"
+    }
+  ]
+}

@@ -8,6 +8,7 @@
     "typegen": "next typegen",
     "predev": "node scripts/sync-island-models.mjs",
     "dev": "next dev --turbopack -p 3001",
+    "dev:poc": "next dev --turbopack -p 3002 --hostname localhost",
     "prebuild": "node scripts/sync-island-models.mjs",
     "build": "next build",
     "start": "next start -p 3001",

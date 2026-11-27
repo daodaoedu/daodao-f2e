@@ -1,0 +1,577 @@
+{
+  "environment": "local synthetic API and PostgreSQL; successful requests forwarded unchanged; injected 503 marked explicitly",
+  "apiReadAt": "2026-11-26T13:11:40.722Z",
+  "api": [
+    {
+      "id": 1191,
+      "mood": "happy",
+      "note": "PR1269 English persisted mood journey"
+    },
+    {
+      "id": 1186,
+      "mood": "neutral",
+      "note": "PR1269 POST503 表單保留重試"
+    },
+    {
+      "id": 1185,
+      "mood": "neutral",
+      "note": "PR1269 選開心後關閉不更新"
+    },
+    {
+      "id": 1184,
+      "mood": "happy",
+      "note": "PR1269 五心情 開心"
+    },
+    {
+      "id": 1183,
+      "mood": "frustrated",
+      "note": "PR1269 五心情 受挫"
+    },
+    {
+      "id": 1182,
+      "mood": "give_up",
+      "note": "PR1269 五心情 想放棄"
+    },
+    {
+      "id": 1181,
+      "mood": "neutral",
+      "note": "PR1269 五心情 普通"
+    },
+    {
+      "id": 1180,
+      "mood": "good",
+      "note": "PR1269 修正後 PUT503 重試"
+    },
+    {
+      "id": 1179,
+      "mood": "neutral",
+      "note": "PR1269 PUT503 重試驗證"
+    },
+    {
+      "id": 1178,
+      "mood": "happy",
+      "note": "PR1269 happy API 真實儲存驗證"
+    }
+  ],
+  "db": [
+    {
+      "id": 1178,
+      "mood": "happy",
+      "note": "PR1269 happy API 真實儲存驗證"
+    },
+    {
+      "id": 1179,
+      "mood": "neutral",
+      "note": "PR1269 PUT503 重試驗證"
+    },
+    {
+      "id": 1180,
+      "mood": "good",
+      "note": "PR1269 修正後 PUT503 重試"
+    },
+    {
+      "id": 1181,
+      "mood": "neutral",
+      "note": "PR1269 五心情 普通"
+    },
+    {
+      "id": 1182,
+      "mood": "give_up",
+      "note": "PR1269 五心情 想放棄"
+    },
+    {
+      "id": 1183,
+      "mood": "frustrated",
+      "note": "PR1269 五心情 受挫"
+    },
+    {
+      "id": 1184,
+      "mood": "happy",
+      "note": "PR1269 五心情 開心"
+    },
+    {
+      "id": 1185,
+      "mood": "neutral",
+      "note": "PR1269 選開心後關閉不更新"
+    },
+    {
+      "id": 1186,
+      "mood": "neutral",
+      "note": "PR1269 POST503 表單保留重試"
+    },
+    {
+      "id": 1191,
+      "mood": "happy",
+      "note": "PR1269 English persisted mood journey"
+    }
+  ],
+  "requests": [
+    {
+      "at": "2026-11-26T12:22:51.907Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:23:04.759Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:23:19.629Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:23:41.836Z",
+      "method": "POST",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins",
+      "status": 201
+    },
+    {
+      "at": "2026-11-26T12:23:42.105Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:23:59.114Z",
+      "method": "OPTIONS",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins/1178",
+      "status": 204
+    },
+    {
+      "at": "2026-11-26T12:23:59.216Z",
+      "method": "PUT",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins/1178",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:23:59.353Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:24:10.448Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:25:12.251Z",
+      "method": "POST",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins",
+      "status": 201
+    },
+    {
+      "at": "2026-11-26T12:25:12.497Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:25:18.585Z",
+      "method": "OPTIONS",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins/1179",
+      "status": 204
+    },
+    {
+      "at": "2026-11-26T12:25:18.610Z",
+      "method": "PUT",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins/1179",
+      "status": 503,
+      "injected": true
+    },
+    {
+      "at": "2026-11-26T12:29:27.101Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:30:32.342Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:30:41.808Z",
+      "method": "POST",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins",
+      "status": 201
+    },
+    {
+      "at": "2026-11-26T12:30:41.955Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:30:47.443Z",
+      "method": "OPTIONS",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins/1180",
+      "status": 204
+    },
+    {
+      "at": "2026-11-26T12:30:47.464Z",
+      "method": "PUT",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins/1180",
+      "status": 503,
+      "injected": true
+    },
+    {
+      "at": "2026-11-26T12:30:55.367Z",
+      "method": "OPTIONS",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins/1180",
+      "status": 204
+    },
+    {
+      "at": "2026-11-26T12:30:55.432Z",
+      "method": "PUT",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins/1180",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:30:55.511Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:31:06.494Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:31:18.525Z",
+      "method": "POST",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins",
+      "status": 201
+    },
+    {
+      "at": "2026-11-26T12:31:18.594Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:31:21.695Z",
+      "method": "POST",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins",
+      "status": 201
+    },
+    {
+      "at": "2026-11-26T12:31:21.837Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:31:23.471Z",
+      "method": "OPTIONS",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins/1182",
+      "status": 204
+    },
+    {
+      "at": "2026-11-26T12:31:23.571Z",
+      "method": "PUT",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins/1182",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:31:23.731Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:31:26.215Z",
+      "method": "POST",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins",
+      "status": 201
+    },
+    {
+      "at": "2026-11-26T12:31:26.289Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:31:27.242Z",
+      "method": "OPTIONS",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins/1183",
+      "status": 204
+    },
+    {
+      "at": "2026-11-26T12:31:27.287Z",
+      "method": "PUT",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins/1183",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:31:27.370Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:31:29.191Z",
+      "method": "POST",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins",
+      "status": 201
+    },
+    {
+      "at": "2026-11-26T12:31:29.305Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:31:30.661Z",
+      "method": "OPTIONS",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins/1184",
+      "status": 204
+    },
+    {
+      "at": "2026-11-26T12:31:30.701Z",
+      "method": "PUT",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins/1184",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:31:30.840Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:31:40.839Z",
+      "method": "POST",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins",
+      "status": 201
+    },
+    {
+      "at": "2026-11-26T12:31:40.918Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:31:46.312Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:37:15.681Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:51:23.017Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:51:40.878Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:51:44.860Z",
+      "method": "POST",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins",
+      "status": 503,
+      "injected": true
+    },
+    {
+      "at": "2026-11-26T12:52:01.796Z",
+      "method": "POST",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins",
+      "status": 201
+    },
+    {
+      "at": "2026-11-26T12:52:02.131Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:53:25.510Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:55:14.638Z",
+      "method": "GET",
+      "path": "/api/v1/practices/02483c64-0bb9-454d-81ed-cda99c4106c0/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:58:06.528Z",
+      "method": "POST",
+      "path": "/api/v1/practices/02483c64-0bb9-454d-81ed-cda99c4106c0/checkins/1190/view",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:58:07.268Z",
+      "method": "GET",
+      "path": "/api/v1/practices/02483c64-0bb9-454d-81ed-cda99c4106c0/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:58:19.672Z",
+      "method": "POST",
+      "path": "/api/v1/practices/02483c64-0bb9-454d-81ed-cda99c4106c0/checkins/1190/view",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:59:04.841Z",
+      "method": "GET",
+      "path": "/api/v1/practices/02483c64-0bb9-454d-81ed-cda99c4106c0/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T12:59:52.087Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T13:00:03.282Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T13:00:03.890Z",
+      "method": "POST",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins/1186/view",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T13:00:03.963Z",
+      "method": "POST",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins/1186/view",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T13:00:29.121Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T13:00:49.048Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T13:00:58.733Z",
+      "method": "POST",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins/1186/view",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T13:00:58.764Z",
+      "method": "POST",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins/1186/view",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T13:01:03.331Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T13:01:42.696Z",
+      "method": "GET",
+      "path": "/api/v1/practices/5782465f-7a1d-4736-ac09-542a44b381e0",
+      "status": 403
+    },
+    {
+      "at": "2026-11-26T13:01:43.745Z",
+      "method": "GET",
+      "path": "/api/v1/practices/5782465f-7a1d-4736-ac09-542a44b381e0/checkins?limit=30",
+      "status": 403
+    },
+    {
+      "at": "2026-11-26T13:02:51.402Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 503,
+      "injected": true
+    },
+    {
+      "at": "2026-11-26T13:06:26.762Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 503,
+      "injected": true
+    },
+    {
+      "at": "2026-11-26T13:06:40.669Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T13:07:13.016Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T13:07:50.449Z",
+      "method": "POST",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins",
+      "status": 201
+    },
+    {
+      "at": "2026-11-26T13:07:50.874Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T13:08:26.028Z",
+      "method": "OPTIONS",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins/1191",
+      "status": 204
+    },
+    {
+      "at": "2026-11-26T13:08:26.527Z",
+      "method": "PUT",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins/1191",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T13:08:27.418Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T13:08:40.352Z",
+      "method": "GET",
+      "path": "/api/v1/practices/0d211cf5-4843-4f6c-9ca5-286784bb19a1/checkins?limit=30",
+      "status": 200
+    },
+    {
+      "at": "2026-11-26T13:09:26.440Z",
+      "method": "GET",
+      "path": "/api/v1/practices/02483c64-0bb9-454d-81ed-cda99c4106c0/checkins?limit=30",
+      "status": 200
+    }
+  ]
+}

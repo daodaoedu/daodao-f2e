@@ -1,0 +1,442 @@
+[
+  {
+    "label": "owner-zh-mobile",
+    "cardOverflow": false,
+    "dates": [
+      {
+        "date": "2026-11-19",
+        "text": "2026/11/19"
+      },
+      {
+        "date": "2026-12-09",
+        "text": "2026/12/09"
+      }
+    ],
+    "height": 844,
+    "overflow": false,
+    "progress": {
+      "label": "實踐期間進度",
+      "text": "已進行 8/21 天",
+      "value": "38.095238095238095"
+    },
+    "terms": [
+      {
+        "label": "每週",
+        "x": 32,
+        "y": 390
+      },
+      {
+        "label": "每次",
+        "x": 115.66667175292967,
+        "y": 390
+      },
+      {
+        "label": "執行時機",
+        "x": 199.33334350585935,
+        "y": 390
+      }
+    ],
+    "text": "戴上耳機，聽一段英文 podcast\n\n2026/11/19\n–\n2026/12/09\n已進行 8/21 天\n剩下 13 天\n每週\n3-5\n天\n每次\n15\n分鐘\n執行時機\n通勤時\n英文\nPodcast\n聽力\n通勤學習\n語言\n20%\n0",
+    "width": 390
+  },
+  {
+    "label": "owner-zh-reference",
+    "cardOverflow": false,
+    "dates": [
+      {
+        "date": "2026-11-19",
+        "text": "2026/11/19"
+      },
+      {
+        "date": "2026-12-09",
+        "text": "2026/12/09"
+      }
+    ],
+    "height": 533,
+    "overflow": false,
+    "progress": {
+      "label": "實踐期間進度",
+      "text": "已進行 8/21 天",
+      "value": "38.095238095238095"
+    },
+    "terms": [
+      {
+        "label": "每週",
+        "x": 32,
+        "y": 390
+      },
+      {
+        "label": "每次",
+        "x": 156.6666717529297,
+        "y": 390
+      },
+      {
+        "label": "執行時機",
+        "x": 281.3333435058594,
+        "y": 390
+      }
+    ],
+    "text": "戴上耳機，聽一段英文 podcast\n\n2026/11/19\n–\n2026/12/09\n已進行 8/21 天\n剩下 13 天\n每週\n3-5\n天\n每次\n15\n分鐘\n執行時機\n通勤時\n英文\nPodcast\n聽力\n通勤學習\n語言\n20%\n0",
+    "width": 554
+  },
+  {
+    "label": "owner-zh-768",
+    "cardOverflow": false,
+    "dates": [
+      {
+        "date": "2026-11-19",
+        "text": "2026/11/19"
+      },
+      {
+        "date": "2026-12-09",
+        "text": "2026/12/09"
+      }
+    ],
+    "height": 1024,
+    "overflow": false,
+    "progress": {
+      "label": "實踐期間進度",
+      "text": "已進行 8/21 天",
+      "value": "38.095238095238095"
+    },
+    "terms": [
+      {
+        "label": "每週",
+        "x": 196,
+        "y": 334
+      },
+      {
+        "label": "每次",
+        "x": 332,
+        "y": 334
+      },
+      {
+        "label": "執行時機",
+        "x": 468,
+        "y": 334
+      }
+    ],
+    "text": "戴上耳機，聽一段英文 podcast\n\n2026/11/19\n–\n2026/12/09\n已進行 8/21 天\n剩下 13 天\n每週\n3-5\n天\n每次\n15\n分鐘\n執行時機\n通勤時\n英文\nPodcast\n聽力\n通勤學習\n語言\n20%\n0",
+    "width": 768
+  },
+  {
+    "label": "owner-zh-1280",
+    "cardOverflow": false,
+    "dates": [
+      {
+        "date": "2026-11-19",
+        "text": "2026/11/19"
+      },
+      {
+        "date": "2026-12-09",
+        "text": "2026/12/09"
+      }
+    ],
+    "height": 900,
+    "overflow": false,
+    "progress": {
+      "label": "實踐期間進度",
+      "text": "已進行 8/21 天",
+      "value": "38.095238095238095"
+    },
+    "terms": [
+      {
+        "label": "每週",
+        "x": 236,
+        "y": 334
+      },
+      {
+        "label": "每次",
+        "x": 332,
+        "y": 334
+      },
+      {
+        "label": "執行時機",
+        "x": 428,
+        "y": 334
+      }
+    ],
+    "text": "戴上耳機，聽一段英文 podcast\n\n2026/11/19\n–\n2026/12/09\n已進行 8/21 天\n剩下 13 天\n每週\n3-5\n天\n每次\n15\n分鐘\n執行時機\n通勤時\n英文\nPodcast\n聽力\n通勤學習\n語言\n20%\n0",
+    "width": 1280
+  },
+  {
+    "label": "visitor-zh-mobile",
+    "cardOverflow": false,
+    "dates": [
+      {
+        "date": "2026-11-19",
+        "text": "2026/11/19"
+      },
+      {
+        "date": "2026-12-09",
+        "text": "2026/12/09"
+      }
+    ],
+    "height": 844,
+    "overflow": false,
+    "progress": {
+      "label": "實踐期間進度",
+      "text": "已進行 8/21 天",
+      "value": "38.095238095238095"
+    },
+    "terms": [
+      {
+        "label": "每週",
+        "x": 32,
+        "y": 394
+      },
+      {
+        "label": "每次",
+        "x": 115.66667175292967,
+        "y": 394
+      },
+      {
+        "label": "執行時機",
+        "x": 199.33334350585935,
+        "y": 394
+      }
+    ],
+    "text": "assistant\n2026/11/19\n\n戴上耳機，聽一段英文 podcast\n\n2026/11/19\n–\n2026/12/09\n已進行 8/21 天\n剩下 13 天\n每週\n3-5\n天\n每次\n15\n分鐘\n執行時機\n通勤時\n英文\nPodcast\n聽力\n通勤學習\n語言\n20%\n我也想實踐\n0",
+    "width": 390
+  },
+  {
+    "label": "owner-en-320",
+    "cardOverflow": false,
+    "dates": [
+      {
+        "date": "2026-11-19",
+        "text": "2026/11/19"
+      },
+      {
+        "date": "2026-12-09",
+        "text": "2026/12/09"
+      }
+    ],
+    "height": 844,
+    "overflow": false,
+    "progress": {
+      "label": "Practice period progress",
+      "text": "8/21 days elapsed",
+      "value": "38.095238095238095"
+    },
+    "terms": [
+      {
+        "label": "Per week",
+        "x": 32,
+        "y": 442
+      },
+      {
+        "label": "Per session",
+        "x": 98.16667175292967,
+        "y": 442
+      },
+      {
+        "label": "Execution Timing",
+        "x": 164.33334350585938,
+        "y": 442
+      }
+    ],
+    "text": "戴上耳機，聽一段英文 podcast\n\n2026/11/19\n–\n2026/12/09\n8/21 days elapsed\n13 days remaining\nPer week\n3-5\ndays\nPer session\n15\nmin\nExecution Timing\nDuring commute\n英文\nPodcast\n聽力\n通勤學習\n語言\n20%\n0",
+    "width": 320
+  },
+  {
+    "label": "ended-zh-mobile",
+    "cardOverflow": false,
+    "dates": [
+      {
+        "date": "2026-11-01",
+        "text": "2026/11/01"
+      },
+      {
+        "date": "2026-11-07",
+        "text": "2026/11/07"
+      }
+    ],
+    "height": 844,
+    "overflow": false,
+    "progress": {
+      "label": "實踐期間進度",
+      "text": "已進行 7/7 天",
+      "value": "100"
+    },
+    "terms": [
+      {
+        "label": "每週",
+        "x": 32,
+        "y": 390
+      },
+      {
+        "label": "每次",
+        "x": 115.66667175292967,
+        "y": 390
+      },
+      {
+        "label": "執行時機",
+        "x": 199.33334350585935,
+        "y": 390
+      }
+    ],
+    "text": "戴上耳機，聽一段英文 podcast\n\n2026/11/01\n–\n2026/11/07\n已進行 7/7 天\n剩下 0 天\n每週\n3-5\n天\n每次\n15\n分鐘\n執行時機\n通勤時\n英文\nPodcast\n聽力\n通勤學習\n語言\n20%\n0",
+    "width": 390
+  },
+  {
+    "label": "future-zh-mobile-loaded",
+    "cardOverflow": false,
+    "dates": [
+      {
+        "date": "2026-12-04",
+        "text": "2026/12/04"
+      },
+      {
+        "date": "2026-12-10",
+        "text": "2026/12/10"
+      }
+    ],
+    "height": 844,
+    "overflow": false,
+    "progress": {
+      "label": "實踐期間進度",
+      "text": "已進行 0/7 天",
+      "value": "0"
+    },
+    "terms": [
+      {
+        "label": "每週",
+        "x": 32,
+        "y": 390
+      },
+      {
+        "label": "每次",
+        "x": 115.66667175292967,
+        "y": 390
+      },
+      {
+        "label": "執行時機",
+        "x": 199.33334350585935,
+        "y": 390
+      }
+    ],
+    "text": "戴上耳機，聽一段英文 podcast\n\n2026/12/04\n–\n2026/12/10\n已進行 0/7 天\n剩下 7 天\n每週\n3-5\n天\n每次\n15\n分鐘\n執行時機\n通勤時\n英文\nPodcast\n聽力\n通勤學習\n語言\n20%\n0",
+    "width": 390
+  },
+  {
+    "label": "owner-en-320-fixed",
+    "cardOverflow": false,
+    "dates": [
+      {
+        "date": "2026-11-19",
+        "text": "2026/11/19"
+      },
+      {
+        "date": "2026-12-09",
+        "text": "2026/12/09"
+      }
+    ],
+    "height": 844,
+    "overflow": false,
+    "progress": {
+      "label": "Practice period progress",
+      "text": "8/21 days elapsed",
+      "value": "38.095238095238095"
+    },
+    "terms": [
+      {
+        "label": "Per week",
+        "x": 32,
+        "y": 442
+      },
+      {
+        "label": "Per session",
+        "x": 98.16667175292967,
+        "y": 442
+      },
+      {
+        "label": "Execution Timing",
+        "x": 164.33334350585938,
+        "y": 442
+      }
+    ],
+    "text": "戴上耳機，聽一段英文 podcast\n\n2026/11/19\n–\n2026/12/09\n8/21 days elapsed\n13 days remaining\nPer week\n3-5\ndays\nPer session\n15\nmin\nExecution Timing\nDuring commute\n英文\nPodcast\n聽力\n通勤學習\n語言\n20%\n0",
+    "width": 320
+  },
+  {
+    "label": "owner-zh-after-checkin",
+    "cardOverflow": false,
+    "dates": [
+      {
+        "date": "2026-11-19",
+        "text": "2026/11/19"
+      },
+      {
+        "date": "2026-12-09",
+        "text": "2026/12/09"
+      }
+    ],
+    "height": 844,
+    "overflow": false,
+    "progress": {
+      "label": "實踐期間進度",
+      "text": "已進行 8/21 天",
+      "value": "38.095238095238095"
+    },
+    "terms": [
+      {
+        "label": "每週",
+        "x": 32,
+        "y": 390
+      },
+      {
+        "label": "每次",
+        "x": 115.66667175292967,
+        "y": 390
+      },
+      {
+        "label": "執行時機",
+        "x": 199.33334350585935,
+        "y": 390
+      }
+    ],
+    "text": "戴上耳機，聽一段英文 podcast\n\n2026/11/19\n–\n2026/12/09\n已進行 8/21 天\n剩下 13 天\n每週\n3-5\n天\n每次\n15\n分鐘\n執行時機\n通勤時\n英文\nPodcast\n聽力\n通勤學習\n語言\n50%\n0",
+    "width": 390
+  },
+  {
+    "label": "owner-zh-desktop-final",
+    "cardOverflow": false,
+    "dates": [
+      {
+        "date": "2026-11-19",
+        "text": "2026/11/19"
+      },
+      {
+        "date": "2026-12-09",
+        "text": "2026/12/09"
+      }
+    ],
+    "height": 900,
+    "overflow": false,
+    "progress": {
+      "label": "實踐期間進度",
+      "text": "已進行 8/21 天",
+      "value": "38.095238095238095"
+    },
+    "terms": [
+      {
+        "label": "每週",
+        "x": 236,
+        "y": 334
+      },
+      {
+        "label": "每次",
+        "x": 332,
+        "y": 334
+      },
+      {
+        "label": "執行時機",
+        "x": 428,
+        "y": 334
+      }
+    ],
+    "text": "戴上耳機，聽一段英文 podcast\n\n2026/11/19\n–\n2026/12/09\n已進行 8/21 天\n剩下 13 天\n每週\n3-5\n天\n每次\n15\n分鐘\n執行時機\n通勤時\n英文\nPodcast\n聽力\n通勤學習\n語言\n50%\n0",
+    "width": 1280
+  }
+]

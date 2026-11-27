@@ -229,7 +229,11 @@ export default function PracticeDetailPage() {
     targetId: practiceId,
   });
 
-  const isOwner = practiceData?.data?.user?.id === currentUserData?.data?.id;
+  // Visitor preview only removes owner controls; API permissions remain unchanged.
+  const isOwner =
+    searchParams.get("view") !== "visitor" &&
+    !!currentUserData?.data?.id &&
+    practiceData?.data?.user?.id === currentUserData.data.id;
   const isCohortPractice =
     practiceData?.data?.isCohortPractice === true && practiceData?.data?.isChallenge !== true;
   const practiceStatus = getCohortPracticeDisplayStatus(
@@ -653,9 +657,9 @@ export default function PracticeDetailPage() {
           readOnly={isReadOnlyCohortView}
           checkInsData={checkInsData}
           isLoadingCheckIns={isLoadingCheckIns}
-          checkInsError={isReadOnlyCohortView && Boolean(allCheckIns.error)}
+          checkInsError={Boolean(checkInsQuery.error)}
           onRetryCheckIns={() => {
-            void allCheckIns.mutate();
+            void checkInsQuery.mutate();
           }}
           isLoadingComments={isLoadingComments}
           commentsError={Boolean(commentsError)}

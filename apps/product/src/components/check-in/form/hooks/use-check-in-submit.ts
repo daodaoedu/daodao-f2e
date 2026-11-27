@@ -1,8 +1,7 @@
 import { useCreatePracticeCheckIn, useUpdatePracticeCheckIn } from "@daodao/api";
 import { useTranslations } from "@daodao/i18n";
 import { toast } from "@daodao/ui/components/sonner";
-import { useRef } from "react";
-import { MoodType, type MoodType as MoodTypeValue, mapMoodTypeToApiMood } from "@/constants/mood";
+import { MoodType, mapMoodTypeToApiMood } from "@/constants/mood";
 import { useCheckInSuccessDialog } from "@/hooks/use-check-in-success-dialog";
 import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import type { ICheckInFormData } from "../../types";
@@ -26,7 +25,6 @@ export const useCheckInSubmit = ({
   const { errorMessage } = useServerErrorMessage();
   const { createCheckIn } = useCreatePracticeCheckIn(practiceId);
   const { updateCheckIn } = useUpdatePracticeCheckIn(practiceId);
-  const selectedMoodRef = useRef<MoodTypeValue>(MoodType.neutral);
   const { openSuccessDialog } = useCheckInSuccessDialog({});
 
   /**
@@ -37,7 +35,6 @@ export const useCheckInSubmit = ({
     // 顯示 loading toast
     const loadingToast = toast.loading(t("checking_in"));
     const initialMood = data.mood ?? MoodType.neutral;
-    selectedMoodRef.current = initialMood;
 
     await runCheckInCreate({
       // 使用封裝好的函數創建打卡記錄（自動處理圖片上傳和 cache 刷新）
@@ -77,29 +74,28 @@ export const useCheckInSubmit = ({
             : undefined;
 
         // 顯示成功對話框
+        let savedMood = initialMood;
         await openSuccessDialog(
           progressPercentage,
           newProgressPercentage,
           encouragement,
-          initialMood,
-          (mood) => {
-            selectedMoodRef.current = mood;
+          async (selectedMood) => {
+            try {
+              if (selectedMood !== initialMood) {
+                await updateCheckIn(
+                  { mood: mapMoodTypeToApiMood(selectedMood) },
+                  String(response.data.id)
+                );
+              }
+              savedMood = selectedMood;
+              return true;
+            } catch (error) {
+              console.error("Check-in mood update failed:", error);
+              toast.error(t("mood_update_failed"));
+              return false;
+            }
           }
         );
-        let savedMood = initialMood;
-        const selectedMood = selectedMoodRef.current;
-        if (selectedMood !== initialMood) {
-          try {
-            await updateCheckIn(
-              { mood: mapMoodTypeToApiMood(selectedMood) },
-              String(response.data.id)
-            );
-            savedMood = selectedMood;
-          } catch (error) {
-            console.error("Check-in mood update failed:", error);
-            toast.error(t("mood_update_failed"));
-          }
-        }
 
         onComplete?.({ ...data, mood: savedMood });
       },
