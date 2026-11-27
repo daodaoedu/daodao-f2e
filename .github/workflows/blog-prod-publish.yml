@@ -12,6 +12,11 @@ on:
         required: false
         default: false
         type: boolean
+      expected_content_sha:
+        description: Scheduled publication guard; must match the prepared content revision
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
@@ -32,6 +37,7 @@ jobs:
       BLOG_PROD_CONTENT_SHA: ${{ vars.BLOG_PROD_CONTENT_SHA }}
       BLOG_PROD_PUBLISHED_CONTENT_SHA: ${{ vars.BLOG_PROD_PUBLISHED_CONTENT_SHA }}
       BLOG_PROD_APPROVALS: ${{ vars.BLOG_PROD_APPROVALS }}
+      BLOG_PROD_EXPECTED_CONTENT_SHA: ${{ inputs.expected_content_sha }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
@@ -163,3 +169,4 @@ jobs:
           rm -f .env apps/website/.env
           if [ -n "$SNAPSHOT" ]; then rm -f -- "$SNAPSHOT"; fi
           if [ -n "${BLOG_APPROVALS_FILE:-}" ]; then rm -f -- "$BLOG_APPROVALS_FILE"; fi
+

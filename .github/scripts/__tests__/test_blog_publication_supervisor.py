@@ -233,12 +233,18 @@ class PublicationSupervisorTests(unittest.TestCase):
             SUPERVISOR.recover_snapshot(
                 adapter,
                 Path("/owned/namespace"),
-                {"baseComposeSha256": "b" * 64, "producerSha256": "c" * 64},
+                {
+                    "baseComposeSha256": "b" * 64,
+                    "producerSha256": "c" * 64,
+                    "reviewedBaseComposeSha256s": ["b" * 64, "e" * 64],
+                },
                 snapshot,
                 {"summary": {"id": "a" * 64}},
                 True,
             )
-        adapter.restore_previous.assert_called_once_with(snapshot, "b" * 64)
+        adapter.restore_previous.assert_called_once_with(
+            snapshot, "b" * 64, reviewed_history=["b" * 64, "e" * 64]
+        )
         state, _producer, outcome = adapter.record_journal.call_args.args
         self.assertTrue(state["legacyContainerRestored"])
         self.assertFalse(state["recovery"]["localRecoveryVerified"])
@@ -251,7 +257,9 @@ class PublicationSupervisorTests(unittest.TestCase):
             with self.subTest(restore_fails=restore_fails):
                 events = []
 
-                def restore(*args, events=events, restore_fails=restore_fails):
+                def restore(
+                    *args, events=events, restore_fails=restore_fails, **kwargs
+                ):
                     events.append("configuration")
                     if restore_fails:
                         raise ValueError("external container replaced operation")

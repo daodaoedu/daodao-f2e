@@ -221,6 +221,36 @@ def verify_base_compose(expected_digest):
     return reviewed_base_compose(expected_digest)
 
 
+def saved_base_transition(expected_digest, reviewed_history):
+    """Classify the owned saved compose against the reviewed source history.
+
+    Returns the saved digest when it is an older reviewed compose that may be
+    replaced by the reviewed head, or None when it already equals the head.
+    Anything outside reviewed history was changed on the host and fails closed.
+    """
+    history = set(reviewed_history or ())
+    if history and expected_digest not in history:
+        raise ValueError("Reviewed head is missing from reviewed compose history")
+    if not all(isinstance(item, str) and RELEASE.fullmatch(item) for item in history):
+        raise ValueError("Reviewed compose history must contain fixed digests")
+    saved = hashlib.sha256(read_owned_file(OPERATOR / OWNED_BASE_NAME)).hexdigest()
+    if saved == expected_digest:
+        return None
+    if saved not in history:
+        raise ValueError(
+            "Saved reviewed compose differs from reviewed history; no configuration mutation"
+        )
+    return saved
+
+
+def replace_saved_base(previous_digest, base_bytes):
+    # Recheck immediately before the write so a concurrent host edit is never overwritten.
+    current = hashlib.sha256(read_owned_file(OPERATOR / OWNED_BASE_NAME)).hexdigest()
+    if current != previous_digest:
+        raise ValueError("Saved reviewed compose changed during transition; unchanged")
+    atomic_owned_write(OPERATOR / OWNED_BASE_NAME, base_bytes)
+
+
 def ownership_marker():
     return {
         "schema": 1,
@@ -502,7 +532,13 @@ def recreate_managed(snapshot, run):
     )
 
 
-def apply_overlay(snapshot, expected_compose_digest, nginx_source, run=subprocess.run):
+def apply_overlay(
+    snapshot,
+    expected_compose_digest,
+    nginx_source,
+    run=subprocess.run,
+    reviewed_history=(),
+):
     base_bytes = reviewed_base_compose(expected_compose_digest)
     current = inspect_container()
     if current["id"] != snapshot["id"] or current["image"] != snapshot["image"]:
@@ -515,15 +551,11 @@ def apply_overlay(snapshot, expected_compose_digest, nginx_source, run=subproces
             raise ValueError(
                 "Managed Nginx configuration transition requires separate review; unchanged"
             )
-        if (
-            hashlib.sha256(read_owned_file(OPERATOR / OWNED_BASE_NAME)).hexdigest()
-            != expected_compose_digest
-        ):
-            raise ValueError(
-                "Saved reviewed compose differs; no configuration mutation"
-            )
+        previous_base = saved_base_transition(expected_compose_digest, reviewed_history)
         managed_overlay(snapshot)
         if not snapshot.get("configurationTransition"):
+            if previous_base is not None:
+                replace_saved_base(previous_base, base_bytes)
             return current
         state = configuration_state(snapshot)
         if (
@@ -540,6 +572,8 @@ def apply_overlay(snapshot, expected_compose_digest, nginx_source, run=subproces
             or read_owned_file(OVERLAY).hex() != state["previousOverlay"]
         ):
             raise ValueError("Configuration preimage changed during syntax probe")
+        if previous_base is not None:
+            replace_saved_base(previous_base, base_bytes)
         atomic_owned_write(NGINX, nginx_source, 0o644)
         atomic_owned_write(OVERLAY, bytes.fromhex(state["targetOverlay"]))
     else:
@@ -592,12 +626,18 @@ def restore_configuration(snapshot, run):
     return inspect_container()
 
 
-def restore_previous(snapshot, expected_compose_digest, run=subprocess.run):
+def restore_previous(
+    snapshot, expected_compose_digest, run=subprocess.run, reviewed_history=()
+):
     """Restore only the captured dev website image/mount selection; never stop the stack."""
     establish_operator()
-    saved_base = read_owned_file(OPERATOR / OWNED_BASE_NAME)
-    if hashlib.sha256(saved_base).hexdigest() != expected_compose_digest:
-        raise ValueError("Saved reviewed compose differs; no restore mutation")
+    # An older reviewed base is the pre-transition state; a host edit is never restored onto.
+    try:
+        saved_base_transition(expected_compose_digest, reviewed_history)
+    except ValueError as error:
+        raise ValueError(
+            "Saved reviewed compose differs; no restore mutation"
+        ) from error
     if snapshot["managedMounts"]:
         if snapshot.get("configurationTransition"):
             return restore_configuration(snapshot, run)
