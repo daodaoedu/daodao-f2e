@@ -21,7 +21,6 @@ import {
   Sparkles,
 } from "lucide-react";
 import { type CSSProperties, useLayoutEffect, useRef, useState } from "react";
-import { FUTURE_LETTER_ENTRY_ENABLED } from "@/constants/future-letter";
 import type {
   FootprintEventCard,
   FootprintLetterCard,
@@ -31,6 +30,7 @@ import type {
 type DraftLetter = FutureLetterType & { updatedAt?: string };
 
 interface VerticalTimelineProps {
+  futureLetterEntryEnabled?: boolean;
   futureLetters: FootprintLetterCard[];
   pastGroups: FootprintMonthGroup[];
   onWriteLetter: () => void;
@@ -366,6 +366,7 @@ function DraftRow({ draft, onClick }: { draft: DraftLetter; onClick: () => void 
 export function VerticalTimeline({
   futureLetters,
   pastGroups,
+  futureLetterEntryEnabled = false,
   onWriteLetter,
   isWriteLetterDisabled,
   onLetterClick,
@@ -394,9 +395,9 @@ export function VerticalTimeline({
     >
       <style>{KEYFRAMES}</style>
 
-      {FUTURE_LETTER_ENTRY_ENABLED && draft && <DraftRow draft={draft} onClick={onWriteLetter} />}
+      {futureLetterEntryEnabled && draft && <DraftRow draft={draft} onClick={onWriteLetter} />}
 
-      {FUTURE_LETTER_ENTRY_ENABLED &&
+      {futureLetterEntryEnabled &&
         (futureLetters.length === 0 ? (
           <Row
             label={t("label_future")}

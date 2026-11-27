@@ -3,13 +3,14 @@
 import {
   logout as apiLogout,
   refreshToken as apiRefreshToken,
+  FeatureFlagSessionContext,
   getAuthMe,
   unauthorizedHandler,
 } from "@daodao/api";
 import { usePathname } from "@daodao/i18n/navigation";
 import { routing } from "@daodao/i18n/routing";
 import { clearBlogSourceContext, getStorage, getStorageKey, StorageEnum } from "@daodao/shared";
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useId, useMemo, useState } from "react";
 import { LoginDialog } from "../components/login-dialog";
 import type { AuthContextValue, StoredUser } from "../types";
 import { initiateOAuthLogin } from "./auth-client";
@@ -200,6 +201,8 @@ export const AuthProvider = ({
   emailVerificationPath,
   onEmailUnverified,
 }: AuthProviderProps) => {
+  const featureFlagProviderId = useId();
+  const [featureFlagSessionRevision, setFeatureFlagSessionRevision] = useState(0);
   const [user, setUser] = useState<StoredUser | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -220,6 +223,7 @@ export const AuthProvider = ({
    * 統一處理使用者狀態清除邏輯
    */
   const clearAuthState = useCallback(() => {
+    setFeatureFlagSessionRevision((revision) => revision + 1);
     setAuthCheckUnavailable(false);
     setUser(null);
     setIsAuthenticated(false);
@@ -241,6 +245,7 @@ export const AuthProvider = ({
    */
   const setAuthState = useCallback(
     (storedUser: StoredUser) => {
+      setFeatureFlagSessionRevision((revision) => revision + 1);
       setAuthCheckUnavailable(false);
       setUser(storedUser);
       setIsAuthenticated(true);
@@ -366,6 +371,7 @@ export const AuthProvider = ({
       if (e.key === getStorageKey(StorageEnum.UserInfo)) {
         const newUserInfo = userInfoStorage.get();
         if (newUserInfo) {
+          setFeatureFlagSessionRevision((revision) => revision + 1);
           setUser(newUserInfo);
           setIsAuthenticated(true);
           setRoles(newUserInfo.roles ?? []);
@@ -676,7 +682,15 @@ export const AuthProvider = ({
 
   return (
     <AuthContext.Provider value={value}>
-      {children}
+      <FeatureFlagSessionContext.Provider
+        value={
+          isLoading || authCheckUnavailable
+            ? null
+            : `${featureFlagProviderId}:${featureFlagSessionRevision}:${user?.id ?? "guest"}`
+        }
+      >
+        {children}
+      </FeatureFlagSessionContext.Provider>
       <LoginDialog
         open={isLoginDialogOpen}
         onOpenChange={setIsLoginDialogOpen}
