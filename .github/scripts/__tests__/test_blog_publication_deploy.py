@@ -562,5 +562,103 @@ class FrontendRefreshProducerTests(unittest.TestCase):
                 self.validate(producer, "refresh")
 
 
+class ReviewedComposeHistoryTests(unittest.TestCase):
+    def test_history_contains_head_and_older_reviewed_compose_versions(self):
+        if (
+            subprocess.check_output(
+                ["git", "rev-parse", "--is-shallow-repository"], cwd=ROOT, text=True
+            ).strip()
+            == "true"
+        ):
+            self.skipTest("shallow checkout has no compose history")
+        head = (ROOT / "docker-compose.yaml").read_bytes()
+        commits = subprocess.check_output(
+            ["git", "log", "--format=%H", "HEAD", "--", "docker-compose.yaml"],
+            cwd=ROOT,
+            text=True,
+        ).split()
+        self.assertGreater(len(commits), 1)
+        older = subprocess.check_output(
+            ["git", "show", commits[-1] + ":docker-compose.yaml"], cwd=ROOT
+        )
+        history = DEPLOY.reviewed_compose_history(head)
+        self.assertIn(sha(head), history)
+        self.assertIn(sha(older), history)
+        self.assertNotIn(sha(b"host edited compose"), history)
+
+    def test_shallow_or_failing_git_accepts_only_the_reviewed_head(self):
+        def shallow(command, **kwargs):
+            return subprocess.CompletedProcess(command, 0, stdout=b"true\n")
+
+        def broken(command, **kwargs):
+            raise subprocess.CalledProcessError(128, command)
+
+        for call in (shallow, broken):
+            with self.subTest(call=call.__name__):
+                self.assertEqual(
+                    DEPLOY.reviewed_compose_history(b"head", call=call), [sha(b"head")]
+                )
+
+    def test_package_binds_history_into_hashed_provenance(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            data = Path(temporary)
+            (data / "producer.json").write_bytes(b"{}")
+            _archive, provenance = DEPLOY.package(
+                data, "c" * 64, 10000, history=lambda head: [sha(head), "d" * 64]
+            )
+        self.assertEqual(
+            provenance["reviewedBaseComposeSha256s"],
+            [provenance["baseComposeSha256"], "d" * 64],
+        )
+
+
+class PublicationSshDiagnosticsTests(unittest.TestCase):
+    def failure(self, stderr):
+        return subprocess.CalledProcessError(1, ["ssh"], stderr=stderr)
+
+    def test_remote_adapter_error_class_and_fixed_message_are_reported(self):
+        stderr = (
+            b"Traceback (most recent call last):\n"
+            b'  File "<string>", line 9, in <module>\n'
+            b"ValueError: Saved reviewed compose differs from reviewed history; "
+            b"no configuration mutation\n"
+        )
+        with (
+            patch.object(DEPLOY.subprocess, "run", side_effect=self.failure(stderr)),
+            self.assertRaises(RuntimeError) as raised,
+        ):
+            DEPLOY.publication_ssh(["ssh"], b"archive")
+        message = str(raised.exception)
+        self.assertIn("remote ValueError", message)
+        self.assertIn("Saved reviewed compose differs from reviewed history", message)
+        self.assertIn("no successful publication claimed", message)
+
+    def test_secret_like_or_unrecognized_stderr_is_never_echoed(self):
+        token = "ghp_" + "A1b2C3d4" * 6
+        cases = [
+            ("ValueError: key " + token + "\n").encode(),
+            ("RuntimeError: Bearer $" + token + "\n").encode(),
+            ("Permission denied (publickey) " + token + "\n").encode(),
+        ]
+        for stderr in cases:
+            with self.subTest(stderr=stderr):
+                summary = DEPLOY.remote_failure_summary(self.failure(stderr))
+                self.assertNotIn(token, summary)
+        self.assertEqual(
+            DEPLOY.remote_failure_summary(self.failure(cases[0])),
+            "remote ValueError (message withheld)",
+        )
+        self.assertIn(
+            "exit status 1",
+            DEPLOY.remote_failure_summary(self.failure(cases[2])),
+        )
+
+    def test_timeout_is_named_without_output(self):
+        error = subprocess.TimeoutExpired(["ssh"], 1500, stderr=b"secret")
+        self.assertEqual(
+            DEPLOY.remote_failure_summary(error), "SSH transport timed out"
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

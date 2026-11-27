@@ -245,7 +245,66 @@ def drain_existing_cd(call=subprocess.check_output, pause=time.sleep):
     raise ValueError("Preexisting legacy CD is still active; no host mutation")
 
 
-def package(data_root, producer_sha, generation):
+HISTORY_LIMIT = 200
+BLOB = re.compile(r"^[a-f0-9]{40}$")
+
+
+def reviewed_compose_history(head_bytes, call=subprocess.run):
+    """sha256 of every docker-compose.yaml version reachable from the trusted checkout.
+
+    The host may replace its saved managed base only when the saved copy is one of
+    these reviewed versions. Without history only the head is accepted (fail closed).
+    """
+    digests = {hashlib.sha256(head_bytes).hexdigest()}
+
+    def git(*arguments):
+        return call(
+            ["git", "-C", str(ROOT), *arguments],
+            check=True,
+            capture_output=True,
+            timeout=120,
+        ).stdout
+
+    try:
+        if git("rev-parse", "--is-shallow-repository").strip() == b"true":
+            raise ValueError("shallow checkout")
+        log = git(
+            "log",
+            "--full-history",
+            "--format=",
+            "--raw",
+            "--no-abbrev",
+            "-n",
+            str(HISTORY_LIMIT),
+            "HEAD",
+            "--",
+            "docker-compose.yaml",
+        ).decode()
+        blobs = set()
+        for line in log.splitlines():
+            fields = line.split("\t", 1)[0].split()
+            blobs.update(
+                item
+                for item in fields[2:4]
+                if BLOB.fullmatch(item) and set(item) != {"0"}
+            )
+        for blob in sorted(blobs):
+            digests.add(hashlib.sha256(git("cat-file", "blob", blob)).hexdigest())
+    except (
+        subprocess.CalledProcessError,
+        subprocess.TimeoutExpired,
+        OSError,
+        ValueError,
+    ):
+        print(
+            "Reviewed compose history unavailable; only the reviewed head compose is accepted",
+            file=sys.stderr,
+        )
+        return [hashlib.sha256(head_bytes).hexdigest()]
+    return sorted(digests)
+
+
+def package(data_root, producer_sha, generation, history=reviewed_compose_history):
     names = ["publication_sandbox.py", "site_client.py", "dev_adapter.py"]
     files = {
         "blog-release.py": ROOT / "scripts/blog-release.py",
@@ -269,6 +328,7 @@ def package(data_root, producer_sha, generation):
         "producerSha256": producer_sha,
         "generationBase": generation,
         "baseComposeSha256": hashlib.sha256(contents["base-compose.yaml"]).hexdigest(),
+        "reviewedBaseComposeSha256s": history(contents["base-compose.yaml"]),
         "inputHashes": {
             name: hashlib.sha256(data).hexdigest() for name, data in contents.items()
         },
@@ -284,6 +344,37 @@ def package(data_root, producer_sha, generation):
     return stream.getvalue(), provenance
 
 
+REMOTE_ERROR = re.compile(
+    r"^([A-Za-z_][A-Za-z0-9_.]{0,80}(?:Error|Exception|Exit|Interrupt)):?(?: (.*))?$"
+)
+SAFE_MESSAGE = re.compile(r"^[A-Za-z0-9 ;:,._()'/-]{1,240}$")
+
+
+def remote_failure_summary(error):
+    """Bounded host-side failure class/message; never echoes raw stderr."""
+    if isinstance(error, subprocess.TimeoutExpired):
+        return "SSH transport timed out"
+    if isinstance(error, OSError):
+        return "SSH transport could not start (" + type(error).__name__ + ")"
+    stderr = error.stderr or b""
+    if isinstance(stderr, bytes):
+        stderr = stderr.decode("utf-8", "replace")
+    lines = [line.strip() for line in stderr.splitlines() if line.strip()]
+    for line in reversed(lines[-20:]):
+        match = REMOTE_ERROR.fullmatch(line)
+        if match:
+            name, message = match.group(1), (match.group(2) or "").strip()
+            # Fixed adapter messages pass; anything else (paths, hex, tokens) is withheld.
+            if (
+                message
+                and SAFE_MESSAGE.fullmatch(message)
+                and not re.search(r"[A-Za-z0-9+/=_-]{32,}", message)
+            ):
+                return "remote " + name + ": " + message
+            return "remote " + name + " (message withheld)"
+    return "exit status " + str(error.returncode) + "; no recognizable remote error"
+
+
 def publication_ssh(command, archive):
     try:
         return subprocess.run(
@@ -294,9 +385,11 @@ def publication_ssh(command, archive):
             close_fds=True,
             timeout=1500,
         )
-    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError):
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError) as error:
         raise RuntimeError(
-            "Development publication SSH failed; no successful publication claimed"
+            "Development publication SSH failed ("
+            + remote_failure_summary(error)
+            + "); no successful publication claimed"
         ) from None
 
 
