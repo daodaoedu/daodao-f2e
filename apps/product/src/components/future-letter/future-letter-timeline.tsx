@@ -22,7 +22,6 @@ import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { format, parseISO } from "date-fns";
 import { Mail, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FUTURE_LETTER_ENTRY_ENABLED } from "@/constants/future-letter";
 import { getLetterDetailScrollKey, isFootprintTimelineSettled } from "./future-letter-utils";
 import { LetterDetailCard } from "./letter-detail-card";
 import { buildFootprintTimeline } from "./timeline-model";
@@ -31,6 +30,7 @@ import { VerticalTimeline } from "./vertical-timeline";
 type LifecycleLetter = FutureLetterType & { sentAt?: string | null; openedAt?: string | null };
 
 interface FutureLetterTimelineProps {
+  futureLetterEntryEnabled?: boolean;
   onWriteLetter: () => void;
   isWriteLetterDisabled?: boolean;
   refreshToken?: number;
@@ -38,6 +38,7 @@ interface FutureLetterTimelineProps {
 }
 
 export function FutureLetterTimeline({
+  futureLetterEntryEnabled = false,
   onWriteLetter,
   isWriteLetterDisabled = false,
   refreshToken = 0,
@@ -61,9 +62,9 @@ export function FutureLetterTimeline({
   const timelineEntries = useMemo(
     () =>
       (timelineQuery.data?.flatMap((page) => page.data) ?? []).filter(
-        (entry) => FUTURE_LETTER_ENTRY_ENABLED || entry.type !== "letter"
+        (entry) => futureLetterEntryEnabled || entry.type !== "letter"
       ),
-    [timelineQuery.data]
+    [timelineQuery.data, futureLetterEntryEnabled]
   );
   const letters = useMemo(
     () => (lettersQuery.data?.flatMap((page) => page.data) ?? []) as LifecycleLetter[],
@@ -71,12 +72,8 @@ export function FutureLetterTimeline({
   );
   const { futureLetters, pastGroups } = useMemo(
     () =>
-      buildFootprintTimeline(
-        timelineEntries,
-        FUTURE_LETTER_ENTRY_ENABLED ? letters : [],
-        new Date()
-      ),
-    [letters, timelineEntries]
+      buildFootprintTimeline(timelineEntries, futureLetterEntryEnabled ? letters : [], new Date()),
+    [letters, timelineEntries, futureLetterEntryEnabled]
   );
   const selectedLetterId =
     pendingRouteTarget === undefined ? deepLinkedLetterId : pendingRouteTarget;
@@ -219,6 +216,7 @@ export function FutureLetterTimeline({
       {hasError && <p className="py-8 text-center text-sm text-red">{t("timeline_error")}</p>}
       {!isLoading && !hasError && (
         <VerticalTimeline
+          futureLetterEntryEnabled={futureLetterEntryEnabled}
           futureLetters={futureLetters}
           pastGroups={pastGroups}
           onWriteLetter={onWriteLetter}

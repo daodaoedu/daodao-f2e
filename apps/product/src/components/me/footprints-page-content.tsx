@@ -1,12 +1,12 @@
 "use client";
 
-import { useMyFutureLetters } from "@daodao/api";
+import { useFeatureFlags, useMyFutureLetters } from "@daodao/api";
 import { useState } from "react";
 import { FutureLetterDialog, FutureLetterTimeline } from "@/components/future-letter";
-import { FUTURE_LETTER_ENTRY_ENABLED } from "@/constants/future-letter";
 
 export function FootprintsPageContent() {
-  if (!FUTURE_LETTER_ENTRY_ENABLED) {
+  const flags = useFeatureFlags();
+  if (!flags.futureLetterEntry) {
     return <FutureLetterTimeline onWriteLetter={() => {}} />;
   }
   return <FootprintsWithLetterComposition />;
@@ -27,6 +27,7 @@ function FootprintsWithLetterComposition() {
   return (
     <>
       <FutureLetterTimeline
+        futureLetterEntryEnabled
         onWriteLetter={openNewLetter}
         isWriteLetterDisabled={isDraftQueryPending}
         refreshToken={timelineVersion}

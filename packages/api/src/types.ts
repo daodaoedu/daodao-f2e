@@ -11213,6 +11213,8 @@ export interface paths {
                                     /** @enum {string} */
                                     status: "draft" | "not_started" | "active" | "completed" | "archived";
                                     creationSource: string | null;
+                                    /** @description 來源實踐模板 ID；共用打卡連結以 cohortId＋templateId 找出登入者自己的實踐 */
+                                    templateId: number | null;
                                     /** Format: date-time */
                                     startDate: string | null;
                                     /** Format: date-time */
@@ -13222,6 +13224,553 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/feature-flags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 讀取目前身分與組織可用功能，不公開發布名單 */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 目前切換到的組織ID；省略時不適用Alpha */
+                    organizationId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 所有已註冊功能的生效布林值 */
+                200: {
+                    headers: {
+                        "Cache-Control"?: "private, no-store";
+                        Vary?: string;
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                [key: string]: boolean;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                /** @description 目前組織ID無效 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/feature-flags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 讀取功能發布管理列表 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 功能列表 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                /**
+                                 * @description 功能識別碼，英文字母開頭，最多64個英數字、底線或連字號
+                                 * @example homeTimeline
+                                 */
+                                key: string;
+                                /**
+                                 * @description 功能顯示名稱
+                                 * @example 首頁學習足跡
+                                 */
+                                name: string;
+                                /**
+                                 * @description 用途與接入說明
+                                 * @example 控制首頁時間軸
+                                 */
+                                description: string;
+                                /**
+                                 * @description off關閉；alpha依目前組織；beta全域試用；ga正式開放
+                                 * @enum {string}
+                                 */
+                                stage: "off" | "alpha" | "beta" | "ga";
+                                organizationIds: number[];
+                                /**
+                                 * Format: date-time
+                                 * @description 最後更新時間
+                                 */
+                                updatedAt: string;
+                            }[];
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+            };
+        };
+        put?: never;
+        /** 註冊預設關閉的功能 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /**
+                         * @description 功能識別碼，英文字母開頭，最多64個英數字、底線或連字號
+                         * @example homeTimeline
+                         */
+                        key: string;
+                        /**
+                         * @description 功能顯示名稱
+                         * @example 首頁學習足跡
+                         */
+                        name: string;
+                        /**
+                         * @description 用途與接入說明
+                         * @example 控制首頁時間軸
+                         */
+                        description: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description 已註冊 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                /**
+                                 * @description 功能識別碼，英文字母開頭，最多64個英數字、底線或連字號
+                                 * @example homeTimeline
+                                 */
+                                key: string;
+                                /**
+                                 * @description 功能顯示名稱
+                                 * @example 首頁學習足跡
+                                 */
+                                name: string;
+                                /**
+                                 * @description 用途與接入說明
+                                 * @example 控制首頁時間軸
+                                 */
+                                description: string;
+                                /**
+                                 * @description off關閉；alpha依目前組織；beta全域試用；ga正式開放
+                                 * @enum {string}
+                                 */
+                                stage: "off" | "alpha" | "beta" | "ga";
+                                organizationIds: number[];
+                                /**
+                                 * Format: date-time
+                                 * @description 最後更新時間
+                                 */
+                                updatedAt: string;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                /** @description 功能格式無效 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                /** @description 功能key已存在 */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/feature-flags/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** 更新完整功能設定與Alpha名單並稽核 */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 功能識別碼，英文字母開頭，最多64個英數字、底線或連字號 */
+                    key: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /**
+                         * @description 功能顯示名稱
+                         * @example 首頁學習足跡
+                         */
+                        name: string;
+                        /**
+                         * @description 用途與接入說明
+                         * @example 控制首頁時間軸
+                         */
+                        description: string;
+                        /**
+                         * @description off關閉；alpha依目前組織；beta全域試用；ga正式開放
+                         * @enum {string}
+                         */
+                        stage: "off" | "alpha" | "beta" | "ga";
+                        /**
+                         * @description Alpha組織名單；其他階段保留但不影響全域判定
+                         * @example [
+                         *       9
+                         *     ]
+                         */
+                        organizationIds: number[];
+                    };
+                };
+            };
+            responses: {
+                /** @description 已更新 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description Indicates successful API response
+                             * @enum {boolean}
+                             */
+                            success: true;
+                            /** @description The main response data */
+                            data: {
+                                /**
+                                 * @description 功能識別碼，英文字母開頭，最多64個英數字、底線或連字號
+                                 * @example homeTimeline
+                                 */
+                                key: string;
+                                /**
+                                 * @description 功能顯示名稱
+                                 * @example 首頁學習足跡
+                                 */
+                                name: string;
+                                /**
+                                 * @description 用途與接入說明
+                                 * @example 控制首頁時間軸
+                                 */
+                                description: string;
+                                /**
+                                 * @description off關閉；alpha依目前組織；beta全域試用；ga正式開放
+                                 * @enum {string}
+                                 */
+                                stage: "off" | "alpha" | "beta" | "ga";
+                                organizationIds: number[];
+                                /**
+                                 * Format: date-time
+                                 * @description 最後更新時間
+                                 */
+                                updatedAt: string;
+                            };
+                            /**
+                             * Format: date-time
+                             * @description ISO 8601 timestamp of the response
+                             */
+                            timestamp: string;
+                            /**
+                             * @description Optional metadata about the response
+                             * @example {
+                             *       "searchQuery": "JavaScript教程",
+                             *       "searchTime": 45,
+                             *       "cacheHit": false,
+                             *       "processingTime": 123.5,
+                             *       "requestId": "req-123e4567-e89b-12d3-a456-426614174000"
+                             *     }
+                             * @example {
+                             *       "categoryCounts": {
+                             *         "前端開發": 25,
+                             *         "後端開發": 18,
+                             *         "資料科學": 12
+                             *       },
+                             *       "filters": {
+                             *         "difficulty": "intermediate",
+                             *         "language": "zh-TW"
+                             *       }
+                             *     }
+                             */
+                            meta?: {
+                                /** @description Search query used for filtering results */
+                                searchQuery?: string;
+                                /** @description Time taken to execute the search query in milliseconds */
+                                searchTime?: number;
+                                /** @description Applied filters for the request */
+                                filters?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Count of items per category */
+                                categoryCounts?: {
+                                    [key: string]: number;
+                                };
+                                /** @description Aggregated statistical data */
+                                aggregateData?: {
+                                    [key: string]: unknown;
+                                };
+                                /** @description Unique identifier for request tracking */
+                                requestId?: string;
+                                /** @description Whether the response was served from cache */
+                                cacheHit?: boolean;
+                                /** @description Total processing time in milliseconds */
+                                processingTime?: number;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                /** @description 設定或組織無效 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                401: components["responses"]["UnauthorizedError"];
+                403: components["responses"]["ForbiddenError"];
+                /** @description 功能未註冊 */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         trace?: never;
     };
     "/api/v1/feedback/mine": {
@@ -54208,6 +54757,16 @@ export interface components {
                 /** @enum {string} */
                 state: "login_required" | "ineligible" | "ready" | "completed";
                 privacy_notice: string;
+                /**
+                 * @description 問卷所屬組織顯示名稱
+                 * @example 島島阿學
+                 */
+                organization_name: string;
+                /**
+                 * @description 問卷所屬場次顯示名稱
+                 * @example 閱讀同行場次
+                 */
+                cohort_name: string;
             };
         };
         QuestionResponse: {
@@ -56993,6 +57552,11 @@ export interface components {
              * @example 123e4567-e89b-12d3-a456-426614174000
              */
             id: string;
+            /**
+             * @description 由燈塔場次模板產生且仍屬於場次的實踐；前端據此不顯示草稿、打卡前先啟用（daodao#544）
+             * @example false
+             */
+            isCohortPractice?: boolean;
             /**
              * @description 實踐項目標題
              * @example 學習React Hooks

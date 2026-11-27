@@ -3,10 +3,10 @@
 import { useLocale } from "@daodao/i18n";
 import { ChevronRight } from "lucide-react";
 import { type CSSProperties, Fragment, useMemo, useState } from "react";
-import { FUTURE_LETTER_ENTRY_ENABLED } from "@/constants/future-letter";
 import type { TimelineCoordinate } from "./timeline-model";
 
 interface CompactTimelineStripProps {
+  futureLetterEntryEnabled?: boolean;
   coordinates: TimelineCoordinate[];
   onNodeClick?: (node: TimelineCoordinate) => void;
   /** Clicking anywhere on the strip (outside a specific node) opens the footprints page. */
@@ -53,6 +53,7 @@ function pastDotStyle(distance: number): CSSProperties {
 }
 
 export function CompactTimelineStrip({
+  futureLetterEntryEnabled = false,
   coordinates,
   onNodeClick,
   onOpen,
@@ -200,7 +201,7 @@ export function CompactTimelineStrip({
               </Fragment>
             );
           })}
-          {FUTURE_LETTER_ENTRY_ENABLED && (
+          {futureLetterEntryEnabled && (
             <>
               <span
                 aria-hidden="true"
@@ -258,7 +259,7 @@ export function CompactTimelineStrip({
               />
             </>
           )}
-          {!FUTURE_LETTER_ENTRY_ENABLED && (
+          {!futureLetterEntryEnabled && (
             <span
               aria-hidden="true"
               style={{ flex: "1 1 0%", height: 1, background: SOLID_LINE }}
@@ -274,7 +275,7 @@ export function CompactTimelineStrip({
           <ChevronRight className="size-[18px]" />
         </span>
       </div>
-      {FUTURE_LETTER_ENTRY_ENABLED && hintOpen && (
+      {futureLetterEntryEnabled && hintOpen && (
         <div
           style={{
             position: "absolute",

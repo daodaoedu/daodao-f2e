@@ -1,9 +1,8 @@
 "use client";
 
-import { useAllMyTimeline } from "@daodao/api";
+import { useAllMyTimeline, useFeatureFlags } from "@daodao/api";
 import { useRouter } from "@daodao/i18n/navigation";
 import { useMemo } from "react";
-import { FUTURE_LETTER_ENTRY_ENABLED } from "@/constants/future-letter";
 import { CompactTimelineStrip } from "./compact-timeline-strip";
 import {
   buildTimelineCoordinates,
@@ -12,14 +11,24 @@ import {
 } from "./timeline-model";
 
 export function HomeTimelineSummary() {
+  const flags = useFeatureFlags();
+  if (!flags.homeTimeline) return null;
+  return <EnabledHomeTimelineSummary futureLetterEntryEnabled={flags.futureLetterEntry === true} />;
+}
+
+function EnabledHomeTimelineSummary({
+  futureLetterEntryEnabled,
+}: {
+  futureLetterEntryEnabled: boolean;
+}) {
   const router = useRouter();
   const timelineQuery = useAllMyTimeline();
   const timelineEntries = useMemo(
     () =>
       (timelineQuery.data?.flatMap((page) => page.data) ?? []).filter(
-        (entry) => FUTURE_LETTER_ENTRY_ENABLED || entry.type !== "letter"
+        (entry) => futureLetterEntryEnabled || entry.type !== "letter"
       ),
-    [timelineQuery.data]
+    [timelineQuery.data, futureLetterEntryEnabled]
   );
   const coordinates = useMemo(
     () => buildTimelineCoordinates(timelineEntries, [], new Date()),
@@ -40,6 +49,7 @@ export function HomeTimelineSummary() {
   return (
     <div className="relative z-[22] -mt-8 flex justify-center">
       <CompactTimelineStrip
+        futureLetterEntryEnabled={futureLetterEntryEnabled}
         coordinates={summary}
         onNodeClick={navigate}
         onOpen={() => router.push("/me/footprints")}

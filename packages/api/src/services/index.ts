@@ -32,6 +32,8 @@ export * from "./connection-hooks";
 // Email Service
 export * from "./email";
 export * from "./email-hooks";
+// Feature Flag Service
+export * from "./feature-flags-hooks";
 // Feed Service
 export * from "./feed-hooks";
 export * from "./feedback";
