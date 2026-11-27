@@ -1,11 +1,13 @@
 "use client";
 
 import { useMySpaces } from "@daodao/api";
+import { SpacesOutlineSvg } from "@daodao/assets";
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Spinner } from "@daodao/ui/components/spinner";
 import { useState } from "react";
+import { ListPageShell } from "@/components/layout/list-page-shell";
 import { SpaceCard, type SpaceCreateKind, SpaceCreateSheet, SpaceFab } from "@/components/spaces";
 
 /** 空間主頁 (FRD 3.1/3.2/3.3): the aggregated space list with the create FAB. */
@@ -27,10 +29,11 @@ export default function SpacesPage() {
   };
 
   return (
-    <div className="mx-auto min-h-screen max-w-[640px] px-4 pb-[72px] pt-[68px] md:pt-8">
-      <p className="mx-1 mb-3 text-[13px] text-text-dark/55">
-        {t("space_count", { count: spaces?.total ?? 0 })}
-      </p>
+    <ListPageShell
+      title={t("page_title")}
+      subtitle={t("list_subtitle", { count: spaces?.total ?? 0 })}
+      icon={<SpacesOutlineSvg className="size-6 shrink-0 text-logo-cyan" aria-hidden="true" />}
+    >
       {isLoading ? (
         <div className="flex justify-center py-16">
           <Spinner aria-label={t("loading")} />
@@ -44,6 +47,6 @@ export default function SpacesPage() {
       )}
       <SpaceFab isAdmin={isAdmin} onSelect={handleCreateSelect} />
       <SpaceCreateSheet kind={createKind} onClose={() => setCreateKind(null)} />
-    </div>
+    </ListPageShell>
   );
 }

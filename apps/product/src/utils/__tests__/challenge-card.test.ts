@@ -4,6 +4,7 @@ import {
   getChallengeCardAction,
   getChallengeStatusKey,
   isChallengeActionMuted,
+  needsSeparatePracticeLink,
   pruneJustJoined,
 } from "../challenge-card";
 
@@ -254,5 +255,25 @@ describe("pruneJustJoined", () => {
   it("returns the same object when nothing changes (no re-render loop)", () => {
     const justJoined = { 9: "c" };
     expect(pruneJustJoined(justJoined, [{ id: 7, practiceId: "a" }])).toBe(justJoined);
+  });
+});
+
+// daodao#572：我的共同挑戰頁不在卡片外另起「打開實踐」一行，除非那是唯一能進實踐的入口
+describe("needsSeparatePracticeLink", () => {
+  it("joined + ongoing: the whole card already opens the practice → no extra link", () => {
+    expect(needsSeparatePracticeLink({ ...base, runStatus: "ongoing" }, PRACTICE_ID)).toBe(false);
+  });
+
+  it("joined + ended: the whole card already opens the summary → no extra link", () => {
+    expect(needsSeparatePracticeLink({ ...base, runStatus: "ended" }, PRACTICE_ID)).toBe(false);
+  });
+
+  it("joined + upcoming: card is not clickable, so the practice is only reachable by the extra link", () => {
+    expect(needsSeparatePracticeLink({ ...base, runStatus: "upcoming" }, PRACTICE_ID)).toBe(true);
+  });
+
+  it("no practice id → nothing to link to", () => {
+    expect(needsSeparatePracticeLink({ ...base, runStatus: "upcoming" }, null)).toBe(false);
+    expect(needsSeparatePracticeLink({ ...base, runStatus: "ongoing" }, undefined)).toBe(false);
   });
 });

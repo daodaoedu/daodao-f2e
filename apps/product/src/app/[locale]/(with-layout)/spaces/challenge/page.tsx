@@ -4,18 +4,16 @@ import { type MyChallengeType, useChallenges, useMyChallenges } from "@daodao/ap
 import { useAuth } from "@daodao/auth";
 import { useTranslations } from "@daodao/i18n";
 import { Link, useRouter } from "@daodao/i18n/navigation";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@daodao/ui/components/dropdown-menu";
+import { FilterMenu, FilterMenuItem } from "@daodao/ui/components/filter-menu";
 import { Spinner } from "@daodao/ui/components/spinner";
 import { addDays, isAfter, parseISO } from "date-fns";
-import { ChevronDown, ChevronRight, Flag } from "lucide-react";
+import { ChevronRight, Flag } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ChallengeCard, InspirationDrawDialog } from "@/components/challenge";
-import { SpaceSubpageHeader } from "@/components/spaces";
+import { ExploreEmpty } from "@/components/explore/explore-empty";
+import { ExploreSectionHeader } from "@/components/explore/explore-section";
+import { SpacePageShell } from "@/components/spaces";
+import { needsSeparatePracticeLink } from "@/utils/challenge-card";
 import { resolveMyChallengesView } from "@/utils/my-challenges-view";
 
 type FilterKey = "all" | "ongoing" | "upcoming" | "ended";
@@ -25,6 +23,7 @@ const UPCOMING_WINDOW_DAYS = 14;
 
 export default function ChallengeSpacePage() {
   const t = useTranslations("space");
+  const tChallenge = useTranslations("challenge");
   const router = useRouter();
   const { isAuthenticated, isLoading: isAuthLoading, login } = useAuth();
   // 確認已登入才查：未登入時此端點必回 401（daodao#295）
@@ -52,60 +51,16 @@ export default function ChallengeSpacePage() {
     );
   }, [exploreData]);
 
-  return (
-    <div className="mx-auto min-h-screen max-w-[640px] px-4 pb-[72px] pt-[68px] md:pt-6">
-      <SpaceSubpageHeader title={t("challenge_name")} variant="banner" />
-      <Link
-        href="/challenges"
-        className="mb-4 flex items-center gap-3 rounded-[14px] border border-[#F5E6B8] bg-[#FDF8EC] px-4 py-3.5 transition-colors hover:border-[#E8D49A]"
-      >
-        <span className="grid size-8 shrink-0 place-items-center rounded-[10px] border border-[#F5E6B8] bg-white">
-          <Flag className="size-4 text-[#D4A843]" />
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-[15px] font-semibold text-text-dark">
-            {t("explore_challenge_title")}
-          </span>
-          <span className="mt-0.5 block text-[13px] text-text-dark/55">
-            {hasUpcoming ? t("explore_challenge_upcoming") : t("explore_challenge_none")}
-          </span>
-        </span>
-        <ChevronRight className="size-[18px] shrink-0 text-[#D4A843]" />
-      </Link>
-
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-text-dark">{t("challenge_section_title")}</h3>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-primary-base bg-primary-base px-3 py-1 text-sm text-white"
-            >
-              {t(`challenge_filter_${filter}`)}
-              <ChevronDown className="size-3.5" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="min-w-28">
-            {FILTER_OPTIONS.map((key) => (
-              <DropdownMenuItem
-                key={key}
-                onClick={() => setFilter(key)}
-                className={filter === key ? "font-semibold text-primary-base" : ""}
-              >
-                {t(`challenge_filter_${key}`)}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+  const triggerLabel = tChallenge(`filter_${filter}`);
+  const content =
+    view === "loading" ? (
+      <div className="flex justify-center py-16">
+        <Spinner aria-label={t("loading")} />
       </div>
-
-      {view === "loading" ? (
-        <div className="flex justify-center py-16">
-          <Spinner aria-label={t("loading")} />
-        </div>
-      ) : view === "login-required" ? (
-        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-[#DCEBEA] px-4 py-10 text-center">
-          <p className="text-sm text-text-dark/60">{t("challenge_login_required")}</p>
+    ) : view === "login-required" ? (
+      <ExploreEmpty
+        title={t("challenge_login_required")}
+        action={
           <button
             type="button"
             onClick={() => login("/spaces/challenge")}
@@ -113,31 +68,83 @@ export default function ChallengeSpacePage() {
           >
             {t("challenge_login_action")}
           </button>
-        </div>
-      ) : view === "error" ? (
-        <p
-          role="alert"
-          className="rounded-2xl border border-dashed border-[#DCEBEA] px-4 py-10 text-center text-sm text-text-dark/60"
+        }
+      />
+    ) : view === "error" ? (
+      <ExploreEmpty role="alert" title={t("challenge_load_error")} />
+    ) : filtered.length === 0 ? (
+      <ExploreEmpty
+        title={mine.length === 0 ? t("challenge_empty") : t("challenge_filter_empty")}
+      />
+    ) : (
+      <ul className="m-0 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2">
+        {filtered.map((challenge) => (
+          <MyChallengeItem
+            key={challenge.id}
+            challenge={challenge}
+            onJoinClick={() => router.push("/challenges")}
+            onDrawClick={(id) => setDrawTarget(id)}
+            openLabel={t("challenge_open_practice")}
+          />
+        ))}
+      </ul>
+    );
+
+  return (
+    <SpacePageShell kind="challenge" title={t("challenge_name")} subtitle={t("challenge_host")}>
+      <div className="flex items-center gap-2">
+        <FilterMenu
+          label={triggerLabel}
+          active={filter !== "all"}
+          triggerAriaLabel={t("filter_trigger_aria_label", { label: triggerLabel })}
+          menuAriaLabel={t("challenge_filter_menu_aria_label")}
         >
-          {t("challenge_load_error")}
-        </p>
-      ) : filtered.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-[#DCEBEA] px-4 py-10 text-center text-sm text-text-dark/60">
-          {mine.length === 0 ? t("challenge_empty") : t("challenge_filter_empty")}
-        </p>
-      ) : (
-        <ul className="m-0 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2">
-          {filtered.map((challenge) => (
-            <MyChallengeItem
-              key={challenge.id}
-              challenge={challenge}
-              onJoinClick={() => router.push("/challenges")}
-              onDrawClick={(id) => setDrawTarget(id)}
-              openLabel={t("challenge_open_practice")}
+          {FILTER_OPTIONS.map((key) => (
+            <FilterMenuItem
+              key={key}
+              label={tChallenge(`filter_${key}`)}
+              checked={filter === key}
+              onToggle={() => setFilter(key)}
             />
           ))}
-        </ul>
-      )}
+        </FilterMenu>
+      </div>
+
+      {/* FR-4.1(b)：篩選器下方顯示探索共同挑戰入口；配色比照首頁探索入口（旗子＋橘色呼吸點） */}
+      <Link
+        href="/challenges"
+        className="flex items-center gap-3 rounded-[20px] border border-[#E4EAE9] bg-white px-4 py-3.5 transition-all duration-160 hover:-translate-y-[3px] hover:border-logo-cyan/50 hover:shadow-[0_12px_26px_rgba(15,48,54,0.09)]"
+      >
+        <span className="grid size-8 shrink-0 place-items-center rounded-[10px] bg-logo-orange/12">
+          <Flag className="size-4 text-logo-orange" aria-hidden="true" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="flex items-center gap-1.5 text-[15px] font-semibold text-bg-dark">
+            {t("explore_challenge_title")}
+            {hasUpcoming && (
+              <span className="relative inline-flex size-[6px]" aria-hidden="true">
+                <span className="absolute inset-0 rounded-full bg-logo-orange animate-breathe-amber" />
+                <span className="absolute inset-px rounded-full bg-logo-orange" />
+              </span>
+            )}
+          </span>
+          <span className="mt-0.5 block text-[13px] text-text-dark/70">
+            {hasUpcoming ? t("explore_challenge_upcoming") : t("explore_challenge_none")}
+          </span>
+        </span>
+        <ChevronRight className="size-[18px] shrink-0 text-text-dark/30" aria-hidden="true" />
+      </Link>
+
+      <section>
+        <div className="mb-5">
+          <ExploreSectionHeader
+            title={t("challenge_section_title")}
+            count={filtered.length}
+            Icon={Flag}
+          />
+        </div>
+        {content}
+      </section>
 
       <InspirationDrawDialog
         challengeId={drawTarget}
@@ -145,7 +152,7 @@ export default function ChallengeSpacePage() {
           if (!open) setDrawTarget(null);
         }}
       />
-    </div>
+    </SpacePageShell>
   );
 }
 
@@ -168,7 +175,7 @@ function MyChallengeItem({
         onDrawClick={() => onDrawClick(challenge.id)}
         practiceId={challenge.practiceId}
       />
-      {challenge.practiceId && (
+      {needsSeparatePracticeLink(challenge, challenge.practiceId) && (
         <Link
           href={`/practices/${challenge.practiceId}`}
           className="inline-flex items-center gap-1 self-end text-[13px] font-semibold text-primary-base"

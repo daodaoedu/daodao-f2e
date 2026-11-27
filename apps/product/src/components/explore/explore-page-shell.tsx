@@ -3,6 +3,7 @@
 import { Flag } from "lucide-react";
 import type { ReactNode } from "react";
 import { ExploreGuestHeader } from "@/components/activity/explore-guest-header";
+import { ListPageShell } from "@/components/layout/list-page-shell";
 import { useLayoutGuest } from "@/components/layout/session-hint";
 
 interface ExplorePageShellProps {
@@ -15,7 +16,7 @@ interface ExplorePageShellProps {
 
 /**
  * 探索頁共用外框（探索共同挑戰、探索活動課程，daodao#567）：
- * 背景與首頁同為 very-light-gray，靠左標題＋副標，內容寬 760。
+ * 外框與空間頁共用 ListPageShell（daodao#572），這裡只加旗子圖示與訪客頁首。
  */
 export function ExplorePageShell({
   title,
@@ -27,25 +28,14 @@ export function ExplorePageShell({
   const showGuestHeader = useLayoutGuest();
 
   return (
-    <div className="min-h-screen bg-very-light-gray">
-      {showGuestHeader && <ExploreGuestHeader redirect={guestRedirect} />}
-      <main
-        className={
-          // 登入時手機版左上有固定 logo（側邊導覽 mobile），內容要讓開
-          showGuestHeader
-            ? "mx-auto flex w-full max-w-[760px] flex-col gap-6 px-4 pt-8 pb-18"
-            : "mx-auto flex w-full max-w-[760px] flex-col gap-6 px-4 pt-[68px] pb-18 md:pt-8"
-        }
-      >
-        <header className="flex flex-col gap-2">
-          <h1 className="m-0 flex items-center gap-2 text-2xl font-bold text-bg-dark">
-            <Flag className="size-6 text-logo-cyan" aria-hidden="true" />
-            {title}
-          </h1>
-          <p className="m-0 text-sm text-text-dark">{subtitle}</p>
-        </header>
-        {children}
-      </main>
-    </div>
+    <ListPageShell
+      title={title}
+      subtitle={subtitle}
+      icon={<Flag className="size-6 shrink-0 text-logo-cyan" aria-hidden="true" />}
+      topBar={showGuestHeader ? <ExploreGuestHeader redirect={guestRedirect} /> : undefined}
+      clearMobileNav={!showGuestHeader}
+    >
+      {children}
+    </ListPageShell>
   );
 }
