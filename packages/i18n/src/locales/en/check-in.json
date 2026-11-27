@@ -65,6 +65,7 @@
   "description_next_step_placeholder": "A short note is enough",
   "description_word_count": "{count}/{max} words",
   "mood_question": "How are you feeling?",
+  "mood_follow_up_title": "Record your mood",
   "moods": {
     "hopeless": "Give up",
     "frustrated": "Frustrated",
@@ -84,6 +85,7 @@
   "add_tag": "Add tag",
   "add": "Add",
   "reflection_toggle": "Show a reflection prompt",
+  "reflection_title": "Reflection question",
   "reflection_refresh": "Try another",
   "reflection_questions": {
     "0": "What did you do today that made you a little proud?",

@@ -85,7 +85,7 @@ class DecideTests(unittest.TestCase):
         self.assertEqual(decision["action"], "dispatch")
         self.assertEqual(decision["workflow"], "blog-prod-publish.yml")
         self.assertEqual(decision["ref"], "prod")
-        self.assertEqual(decision["inputs"], {"ci_run_id": "111"})
+        self.assertEqual(decision["inputs"], {"ci_run_id": "111", "expected_content_sha": CONTENT})
 
     def test_prod_never_auto_publishes_a_staged_content_release(self):
         staged = "7" * 40
@@ -636,3 +636,4 @@ class DispatchTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

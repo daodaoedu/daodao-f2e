@@ -2,7 +2,7 @@ import { useCreatePracticeCheckIn, useUpdatePracticeCheckIn } from "@daodao/api"
 import { useTranslations } from "@daodao/i18n";
 import { toast } from "@daodao/ui/components/sonner";
 import { useRef } from "react";
-import { MoodType, type MoodType as MoodTypeValue, mapMoodTypeToApiMood } from "@/constants/mood";
+import { type MoodType as MoodTypeValue, mapMoodTypeToApiMood } from "@/constants/mood";
 import { useCheckInSuccessDialog } from "@/hooks/use-check-in-success-dialog";
 import { useServerErrorMessage } from "@/lib/server-error/use-server-error-message";
 import type { ICheckInFormData } from "../../types";
@@ -26,7 +26,7 @@ export const useCheckInSubmit = ({
   const { errorMessage } = useServerErrorMessage();
   const { createCheckIn } = useCreatePracticeCheckIn(practiceId);
   const { updateCheckIn } = useUpdatePracticeCheckIn(practiceId);
-  const selectedMoodRef = useRef<MoodTypeValue>(MoodType.neutral);
+  const selectedMoodRef = useRef<MoodTypeValue | null>(null);
   const { openSuccessDialog } = useCheckInSuccessDialog({});
 
   /**
@@ -36,7 +36,8 @@ export const useCheckInSubmit = ({
   const submitCheckIn = async (data: ICheckInFormData, options?: { onCreated?: () => void }) => {
     // 顯示 loading toast
     const loadingToast = toast.loading(t("checking_in"));
-    const initialMood = data.mood ?? MoodType.neutral;
+    // 心情只在成功視窗按完成後才寫入；建立時沒選就不帶，避免把預設值當成使用者的選擇（daodao#575）
+    const initialMood = data.mood ?? null;
     selectedMoodRef.current = initialMood;
 
     await runCheckInCreate({
@@ -77,18 +78,17 @@ export const useCheckInSubmit = ({
             : undefined;
 
         // 顯示成功對話框
-        await openSuccessDialog(
+        const successResult = await openSuccessDialog(
           progressPercentage,
           newProgressPercentage,
           encouragement,
-          initialMood,
           (mood) => {
             selectedMoodRef.current = mood;
           }
         );
         let savedMood = initialMood;
         const selectedMood = selectedMoodRef.current;
-        if (selectedMood !== initialMood) {
+        if (successResult.value === "complete" && selectedMood && selectedMood !== initialMood) {
           try {
             await updateCheckIn(
               { mood: mapMoodTypeToApiMood(selectedMood) },

@@ -255,6 +255,14 @@ def publish(base, config):
     return execute_adapter(adapter, base, config)
 
 
+def reviewed_history(config):
+    # Hash-bound provenance from the trusted checkout; older archives carry none.
+    history = config.get("reviewedBaseComposeSha256s", [])
+    if not isinstance(history, list) or len(history) > 256:
+        raise ValueError("Reviewed compose history is malformed")
+    return history
+
+
 def recover_snapshot(adapter, base, config, snapshot, initial, mounting):
     key = "previousId" if snapshot["managedMounts"] else "id"
     previous = initial["summary"][key]
@@ -265,7 +273,11 @@ def recover_snapshot(adapter, base, config, snapshot, initial, mounting):
     configuration_restored = not snapshot.get("configurationTransition")
     if snapshot.get("configurationTransition"):
         try:
-            adapter.restore_previous(snapshot, config["baseComposeSha256"])
+            adapter.restore_previous(
+                snapshot,
+                config["baseComposeSha256"],
+                reviewed_history=reviewed_history(config),
+            )
             configuration_restored = True
         except RECOVERY_ERRORS:
             recovery["configurationRestoreFailed"] = True
@@ -277,7 +289,11 @@ def recover_snapshot(adapter, base, config, snapshot, initial, mounting):
     finally:
         if mounting and not snapshot["managedMounts"]:
             try:
-                adapter.restore_previous(snapshot, config["baseComposeSha256"])
+                adapter.restore_previous(
+                    snapshot,
+                    config["baseComposeSha256"],
+                    reviewed_history=reviewed_history(config),
+                )
                 restored_container = True
             except RECOVERY_ERRORS:
                 recovery["legacyRestoreFailed"] = True
@@ -346,6 +362,7 @@ def execute_adapter(adapter, base, config):
             snapshot,
             config["baseComposeSha256"],
             (base / "input/nginx.conf").read_bytes(),
+            reviewed_history=reviewed_history(config),
         )
         actual = phase(
             base,

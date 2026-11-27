@@ -1,6 +1,6 @@
 # Publish approved Blog content to production
 
-This entry updates Website only, after checking successful CI for the exact current `prod` frontend. Frontend-only releases are dispatched automatically (see "Automatic frontend releases"); content releases stay manual. It does not merge the held content migration PR9, and does not enable cross-repository automatic publishing.
+This entry updates Website only, after checking successful CI for the exact current `prod` frontend. Frontend-only releases are dispatched automatically (see "Automatic frontend releases"); content releases can be explicitly scheduled with the daily GitHub-hosted check below. It does not merge the held content migration PR9, and does not enable cross-repository automatic publishing.
 
 ## Install before first use
 
@@ -28,7 +28,11 @@ Frontend changes merged to `prod` no longer wait for a manual run (daodaoedu/dao
 - No legacy prod CD run is unfinished.
 - The live marker `content_sha`, `BLOG_PROD_PUBLISHED_CONTENT_SHA` and `BLOG_PROD_CONTENT_SHA` are identical.
 
-The last condition means automation only moves the frontend under the articles already live. A staged content release (new `BLOG_PROD_CONTENT_SHA` or approvals) is never published automatically; the sync waits, and after 60 minutes it fails with a Discord alert so an operator publishes it manually as below. A failed run for the same head is retried once, and both that sync run and a second failure fail the check with a Discord alert. All gates in this workflow still apply to the dispatched run.
+The last condition means ordinary frontend sync only moves the frontend under the articles already live. A staged content release is published only by an explicit manual invocation or a configured approved publication schedule. Ordinary sync holds pending schedules for the daily publication check; without a schedule, it retains the existing 60-minute lag alert. A failed run for the same head is retried once, and both that sync run and a second failure fail the check with a Discord alert. All gates in this workflow still apply to the dispatched run.
+
+## Scheduled content publication
+
+For the GitHub-hosted daily check (09:00 Taipei), setup, cancellation and verification, see [scheduled publication](scheduled-publication.md). No post is scheduled until its exact approved revision and offset-aware time are stored in the schedule variable.
 
 ## Invoke and verify
 
@@ -51,3 +55,4 @@ Verify the Actions run and host recovery report separately. Success requires exa
 Known deployment, public verification, incomplete HTTP reads and handled termination failures attempt to restore the captured previous image and compare all previously captured public Blog HTML and image hashes and MIME. Matching only indexes or the marker is insufficient. Recovery success does not change the failed operation into a successful publication. If recovery is not verified, preserve the rollback image holder and private host report/configuration; inspect the recorded previous image and frozen Compose before any authorized recovery attempt. Never run global Docker pruning, reset the shared Git checkout, remove Product, switch a migration PR or set `force_deploy=true` to get past a failure.
 
 The local tests and Docker checks accompanying this implementation do not prove installation or a production publication. Record first installed run, actual frontend/content identities, public readback, failure/recovery and cleanup evidence before declaring the entry operational.
+

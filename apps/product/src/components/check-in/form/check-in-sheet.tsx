@@ -6,7 +6,7 @@ import { Button, type ButtonProps } from "@daodao/ui/components/button";
 import { Form } from "@daodao/ui/components/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isBefore, startOfDay } from "date-fns";
-import { CalendarCheck, Check, ChevronDown, Eye, History, Sparkles } from "lucide-react";
+import { CalendarCheck, Check, Eye, History } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { CheckInStatus } from "@/constants/check-in-status";
@@ -65,7 +65,7 @@ export const CheckInSheetContent = ({
   const form = useForm<CheckInFormValuesType>({
     resolver: zodResolver(createCheckInFormSchema(t, locale, { isEditing })),
     defaultValues: {
-      mood: initialValues?.mood ?? (moodSelectionPosition === "after" ? "neutral" : null),
+      mood: initialValues?.mood ?? null,
       tags: initialValues?.tags ?? [],
       actionObservation: initialDescriptionAnswers.actionObservation,
       nextStep: initialDescriptionAnswers.nextStep,
@@ -75,7 +75,6 @@ export const CheckInSheetContent = ({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPreviousCheckIns, setShowPreviousCheckIns] = useState(false);
-  const [showWritingAids, setShowWritingAids] = useState(false);
   const [keptExistingImages, setKeptExistingImages] = useState<string[]>(existingImages ?? []);
 
   const onSubmit = async (values: CheckInFormValuesType) => {
@@ -144,25 +143,7 @@ export const CheckInSheetContent = ({
             <span className="sr-only">{t("tags_required_hint")}</span>
           </h3>
           <TagSelector form={form} />
-          <Button
-            type="button"
-            variant="ghost"
-            aria-expanded={showWritingAids}
-            onClick={() => setShowWritingAids((visible) => !visible)}
-            className="mb-2 h-8 gap-1.5 px-2 text-sm font-medium text-logo-cyan hover:bg-logo-cyan/10 hover:text-logo-cyan"
-          >
-            <Sparkles className="size-4" aria-hidden="true" />
-            {t("writing_aids")}
-            <ChevronDown
-              className={`size-3.5 transition-transform ${showWritingAids ? "rotate-180" : ""}`}
-              aria-hidden="true"
-            />
-          </Button>
-          {showWritingAids && (
-            <div className="mb-3 rounded-xl bg-very-light-gray/60 p-3">
-              <ReflectionQuestion />
-            </div>
-          )}
+          <ReflectionQuestion />
           <DescriptionField form={form} isEditing={isEditing} />
           <MediaUploadField
             form={form}

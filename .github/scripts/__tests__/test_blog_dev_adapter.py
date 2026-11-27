@@ -418,6 +418,103 @@ class ManagedConfigurationTests(unittest.TestCase):
         self.assertEqual(ADAPTER.NGINX.read_bytes(), b"previous healthy config")
         self.assertEqual(ADAPTER.OVERLAY.read_bytes(), self.previous_overlay)
 
+    def reviewed_change(self):
+        """Repo head moved from the saved reviewed compose to a newer reviewed one."""
+        current_base = self.root / "current-base.yaml"
+        current_base.write_bytes(b"new reviewed compose")
+        self.stack.enter_context(patch.object(ADAPTER, "BASE_COMPOSE", current_base))
+        new_digest = hashlib.sha256(b"new reviewed compose").hexdigest()
+        return new_digest, [new_digest, self.digest]
+
+    def saved_base(self):
+        return (self.root / ADAPTER.OWNED_BASE_NAME).read_bytes()
+
+    def test_reviewed_compose_change_updates_saved_base_without_nginx_change(self):
+        # Regression for daodao#584: a reviewed compose change blocked every refresh.
+        digest, history = self.reviewed_change()
+        snapshot = ADAPTER.prepare_configuration(
+            dict(self.current), b"previous healthy config"
+        )
+        ADAPTER.apply_overlay(
+            snapshot,
+            digest,
+            b"previous healthy config",
+            run=self.execute,
+            reviewed_history=history,
+        )
+        self.assertEqual(self.saved_base(), b"new reviewed compose")
+        self.assertEqual(ADAPTER.NGINX.read_bytes(), b"previous healthy config")
+        self.assertEqual(ADAPTER.OVERLAY.read_bytes(), self.previous_overlay)
+
+    def test_reviewed_compose_change_with_nginx_transition_recreates_on_new_base(self):
+        digest, history = self.reviewed_change()
+        snapshot = self.prepare()
+        seen = []
+
+        def observe(command, **kwargs):
+            if "up" in command:
+                seen.append(self.saved_base())
+            return self.execute(command, **kwargs)
+
+        ADAPTER.apply_overlay(
+            snapshot,
+            digest,
+            b"new healthy config",
+            run=observe,
+            reviewed_history=history,
+        )
+        self.assertEqual(seen, [b"new reviewed compose"])
+        self.assertEqual(ADAPTER.NGINX.read_bytes(), b"new healthy config")
+
+    def test_tampered_saved_base_outside_reviewed_history_fails_closed(self):
+        digest, history = self.reviewed_change()
+        (self.root / ADAPTER.OWNED_BASE_NAME).write_bytes(b"host edited compose")
+        for nginx in (b"previous healthy config", b"new healthy config"):
+            with self.subTest(nginx=nginx):
+                snapshot = ADAPTER.prepare_configuration(dict(self.current), nginx)
+                with self.assertRaisesRegex(ValueError, "Saved reviewed compose"):
+                    ADAPTER.apply_overlay(
+                        snapshot,
+                        digest,
+                        nginx,
+                        run=self.execute,
+                        reviewed_history=history,
+                    )
+                self.assertEqual(self.calls, [])
+                self.assertEqual(self.saved_base(), b"host edited compose")
+                self.assertEqual(ADAPTER.NGINX.read_bytes(), b"previous healthy config")
+                self.assertEqual(ADAPTER.OVERLAY.read_bytes(), self.previous_overlay)
+
+    def test_history_must_contain_the_reviewed_head(self):
+        digest, _history = self.reviewed_change()
+        snapshot = ADAPTER.prepare_configuration(
+            dict(self.current), b"previous healthy config"
+        )
+        with self.assertRaisesRegex(ValueError, "reviewed compose history"):
+            ADAPTER.apply_overlay(
+                snapshot,
+                digest,
+                b"previous healthy config",
+                run=self.execute,
+                reviewed_history=[self.digest],
+            )
+        self.assertEqual(self.saved_base(), b"reviewed compose")
+
+    def test_restore_accepts_reviewed_history_but_not_tampered_saved_base(self):
+        digest, history = self.reviewed_change()
+        snapshot = self.prepare()
+        # Failure before apply_overlay leaves the older reviewed base in place.
+        ADAPTER.restore_previous(
+            snapshot, digest, run=self.execute, reviewed_history=history
+        )
+        self.assertEqual(ADAPTER.NGINX.read_bytes(), b"previous healthy config")
+        (self.root / ADAPTER.OWNED_BASE_NAME).write_bytes(b"host edited compose")
+        with self.assertRaisesRegex(ValueError, "Saved reviewed compose"):
+            ADAPTER.restore_previous(
+                snapshot, digest, run=self.execute, reviewed_history=history
+            )
+        self.assertEqual(self.calls, [])
+
     def test_changed_preimage_is_rejected_before_syntax_or_serving_mutation(self):
         snapshot = self.prepare()
         ADAPTER.NGINX.write_bytes(b"externally updated config")
