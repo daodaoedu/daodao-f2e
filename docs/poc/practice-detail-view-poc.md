@@ -1,5 +1,7 @@
 # Practice detail view POC
 
+Latest layout follow-up: [2026-11-27 full overview verification](practice-detail-layout-verification-2026-11-27.md) adds the screenshot's inline date range, elapsed/remaining calendar days, horizontal period bar, and side-by-side execution timing for owner and visitor views. The former More Info disclosure is removed. This report includes responsive screenshots, future/ended boundaries and a fresh Chinese happy-mood API/DB regression; broader earlier journeys below remain historical evidence.
+
 Latest follow-up: [2026-11-26 browser/API verification report](practice-detail-verification-2026-11-26.md) records actual five-mood API/DB persistence, cancellation, write retry, read retry, Chinese/English and owner/real-visitor responsive navigation. It supersedes the earlier persistence-outage and unverified-journey limitations below for the explicitly tested local synthetic environment. The PR remains draft; deployed-dev compatibility and formal acceptance are separate.
 
 Engineering review reference, based on `dev` at `22d30ef8` (2026-11-26).
@@ -22,6 +24,7 @@ Current dev uses `localePrefix: "as-needed"`; Traditional Chinese is the default
 
 ## Settled behavior
 
+- The expanded overview directly includes the date range, elapsed/total days, remaining days and horizontal time progress, followed by a three-column weekly/session/execution-timing row. Time progress uses local calendar days and is independent of the API check-in progress ring. Missing dates or duration do not produce fabricated date information.
 - Check-ins default to List. Tablet and desktop show List/Bubbles controls for owner and visitor views; mobile continues using the existing list presentation.
 - Practice information starts expanded on compact screens. After collapsing, the summary shows the creator avatar (or fallback), name and action description when a creator is available. The collapse control sits inside the expanded card rather than in a separate bar.
 - Visitor preview hides practice editing, resource editing, archive/delete and owner check-in controls; it shows the creator profile and existing visitor actions. Preview context survives navigation into a check-in and back, in both list and bubble modes.

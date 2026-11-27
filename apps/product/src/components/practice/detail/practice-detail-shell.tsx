@@ -57,7 +57,6 @@ import { LottieEmoji } from "@/components/check-in/reactions/lottie-emoji";
 import { PracticeOverviewCard } from "@/components/practice";
 import { CheckInCommentGroups } from "@/components/practice/detail/check-in-comment-groups";
 import { PracticeDetailTitle } from "@/components/practice/detail/practice-detail-title";
-import { PracticeScheduleDetails } from "@/components/practice/detail/practice-schedule-details";
 import {
   BrowseActivityContent,
   type IBrowseActivityFollower,
@@ -736,7 +735,7 @@ export function PracticeDetailShell({
           <div
             id="practice-overview-card"
             className={cn(
-              "relative bg-white rounded-lg shadow-sm mb-4",
+              "relative bg-very-light-blue rounded-lg shadow-sm mb-4",
               isOverviewCollapsible && !practice.creator && "pt-10 md:pt-4",
               isOverviewCollapsible && !overviewOpenOnMobile && "hidden md:block"
             )}
@@ -763,6 +762,12 @@ export function PracticeDetailShell({
               progress={practice.progress}
               showProgress
               creator={practice.creator}
+              schedule={{
+                startDate: practice.startDate,
+                durationDays: practice.durationDays,
+                executionTiming: practice.executionTiming,
+                customTiming: practice.customTiming,
+              }}
             />
 
             <div className="px-4">
@@ -796,12 +801,6 @@ export function PracticeDetailShell({
                     {isCopying ? t("action_copying") : t("action_also_practice")}
                   </Button>
                 )}
-              <PracticeScheduleDetails
-                executionTiming={practice.executionTiming}
-                customTiming={practice.customTiming}
-                durationDays={practice.durationDays}
-                startDate={practice.startDate}
-              />
               <div className="flex flex-wrap items-center justify-between gap-2 pb-3">
                 <div className="flex items-center gap-2">
                   <div className="flex w-fit rounded-xl py-1 transition-colors hover:bg-gray-100">
