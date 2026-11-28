@@ -7,13 +7,15 @@ import { CHECK_IN_MOOD_OPTIONS, mapApiMoodToMoodType, mapMoodTypeToApiMood } fro
 vi.mock("@daodao/i18n", () => ({ useTranslations: () => (key: string) => key }));
 
 describe("historical check-in mood compatibility", () => {
-  it("counts historical bored separately from neutral instead of hiding it", () => {
+  it("charts historical bored separately from neutral with proportional segments", () => {
     const data = {
-      data: [{ mood: "bored" }, { mood: "bored" }, { mood: "neutral" }],
+      data: [{ mood: "neutral" }, { mood: "bored" }, { mood: "bored" }, { mood: "bored" }],
     } as PracticeCheckInsResponse;
     const markup = renderToStaticMarkup(<CheckInRecordCard checkInsData={data} />);
-    expect(markup).toContain('aria-label="moods.bored: 2"');
-    expect(markup).toContain('aria-label="moods.neutral: 1"');
+    expect(markup).toMatch(/width:75%.*width:25%/);
+    expect(markup).toMatch(/moods\.bored<small[^>]*> \(3\)<\/small>/);
+    expect(markup).toMatch(/moods\.neutral<small[^>]*> \(1\)<\/small>/);
+    expect(markup).not.toContain("moods.happy");
   });
 
   it("preserves existing six-value API roundtrip without adding bored to five new choices", () => {
